@@ -3,10 +3,13 @@ Title: Install R Packages from 'GitHub'
 Version: 1.0.0
 Author: Gabor Csardi
 Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
-Description: Download and install R packages stored in GitHub repositories. This package is a lightweight replacement of `devtools::install_github()`.
+Description: Download and install R packages stored in GitHub
+    repositories. This package is a lightweight replacement of
+    `devtools::install_github()`.
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/mangothecat/installgithub
 BugReports: https://github.com/mangothecat/installgithub/issues
-Suggests: 
+Suggests:
     testthat
+RoxygenNote: 5.0.1
