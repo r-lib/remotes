@@ -1,7 +1,7 @@
 Package: installgithub
 Title: Install R Packages from 'GitHub'
 Version: 1.0.0
-Author: Gabor Csardi
+Author: Gabor Csardi, Hadley Wickham
 Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
 Description: Download and install R packages stored in GitHub
     repositories. This package is a lightweight replacement of
