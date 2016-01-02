@@ -13,4 +13,5 @@ URL: https://github.com/mangothecat/install
 BugReports: https://github.com/mangothecat/install/issues
 Suggests:
     testthat
+Depends: R (>= 3.2.0)
 RoxygenNote: 5.0.1
