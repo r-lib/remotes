@@ -1,4 +1,4 @@
 library(testthat)
-library(installgithub)
+library(install)
 
-test_check("installgithub")
+test_check("install")

@@ -20,7 +20,7 @@
 #'   the \code{GITHUB_PAT} environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
 #'   hostname, for example, \code{"github.hostname.com/api/v3"}.
-#' @param ... Other arguments passed on to \code{\link{install}}.
+#' @param ... Other arguments passed on to \code{install.packages}.
 #' @details
 #' Attempting to install from a source repository that uses submodules
 #' raises a warning. Because the zipped sources provided by GitHub do not
@@ -33,27 +33,27 @@
 #' @seealso \code{\link{github_pull}}
 #' @examples
 #' \dontrun{
-#' install_github("klutometis/roxygen")
-#' install_github("wch/ggplot2")
-#' install_github(c("rstudio/httpuv", "rstudio/shiny"))
-#' install_github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
+#' github("klutometis/roxygen")
+#' github("wch/ggplot2")
+#' github(c("rstudio/httpuv", "rstudio/shiny"))
+#' github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # Update devtools to the latest version, on Linux and Mac
 #' # On Windows, this won't work - see ?build_github_devtools
-#' install_github("hadley/devtools")
+#' github("hadley/devtools")
 #'
 #' # To install from a private repo, use auth_token with a token
 #' # from https://github.com/settings/applications. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
-#' install_github("hadley/private", auth_token = "abc")
+#' github("hadley/private", auth_token = "abc")
 #'
 #' }
-install_github <- function(repo, username = NULL,
-                           ref = "master", subdir = NULL,
-                           auth_token = github_pat(),
-                           host = "api.github.com", ...) {
+github <- function(repo, username = NULL,
+                   ref = "master", subdir = NULL,
+                   auth_token = github_pat(),
+                   host = "api.github.com", ...) {
 
   remotes <- lapply(repo, github_remote, username = username, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
@@ -153,11 +153,11 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
 
 #' GitHub references
 #'
-#' Use as \code{ref} parameter to \code{\link{install_github}}.
+#' Use as \code{ref} parameter to \code{\link{github}}.
 #' Allows installing a specific pull request or the latest release.
 #'
 #' @param pull The pull request to install
-#' @seealso \code{\link{install_github}}
+#' @seealso \code{\link{github}}
 #' @rdname github_refs
 #' @export
 github_pull <- function(pull) structure(pull, class = "github_pull")

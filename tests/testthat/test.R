@@ -1,7 +1,7 @@
 
-context("installgithub")
+context("install")
 
-test_that("installgithub works", {
+test_that("install works", {
 
   expect_true(TRUE)
 

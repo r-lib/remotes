@@ -13,10 +13,10 @@ github_release()
 \item{pull}{The pull request to install}
 }
 \description{
-Use as \code{ref} parameter to \code{\link{install_github}}.
+Use as \code{ref} parameter to \code{\link{github}}.
 Allows installing a specific pull request or the latest release.
 }
 \seealso{
-\code{\link{install_github}}
+\code{\link{github}}
 }
 
