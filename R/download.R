@@ -1,5 +1,6 @@
 
-download <- function(path, url) {
+download <- function(path, url, auth) {
+  ## TODO: auth
   download.file(url, path, method = download_method())
 }
 
