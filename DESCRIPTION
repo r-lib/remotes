@@ -12,10 +12,9 @@ LazyData: true
 URL: https://github.com/mangothecat/install
 BugReports: https://github.com/mangothecat/install/issues
 Imports:
-    BiocInstaller,
-    httr,
-    jsonlite
+    httr
 Suggests:
-    testthat
+    testthat,
+    BiocInstaller
 Depends: R (>= 3.2.0)
 RoxygenNote: 5.0.1
