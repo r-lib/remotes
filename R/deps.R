@@ -43,7 +43,7 @@ dev_package_deps <- function(pkgdir, dependencies = NA,
                              type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
-  install_dev_remotes(pkgdir)
+  install_dev_remotes(pkg)
 
   dependencies <- tolower(standardise_dep(dependencies))
   dependencies <- intersect(dependencies, names(pkg))
