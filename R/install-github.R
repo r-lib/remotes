@@ -26,10 +26,9 @@
 #' raises a warning. Because the zipped sources provided by GitHub do not
 #' include submodules, this may lead to unexpected behaviour or compilation
 #' failure in source packages. In this case, cloning the repository manually
-#' using \code{\link{install_git}} with \code{args="--recursive"} may yield
+#' using \code{\link{git}} with \code{args="--recursive"} may yield
 #' better results.
 #' @export
-#' @family package installation
 #' @seealso \code{\link{github_pull}}
 #' @examples
 #' \dontrun{
