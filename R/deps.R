@@ -1,52 +1,8 @@
-#' Find all dependencies of a CRAN or dev package.
-#'
-#' Find all the dependencies of a package and determine whether they are ahead
-#' or behind CRAN. A \code{print()} method identifies mismatches (if any)
-#' between local and CRAN versions of each dependent package; an
-#' \code{update()} method installs outdated or missing packages from CRAN.
-#'
-#' @param pkg A character vector of package names. If missing, defaults to
-#'   the name of the package in the current directory.
-#' @param dependencies Which dependencies do you want to check?
-#'   Can be a character vector (selecting from "Depends", "Imports",
-#'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
-#'
-#'   \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
-#'   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-#'   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
-#'   just check this package, not its dependencies).
-#' @param quiet If \code{TRUE}, suppress output.
-#' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
-#' @param repos A character vector giving repositories to use.
-#' @param type Type of package to \code{update}.  If "both", will switch
-#'   automatically to "binary" to avoid interactive prompts during package
-#'   installation.
-#'
-#' @param object A \code{package_deps} object.
-#' @param ... Additional arguments passed to \code{\link{install.packages}}.
-#'
-#' @return
-#'
-#' A \code{data.frame} with columns:
-#'
-#' \tabular{ll}{
-#' \code{package} \tab The dependent package's name,\cr
-#' \code{installed} \tab The currently installed version,\cr
-#' \code{available} \tab The version available on CRAN,\cr
-#' \code{diff} \tab An integer denoting whether the locally installed version
-#'   of the package is newer (1), the same (0) or older (-1) than the version
-#'   currently available on CRAN.\cr
-#' }
-#'
-#' @export
-#' @examples
-#' \dontrun{
-#' package_deps("devtools")
-#' # Use update to update any out-of-date dependencies
-#' update(package_deps("devtools"))
-#' }
-package_deps <- function(pkg, dependencies = NA, repos = getOption("repos"),
+
+package_deps <- function(packages, dependencies = NA,
+                         repos = getOption("repos"),
                          type = getOption("pkgType")) {
+
   if (identical(type, "both")) {
     type <- "binary"
   }
@@ -57,7 +13,7 @@ package_deps <- function(pkg, dependencies = NA, repos = getOption("repos"),
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
   cran <- available_packages(repos, type)
 
-  deps <- sort(find_deps(pkg, cran, top_dep = dependencies))
+  deps <- sort(find_deps(packages, cran, top_dep = dependencies))
 
   # Remove base packages
   inst <- installed.packages()
@@ -82,12 +38,12 @@ package_deps <- function(pkg, dependencies = NA, repos = getOption("repos"),
   )
 }
 
-#' @export
-#' @rdname package_deps
-dev_package_deps <- function(pkg = ".", dependencies = NA,
+dev_package_deps <- function(pkgdir, dependencies = NA,
                              repos = getOption("repos"),
                              type = getOption("pkgType")) {
-  install_dev_remotes(pkg)
+
+  pkg <- load_pkg_description(pkgdir)
+  install_dev_remotes(pkgdir)
 
   dependencies <- tolower(standardise_dep(dependencies))
   dependencies <- intersect(dependencies, names(pkg))
@@ -181,36 +137,6 @@ has_dev_remotes <- function(pkg) {
 }
 
 
-#' @export
-print.package_deps <- function(x, show_ok = FALSE, ...) {
-  class(x) <- "data.frame"
-
-  ahead <- x$diff > 0L
-  behind <- x$diff < 0L
-  same_ver <- x$diff == 0L
-
-  x$diff <- NULL
-  x[] <- lapply(x, format)
-
-  if (any(behind)) {
-    cat("Needs update -----------------------------\n")
-    print(x[behind, , drop = FALSE], row.names = FALSE, right = FALSE)
-  }
-
-  if (any(ahead)) {
-    cat("Not on CRAN ----------------------------\n")
-    print(x[ahead, , drop = FALSE], row.names = FALSE, right = FALSE)
-  }
-
-  if (show_ok && any(same_ver)) {
-    cat("OK ---------------------------------------\n")
-    print(x[same_ver, , drop = FALSE], row.names = FALSE, right = FALSE)
-  }
-}
-
-#' @export
-#' @rdname package_deps
-#' @importFrom stats update
 update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead <- object$package[object$diff == 2L]
   if (length(ahead) > 0 && !quiet) {
@@ -236,7 +162,7 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
 }
 
-install_packages <- function(pkgs, repos = getOption("repos"),
+install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
                              dependencies = FALSE, quiet = NULL) {
   if (identical(type, "both"))
@@ -244,21 +170,21 @@ install_packages <- function(pkgs, repos = getOption("repos"),
   if (is.null(quiet))
     quiet <- !identical(type, "source")
 
-  message("Installing ", length(pkgs), " packages: ",
-    paste(pkgs, collapse = ", "))
-  utils::install.packages(pkgs, repos = repos, type = type, ...,
+  message("Installing ", length(packages), " packages: ",
+    paste(packages, collapse = ", "))
+  utils::install.packages(packages, repos = repos, type = type, ...,
     dependencies = dependencies, quiet = quiet)
 }
 
-find_deps <- function(pkgs, available = available.packages(), top_dep = TRUE,
-                      rec_dep = NA, include_pkgs = TRUE) {
-  if (length(pkgs) == 0 || identical(top_dep, FALSE))
+find_deps <- function(packages, available = available.packages(),
+                      top_dep = TRUE, rec_dep = NA, include_pkgs = TRUE) {
+  if (length(packages) == 0 || identical(top_dep, FALSE))
     return(character())
 
   top_dep <- standardise_dep(top_dep)
   rec_dep <- standardise_dep(rec_dep)
 
-  top <- tools::package_dependencies(pkgs, db = available, which = top_dep)
+  top <- tools::package_dependencies(packages, db = available, which = top_dep)
   top_flat <- unlist(top, use.names = FALSE)
 
   if (length(rec_dep) != 0 && length(top_flat) > 0) {
@@ -269,7 +195,7 @@ find_deps <- function(pkgs, available = available.packages(), top_dep = TRUE,
     rec_flat <- character()
   }
 
-  unique(c(if (include_pkgs) pkgs, top_flat, rec_flat))
+  unique(c(if (include_pkgs) packages, top_flat, rec_flat))
 }
 
 
@@ -287,24 +213,9 @@ standardise_dep <- function(x) {
   }
 }
 
-#' Update packages that are missing or out-of-date.
-#'
-#' Works similarly to \code{install.packages()} but doesn't install packages
-#' that are already installed, and also upgrades out dated dependencies.
-#'
-#' @param pkgs Character vector of packages to update.
-#' @inheritParams package_deps
-#' @seealso \code{\link{package_deps}} to see which packages are out of date/
-#'   missing.
-#' @export
-#' @examples
-#' \dontrun{
-#' update_packages("ggplot2")
-#' update_packages(c("plyr", "ggplot2"))
-#' }
-update_packages <- function(pkgs, dependencies = NA,
+update_packages <- function(packages, dependencies = NA,
                             repos = getOption("repos"),
                             type = getOption("pkgType")) {
-  pkgs <- package_deps(pkgs, repos = repos, type = type)
-  update(pkgs)
+  packages <- package_deps(packages, repos = repos, type = type)
+  update(packages)
 }
