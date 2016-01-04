@@ -14,8 +14,7 @@ BugReports: https://github.com/mangothecat/install/issues
 Imports:
     BiocInstaller,
     httr,
-    jsonlite,
-    withr
+    jsonlite
 Suggests:
     testthat
 Depends: R (>= 3.2.0)
