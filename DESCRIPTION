@@ -11,6 +11,11 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/mangothecat/install
 BugReports: https://github.com/mangothecat/install/issues
+Imports:
+    BiocInstaller,
+    httr,
+    jsonlite,
+    withr
 Suggests:
     testthat
 Depends: R (>= 3.2.0)
