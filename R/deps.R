@@ -137,7 +137,7 @@ has_dev_remotes <- function(pkg) {
 }
 
 
-update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
+update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead <- object$package[object$diff == 2L]
   if (length(ahead) > 0 && !quiet) {
     message("Skipping ", length(ahead), " packages not available: ",
@@ -211,11 +211,4 @@ standardise_dep <- function(x) {
   } else {
     stop("Dependencies must be a boolean or a character vector", call. = FALSE)
   }
-}
-
-update_packages <- function(packages, dependencies = NA,
-                            repos = getOption("repos"),
-                            type = getOption("pkgType")) {
-  packages <- package_deps(packages, repos = repos, type = type)
-  update(packages)
 }
