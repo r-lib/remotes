@@ -1,6 +1,6 @@
 
 #' @export
 
-install_git <- function(...) {
+git <- function(...) {
   ## TODO
 }
