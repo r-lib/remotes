@@ -1,4 +1,29 @@
 
+github_GET <- function(path, ..., pat = github_pat()) {
+  auth <- github_auth(pat)
+  req <- httr::GET("https://api.github.com/", path = path, auth, ...)
+  github_response(req)
+}
+
+github_auth <- function (token) {
+  if (is.null(token)) {
+    NULL
+  } else {
+    httr::authenticate(token, "x-oauth-basic", "basic")
+  }
+}
+
+github_response <- function (req) {
+  text <- httr::content(req, as = "text")
+  parsed <- jsonlite::fromJSON(text, simplifyVector = FALSE)
+  if (httr::status_code(req) >= 400) {
+    errors <- vapply(parsed$errors, `[[`, "message", FUN.VALUE = character(1))
+    stop(parsed$message, " (", httr::status_code(req), ")\n",
+         paste("* ", errors, collapse = "\n"), call. = FALSE)
+  }
+  parsed
+}
+
 github_commit <- function(username, repo, ref = "master") {
 
   url <- file.path("https://api.github.com",
