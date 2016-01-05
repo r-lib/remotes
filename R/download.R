@@ -1,21 +1,32 @@
 
-download <- function(path, url, auth) {
-  ## TODO: auth
-  download.file(url, path, method = download_method())
+download <- function(path, url, auth_token, quiet = TRUE) {
+
+  real_url <- url
+  if (!is.null(auth_token)) {
+    sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
+    real_url <- paste0(url, sep, "access_token=", auth_token)
+  }
+
+  status <- download.file(
+    real_url,
+    path,
+    method = download_method(),
+    quiet = quiet,
+    mode = "wb"
+  )
+
+  if (status != 0)  stop("Cannot download file from ", url, call. = FALSE)
 
   path
 }
 
 download_method <- function() {
 
-  if (.Platform$OS.type == "windows") {
-    "wininet"
-
-  } else if (isTRUE(unname(capabilities("libcurl")))) {
+  if (isTRUE(unname(capabilities("libcurl")))) {
     "libcurl"
 
-  } else if (Sys.which("wget") != "") {
-    "wget"
+  } else if (.Platform$OS.type == "windows") {
+    "wininet"
 
   } else {
     "auto"

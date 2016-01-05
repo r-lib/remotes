@@ -4,12 +4,8 @@ github_commit <- function(username, repo, ref = "master") {
   url <- file.path("https://api.github.com",
                    "repos", username, repo, "commits", ref)
 
-  pat <- github_pat()
-  auth <- if (is.null(pat)) "" else paste0("?access_code=", pat)
-  url <- paste0(url, auth)
-
   tmp <- tempfile()
-  download(tmp, url)
+  download(tmp, url, auth_token = github_pat())
 
   json_dict_get(tmp, "sha")
 }

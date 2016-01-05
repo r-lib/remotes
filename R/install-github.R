@@ -95,28 +95,34 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
   src <- paste0(src_root, "/zipball/", x$ref)
 
-  if (!is.null(x$auth_token)) {
-    auth <- httr::authenticate(
-      user = x$auth_token,
-      password = "x-oauth-basic",
-      type = "basic"
-    )
-  } else {
-    auth <- NULL
+  if (github_has_submodules(x)) {
+    warning("GitHub repo contains submodules, may not function as expected!",
+            call. = FALSE)
   }
 
-  if (github_has_remotes(x, auth))
-    warning("GitHub repo contains submodules, may not function as expected!",
-      call. = FALSE)
-
-  download(dest, src, auth)
+  download(dest, src, auth_token = x$auth_token)
 }
 
-github_has_remotes <- function(x, auth = NULL) {
+github_has_submodules <- function(x) {
   src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
   src_submodules <- paste0(src_root, "/contents/.gitmodules?ref=", x$ref)
-  response <- httr::HEAD(src_submodules, , auth)
-  identical(httr::status_code(response), 200L)
+
+  tmp <- tempfile()
+  res <- tryCatch(
+    download(tmp, src_submodules, auth_token = x$auth_token),
+    error = function(e) e
+  )
+  if (is(res, "error")) return(FALSE)
+
+  ## download() sometimes just downloads the error page, because
+  ## the libcurl backend in download.file() is broken
+  ## If the request was successful (=submodules exist), then it has an
+  ## 'sha' field.
+  sha <- tryCatch(
+    json_dict_get(tmp, "sha"),
+    error = function(e) e
+  )
+  ! is(sha, "error")
 }
 
 #' @export
