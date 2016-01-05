@@ -119,7 +119,7 @@ github_has_submodules <- function(x) {
   ## If the request was successful (=submodules exist), then it has an
   ## 'sha' field.
   sha <- tryCatch(
-    json_dict_get(tmp, "sha"),
+    fromJSONFile(tmp)$sha,
     error = function(e) e
   )
   ! is(sha, "error")

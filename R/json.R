@@ -1,74 +1,138 @@
 
-json_dict_get <- function(con, key) {
-  text <- paste(readLines(con, warn = FALSE), collapse = " ")
-  chr <- strsplit(text, "")[[1]]
+tokenize_json <- function(text) {
+  text <- paste(text, collapse = "\n")
 
-  in_string <- FALSE
-  in_topkey <- FALSE
-  escaped <- FALSE
-  level <- 0
-  keyword <- ""
-  for (i in seq_along(chr)) {
-    c <- chr[[i]]
+  ESCAPE <- '(\\\\[^u[:cntrl:]]|\\\\u[0-9a-fA-F]{4})'
+  CHAR <- '[^[:cntrl:]"\\\\]'
 
-    ## Whatever is escaped, ignore it
-    if (escaped) {
-      escaped <- FALSE
+  STRING <- paste0('"', CHAR, '*(', ESCAPE, CHAR, '*)*"')
+  NUMBER <- "-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?"
+  KEYWORD <- 'null|false|true'
+  SPACE <- '[[:space:]]+'
 
-    ## Ignore escape characters
-    } else if (c == "\\") {
-      escaped <- TRUE
+  match <- gregexpr(
+    pattern = paste0(
+      STRING, "|", NUMBER, "|", KEYWORD, "|", SPACE, "|", "."
+    ),
+    text = text,
+    perl = TRUE
+  )
 
-    ## If in a top keyword that ends, maybe got it
-    } else if (in_topkey  && c == '"') {
-      if (keyword == key) { break }
-      keyword <- ""
-      in_topkey <- FALSE
+  grep("^\\s+$", regmatches(text, match)[[1]], value = TRUE, invert = TRUE)
+}
 
-    ## Otherwise if in top keyword, collect it
-    } else if (in_topkey) {
-      keyword <- paste0(keyword, c)
+throw <- function(...) {
+  stop("JSON: ", ..., call. = FALSE)
+}
 
-    ## If in a string, and ", the string is over
-    } else if (in_string && c == '"') {
-      in_string <- FALSE
+fromJSONFile <- function(filename) {
+  fromJSON(readLines(filename, warn = FALSE))
+}
 
-    ## Otherwise ignore the string
-    } else if (in_string) {
+fromJSON <- function(text) {
 
-    ## We are not in a string
-    ## Starting a string, maybe a top key
-    } else if (c == '"') {
-      if (level == 2) in_topkey <- TRUE else in_string <- TRUE
+  tokens <- tokenize_json(text)
+  token <- NULL
+  ptr <- 1
 
-    ## We go one level deeper, proper levels are even numbers
-    } else if (c == "{" || c == "[") {
-      level <- level + 2
-
-    ## We go one level higher
-    } else if (c == "}" || c == "]") {
-      level <- level - 2
-
-    ## A top level value is considered as an odd level
-    } else if (level == 2 && c == ":") {
-      level <- level + 1
-
-    ## We are in a top-level value
-    } else if (level == 3 && c == ",") {
-      level <- level - 1
-
-    ## just ignore other stuff (whitespace, mostly, some commas)
+  read_token <- function() {
+    if (ptr <= length(tokens)) {
+      token <<- tokens[ptr]
+      ptr <<- ptr + 1
     } else {
-
+      token <<- 'EOF'
     }
   }
 
-  if (keyword != "sha") {
-    stop('Cannot get "sha" from GitHub', call. = FALSE)
+  parse_value <- function(name = "") {
+    if (token == "{") {
+      parse_object()
+    } else if (token == "[") {
+      parse_array()
+    } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
+      throw("EXPECTED value, GOT ", token)
+    } else {
+      j2r(token)
+    }
   }
 
-  ## Look for sha at position i
-  atsha <- paste(chr[i:length(chr)], collapse = "")
+  parse_object <- function() {
+    res <- structure(list(), names = character())
 
-  sub('^"\\s*:\\s*"([a-fA-F0-9]+)".*$', "\\1", atsha)
+    read_token()
+
+    ## Invariant: we are at the beginning of an element
+    while (token != "}") {
+
+      ## "key"
+      if (grepl('^".*"$', token)) {
+        key <- j2r(token)
+      } else {
+        throw("EXPECTED string GOT ", token)
+      }
+
+      ## :
+      read_token()
+      if (token != ":") { throw("EXPECTED : GOT ", token) }
+
+      ## value
+      read_token()
+      res[key] <- list(parse_value())
+
+      ## } or ,
+      read_token()
+      if (token == "}") {
+        break
+      } else if (token != ",") {
+        throw("EXPECTED , or } GOT ", token)
+      }
+      read_token()
+    }
+
+    res
+  }
+
+  parse_array <- function() {
+    res <- list()
+
+    read_token()
+
+    ## Invariant: we are at the beginning of an element
+    while (token != "]") {
+      ## value
+      res <- c(res, list(parse_value()))
+
+      ## ] or ,
+      read_token()
+      if (token == "]") {
+        break
+      } else if (token != ",") {
+        throw("EXPECTED , GOT ", token)
+      }
+      read_token()
+    }
+
+    res
+  }
+
+  read_token()
+  parse_value(tokens)
+}
+
+j2r <- function(token) {
+  if (token == "null") {
+    NULL
+  } else if (token == "true") {
+    TRUE
+  } else if (token == "false") {
+    FALSE
+  } else if (grepl('^".*"$', token)) {
+    trimq(token)
+  } else {
+    as.numeric(token)
+  }
+}
+
+trimq <- function(x) {
+  sub('^"(.*)"$', "\\1", x)
 }

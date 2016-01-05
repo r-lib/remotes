@@ -15,7 +15,7 @@ github_auth <- function (token) {
 
 github_response <- function (req) {
   text <- httr::content(req, as = "text")
-  parsed <- jsonlite::fromJSON(text, simplifyVector = FALSE)
+  parsed <- fromJSON(text)
   if (httr::status_code(req) >= 400) {
     errors <- vapply(parsed$errors, `[[`, "message", FUN.VALUE = character(1))
     stop(parsed$message, " (", httr::status_code(req), ")\n",
@@ -32,7 +32,7 @@ github_commit <- function(username, repo, ref = "master") {
   tmp <- tempfile()
   download(tmp, url, auth_token = github_pat())
 
-  json_dict_get(tmp, "sha")
+  fromJSONFile(tmp)$sha
 }
 
 #' Retrieve Github personal access token.
