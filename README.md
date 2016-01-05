@@ -4,10 +4,10 @@
 
 > Install R Packages from 'GitHub'
 
-[![Linux Build Status](https://travis-ci.org/MangoTheCat/install.svg?branch=master)](https://travis-ci.org/MangoTheCat/install)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/MangoTheCat/install?svg=true)](https://ci.appveyor.com/project/MangoTheCat/install)
-[![](http://www.r-pkg.org/badges/version/install)](http://www.r-pkg.org/pkg/install)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/install)](http://www.r-pkg.org/pkg/install)
+[![Linux Build Status](https://travis-ci.org/MangoTheCat/remotes.svg?branch=master)](https://travis-ci.org/MangoTheCat/remotes)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/MangoTheCat/remotes?svg=true)](https://ci.appveyor.com/project/MangoTheCat/remotes)
+[![](http://www.r-pkg.org/badges/version/remotes)](http://www.r-pkg.org/pkg/remotes)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/remotes)](http://www.r-pkg.org/pkg/remotes)
 [![Coverage Status](https://img.shields.io/codecov/c/github/MangoTheCat/remotes/master.svg)](https://codecov.io/github/MangoTheCat/remotes?branch=master)
 
 Download and install R packages stored in GitHub repositories.
