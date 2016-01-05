@@ -12,13 +12,13 @@
 #' @param args DEPRECATED. A character vector providing extra arguments to
 #'   pass on to git.
 #' @param ... passed on to \code{install.packages}
-#' @export
+#' @noRd
 #' @examples
 #' \dontrun{
 #' install_git("git://github.com/hadley/stringr.git")
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
-git <- function(url, subdir = NULL, branch = NULL, args = character(0),
+install_git <- function(url, subdir = NULL, branch = NULL, args = character(0),
                 ...) {
   ## TODO
 }

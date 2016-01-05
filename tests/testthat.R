@@ -1,4 +1,4 @@
 library(testthat)
-library(install)
+library(remotes)
 
-test_check("install")
+test_check("remotes")

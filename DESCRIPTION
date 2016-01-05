@@ -1,18 +1,17 @@
-Package: install
-Title: Remote R Packages Installation
+Package: remotes
+Title: R Package Installation from Remote 'GitHub' Repositories
 Version: 1.0.0
 Author: Gabor Csardi, Hadley Wickham
 Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
 Description: Download and install R packages stored in 'GitHub',
-    'BitBucket' or other 'Git' or 'SVN' repositories.
-    This package is a lightweight replacement of 'devtools::install_*()',
-    including 'devtools::install_github()'.
+    repositories. This package is a lightweight replacement of
+    'devtools::install_github()'.
 License: MIT + file LICENSE
-LazyData: true
-URL: https://github.com/mangothecat/install
-BugReports: https://github.com/mangothecat/install/issues
+URL: https://github.com/mangothecat/remotes
+BugReports: https://github.com/mangothecat/remotes/issues
 Suggests:
-    testthat,
-    BiocInstaller
+    BiocInstaller,
+    covr,
+    testthat
 Depends: R (>= 3.2.0)
 RoxygenNote: 5.0.1

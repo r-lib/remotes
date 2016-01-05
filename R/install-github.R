@@ -26,33 +26,28 @@
 #' raises a warning. Because the zipped sources provided by GitHub do not
 #' include submodules, this may lead to unexpected behaviour or compilation
 #' failure in source packages. In this case, cloning the repository manually
-#' using \code{\link{git}} with \code{args="--recursive"} may yield
-#' better results.
+#' may yield better results.
 #' @export
 #' @seealso \code{\link{github_pull}}
 #' @examples
 #' \dontrun{
-#' github("klutometis/roxygen")
-#' github("wch/ggplot2")
-#' github(c("rstudio/httpuv", "rstudio/shiny"))
-#' github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
+#' install_github("klutometis/roxygen")
+#' install_github("wch/ggplot2")
+#' install_github(c("rstudio/httpuv", "rstudio/shiny"))
+#' install_github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
 #'   "mfrasca/r-logging/pkg"))
-#'
-#' # Update devtools to the latest version, on Linux and Mac
-#' # On Windows, this won't work - see ?build_github_devtools
-#' github("hadley/devtools")
 #'
 #' # To install from a private repo, use auth_token with a token
 #' # from https://github.com/settings/applications. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
-#' github("hadley/private", auth_token = "abc")
+#' install_github("hadley/private", auth_token = "abc")
 #'
 #' }
-github <- function(repo, username = NULL,
-                   ref = "master", subdir = NULL,
-                   auth_token = github_pat(),
-                   host = "api.github.com", ...) {
+install_github <- function(repo, username = NULL,
+                           ref = "master", subdir = NULL,
+                           auth_token = github_pat(),
+                           host = "api.github.com", ...) {
 
   remotes <- lapply(repo, github_remote, username = username, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
@@ -158,11 +153,11 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
 
 #' GitHub references
 #'
-#' Use as \code{ref} parameter to \code{\link{github}}.
+#' Use as \code{ref} parameter to \code{\link{install_github}}.
 #' Allows installing a specific pull request or the latest release.
 #'
 #' @param pull The pull request to install
-#' @seealso \code{\link{github}}
+#' @seealso \code{\link{install_github}}
 #' @rdname github_refs
 #' @export
 github_pull <- function(pull) structure(pull, class = "github_pull")
