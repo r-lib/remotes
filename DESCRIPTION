@@ -12,6 +12,7 @@ BugReports: https://github.com/mangothecat/remotes/issues
 Suggests:
     BiocInstaller,
     covr,
+    pingr,
     testthat
 Depends: R (>= 3.2.0)
 RoxygenNote: 5.0.1

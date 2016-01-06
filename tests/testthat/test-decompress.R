@@ -28,7 +28,9 @@ test_that("decompress with internal unzip", {
 
     fname <- paste0("foo.", type)
     archive <- system.file(package = packageName(), "archives", fname)
+
     dec <- tempfile()
+    on.exit(unlink(dec, recursive = TRUE), add = TRUE)
 
     with_mock(
       `base::getOption` = function(x, default = NULL) {
