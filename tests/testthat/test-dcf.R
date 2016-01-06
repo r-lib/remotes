@@ -26,6 +26,8 @@ Title: Foo Bar
   DESC2 <- readChar(tmp2, nchars = file.info(tmp2)$size)
 
   ## This is a workaround for a write.dcf bug
+  ## And also windows line ending characters
+  DESC2 <- gsub("\r\n", "\n", DESC2)
   DESC2 <- gsub("\n .\n  ", "\n .\n ", DESC2)
   expect_equal(DESC, DESC2)
 })
