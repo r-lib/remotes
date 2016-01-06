@@ -15,6 +15,10 @@ system_check <- function(cmd, args = character(), quiet = FALSE, ...) {
     message()
   }
 
+  result <- suppressWarnings(
+    system(full, intern = quiet, ignore.stderr = quiet, ...)
+  )
+
   if (quiet) {
     status <- attr(result, "status") %||% 0
   } else {
