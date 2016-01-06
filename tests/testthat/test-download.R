@@ -16,6 +16,7 @@ test_that("download_method", {
 
   with_mock(
     `base::capabilities` = function(...) c(libcurl = FALSE),
+    `remotes::os_type` = function() "unix",
     expect_equal(download_method(), "auto")
   )
 

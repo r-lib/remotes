@@ -17,7 +17,7 @@ test_that("decompress various file types", {
       info = type
     )
   }
-  
+
 })
 
 test_that("decompress with internal unzip", {
@@ -52,5 +52,17 @@ test_that("decompress with internal unzip", {
       info = type
     )
   }
+
+})
+
+test_that("decompress errors on unknown file types", {
+
+  tmp <- tempfile(fileext = ".foobar")
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  cat("surprise!", file = tmp)
+  expect_error(
+    decompress(tmp, tempdir()),
+    "Don't know how to decompress"
+  )
 
 })
