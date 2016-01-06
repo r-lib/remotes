@@ -5,7 +5,10 @@ test_that("install_github", {
 
   skip_on_cran()
   skip_if_offline()
-  
+  skip_if_over_rate_limit()
+
+  Sys.unsetenv("R_TESTS")
+
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
