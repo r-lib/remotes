@@ -6,8 +6,8 @@ test_that("available_packages", {
   skip_on_cran()
 
   pkgs <- available_packages(
-    repos = getOption("repos"),
-    type = getOption("pkgType")
+    repos = c(CRAN = "http://cran.rstudio.com"),
+    type = "source"
   )
 
   expect_equal(class(pkgs), "matrix")

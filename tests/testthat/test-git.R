@@ -15,7 +15,7 @@ test_that("git_extract_sha1", {
 
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  download(tmp, url, auth_token = NULL)
+  download(tmp, url, auth_token = github_pat())
 
   expect_equal(
     git_extract_sha1(tmp),
