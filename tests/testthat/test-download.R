@@ -39,3 +39,8 @@ test_that("download", {
   expect_equal(res$args$access_token, "foobar")
 
 })
+
+test_that("os_type", {
+
+  expect_equal(os_type(), .Platform$OS.type)
+})

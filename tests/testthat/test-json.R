@@ -109,3 +109,32 @@ test_that("JSON parser, real examples", {
   expect_equal(fromJSON(inp), exp)
 
 })
+
+test_that("JSON parser, errors", {
+
+  expect_error(
+    fromJSON("[1,2,3,"),
+    "EXPECTED value GOT EOF"
+  )
+
+  expect_error(
+    fromJSON('{ 123: "foo" }'),
+    "EXPECTED string GOT 123"
+  )
+
+  expect_error(
+    fromJSON('{ "foo" "foobar" }'),
+    'EXPECTED : GOT "foobar"'
+  )
+
+  expect_error(
+    fromJSON('{ "foo": "foobar" "foo2": "foobar2" }'),
+    'EXPECTED , or } GOT "foo2"'
+  )
+
+  expect_error(
+    fromJSON('[1,2,3 4]'),
+    'EXPECTED , GOT 4'
+  )
+
+})
