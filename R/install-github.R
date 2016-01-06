@@ -117,7 +117,7 @@ github_has_submodules <- function(x) {
     fromJSONFile(tmp)$sha,
     error = function(e) e
   )
-  ! is(sha, "error")
+  ! is(sha, "error") && ! is.null(sha)
 }
 
 #' @export
