@@ -25,10 +25,14 @@ download_method <- function() {
   if (isTRUE(unname(capabilities("libcurl")))) {
     "libcurl"
 
-  } else if (.Platform$OS.type == "windows") {
+  } else if (os_type() == "windows") {
     "wininet"
 
   } else {
     "auto"
   }
+}
+
+os_type <- function() {
+  .Platform$OS.type
 }
