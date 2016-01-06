@@ -50,7 +50,7 @@ fromJSON <- function(text) {
     } else if (token == "[") {
       parse_array()
     } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
-      throw("EXPECTED value, GOT ", token)
+      throw("EXPECTED value GOT ", token)
     } else {
       j2r(token)
     }
