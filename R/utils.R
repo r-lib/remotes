@@ -9,15 +9,6 @@ trim_ws <- function(x) {
   gsub("^[[:space:]]+|[[:space:]]+$", "", x)
 }
 
-with_something <- function(set, reset = set) {
-  function(new, code) {
-    old <- set(new)
-    on.exit(reset(old))
-    force(code)
-  }
-}
-
-
 set_envvar <- function(envs, action = "replace") {
   if (length(envs) == 0) return()
 
