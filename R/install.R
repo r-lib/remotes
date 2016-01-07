@@ -3,15 +3,28 @@ install <- function(pkgdir, dependencies = NA, quiet = TRUE, ...) {
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
-  install.packages(
-    pkgdir,
-    repos = NULL,
-    quiet = quiet,
-    type = "source",
+  safe_install_packages(
+      pkgdir,
+      repos = NULL,
+      quiet = quiet,
+      type = "source",
     ...
   )
 
   invisible(TRUE)
+}
+
+safe_install_packages <- function(...) {
+
+  lib <- paste(.libPaths(), collapse = ":")
+
+  with_envvar(
+    c(R_LIBS = lib,
+      R_LIBS_USER = lib,
+      R_LIBS_SITE = lib,
+      R_PROFILE_USER = tempfile()),
+    utils::install.packages(...)
+  )
 }
 
 install_deps <- function(pkgdir, dependencies = NA,

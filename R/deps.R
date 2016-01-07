@@ -173,8 +173,15 @@ install_packages <- function(packages, repos = getOption("repos"),
 
   message("Installing ", length(packages), " packages: ",
     paste(packages, collapse = ", "))
-  utils::install.packages(packages, repos = repos, type = type, ...,
-    dependencies = dependencies, quiet = quiet)
+
+  safe_install_packages(
+    packages,
+    repos = repos,
+    type = type,
+    ...,
+    dependencies = dependencies,
+    quiet = quiet
+  )
 }
 
 find_deps <- function(packages, available = available.packages(),
