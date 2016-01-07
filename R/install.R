@@ -31,6 +31,7 @@ install_deps <- function(pkgdir, dependencies = NA,
 
   update_packages(
     packages,
+    dependencies = dependencies,
     ...,
     Ncpus = threads,
     quiet = quiet,
