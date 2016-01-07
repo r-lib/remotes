@@ -1,4 +1,3 @@
-# **UNFINISHED**
 
 # remotes
 
@@ -17,9 +16,9 @@ This R package is a lightweight replacement of
 ## Usage
 
 ```r
-remotes::intall_github("mangothecat/franc")
+remotes::install_github("mangothecat/franc")
 ```
 
 ## License
 
-MIT © Mango Solutions, Hadley Wickham
+MIT © Mango Solutions, RStudio
