@@ -184,10 +184,13 @@ github_resolve_ref.NULL <- function(x, params) {
 github_resolve_ref.github_pull <- function(x, params) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
-  response <- github_GET(path)
+  response <- tryCatch(
+    github_GET(path),
+    error = function(e) e
+  )
 
   ## Just because libcurl might download the error page...
-  if (is.null(response$head)) {
+  if (is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
          params$repo, "#", x)
   }
@@ -202,9 +205,12 @@ github_resolve_ref.github_pull <- function(x, params) {
 github_resolve_ref.github_release <- function(x, params) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
-  response <- github_GET(path)
+  response <- tryCatch(
+    github_GET(path),
+    error = function(e) e
+  )
 
-  if (!is.null(response$message)) {
+  if (is(response, "error") || !is.null(response$message)) {
     stop("Cannot find repo ", params$username, "/", params$repo, ".")
   }
 
