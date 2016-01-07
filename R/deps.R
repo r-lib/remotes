@@ -85,8 +85,9 @@ compare_versions <- function(a, b) {
   vapply(seq_along(a), function(i) compare_var(a[[i]], b[[i]]), integer(1))
 }
 
-install_dev_remotes <- function(pkg, ...) {
+install_dev_remotes <- function(pkgdir, ...) {
 
+  pkg <- load_pkg_description(pkgdir)
   if (!has_dev_remotes(pkg)) {
     return()
   }
@@ -120,7 +121,7 @@ dev_remote_type <- function(remotes = "") {
     }
     tryCatch(
       fun <- get(x = paste0("install_", tolower(type)),
-        envir = asNamespace("devtools"),
+        envir = asNamespace("remotes"),
         mode = "function",
         inherits = FALSE),
       error = function(e) {
