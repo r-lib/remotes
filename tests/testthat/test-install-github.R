@@ -62,6 +62,10 @@ test_that("github_release", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(lib)
+
   install_github(
     "gaborcsardi/falsy",
     ref = github_release(),
@@ -69,9 +73,6 @@ test_that("github_release", {
     quiet = TRUE
   )
 
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
   expect_silent(packageDescription("falsy"))
   expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
 
@@ -88,11 +89,12 @@ test_that("install_github", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  install_github("cran/falsy", lib = lib, quiet = TRUE)
-
   libpath <- .libPaths()
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
+
+  install_github("cran/falsy", lib = lib, quiet = TRUE)
+
   expect_silent(packageDescription("falsy"))
   expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
 
@@ -215,6 +217,10 @@ test_that("github_pull", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(lib)
+
   install_github(
     "gaborcsardi/pkgconfig",
     ref = github_pull(7),
@@ -222,9 +228,6 @@ test_that("github_pull", {
     quiet = TRUE
   )
 
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
   expect_silent(packageDescription("pkgconfig"))
   expect_equal(packageDescription("pkgconfig")$RemoteRepo, "pkgconfig")
 
