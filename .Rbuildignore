@@ -4,3 +4,5 @@
 ^README.md$
 ^.travis.yml$
 ^appveyor.yml$
+^install-github.R$
+^install-github.Rin$

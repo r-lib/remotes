@@ -1,0 +1,15 @@
+
+function(...) {
+
+  ## This is the code of the package, put in here by brew
+
+  <%
+  lapply(
+    sort(list.files("R", full.names = TRUE)),
+    function(x) cat(readLines(x), sep = "\n")
+  )
+  %>
+
+  install_github(...)
+
+}
