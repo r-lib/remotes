@@ -1,6 +1,47 @@
 
 context("Install from GitHub")
 
+test_that("github_resolve_ref.github_release", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_error(
+    github_resolve_ref.github_release(
+      NA,
+      list(username = "hadley", repo = "devtools")
+    ),
+    NA
+  )
+})
+
+test_that("github_release", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+  install_github(
+    "gaborcsardi/falsy",
+    ref = github_release(),
+    lib = lib,
+    quiet = TRUE
+  )
+
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(lib)
+  expect_silent(packageDescription("falsy"))
+  expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
+
+})
+
 test_that("install_github", {
 
   skip_on_cran()
@@ -81,4 +122,89 @@ test_that("remote_download.github_remote messages", {
       "Downloading GitHub repo"
     )
   )
+})
+
+test_that("github_has_submodules with broken libcurl", {
+
+  with_mock(
+    `remotes::download` = function(path, ...) {
+      cat('{ "message": "Not Found",',
+          '  "documentation_url": "https://developer.github.com/v3"',
+          '}', file = path)
+    },
+    expect_false(
+      github_has_submodules(
+        list(
+          host = "api.github.com",
+          username = "cran",
+          repo = "falsy",
+          ref = "master"
+        )
+      )
+    )
+  )
+})
+
+test_that("remote_metadata.github_remote", {
+
+  expect_equal(
+    remote_metadata.github_remote(list(sha = "foobar"))$RemoteSha,
+    "foobar"
+  )
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_equal(
+    remote_metadata.github_remote(
+      list(
+        username = "cran",
+        repo = "falsy",
+        ref = "1.0"
+      )
+    )$RemoteSha,
+    "0f39d9eb735bf16909831c0bb129063dda388375"
+  )
+
+})
+
+test_that("github_pull", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+  install_github(
+    "gaborcsardi/pkgconfig",
+    ref = github_pull(7),
+    lib = lib,
+    quiet = TRUE
+  )
+
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(lib)
+  expect_silent(packageDescription("pkgconfig"))
+  expect_equal(packageDescription("pkgconfig")$RemoteRepo, "pkgconfig")
+
+})
+
+test_that("pull request, release, alternative notation", {
+
+  expect_equal(
+    parse_git_repo("gaborcsardi/pkgconfig#7")$ref,
+    github_pull("7")
+  )
+
+  expect_equal(
+    parse_git_repo("gaborcsardi/pkgconfig@*release")$ref,
+    github_release()
+  )
+
 })
