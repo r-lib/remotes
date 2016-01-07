@@ -17,7 +17,7 @@ github_commit <- function(username, repo, ref = "master") {
   tmp <- tempfile()
   download(tmp, url, auth_token = github_pat())
 
-  fromJSONFile(tmp)$sha
+  fromJSONFile(tmp)
 }
 
 #' Retrieve Github personal access token.
