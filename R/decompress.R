@@ -2,7 +2,7 @@
 source_pkg <- function(path, subdir = NULL, before_install = NULL) {
   if (!file.info(path)$isdir) {
     bundle <- path
-    outdir <- tempfile(pattern = "devtools")
+    outdir <- tempfile(pattern = "remotes")
     dir.create(outdir)
 
     path <- decompress(path, outdir)
