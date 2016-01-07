@@ -16,6 +16,41 @@ test_that("github_resolve_ref.github_release", {
   )
 })
 
+test_that("github_resolve_ref.NULL", {
+
+  expect_equal(
+    github_resolve_ref(NULL, list()),
+    list(ref = "master")
+  )
+})
+
+test_that("github_resolve_ref.github_pull", {
+
+  expect_error(
+    github_resolve_ref(
+      github_pull("1"),
+      list(userame = "gaborcsardi", repo = "pkgconfig")
+    ),
+    "Cannot find GitHub pull request"
+  )
+})
+
+test_that("github_resolve_ref.github_release", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_error(
+    github_resolve_ref(
+      github_release(),
+      list(userame = "gaborcsardi", repo = "xxxxxxxxxx")
+    ),
+    "Cannot find repo"
+  )
+
+})
+
 test_that("github_release", {
 
   skip_on_cran()
