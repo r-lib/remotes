@@ -67,7 +67,7 @@ test_that("github_release", {
   .libPaths(lib)
 
   install_github(
-    "gaborcsardi/falsy",
+    "cran/falsy",
     ref = github_release(),
     lib = lib,
     quiet = TRUE
@@ -222,7 +222,7 @@ test_that("github_pull", {
   .libPaths(lib)
 
   install_github(
-    "gaborcsardi/pkgconfig",
+    "cran/pkgconfig",
     ref = github_pull(7),
     lib = lib,
     quiet = TRUE
