@@ -5,6 +5,7 @@ Authors@R: c(
     person("Gabor", "Csardi", , "gcsardi@mango-solutions.com", role = c("aut", "cre")),
     person("Hadley", "Wickham", role = c("aut")),
     person("Winston", "Chang", role = "aut"),
+    person("Jim", "Hester", role = "aut"),
     person("RStudio", role = "cph"),
     person("Mango Solutions", role = "cph")
     )
