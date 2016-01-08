@@ -1,4 +1,4 @@
 
 available_packages <- function(repos, type) {
-  suppressWarnings(available.packages(contrib.url(repos, type), type = type))
+  suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
 }

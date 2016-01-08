@@ -107,7 +107,7 @@ github_has_submodules <- function(x) {
     download(tmp, src_submodules, auth_token = x$auth_token),
     error = function(e) e
   )
-  if (is(res, "error")) return(FALSE)
+  if (methods::is(res, "error")) return(FALSE)
 
   ## download() sometimes just downloads the error page, because
   ## the libcurl backend in download.file() is broken
@@ -117,7 +117,7 @@ github_has_submodules <- function(x) {
     fromJSONFile(tmp)$sha,
     error = function(e) e
   )
-  ! is(sha, "error") && ! is.null(sha)
+  ! methods::is(sha, "error") && ! is.null(sha)
 }
 
 #' @export
@@ -190,7 +190,7 @@ github_resolve_ref.github_pull <- function(x, params) {
   )
 
   ## Just because libcurl might download the error page...
-  if (is(response, "error") || is.null(response$head)) {
+  if (methods::is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
          params$repo, "#", x)
   }
@@ -210,7 +210,7 @@ github_resolve_ref.github_release <- function(x, params) {
     error = function(e) e
   )
 
-  if (is(response, "error") || !is.null(response$message)) {
+  if (methods::is(response, "error") || !is.null(response$message)) {
     stop("Cannot find repo ", params$username, "/", params$repo, ".")
   }
 

@@ -16,7 +16,7 @@ package_deps <- function(packages, dependencies = NA,
   deps <- sort(find_deps(packages, cran, top_dep = dependencies))
 
   # Remove base packages
-  inst <- installed.packages()
+  inst <- utils::installed.packages()
   base <- unname(inst[inst[, "Priority"] %in% c("base", "recommended"), "Package"])
   deps <- setdiff(deps, base)
 
@@ -184,7 +184,7 @@ install_packages <- function(packages, repos = getOption("repos"),
   )
 }
 
-find_deps <- function(packages, available = available.packages(),
+find_deps <- function(packages, available = utils::available.packages(),
                       top_dep = TRUE, rec_dep = NA, include_pkgs = TRUE) {
   if (length(packages) == 0 || identical(top_dep, FALSE))
     return(character())

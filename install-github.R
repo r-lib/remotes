@@ -5,7 +5,7 @@ function(...) {
 
   
 available_packages <- function(repos, type) {
-  suppressWarnings(available.packages(contrib.url(repos, type), type = type))
+  suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
 }
 read_dcf <- function(path) {
   fields <- colnames(read.dcf(path))
@@ -743,7 +743,7 @@ add_metadata <- function(pkg_path, meta) {
   path <- file.path(pkg_path, "DESCRIPTION")
   desc <- read_dcf(path)
 
-  desc <- modifyList(desc, meta)
+  desc <- utils::modifyList(desc, meta)
 
   write_dcf(path, desc)
 }

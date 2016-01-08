@@ -16,6 +16,9 @@ Description: Download and install R packages stored in 'GitHub',
 License: MIT + file LICENSE
 URL: https://github.com/mangothecat/remotes
 BugReports: https://github.com/mangothecat/remotes/issues
+Imports:
+    methods,
+    utils
 Suggests:
     BiocInstaller,
     covr,

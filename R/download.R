@@ -7,7 +7,7 @@ download <- function(path, url, auth_token, quiet = TRUE) {
     real_url <- paste0(url, sep, "access_token=", auth_token)
   }
 
-  status <- download.file(
+  status <- utils::download.file(
     real_url,
     path,
     method = download_method(),

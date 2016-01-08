@@ -34,7 +34,7 @@ add_metadata <- function(pkg_path, meta) {
   path <- file.path(pkg_path, "DESCRIPTION")
   desc <- read_dcf(path)
 
-  desc <- modifyList(desc, meta)
+  desc <- utils::modifyList(desc, meta)
 
   write_dcf(path, desc)
 }
