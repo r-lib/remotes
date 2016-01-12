@@ -34,3 +34,25 @@ with_envvar <- function(new, code) {
 is.named <- function(x) {
   !is.null(names(x)) && all(names(x) != "")
 }
+
+pkg_installed <- function(pkg) {
+
+  if (pkg %in% loadedNamespaces()) {
+    TRUE
+  } else if (requireNamespace(pkg, quietly = TRUE)) {
+    try(unloadNamespace(pkg))
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
+with_something <- function(set, reset = set) {
+  function(new, code) {
+    old <- set(new)
+    on.exit(reset(old))
+    force(code)
+  }
+}
+
+in_dir <- with_something(setwd)

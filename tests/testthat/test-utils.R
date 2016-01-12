@@ -50,3 +50,45 @@ test_that("is_bioconductor", {
   expect_false(is_bioconductor(D))
 
 })
+
+test_that("pkg_installed", {
+
+  expect_true(pkg_installed("methods"))
+  expect_false(pkg_installed("there-is-no-such-package"))
+
+  if (pkg_installed("codetools")) {
+    tryCatch(
+      {
+        unloadNamespace("codetools")
+        expect_true(pkg_installed("codetools"))
+        expect_false("codetools" %in% loadedNamespaces())
+      },
+      error = function(e) { }
+    )
+  }
+
+})
+
+test_that("in_dir", {
+
+  tmp <- tempfile()
+  dir.create(tmp)
+
+  ## We need the basename, because of the symbolic links
+
+  wd <- getwd()
+  expect_equal(
+    basename(in_dir(tmp, getwd())),
+    basename(tmp)
+  )
+  expect_equal(getwd(), wd)
+
+  in_dir2 <- with_something(setwd)
+  wd <- getwd()
+  expect_equal(
+    basename(in_dir2(tmp, getwd())),
+    basename(tmp)
+  )
+  expect_equal(getwd(), wd)
+
+})
