@@ -55,7 +55,7 @@ git_path <- function(git_binary_name = NULL) {
   if (git_path != "") return(git_path)
 
   # On Windows, look in common locations
-  if (.Platform$OS.type == "windows") {
+  if (os_type() == "windows") {
     look_in <- c(
       "C:/Program Files/Git/bin/git.exe",
       "C:/Program Files (x86)/Git/bin/git.exe"
