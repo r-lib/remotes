@@ -13,6 +13,23 @@ Download and install R packages stored in GitHub repositories.
 This R package is a lightweight replacement of
 `devtools::install_github()`.
 
+## Installation
+
+You can install `remotes` from GitHub. If you already have a previous
+version of `remotes` installed, you can use that to install the new
+versions:
+
+```r
+remotes::install_github("mangothecat/remotes")
+```
+
+Otherwise you can call the supplied `install-github.R`
+file directly, from within R:
+
+```r
+source("https://raw.githubusercontent.com/MangoTheCat/remotes/master/install-github.R")$value("mangothecat/remotes")
+```
+
 ## Usage
 
 To install the latest version in the `master` branch from GitHub,
