@@ -263,8 +263,8 @@ test_that("type = 'both' works well", {
 test_that("update_packages", {
 
   object <- package_deps("dotenv")
+  object$diff <- 0L
   object$diff[object$package == "falsy"] <- 2L
-  object$diff[object$package == "magrittr"] <- 0L
 
   with_mock(
     `remotes::install_packages` = function(...) { },
@@ -285,6 +285,7 @@ test_that("update_packages", {
   )
 
   object$diff[object$package == "falsy"] <- 0L
+  object$diff[object$package == "magrittr"] <- NA_integer_
   object$installed[object$package == "magrittr"] <- NA_integer_
 
   with_mock(
