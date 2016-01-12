@@ -15,10 +15,73 @@ This R package is a lightweight replacement of
 
 ## Usage
 
+To install the latest version in the `master` branch from GitHub,
+you can use the `user/repo` form. Note that `user` can also be
+an organization:
+
 ```r
 remotes::install_github("mangothecat/franc")
 ```
 
+If the R package is inside a subdirectory of the root directory,
+then give this subdirectory as well:
+
+```r
+remotes::install_github("dmlc/xgboost/R-package")
+```
+
+To install a certain branch or commit or tag, append it to the
+repo name, after an `@`:
+
+```r
+remotes::install_github("gaborcsardi/pkgconfig@v2.0.0")
+```
+
+To install the latest release, append `@*release` to the repo
+name:
+
+```r
+remotes::install_github("gaborcsardi/pkgconfig@*release")
+```
+
+To install a pull request, append `#` and the id (an integer number)
+of the pull request to the repo name:
+
+```r
+remotes::install_github("mangothecat/pkgsnap#10")
+```
+
+### Dependencies
+
+Dependencies are automatically installed from CRAN. By default,
+outdated dependencies are automatically upgraded.
+
+#### Dependencies on GitHub
+
+It is also possible to install dependencies from GitHub. For this
+you need to add a `Remotes` field to the `DESCRIPTION` file.
+Its format is:
+```
+Remotes: [remote::]repo_spec, [remote::]repo_spec, ...
+```
+where `repo_spec` is any repository specification `install_github`
+can handle. If `remote::` is missing, `github::` is assumed.
+Note that currently only the `github::` remote type is supported
+by `remotes`. The [devtools](https://github.com/hadley/devtools)
+package supports more remote types.
+
+#### BioConductor packages
+
+BioConductor packages are automatically detected and their
+dependencies are installed from BioConductor. Note that you
+need to have the `BiocInstaller` package installed to
+install BioConductor packages with `remotes`.
+
+### Notes
+
+If the package has git submodules, then the installation will likely
+fail. Nevertheless, a warning is given in this case.
+
 ## License
 
-MIT © Mango Solutions, RStudio
+GPL (>= 2) © Mango Solutions, RStudio
