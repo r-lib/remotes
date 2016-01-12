@@ -16,11 +16,14 @@ test_that("install_git", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  url <- "https://github.com/cran/falsy.git"
-  install_git(url, lib = lib, quiet = TRUE)
+  url <- "https://github.com/gaborcsardi/pkgconfig.git"
+  expect_message(
+    install_git(url, lib = lib, quiet = FALSE, branch = "travis"),
+    "Downloading git repo"
+  )
 
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteUrl, url)
+  expect_silent(packageDescription("pkgconfig"))
+  expect_equal(packageDescription("pkgconfig")$RemoteUrl, url)
 
 })
 
@@ -46,9 +49,30 @@ test_that("install_git with command line git", {
   .libPaths(lib)
 
   url <- "https://github.com/cran/falsy.git"
-  install_git(url, git = "external", lib = lib, quiet = TRUE)
+  expect_message(
+    install_git(url, git = "external", lib = lib, quiet = FALSE),
+    "Downloading git repo"
+  )
 
   expect_silent(packageDescription("falsy"))
   expect_equal(packageDescription("falsy")$RemoteUrl, url)
 
+})
+
+
+test_that("remote_metadata.git2r_remote", {
+
+  r <- remote_metadata.git2r_remote(
+    list(url = "foo", subdir = "foo2", ref = "foo3")
+  )
+
+  e <- list(
+    RemoteType = "git",
+    RemoteUrl = "foo",
+    RemoteSubdir = "foo2",
+    RemoteRef = "foo3",
+    RemoteSha = NULL
+  )
+
+  expect_equal(r, e)
 })

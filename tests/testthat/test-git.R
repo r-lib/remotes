@@ -64,6 +64,7 @@ test_that("git_path", {
   with_mock(
     `base::Sys.which` = function(...) "",
     `remotes::os_type` = function() "windows",
+    `base::file.exists` = function(...) FALSE,
     expect_null(git_path())
   )
 })
