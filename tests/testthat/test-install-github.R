@@ -260,11 +260,22 @@ test_that("type = 'both' works well", {
 
 })
 
+## -2 = not installed, but available on CRAN
+## -1 = installed, but out of date
+##  0 = installed, most recent version
+##  1 = installed, version ahead of CRAN
+##  2 = package not on CRAN
+
 test_that("update_packages", {
 
-  object <- package_deps("dotenv")
-  object$diff <- 0L
-  object$diff[object$package == "falsy"] <- 2L
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", "1.0"),
+    available = c("1.0", NA, "1.0"),
+    diff = c(0L, 2L, 0L)
+  )
+  class(object) <- c("package_deps", "data.frame")
 
   with_mock(
     `remotes::install_packages` = function(...) { },
@@ -274,7 +285,14 @@ test_that("update_packages", {
     )
   )
 
-  object$diff[object$package == "falsy"] <- 1L
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.1", "1.0"),
+    available = c("1.0", "1.0", "1.0"),
+    diff = c(0L, 1L, 0L)
+  )
+  class(object) <- c("package_deps", "data.frame")
 
   with_mock(
     `remotes::install_packages` = function(...) { },
@@ -284,9 +302,14 @@ test_that("update_packages", {
     )
   )
 
-  object$diff[object$package == "falsy"] <- 0L
-  object$diff[object$package == "magrittr"] <- NA_integer_
-  object$installed[object$package == "magrittr"] <- NA_integer_
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", NA),
+    available = c("1.0", "1.1", "1.0"),
+    diff = c(0L, 2L, 0L)
+  )
+  class(object) <- c("package_deps", "data.frame")
 
   with_mock(
     `remotes::install_packages` = function(packages, ...) packages,
