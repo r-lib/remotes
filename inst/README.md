@@ -83,8 +83,8 @@ Remotes: [remote::]repo_spec, [remote::]repo_spec, ...
 ```
 where `repo_spec` is any repository specification `install_github`
 can handle. If `remote::` is missing, `github::` is assumed.
-Note that currently only the `github::` remote type is supported
-by `remotes`. The [devtools](https://github.com/hadley/devtools)
+Note that currently only the `github::` and `git::` remote types are
+supported by `remotes`. The [devtools](https://github.com/hadley/devtools)
 package supports more remote types.
 
 #### BioConductor packages
