@@ -154,7 +154,7 @@ update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   if (upgrade) {
     behind <- object$package[object$diff < 0L]
   } else {
-    behind <- object$package[is.na(object$available)]
+    behind <- object$package[is.na(object$installed)]
   }
   if (length(behind) > 0L) {
     install_packages(behind, repos = attr(object, "repos"),
