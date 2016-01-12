@@ -246,3 +246,53 @@ test_that("pull request, release, alternative notation", {
   )
 
 })
+
+test_that("type = 'both' works well", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_equal(
+    package_deps("falsy", type = "both"),
+    package_deps("falsy", type = "binary")
+  )
+
+})
+
+test_that("update_packages", {
+
+  object <- package_deps("dotenv")
+  object$diff[object$package == "falsy"] <- 2L
+  object$diff[object$package == "magrittr"] <- 0L
+
+  with_mock(
+    `remotes::install_packages` = function(...) { },
+    expect_message(
+      update_packages(object, quiet = FALSE),
+      "Skipping 1 packages? not available: falsy"
+    )
+  )
+
+  object$diff[object$package == "falsy"] <- 1L
+
+  with_mock(
+    `remotes::install_packages` = function(...) { },
+    expect_message(
+      update_packages(object, quiet = FALSE),
+      "Skipping 1 packages? ahead of CRAN: falsy"
+    )
+  )
+
+  object$diff[object$package == "falsy"] <- 0L
+  object$installed[object$package == "magrittr"] <- NA_integer_
+
+  with_mock(
+    `remotes::install_packages` = function(packages, ...) packages,
+    expect_equal(
+      update_packages(object, upgrade = FALSE),
+      "magrittr"
+    )
+  )
+
+})
