@@ -119,6 +119,8 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
   )
 }
 
+#' @importFrom utils read.delim
+
 xgit_remote_sha1 <- function(url, ref = "master") {
   refs <- git(paste("ls-remote", url, ref))
 
