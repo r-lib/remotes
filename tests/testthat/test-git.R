@@ -31,7 +31,7 @@ test_that("git not quiet", {
     `base::system` = function(...) "0",
     expect_message(
       git(args = c("arg1", "arg2"), quiet = FALSE),
-      "'/foo/git' arg1arg2"
+      "['\"]/foo/git['\"] arg1arg2"
     )
   )
 })
