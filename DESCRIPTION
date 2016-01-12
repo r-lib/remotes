@@ -13,7 +13,7 @@ Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
 Description: Download and install R packages stored in 'GitHub',
     repositories. This package is a lightweight replacement of
     'devtools::install_github()'.
-License: MIT + file LICENSE
+License: GPL (>= 2)
 URL: https://github.com/mangothecat/remotes
 BugReports: https://github.com/mangothecat/remotes/issues
 Imports:
