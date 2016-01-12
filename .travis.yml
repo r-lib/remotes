@@ -20,7 +20,7 @@ after_failure:
   - ./pkg-build.sh dump_logs
 
 after_success:
-  - if [[ ! -z "$COVERAGE" ]];then ./pkg-build.sh run_script -e 'covr::codecov()'; fi
+  - if [[ ! -z "$COVERAGE" ]];then ./pkg-build.sh install_r covr; ./pkg-build.sh run_script -e 'covr::codecov()'; fi
 
 notifications:
   email:

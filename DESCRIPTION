@@ -21,7 +21,6 @@ Imports:
     utils
 Suggests:
     BiocInstaller,
-    covr,
     git2r,
     pingr,
     testthat
