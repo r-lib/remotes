@@ -126,7 +126,7 @@ package_deps <- function(packages, dependencies = NA,
   deps <- sort(find_deps(packages, cran, top_dep = dependencies))
 
   # Remove base packages
-  inst <- installed.packages()
+  inst <- utils::installed.packages()
   base <- unname(inst[inst[, "Priority"] %in% c("base", "recommended"), "Package"])
   deps <- setdiff(deps, base)
 
@@ -173,26 +173,36 @@ dev_package_deps <- function(pkgdir, dependencies = NA,
   package_deps(deps, repos = repos, type = type)
 }
 
-compare_versions <- function(a, b) {
-  stopifnot(length(a) == length(b))
+## -2 = not installed, but available on CRAN
+## -1 = installed, but out of date
+##  0 = installed, most recent version
+##  1 = installed, version ahead of CRAN
+##  2 = package not on CRAN
 
-  compare_var <- function(x, y) {
-    if (is.na(y)) return(2L)
-    if (is.na(x)) return(-2L)
+compare_versions <- function(installed, cran) {
+  stopifnot(length(installed) == length(cran))
 
-    x <- package_version(x)
-    y <- package_version(y)
+  compare_var <- function(i, c) {
+    if (is.na(c)) return(c(notcran = 2L))
+    if (is.na(i)) return(c(notinst = -2L))
 
-    if (x < y) {
-      -1L
-    } else if (x > y) {
-      1L
+    i <- package_version(i)
+    c <- package_version(c)
+
+    if (i < c) {
+      c(outofdate = -1L)
+    } else if (i > c) {
+      c(aheadofcran = 1L)
     } else {
-      0L
+      c(equal = 0L)
     }
   }
 
-  vapply(seq_along(a), function(i) compare_var(a[[i]], b[[i]]), integer(1))
+  vapply(
+    seq_along(installed),
+    function(i) compare_var(installed[[i]], cran[[i]]),
+    integer(1)
+  )
 }
 
 install_dev_remotes <- function(pkgdir, ...) {
@@ -247,6 +257,11 @@ has_dev_remotes <- function(pkg) {
   !is.null(pkg[["remotes"]])
 }
 
+## -2 = not installed, but available on CRAN
+## -1 = installed, but out of date
+##  0 = installed, most recent version
+##  1 = installed, version ahead of CRAN
+##  2 = package not on CRAN
 
 update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead <- object$package[object$diff == 2L]
@@ -264,7 +279,7 @@ update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   if (upgrade) {
     behind <- object$package[object$diff < 0L]
   } else {
-    behind <- object$package[is.na(object$available)]
+    behind <- object$package[is.na(object$installed)]
   }
   if (length(behind) > 0L) {
     install_packages(behind, repos = attr(object, "repos"),
@@ -294,7 +309,7 @@ install_packages <- function(packages, repos = getOption("repos"),
   )
 }
 
-find_deps <- function(packages, available = available.packages(),
+find_deps <- function(packages, available = utils::available.packages(),
                       top_dep = TRUE, rec_dep = NA, include_pkgs = TRUE) {
   if (length(packages) == 0 || identical(top_dep, FALSE))
     return(character())
@@ -339,7 +354,7 @@ download <- function(path, url, auth_token, quiet = TRUE) {
     real_url <- paste0(url, sep, "access_token=", auth_token)
   }
 
-  status <- download.file(
+  status <- utils::download.file(
     real_url,
     path,
     method = download_method(),
@@ -393,6 +408,61 @@ git_extract_sha1 <- function(bundle) {
   }
 }
 
+git <- function(args, quiet = TRUE, path = ".") {
+  full <- paste0(shQuote(check_git_path()), " ", paste(args, collapse = ""))
+  if (!quiet) {
+    message(full)
+  }
+
+  result <- in_dir(path, system(full, intern = TRUE, ignore.stderr = quiet))
+
+  status <- attr(result, "status") %||% 0
+  if (!identical(as.character(status), "0")) {
+    stop("Command failed (", status, ")", call. = FALSE)
+  }
+
+  result
+}
+
+# Retrieve the current running path of the git binary.
+# @param git_binary_name The name of the binary depending on the OS.
+git_path <- function(git_binary_name = NULL) {
+  # Use user supplied path
+  if (!is.null(git_binary_name)) {
+    if (!file.exists(git_binary_name)) {
+      stop("Path ", git_binary_name, " does not exist", .call = FALSE)
+    }
+    return(git_binary_name)
+  }
+
+  # Look on path
+  git_path <- Sys.which("git")[[1]]
+  if (git_path != "") return(git_path)
+
+  # On Windows, look in common locations
+  if (os_type() == "windows") {
+    look_in <- c(
+      "C:/Program Files/Git/bin/git.exe",
+      "C:/Program Files (x86)/Git/bin/git.exe"
+    )
+    found <- file.exists(look_in)
+    if (any(found)) return(look_in[found][1])
+  }
+
+  NULL
+}
+
+check_git_path <- function(git_binary_name = NULL) {
+
+  path <- git_path(git_binary_name)
+
+  if (is.null(path)) {
+    stop("Git does not seem to be installed on your system.", call. = FALSE)
+  }
+
+  path
+}
+
 github_GET <- function(path, ..., pat = github_pat()) {
 
   url <- paste0("https://api.github.com/", path)
@@ -432,25 +502,133 @@ github_pat <- function() {
 #' Install a package from a git repository
 #'
 #' It is vectorised so you can install multiple packages with
-#' a single command. You do not need to have git installed.
+#' a single command. You do not need to have the \code{git2r} package,
+#' or an external git client installed.
 #'
 #' @param url Location of package. The url should point to a public or
 #'   private repository.
 #' @param branch Name of branch or tag to use, if not master.
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
-#' @param args DEPRECATED. A character vector providing extra arguments to
-#'   pass on to git.
+#' @param git Whether to use the \code{git2r} package, or an external
+#'   git client via system. Default is \code{git2r} if it is installed,
+#'   otherwise an external git installation.
 #' @param ... passed on to \code{install.packages}
-#' @noRd
+#' @export
 #' @examples
 #' \dontrun{
 #' install_git("git://github.com/hadley/stringr.git")
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
-install_git <- function(url, subdir = NULL, branch = NULL, args = character(0),
-                ...) {
-  ## TODO
+install_git <- function(url, subdir = NULL, branch = NULL,
+                        git = c("auto", "git2r", "external"), ...) {
+
+  git_remote <- select_git_remote(match.arg(git))
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  install_remotes(remotes, ...)
+}
+
+
+select_git_remote <- function(git) {
+  if (git == "auto") {
+    git <- if (pkg_installed("git2r")) "git2r" else "external"
+  }
+
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]]
+}
+
+
+git_remote_git2r <- function(url, subdir = NULL, branch = NULL) {
+  remote("git2r",
+    url = url,
+    subdir = subdir,
+    branch = branch
+  )
+}
+
+
+git_remote_xgit <- function(url, subdir = NULL, branch = NULL) {
+  remote("xgit",
+    url = url,
+    subdir = subdir,
+    branch = branch
+  )
+}
+
+#' @export
+remote_download.git2r_remote <- function(x, quiet = FALSE) {
+  if (!quiet) {
+    message("Downloading git repo ", x$url)
+  }
+
+  bundle <- tempfile()
+  git2r::clone(x$url, bundle, progress = FALSE)
+
+  if (!is.null(x$branch)) {
+    r <- git2r::repository(bundle)
+    git2r::checkout(r, x$branch)
+  }
+
+  bundle
+}
+
+#' @export
+remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
+  if (!is.null(bundle)) {
+    r <- git2r::repository(bundle)
+    sha <- git2r::commits(r)[[1]]@sha
+  } else {
+    sha <- NULL
+  }
+
+  list(
+    RemoteType = "git",
+    RemoteUrl = x$url,
+    RemoteSubdir = x$subdir,
+    RemoteRef = x$ref,
+    RemoteSha = sha
+  )
+}
+
+
+#' @export
+remote_download.xgit_remote <- function(x, quiet = FALSE) {
+  if (!quiet) {
+    message("Downloading git repo ", x$url)
+  }
+
+  bundle <- tempfile()
+
+  args <- c('clone', '--depth', '1', '--no-hardlinks')
+  if (!is.null(x$branch)) args <- c(args, "--branch", x$branch)
+  args <- c(args, x$args, x$url, bundle)
+  git(paste0(args, collapse = " "), quiet = quiet)
+
+  bundle
+}
+
+#' @export
+remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
+  list(
+    RemoteType = "git",
+    RemoteUrl = x$url,
+    RemoteSubdir = x$subdir,
+    RemoteRef = x$ref,
+    RemoteSha = xgit_remote_sha1(x$url),
+    RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
+  )
+}
+
+#' @importFrom utils read.delim
+
+xgit_remote_sha1 <- function(url, ref = "master") {
+  refs <- git(paste("ls-remote", url, ref))
+
+  refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
+    header = FALSE)
+  names(refs_df) <- c("sha", "ref")
+
+  refs_df$sha[1]
 }
 #' Attempts to install a package directly from GitHub.
 #'
@@ -561,7 +739,7 @@ github_has_submodules <- function(x) {
     download(tmp, src_submodules, auth_token = x$auth_token),
     error = function(e) e
   )
-  if (is(res, "error")) return(FALSE)
+  if (methods::is(res, "error")) return(FALSE)
 
   ## download() sometimes just downloads the error page, because
   ## the libcurl backend in download.file() is broken
@@ -571,7 +749,7 @@ github_has_submodules <- function(x) {
     fromJSONFile(tmp)$sha,
     error = function(e) e
   )
-  ! is(sha, "error") && ! is.null(sha)
+  ! methods::is(sha, "error") && ! is.null(sha)
 }
 
 #' @export
@@ -644,7 +822,7 @@ github_resolve_ref.github_pull <- function(x, params) {
   )
 
   ## Just because libcurl might download the error page...
-  if (is(response, "error") || is.null(response$head)) {
+  if (methods::is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
          params$repo, "#", x)
   }
@@ -664,7 +842,7 @@ github_resolve_ref.github_release <- function(x, params) {
     error = function(e) e
   )
 
-  if (is(response, "error") || !is.null(response$message)) {
+  if (methods::is(response, "error") || !is.null(response$message)) {
     stop("Cannot find repo ", params$username, "/", params$repo, ".")
   }
 
@@ -1107,6 +1285,28 @@ with_envvar <- function(new, code) {
 is.named <- function(x) {
   !is.null(names(x)) && all(names(x) != "")
 }
+
+pkg_installed <- function(pkg) {
+
+  if (pkg %in% loadedNamespaces()) {
+    TRUE
+  } else if (requireNamespace(pkg, quietly = TRUE)) {
+    try(unloadNamespace(pkg))
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
+with_something <- function(set, reset = set) {
+  function(new, code) {
+    old <- set(new)
+    on.exit(reset(old))
+    force(code)
+  }
+}
+
+in_dir <- with_something(setwd)
 
 
   install_github(...)
