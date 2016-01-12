@@ -24,7 +24,7 @@ git_extract_sha1 <- function(bundle) {
 }
 
 git <- function(args, quiet = TRUE, path = ".") {
-  full <- paste0(shQuote(git_path()), " ", paste(args, collapse = ""))
+  full <- paste0(shQuote(check_git_path()), " ", paste(args, collapse = ""))
   if (!quiet) {
     message(full)
   }
@@ -64,5 +64,16 @@ git_path <- function(git_binary_name = NULL) {
     if (any(found)) return(look_in[found][1])
   }
 
-  stop("Git does not seem to be installed on your system.", call. = FALSE)
+  NULL
+}
+
+check_git_path <- function(git_binary_name = NULL) {
+
+  path <- git_path(git_binary_name)
+
+  if (is.null(path)) {
+    stop("Git does not seem to be installed on your system.", call. = FALSE)
+  }
+
+  path
 }
