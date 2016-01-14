@@ -198,6 +198,33 @@ has_dev_remotes <- function(pkg) {
   !is.null(pkg[["remotes"]])
 }
 
+#' @export
+print.package_deps <- function(x, show_ok = FALSE, ...) {
+  class(x) <- "data.frame"
+
+  ahead <- x$diff > 0L
+  behind <- x$diff < 0L
+  same_ver <- x$diff == 0L
+
+  x$diff <- NULL
+  x[] <- lapply(x, format)
+
+  if (any(behind)) {
+    cat("Needs update -----------------------------\n")
+    print(x[behind, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+
+  if (any(ahead)) {
+    cat("Not on CRAN ----------------------------\n")
+    print(x[ahead, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+
+  if (show_ok && any(same_ver)) {
+    cat("OK ---------------------------------------\n")
+    print(x[same_ver, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+}
+
 ## -2 = not installed, but available on CRAN
 ## -1 = installed, but out of date
 ##  0 = installed, most recent version
