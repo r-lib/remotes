@@ -317,3 +317,26 @@ standardise_dep <- function(x) {
     stop("Dependencies must be a boolean or a character vector", call. = FALSE)
   }
 }
+
+#' Update packages that are missing or out-of-date.
+#'
+#' Works similarly to \code{install.packages()} but doesn't install packages
+#' that are already installed, and also upgrades out dated dependencies.
+#'
+#' @param packages Character vector of packages to update.
+#' @inheritParams package_deps
+#' @seealso \code{\link{package_deps}} to see which packages are out of date/
+#'   missing.
+#' @export
+#' @examples
+#' \dontrun{
+#' update_packages("ggplot2")
+#' update_packages(c("plyr", "ggplot2"))
+#' }
+
+update_packages <- function(packages, dependencies = NA,
+                            repos = getOption("repos"),
+                            type = getOption("pkgType")) {
+  pkgs <- package_deps(packages, repos = repos, type = type)
+  update(pkgs)
+}
