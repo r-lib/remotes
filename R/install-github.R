@@ -221,9 +221,26 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-# Parse concise git repo specification: [username/]repo[/subdir][#pull|@ref|@*release]
-# (the *release suffix represents the latest release)
-parse_git_repo <- function(path) {
+#' Parse a concise GitHub repo specification
+#'
+#' The current format is:
+#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}
+#' The \code{*release} suffix represents the latest release.
+#'
+#' @param repo Character scalar, the repo specification.
+#' @return List with members: \code{username}, \code{repo}, \code{subdir}
+#'   \code{ref}, \code{pull}, \code{release}. Members that do not
+#'   appear in the input repo specification are omitted.
+#'
+#' @export
+#' @examples
+#' parse_github_repo_spec("metacran/crandb")
+#' parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+#' parse_github_repo_spec("jimhester/covr#47")
+#' parse_github_repo_spec("hadley/dplyr@*release")
+#' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+
+parse_github_repo_spec <- function(path) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/]))?"
@@ -240,6 +257,12 @@ parse_git_repo <- function(path) {
   if (params$invalid != "")
     stop(sprintf("Invalid git repo: %s", path))
   params <- params[sapply(params, nchar) > 0]
+
+  params
+}
+
+parse_git_repo <- function(path) {
+  params <- parse_github_repo_spec(path)
 
   if (!is.null(params$pull)) {
     params$ref <- github_pull(params$pull)
