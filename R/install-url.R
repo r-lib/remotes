@@ -11,7 +11,7 @@
 #'   authentication) passed on to \code{\link[httr]{GET}}.
 #' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
-#' @family package installation
+#'
 #' @examples
 #' \dontrun{
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
