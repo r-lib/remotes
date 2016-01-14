@@ -266,7 +266,7 @@ test_that("type = 'both' works well", {
 ##  1 = installed, version ahead of CRAN
 ##  2 = package not on CRAN
 
-test_that("update_packages", {
+test_that("update.package_deps", {
 
   object <- data.frame(
     stringsAsFactors = FALSE,
@@ -280,7 +280,7 @@ test_that("update_packages", {
   with_mock(
     `remotes::install_packages` = function(...) { },
     expect_message(
-      update_packages(object, quiet = FALSE),
+      update(object, quiet = FALSE),
       "Skipping 1 packages? not available: falsy"
     )
   )
@@ -297,7 +297,7 @@ test_that("update_packages", {
   with_mock(
     `remotes::install_packages` = function(...) { },
     expect_message(
-      update_packages(object, quiet = FALSE),
+      update(object, quiet = FALSE),
       "Skipping 1 packages? ahead of CRAN: falsy"
     )
   )
@@ -314,7 +314,7 @@ test_that("update_packages", {
   with_mock(
     `remotes::install_packages` = function(packages, ...) packages,
     expect_equal(
-      update_packages(object, upgrade = FALSE),
+      update(object, upgrade = FALSE),
       "magrittr"
     )
   )

@@ -42,7 +42,7 @@ install_deps <- function(pkgdir, dependencies = NA,
     type = type
   )
 
-  update_packages(
+  update(
     packages,
     dependencies = dependencies,
     ...,

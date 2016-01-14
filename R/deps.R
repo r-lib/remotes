@@ -1,4 +1,52 @@
 
+#' Find all dependencies of a CRAN or dev package.
+#'
+#' Find all the dependencies of a package and determine whether they are ahead
+#' or behind CRAN. A \code{print()} method identifies mismatches (if any)
+#' between local and CRAN versions of each dependent package; an
+#' \code{update()} method installs outdated or missing packages from CRAN.
+#'
+#' @param pkg A character vector of package names. If missing, defaults to
+#'   the name of the package in the current directory.
+#' @param dependencies Which dependencies do you want to check?
+#'   Can be a character vector (selecting from "Depends", "Imports",
+#'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+#'
+#'   \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+#'   just check this package, not its dependencies).
+#' @param quiet If \code{TRUE}, suppress output.
+#' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
+#' @param repos A character vector giving repositories to use.
+#' @param type Type of package to \code{update}.  If "both", will switch
+#'   automatically to "binary" to avoid interactive prompts during package
+#'   installation.
+#'
+#' @param object A \code{package_deps} object.
+#' @param ... Additional arguments passed to \code{install_packages}.
+#'
+#' @return
+#'
+#' A \code{data.frame} with columns:
+#'
+#' \tabular{ll}{
+#' \code{package} \tab The dependent package's name,\cr
+#' \code{installed} \tab The currently installed version,\cr
+#' \code{available} \tab The version available on CRAN,\cr
+#' \code{diff} \tab An integer denoting whether the locally installed version
+#'   of the package is newer (1), the same (0) or older (-1) than the version
+#'   currently available on CRAN.\cr
+#' }
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' package_deps("devtools")
+#' # Use update to update any out-of-date dependencies
+#' update(package_deps("devtools"))
+#' }
+
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType")) {
@@ -37,6 +85,9 @@ package_deps <- function(packages, dependencies = NA,
     type = type
   )
 }
+
+#' @export
+#' @rdname package_deps
 
 dev_package_deps <- function(pkgdir, dependencies = NA,
                              repos = getOption("repos"),
@@ -153,7 +204,11 @@ has_dev_remotes <- function(pkg) {
 ##  1 = installed, version ahead of CRAN
 ##  2 = package not on CRAN
 
-update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
+#' @export
+#' @rdname package_deps
+#' @importFrom stats update
+
+update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead <- object$package[object$diff == 2L]
   if (length(ahead) > 0 && !quiet) {
     message("Skipping ", length(ahead), " packages not available: ",
