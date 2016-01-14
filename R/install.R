@@ -27,6 +27,14 @@ safe_install_packages <- function(...) {
   )
 }
 
+#' Install package dependencies if needed.
+#'
+#' @inheritParams package_deps
+#' @param ... additional arguments passed to \code{\link{install.packages}}.
+#' @export
+#' @examples
+#' \dontrun{install_deps(".")}
+
 install_deps <- function(pkgdir, dependencies = NA,
                          threads = getOption("Ncpus", 1),
                          repos = getOption("repos"),
