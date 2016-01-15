@@ -71,3 +71,55 @@ test_that("install_dev_remotes", {
   )
 
 })
+
+
+test_that("printing package_deps", {
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", "1.0"),
+    available = c("1.0", NA, "1.0"),
+    diff = c(0L, 2L, 0L)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  expect_output(
+    print(object),
+    "Not on CRAN.*\n.*package.*\n.*falsy.*"
+  )
+
+  expect_output(
+    print(object, show_ok = TRUE),
+    paste(
+      sep = "\n",
+      "Not on CRAN.*",
+      ".*package.*",
+      ".*falsy.*",
+      "OK.*",
+      ".*package.*",
+      " dotenv.*",
+      " magrittr"
+    )
+  )
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", NA),
+    available = c("1.0", "1.1", "1.0"),
+    diff = c(0L, -1L, -2L)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  expect_output(
+    print(object),
+    paste(
+      sep = "\n",
+      "Needs update ------.*",
+      " package .*",
+      " falsy .*",
+      " magrittr .*"
+    )
+  )
+})
