@@ -96,6 +96,8 @@ dev_package_deps <- function(pkgdir, dependencies = NA,
   pkg <- load_pkg_description(pkgdir)
   install_dev_remotes(pkgdir)
 
+  repos <- c(repos, parse_additional_repositories(pkg))
+
   dependencies <- tolower(standardise_dep(dependencies))
   dependencies <- intersect(dependencies, names(pkg))
 
@@ -303,7 +305,6 @@ find_deps <- function(packages, available = utils::available.packages(),
   unique(c(if (include_pkgs) packages, top_flat, rec_flat))
 }
 
-
 standardise_dep <- function(x) {
   if (identical(x, NA)) {
     c("Depends", "Imports", "LinkingTo")
@@ -339,4 +340,18 @@ update_packages <- function(packages, dependencies = NA,
                             type = getOption("pkgType")) {
   pkgs <- package_deps(packages, repos = repos, type = type)
   update(pkgs)
+}
+
+has_additional_repositories <- function(pkg) {
+  pkg <- as.package(pkg)
+
+  "additional_repositories" %in% names(pkg)
+}
+
+parse_additional_repositories <- function(pkg) {
+  pkg <- as.package(pkg)
+
+  if (has_additional_repositories(pkg)) {
+    strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
+  }
 }
