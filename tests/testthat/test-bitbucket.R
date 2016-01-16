@@ -21,3 +21,29 @@ test_that("", {
   expect_equal(packageDescription("showimage")$RemoteRepo, "showimage")
 
 })
+
+
+test_that("remote_download.bitbucket_remote", {
+
+  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "master")
+
+  with_mock(
+    `remotes::download` = function(...) { },
+    expect_message(
+      remote_download.bitbucket_remote(x),
+      "Downloading bitbucket repo csardigabor/pkgconfig@master"
+    )
+  )
+})
+
+test_that("remote_metadata.bitbucket_remote", {
+
+  expect_equal(
+    remote_metadata.bitbucket_remote(list(sha = "foobar"))$RemoteSha,
+    "foobar"
+  )
+
+  expect_null(
+    remote_metadata.bitbucket_remote(list())$RemoteSha
+  )
+})
