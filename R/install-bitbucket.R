@@ -20,25 +20,19 @@
 #' install_bitbucket("sulab/mygene.r@@default")
 #' install_bitbucket("dannavarro/lsr-package")
 #' }
-install_bitbucket <- function(repo, username, ref = "master", subdir = NULL,
+install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = NULL, password = NULL, ...) {
 
-  remotes <- lapply(repo, bitbucket_remote, username = username, ref = ref,
+  remotes <- lapply(repo, bitbucket_remote, ref = ref,
     subdir = subdir, auth_user = auth_user, password = password)
 
   install_remotes(remotes, ...)
 }
 
-bitbucket_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
+bitbucket_remote <- function(repo, ref = NULL, subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL) {
 
   meta <- parse_git_repo(repo)
-
-  if (is.null(meta$username)) {
-    meta$username <- username %||% stop("Unknown username.")
-    warning("Username parameter is deprecated. Please use ",
-      username, "/", repo, call. = FALSE)
-  }
 
   remote("bitbucket",
     repo = meta$repo,

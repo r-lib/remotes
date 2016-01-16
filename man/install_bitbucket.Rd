@@ -4,8 +4,8 @@
 \alias{install_bitbucket}
 \title{Install a package directly from bitbucket}
 \usage{
-install_bitbucket(repo, username, ref = "master", subdir = NULL,
-  auth_user = NULL, password = NULL, ...)
+install_bitbucket(repo, ref = "master", subdir = NULL, auth_user = NULL,
+  password = NULL, ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -13,9 +13,6 @@ install_bitbucket(repo, username, ref = "master", subdir = NULL,
 specify \code{subdir} and/or \code{ref} using the respective parameters
 (see below); if both is specified, the values in \code{repo} take
 precedence.}
-
-\item{username}{User name. Deprecated: please include username in the
-\code{repo}}
 
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
 Defaults to master.}
