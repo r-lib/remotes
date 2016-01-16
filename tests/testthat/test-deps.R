@@ -123,3 +123,25 @@ test_that("printing package_deps", {
     )
   )
 })
+
+
+test_that("update_packages", {
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", NA),
+    available = c("1.0", "1.1", "1.0"),
+    diff = c(0L, -1L, -2L)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  with_mock(
+    `remotes::package_deps` = function(...) object,
+    `remotes::update.package_deps` = function(x, ...) x$package,
+    expect_equal(
+      update_packages("dotenv"),
+      c("dotenv", "falsy", "magrittr")
+    )
+  )
+})
