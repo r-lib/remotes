@@ -9,6 +9,8 @@ install_deps(pkgdir, dependencies = NA, threads = getOption("Ncpus", 1),
   upgrade = TRUE, quiet = FALSE)
 }
 \arguments{
+\item{pkgdir}{path to a package directory.}
+
 \item{dependencies}{Which dependencies do you want to check?
   Can be a character vector (selecting from "Depends", "Imports",
    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
@@ -17,6 +19,9 @@ install_deps(pkgdir, dependencies = NA, threads = getOption("Ncpus", 1),
   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
   just check this package, not its dependencies).}
+
+\item{threads}{Number of threads to start, passed to
+\code{install.packages} as \code{Ncpus}.}
 
 \item{repos}{A character vector giving repositories to use.}
 

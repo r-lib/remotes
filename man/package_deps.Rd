@@ -15,6 +15,8 @@ dev_package_deps(pkgdir, dependencies = NA, repos = getOption("repos"),
 \method{update}{package_deps}(object, ..., quiet = FALSE, upgrade = TRUE)
 }
 \arguments{
+\item{packages}{A character vector of package names.}
+
 \item{dependencies}{Which dependencies do you want to check?
   Can be a character vector (selecting from "Depends", "Imports",
    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
@@ -30,6 +32,8 @@ dev_package_deps(pkgdir, dependencies = NA, repos = getOption("repos"),
 automatically to "binary" to avoid interactive prompts during package
 installation.}
 
+\item{pkgdir}{path to a package directory.}
+
 \item{object}{A \code{package_deps} object.}
 
 \item{...}{Additional arguments passed to \code{install_packages}.}
@@ -37,9 +41,6 @@ installation.}
 \item{quiet}{If \code{TRUE}, suppress output.}
 
 \item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
-
-\item{pkg}{A character vector of package names. If missing, defaults to
-the name of the package in the current directory.}
 }
 \value{
 A \code{data.frame} with columns:

@@ -6,8 +6,8 @@
 #' between local and CRAN versions of each dependent package; an
 #' \code{update()} method installs outdated or missing packages from CRAN.
 #'
-#' @param pkg A character vector of package names. If missing, defaults to
-#'   the name of the package in the current directory.
+#' @param packages A character vector of package names.
+#' @param pkgdir path to a package directory.
 #' @param dependencies Which dependencies do you want to check?
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.

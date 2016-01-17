@@ -30,6 +30,8 @@ safe_install_packages <- function(...) {
 #' Install package dependencies if needed.
 #'
 #' @inheritParams package_deps
+#' @param threads Number of threads to start, passed to
+#'   \code{install.packages} as \code{Ncpus}.
 #' @param ... additional arguments passed to \code{\link{install.packages}}.
 #' @export
 #' @examples
