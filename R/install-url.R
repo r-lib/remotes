@@ -7,8 +7,6 @@
 #' @param url location of package on internet. The url should point to a
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
-#' @param config additional configuration argument (e.g. proxy,
-#'   authentication) passed on to \code{\link[httr]{GET}}.
 #' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
@@ -17,16 +15,15 @@
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
 #' }
 
-install_url <- function(url, subdir = NULL, config = list(), ...) {
-  remotes <- lapply(url, url_remote, subdir = subdir, config = config)
+install_url <- function(url, subdir = NULL, ...) {
+  remotes <- lapply(url, url_remote, subdir = subdir)
   install_remotes(remotes, ...)
 }
 
-url_remote <- function(url, subdir = NULL, config = list()) {
+url_remote <- function(url, subdir = NULL) {
   remote("url",
     url = url,
-    subdir = subdir,
-    config = config
+    subdir = subdir
   )
 }
 
@@ -40,7 +37,7 @@ remote_download.url_remote <- function(x, quiet = FALSE) {
   ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
 
   bundle <- tempfile(fileext = paste0(".", ext))
-  download(bundle, x$url, x$config)
+  download(bundle, x$url)
 }
 
 #' @export

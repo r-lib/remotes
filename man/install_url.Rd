@@ -4,16 +4,13 @@
 \alias{install_url}
 \title{Install a package from a url}
 \usage{
-install_url(url, subdir = NULL, config = list(), ...)
+install_url(url, subdir = NULL, ...)
 }
 \arguments{
 \item{url}{location of package on internet. The url should point to a
 zip file, a tar file or a bzipped/gzipped tar file.}
 
 \item{subdir}{subdirectory within url bundle that contains the R package.}
-
-\item{config}{additional configuration argument (e.g. proxy,
-authentication) passed on to \code{\link[httr]{GET}}.}
 
 \item{...}{Other arguments passed on to \code{install.packages}.}
 }
