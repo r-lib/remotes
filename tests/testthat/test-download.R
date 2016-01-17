@@ -44,3 +44,18 @@ test_that("os_type", {
 
   expect_equal(os_type(), .Platform$OS.type)
 })
+
+test_that("download basic auth", {
+
+  with_mock(
+    `utils::download.file` = function(url, ...) { message(url); 0 },
+    expect_message(
+      download(
+        "http://foo.bar.com",
+        tempfile(),
+        basic_auth = list(user = "user", password = "password")
+      ),
+      "http://user:password@foo.bar.com"
+    )
+  )
+})
