@@ -108,7 +108,7 @@ svn_path <- function(svn_binary_name = NULL) {
   if (svn_path != "") return(svn_path)
 
   # On Windows, look in common locations
-  if (.Platform$OS.type == "windows") {
+  if (os_type() == "windows") {
     look_in <- c(
       "C:/Program Files/Svn/bin/svn.exe",
       "C:/Program Files (x86)/Svn/bin/svn.exe"
