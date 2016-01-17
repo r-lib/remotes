@@ -1,5 +1,5 @@
 Package: remotes
-Title: R Package Installation from Remote 'GitHub' Repositories
+Title: R Package Installation from Remote Repositories, Including 'GitHub'
 Version: 1.0.0
 Authors@R: c(
     person("Gabor", "Csardi", , "gcsardi@mango-solutions.com", role = c("aut", "cre")),
@@ -11,8 +11,9 @@ Authors@R: c(
     )
 Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
 Description: Download and install R packages stored in 'GitHub',
-    repositories. This package is a lightweight replacement of
-    'devtools::install_github()'.
+    'BitBucket', or plain 'subversion' or 'git' repositories. This package
+    is a lightweight replacement of the 'install_*' functions in 'devtools'.
+    Indeed most of the code was copied over from 'devtools'.
 License: GPL (>= 2)
 URL: https://github.com/mangothecat/remotes
 BugReports: https://github.com/mangothecat/remotes/issues
