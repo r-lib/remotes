@@ -7,6 +7,8 @@ test_that("installing bioc packages", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
+  Sys.unsetenv("R_TESTS")
+
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
