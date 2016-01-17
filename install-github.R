@@ -116,8 +116,8 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
 #' between local and CRAN versions of each dependent package; an
 #' \code{update()} method installs outdated or missing packages from CRAN.
 #'
-#' @param pkg A character vector of package names. If missing, defaults to
-#'   the name of the package in the current directory.
+#' @param packages A character vector of package names.
+#' @param pkgdir path to a package directory.
 #' @param dependencies Which dependencies do you want to check?
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
@@ -205,6 +205,8 @@ dev_package_deps <- function(pkgdir, dependencies = NA,
 
   pkg <- load_pkg_description(pkgdir)
   install_dev_remotes(pkgdir)
+
+  repos <- c(repos, parse_additional_repositories(pkg))
 
   dependencies <- tolower(standardise_dep(dependencies))
   dependencies <- intersect(dependencies, names(pkg))
@@ -413,7 +415,6 @@ find_deps <- function(packages, available = utils::available.packages(),
   unique(c(if (include_pkgs) packages, top_flat, rec_flat))
 }
 
-
 standardise_dep <- function(x) {
   if (identical(x, NA)) {
     c("Depends", "Imports", "LinkingTo")
@@ -449,6 +450,16 @@ update_packages <- function(packages, dependencies = NA,
                             type = getOption("pkgType")) {
   pkgs <- package_deps(packages, repos = repos, type = type)
   update(pkgs)
+}
+
+has_additional_repositories <- function(pkg) {
+  "additional_repositories" %in% names(pkg)
+}
+
+parse_additional_repositories <- function(pkg) {
+  if (has_additional_repositories(pkg)) {
+    strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
+  }
 }
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
@@ -624,7 +635,7 @@ github_pat <- function() {
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
-#'   \url{https://confluence.atlassian.com/display/BITBUCKET/Use+the+Bitbucket+REST+APIs}
+#'   \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
 #'
 #' @export
 #' @examples
@@ -1076,7 +1087,7 @@ github_resolve_ref.github_release <- function(x, params) {
 #' parse_github_repo_spec("hadley/dplyr@*release")
 #' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
 
-parse_github_repo_spec <- function(path) {
+parse_github_repo_spec <- function(repo) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/]))?"
@@ -1089,16 +1100,16 @@ parse_github_repo_spec <- function(path) {
 
   param_names <- c("username", "repo", "subdir", "ref", "pull", "release", "invalid")
   replace <- stats::setNames(sprintf("\\%d", seq_along(param_names)), param_names)
-  params <- lapply(replace, function(r) gsub(github_rx, r, path, perl = TRUE))
+  params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
   if (params$invalid != "")
-    stop(sprintf("Invalid git repo: %s", path))
+    stop(sprintf("Invalid git repo: %s", repo))
   params <- params[sapply(params, nchar) > 0]
 
   params
 }
 
-parse_git_repo <- function(path) {
-  params <- parse_github_repo_spec(path)
+parse_git_repo <- function(repo) {
+  params <- parse_github_repo_spec(repo)
 
   if (!is.null(params$pull)) {
     params$ref <- github_pull(params$pull)
@@ -1238,7 +1249,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #    svn.
 #' @param revision svn revision, if omitted updates to latest
 #' @param branch Name of branch or tag to use, if not trunk.
-#' @param ... Other arguments passed on to \code{\link{install}}
+#' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
 #' @examples
@@ -1351,8 +1362,6 @@ svn_path <- function(svn_binary_name = NULL) {
 #' @param url location of package on internet. The url should point to a
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
-#' @param config additional configuration argument (e.g. proxy,
-#'   authentication) passed on to \code{\link[httr]{GET}}.
 #' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
@@ -1361,16 +1370,15 @@ svn_path <- function(svn_binary_name = NULL) {
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
 #' }
 
-install_url <- function(url, subdir = NULL, config = list(), ...) {
-  remotes <- lapply(url, url_remote, subdir = subdir, config = config)
+install_url <- function(url, subdir = NULL, ...) {
+  remotes <- lapply(url, url_remote, subdir = subdir)
   install_remotes(remotes, ...)
 }
 
-url_remote <- function(url, subdir = NULL, config = list()) {
+url_remote <- function(url, subdir = NULL) {
   remote("url",
     url = url,
-    subdir = subdir,
-    config = config
+    subdir = subdir
   )
 }
 
@@ -1384,7 +1392,7 @@ remote_download.url_remote <- function(x, quiet = FALSE) {
   ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
 
   bundle <- tempfile(fileext = paste0(".", ext))
-  download(bundle, x$url, x$config)
+  download(bundle, x$url)
 }
 
 #' @export
@@ -1400,18 +1408,21 @@ remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL) {
 #'
 #' If you are installing an package that contains compiled code, you will
 #' need to have an R development environment installed.  You can check
-#' if you do by running \code{\link{has_devel}}.
+#' if you do by running \code{devtools::has_devel} (you need the
+#' \code{devtools} package for this).
 #'
 #' @export
 #' @family package installation
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most
 #'   recent version of the package, this function simply calls
-#'   \code{\link{install}}. Otherwise, it looks at the list of
+#'   \code{install.packages}. Otherwise, it looks at the list of
 #'   archived source tarballs and tries to install an older version instead.
-#' @param ... Other arguments passed on to \code{\link{install}}.
+#' @param ... Other arguments passed on to \code{install.packages}.
 #' @inheritParams utils::install.packages
 #' @author Jeremy Stephens
+#' @importFrom utils available.packages contrib.url install.packages
+
 install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
 
   contriburl <- contrib.url(repos, type)
@@ -1429,7 +1440,7 @@ install_version <- function(package, version = NULL, repos = getOption("repos"),
 
   if (is.null(version)) {
     # Grab the latest one: only happens if pulled from CRAN
-    package.path <- info[length(info)]
+    package.path <- row.names(info)[nrow(info)]
   } else {
     package.path <- paste(package, "/", package, "_", version, ".tar.gz",
       sep = "")
@@ -1498,6 +1509,8 @@ safe_install_packages <- function(...) {
 #' Install package dependencies if needed.
 #'
 #' @inheritParams package_deps
+#' @param threads Number of threads to start, passed to
+#'   \code{install.packages} as \code{Ncpus}.
 #' @param ... additional arguments passed to \code{\link{install.packages}}.
 #' @export
 #' @examples
