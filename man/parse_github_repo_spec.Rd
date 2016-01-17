@@ -4,7 +4,7 @@
 \alias{parse_github_repo_spec}
 \title{Parse a concise GitHub repo specification}
 \usage{
-parse_github_repo_spec(path)
+parse_github_repo_spec(repo)
 }
 \arguments{
 \item{repo}{Character scalar, the repo specification.}

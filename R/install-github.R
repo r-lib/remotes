@@ -240,7 +240,7 @@ github_resolve_ref.github_release <- function(x, params) {
 #' parse_github_repo_spec("hadley/dplyr@*release")
 #' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
 
-parse_github_repo_spec <- function(path) {
+parse_github_repo_spec <- function(repo) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/]))?"
@@ -253,16 +253,16 @@ parse_github_repo_spec <- function(path) {
 
   param_names <- c("username", "repo", "subdir", "ref", "pull", "release", "invalid")
   replace <- stats::setNames(sprintf("\\%d", seq_along(param_names)), param_names)
-  params <- lapply(replace, function(r) gsub(github_rx, r, path, perl = TRUE))
+  params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
   if (params$invalid != "")
-    stop(sprintf("Invalid git repo: %s", path))
+    stop(sprintf("Invalid git repo: %s", repo))
   params <- params[sapply(params, nchar) > 0]
 
   params
 }
 
-parse_git_repo <- function(path) {
-  params <- parse_github_repo_spec(path)
+parse_git_repo <- function(repo) {
+  params <- parse_github_repo_spec(repo)
 
   if (!is.null(params$pull)) {
     params$ref <- github_pull(params$pull)
