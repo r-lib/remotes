@@ -77,3 +77,23 @@ test_that("bitbucket passwords", {
   expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
 
 })
+
+
+test_that("more bitbucket password", {
+
+  x <- list(
+    username = "username",
+    repo = "repo",
+    ref = "master",
+    auth_user = "user",
+    password = "pass"
+  )
+
+  with_mock(
+    `remotes::download` = function(dest, src, basic_auth) basic_auth,
+    expect_equal(
+      remote_download.bitbucket_remote(x),
+      list(user = "user", password = "pass")
+    )
+  )
+})
