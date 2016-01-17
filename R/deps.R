@@ -343,14 +343,10 @@ update_packages <- function(packages, dependencies = NA,
 }
 
 has_additional_repositories <- function(pkg) {
-  pkg <- as.package(pkg)
-
   "additional_repositories" %in% names(pkg)
 }
 
 parse_additional_repositories <- function(pkg) {
-  pkg <- as.package(pkg)
-
   if (has_additional_repositories(pkg)) {
     strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
   }
