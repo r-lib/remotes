@@ -120,3 +120,26 @@ test_that("downloading a wrong SVN revision", {
   )
 })
 
+
+test_that("svn_path", {
+
+  tmp <- tempfile()
+  expect_error(
+    svn_path(tmp),
+    "does not exist"
+  )
+
+  cat("Hello", file = tmp)
+  expect_equal(svn_path(tmp), tmp)
+
+  with_mock(
+    `base::Sys.which` = function(...) "",
+    `remotes::os_type` = function() "windows",
+    `base::file.exists` = function(...) FALSE,
+    expect_error(
+      svn_path(),
+      "SVN does not seem to be installed on your system"
+    )
+  )
+
+})
