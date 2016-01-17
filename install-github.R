@@ -109,6 +109,54 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
   system_check(unzip, args, quiet = TRUE)
 }
 
+#' Find all dependencies of a CRAN or dev package.
+#'
+#' Find all the dependencies of a package and determine whether they are ahead
+#' or behind CRAN. A \code{print()} method identifies mismatches (if any)
+#' between local and CRAN versions of each dependent package; an
+#' \code{update()} method installs outdated or missing packages from CRAN.
+#'
+#' @param pkg A character vector of package names. If missing, defaults to
+#'   the name of the package in the current directory.
+#' @param dependencies Which dependencies do you want to check?
+#'   Can be a character vector (selecting from "Depends", "Imports",
+#'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+#'
+#'   \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+#'   just check this package, not its dependencies).
+#' @param quiet If \code{TRUE}, suppress output.
+#' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
+#' @param repos A character vector giving repositories to use.
+#' @param type Type of package to \code{update}.  If "both", will switch
+#'   automatically to "binary" to avoid interactive prompts during package
+#'   installation.
+#'
+#' @param object A \code{package_deps} object.
+#' @param ... Additional arguments passed to \code{install_packages}.
+#'
+#' @return
+#'
+#' A \code{data.frame} with columns:
+#'
+#' \tabular{ll}{
+#' \code{package} \tab The dependent package's name,\cr
+#' \code{installed} \tab The currently installed version,\cr
+#' \code{available} \tab The version available on CRAN,\cr
+#' \code{diff} \tab An integer denoting whether the locally installed version
+#'   of the package is newer (1), the same (0) or older (-1) than the version
+#'   currently available on CRAN.\cr
+#' }
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' package_deps("devtools")
+#' # Use update to update any out-of-date dependencies
+#' update(package_deps("devtools"))
+#' }
+
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType")) {
@@ -147,6 +195,9 @@ package_deps <- function(packages, dependencies = NA,
     type = type
   )
 }
+
+#' @export
+#' @rdname package_deps
 
 dev_package_deps <- function(pkgdir, dependencies = NA,
                              repos = getOption("repos"),
@@ -257,13 +308,44 @@ has_dev_remotes <- function(pkg) {
   !is.null(pkg[["remotes"]])
 }
 
+#' @export
+print.package_deps <- function(x, show_ok = FALSE, ...) {
+  class(x) <- "data.frame"
+
+  ahead <- x$diff > 0L
+  behind <- x$diff < 0L
+  same_ver <- x$diff == 0L
+
+  x$diff <- NULL
+  x[] <- lapply(x, format)
+
+  if (any(behind)) {
+    cat("Needs update -----------------------------\n")
+    print(x[behind, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+
+  if (any(ahead)) {
+    cat("Not on CRAN ----------------------------\n")
+    print(x[ahead, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+
+  if (show_ok && any(same_ver)) {
+    cat("OK ---------------------------------------\n")
+    print(x[same_ver, , drop = FALSE], row.names = FALSE, right = FALSE)
+  }
+}
+
 ## -2 = not installed, but available on CRAN
 ## -1 = installed, but out of date
 ##  0 = installed, most recent version
 ##  1 = installed, version ahead of CRAN
 ##  2 = package not on CRAN
 
-update_packages <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
+#' @export
+#' @rdname package_deps
+#' @importFrom stats update
+
+update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead <- object$package[object$diff == 2L]
   if (length(ahead) > 0 && !quiet) {
     message("Skipping ", length(ahead), " packages not available: ",
@@ -346,9 +428,39 @@ standardise_dep <- function(x) {
   }
 }
 
-download <- function(path, url, auth_token, quiet = TRUE) {
+#' Update packages that are missing or out-of-date.
+#'
+#' Works similarly to \code{install.packages()} but doesn't install packages
+#' that are already installed, and also upgrades out dated dependencies.
+#'
+#' @param packages Character vector of packages to update.
+#' @inheritParams package_deps
+#' @seealso \code{\link{package_deps}} to see which packages are out of date/
+#'   missing.
+#' @export
+#' @examples
+#' \dontrun{
+#' update_packages("ggplot2")
+#' update_packages(c("plyr", "ggplot2"))
+#' }
+
+update_packages <- function(packages, dependencies = NA,
+                            repos = getOption("repos"),
+                            type = getOption("pkgType")) {
+  pkgs <- package_deps(packages, repos = repos, type = type)
+  update(pkgs)
+}
+
+download <- function(path, url, auth_token = NULL, basic_auth = NULL,
+                     quiet = TRUE) {
 
   real_url <- url
+
+  if (!is.null(basic_auth)) {
+    str <- paste0("://", basic_auth$user, ":", basic_auth$password, "@")
+    real_url <- sub("://", str, url)
+  }
+
   if (!is.null(auth_token)) {
     sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
     real_url <- paste0(url, sep, "access_token=", auth_token)
@@ -497,6 +609,98 @@ github_pat <- function() {
 
   message("Using github PAT from envvar GITHUB_PAT")
   pat
+}
+
+#' Install a package directly from bitbucket
+#'
+#' This function is vectorised so you can install multiple packages in
+#' a single command.
+#'
+#' @inheritParams install_github
+#' @param auth_user your account username if you're attempting to install
+#'   a package hosted in a private repository (and your username is different
+#'   to \code{username})
+#' @param password your password
+#' @param ref Desired git reference; could be a commit, tag, or branch name.
+#'   Defaults to master.
+#' @seealso Bitbucket API docs:
+#'   \url{https://confluence.atlassian.com/display/BITBUCKET/Use+the+Bitbucket+REST+APIs}
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' install_bitbucket("sulab/mygene.r@@default")
+#' install_bitbucket("dannavarro/lsr-package")
+#' }
+install_bitbucket <- function(repo, ref = "master", subdir = NULL,
+                              auth_user = NULL, password = NULL, ...) {
+
+  remotes <- lapply(repo, bitbucket_remote, ref = ref,
+    subdir = subdir, auth_user = auth_user, password = password)
+
+  install_remotes(remotes, ...)
+}
+
+bitbucket_remote <- function(repo, ref = NULL, subdir = NULL,
+                              auth_user = NULL, password = NULL, sha = NULL) {
+
+  meta <- parse_git_repo(repo)
+
+  remote("bitbucket",
+    repo = meta$repo,
+    subdir = meta$subdir %||% subdir,
+    username = meta$username,
+    ref = meta$ref %||% ref,
+    sha = sha,
+    auth_user = auth_user,
+    password = password
+  )
+}
+
+#' @export
+remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
+  if (!quiet) {
+    message("Downloading bitbucket repo ", x$username, "/", x$repo, "@", x$ref)
+  }
+
+  dest <- tempfile(fileext = paste0(".zip"))
+  src <- paste("https://bitbucket.org/", x$username, "/", tolower(x$repo), "/get/",
+    x$ref, ".zip", sep = "")
+
+  if (!is.null(x$password)) {
+    auth <- list(
+      user = x$auth_user %||% x$username,
+      password = x$password
+    )
+  } else {
+    auth <- NULL
+  }
+
+  download(dest, src, basic_auth = auth)
+}
+
+#' @export
+remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
+  # Determine sha as efficiently as possible
+  if (!is.null(x$sha)) {
+    # Might be cached already (because re-installing)
+    sha <- x$sha
+  } else if (!is.null(bundle)) {
+    # Might be able to get from zip archive
+    sha <- git_extract_sha1(bundle)
+  } else {
+    # Don't know
+    sha <- NULL
+  }
+
+  list(
+    RemoteType = "bitbucket",
+    RemoteRepo = x$repo,
+    RemoteUsername = x$username,
+    RemoteRef = x$ref,
+    RemoteSha = sha,
+    RemoteSubdir = x$subdir
+  )
 }
 
 #' Install a package from a git repository
@@ -853,9 +1057,26 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-# Parse concise git repo specification: [username/]repo[/subdir][#pull|@ref|@*release]
-# (the *release suffix represents the latest release)
-parse_git_repo <- function(path) {
+#' Parse a concise GitHub repo specification
+#'
+#' The current format is:
+#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}
+#' The \code{*release} suffix represents the latest release.
+#'
+#' @param repo Character scalar, the repo specification.
+#' @return List with members: \code{username}, \code{repo}, \code{subdir}
+#'   \code{ref}, \code{pull}, \code{release}. Members that do not
+#'   appear in the input repo specification are omitted.
+#'
+#' @export
+#' @examples
+#' parse_github_repo_spec("metacran/crandb")
+#' parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+#' parse_github_repo_spec("jimhester/covr#47")
+#' parse_github_repo_spec("hadley/dplyr@*release")
+#' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+
+parse_github_repo_spec <- function(path) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/]))?"
@@ -873,6 +1094,12 @@ parse_git_repo <- function(path) {
     stop(sprintf("Invalid git repo: %s", path))
   params <- params[sapply(params, nchar) > 0]
 
+  params
+}
+
+parse_git_repo <- function(path) {
+  params <- parse_github_repo_spec(path)
+
   if (!is.null(params$pull)) {
     params$ref <- github_pull(params$pull)
     params$pull <- NULL
@@ -884,6 +1111,55 @@ parse_git_repo <- function(path) {
   }
 
   params
+}
+
+#' Install a package from a local file
+#'
+#' This function is vectorised so you can install multiple packages in
+#' a single command.
+#'
+#' @param path path to local directory, or compressed file (tar, zip, tar.gz
+#'   tar.bz2, tgz2 or tbz)
+#' @inheritParams install_url
+#' @export
+#' @examples
+#' \dontrun{
+#' dir <- tempfile()
+#' dir.create(dir)
+#' pkg <- download.packages("testthat", dir, type = "source")
+#' install_local(pkg[, 2])
+#' }
+
+install_local <- function(path, subdir = NULL, ...) {
+  remotes <- lapply(path, local_remote, subdir = subdir)
+  install_remotes(remotes, ...)
+}
+
+local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0)) {
+  remote("local",
+    path = path,
+    subdir = subdir
+  )
+}
+
+#' @export
+remote_download.local_remote <- function(x, quiet = FALSE) {
+  # Already downloaded - just need to copy to tempdir()
+  bundle <- tempfile()
+  dir.create(bundle)
+  file.copy(x$path, bundle, recursive = TRUE)
+
+  # file.copy() creates directory inside of bundle
+  dir(bundle, full.names = TRUE)[1]
+}
+
+#' @export
+remote_metadata.local_remote <- function(x, bundle = NULL, source = NULL) {
+  list(
+    RemoteType = "local",
+    RemoteUrl = x$path,
+    RemoteSubdir = x$subdir
+  )
 }
 #' Install a remote package.
 #'
@@ -945,6 +1221,7 @@ is.remote <- function(x) inherits(x, "remote")
 
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
 remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")
+
 #' Install a package from a SVN repository
 #'
 #' This function requires \code{svn} to be installed on your system in order to
@@ -962,16 +1239,232 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #' @param revision svn revision, if omitted updates to latest
 #' @param branch Name of branch or tag to use, if not trunk.
 #' @param ... Other arguments passed on to \code{\link{install}}
-#' @noRd
-#' @family package installation
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' install_svn("https://github.com/hadley/stringr")
 #' install_svn("https://github.com/hadley/httr", branch = "oauth")
 #'}
 install_svn <- function(url, subdir = NULL, branch = NULL, args = character(0),
-                        ..., revision = NULL) {
-  ## TODO
+  ..., revision = NULL) {
+
+  remotes <- lapply(url, svn_remote, svn_subdir = subdir, branch = branch,
+    revision = revision, args = args)
+
+  install_remotes(remotes, ...)
+}
+
+svn_remote <- function(url, svn_subdir = NULL, branch = NULL, revision = revision,
+  args = character(0)) {
+  remote("svn",
+    url = url,
+    svn_subdir = svn_subdir,
+    branch = branch,
+    revision = revision,
+    args = args
+  )
+}
+
+#' @export
+remote_download.svn_remote <- function(x, quiet = FALSE) {
+  if (!quiet) {
+    message("Downloading svn repo ", x$url)
+  }
+
+  bundle <- tempfile()
+  svn_binary_path <- svn_path()
+
+  args <- c('co')
+  if (!is.null(x$branch)) {
+    url <- file.path(x$url, "branches", x$branch)
+  } else {
+    url <- file.path(x$url, "trunk")
+  }
+  if (!is.null(x$svn_subdir)) {
+    url <- file.path(url, x$svn_subdir);
+  }
+  args <- c(args, x$args, url, bundle)
+
+  message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
+  request <- system2(svn_binary_path, args, stdout = FALSE, stderr = FALSE)
+
+  # This is only looking for an error code above 0-success
+  if (request > 0) {
+    stop("There seems to be a problem retrieving this SVN-URL.", call. = FALSE)
+  }
+
+  if (!is.null(x$revision)) {
+    pwd <- setwd(bundle)
+    on.exit(setwd(pwd))
+
+    request <- system2(svn_binary_path, paste('update -r', x$revision))
+    if (request > 0) {
+      stop("There was a problem switching to the requested SVN revision", call. = FALSE)
+    }
+  }
+
+  bundle
+}
+
+#' @export
+remote_metadata.svn_remote <- function(x, bundle = NULL, source = NULL) {
+  list(
+    RemoteType = "svn",
+    RemoteUrl = x$url,
+    RemoteSubdir = x$subdir,
+    RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
+  )
+}
+
+svn_path <- function(svn_binary_name = NULL) {
+  # Use user supplied path
+  if (!is.null(svn_binary_name)) {
+    if (!file.exists(svn_binary_name)) {
+      stop("Path ", svn_binary_name, " does not exist", .call = FALSE)
+    }
+    return(svn_binary_name)
+  }
+
+  # Look on path
+  svn_path <- Sys.which("svn")[[1]]
+  if (svn_path != "") return(svn_path)
+
+  # On Windows, look in common locations
+  if (os_type() == "windows") {
+    look_in <- c(
+      "C:/Program Files/Svn/bin/svn.exe",
+      "C:/Program Files (x86)/Svn/bin/svn.exe"
+    )
+    found <- file.exists(look_in)
+    if (any(found)) return(look_in[found][1])
+  }
+
+  stop("SVN does not seem to be installed on your system.", call. = FALSE)
+}
+
+#' Install a package from a url
+#'
+#' This function is vectorised so you can install multiple packages in
+#' a single command.
+#'
+#' @param url location of package on internet. The url should point to a
+#'   zip file, a tar file or a bzipped/gzipped tar file.
+#' @param subdir subdirectory within url bundle that contains the R package.
+#' @param config additional configuration argument (e.g. proxy,
+#'   authentication) passed on to \code{\link[httr]{GET}}.
+#' @param ... Other arguments passed on to \code{install.packages}.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' install_url("https://github.com/hadley/stringr/archive/master.zip")
+#' }
+
+install_url <- function(url, subdir = NULL, config = list(), ...) {
+  remotes <- lapply(url, url_remote, subdir = subdir, config = config)
+  install_remotes(remotes, ...)
+}
+
+url_remote <- function(url, subdir = NULL, config = list()) {
+  remote("url",
+    url = url,
+    subdir = subdir,
+    config = config
+  )
+}
+
+#' @importFrom tools file_ext
+#' @export
+remote_download.url_remote <- function(x, quiet = FALSE) {
+  if (!quiet) {
+    message("Downloading package from url: ", x$url)
+  }
+
+  ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
+
+  bundle <- tempfile(fileext = paste0(".", ext))
+  download(bundle, x$url, x$config)
+}
+
+#' @export
+remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL) {
+  list(
+    RemoteType = "url",
+    RemoteUrl = x$url,
+    RemoteSubdir = x$subdir
+  )
+}
+
+#' Install specified version of a CRAN package.
+#'
+#' If you are installing an package that contains compiled code, you will
+#' need to have an R development environment installed.  You can check
+#' if you do by running \code{\link{has_devel}}.
+#'
+#' @export
+#' @family package installation
+#' @param package package name
+#' @param version If the specified version is NULL or the same as the most
+#'   recent version of the package, this function simply calls
+#'   \code{\link{install}}. Otherwise, it looks at the list of
+#'   archived source tarballs and tries to install an older version instead.
+#' @param ... Other arguments passed on to \code{\link{install}}.
+#' @inheritParams utils::install.packages
+#' @author Jeremy Stephens
+install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
+
+  contriburl <- contrib.url(repos, type)
+  available <- available.packages(contriburl)
+
+  if (package %in% row.names(available)) {
+    current.version <- available[package, 'Version']
+    if (is.null(version) || version == current.version) {
+      return(install.packages(package, repos = repos, contriburl = contriburl,
+        type = type, ...))
+    }
+  }
+
+  info <- package_find_repo(package, repos)
+
+  if (is.null(version)) {
+    # Grab the latest one: only happens if pulled from CRAN
+    package.path <- info[length(info)]
+  } else {
+    package.path <- paste(package, "/", package, "_", version, ".tar.gz",
+      sep = "")
+    if (!(package.path %in% row.names(info))) {
+      stop(sprintf("version '%s' is invalid for package '%s'", version,
+        package))
+    }
+  }
+
+  url <- paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
+  install_url(url, ...)
+}
+
+package_find_repo <- function(package, repos) {
+  for (repo in repos) {
+    if (length(repos) > 1)
+      message("Trying ", repo)
+
+    archive <-
+      tryCatch({
+        con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
+        on.exit(close(con))
+        readRDS(con)
+      },
+      warning = function(e) list(),
+      error = function(e) list())
+
+    info <- archive[[package]]
+    if (!is.null(info)) {
+      info$repo <- repo
+      return(info)
+    }
+  }
+
+  stop(sprintf("couldn't find package '%s'", package))
 }
 
 install <- function(pkgdir, dependencies = NA, quiet = TRUE, ...) {
@@ -1002,6 +1495,14 @@ safe_install_packages <- function(...) {
   )
 }
 
+#' Install package dependencies if needed.
+#'
+#' @inheritParams package_deps
+#' @param ... additional arguments passed to \code{\link{install.packages}}.
+#' @export
+#' @examples
+#' \dontrun{install_deps(".")}
+
 install_deps <- function(pkgdir, dependencies = NA,
                          threads = getOption("Ncpus", 1),
                          repos = getOption("repos"),
@@ -1017,7 +1518,7 @@ install_deps <- function(pkgdir, dependencies = NA,
     type = type
   )
 
-  update_packages(
+  update(
     packages,
     dependencies = dependencies,
     ...,
