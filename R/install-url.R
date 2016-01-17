@@ -37,7 +37,9 @@ remote_download.url_remote <- function(x, quiet = FALSE) {
     message("Downloading package from url: ", x$url)
   }
 
-  bundle <- tempfile(fileext = paste0(".", file_ext(x$url)))
+  ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
+
+  bundle <- tempfile(fileext = paste0(".", ext))
   download(bundle, x$url, x$config)
 }
 
