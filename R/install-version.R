@@ -34,7 +34,7 @@ install_version <- function(package, version = NULL, repos = getOption("repos"),
 
   if (is.null(version)) {
     # Grab the latest one: only happens if pulled from CRAN
-    package.path <- info[length(info)]
+    package.path <- row.names(info)[nrow(info)]
   } else {
     package.path <- paste(package, "/", package, "_", version, ".tar.gz",
       sep = "")

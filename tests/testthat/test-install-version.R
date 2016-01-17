@@ -98,3 +98,22 @@ test_that("install_version and non-existing package", {
   )
 
 })
+
+
+test_that("install_version for archives pacakges", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  repos <- getOption("repos")
+  if (length(repos) == 0) repos <- character()
+  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+
+  with_mock(
+    `remotes::install_url` = function(url, ...) url,
+    expect_equal(
+      install_version("igraph0", type = "source", lib = lib, repos = repos),
+      "http://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+    )
+  )
+})
