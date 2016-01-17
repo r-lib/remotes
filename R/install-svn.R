@@ -15,7 +15,7 @@
 #    svn.
 #' @param revision svn revision, if omitted updates to latest
 #' @param branch Name of branch or tag to use, if not trunk.
-#' @param ... Other arguments passed on to \code{\link{install}}
+#' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
 #' @examples

@@ -12,7 +12,7 @@ install_version(package, version = NULL, repos = getOption("repos"),
 
 \item{version}{If the specified version is NULL or the same as the most
 recent version of the package, this function simply calls
-\code{\link{install}}. Otherwise, it looks at the list of
+\code{install.packages}. Otherwise, it looks at the list of
 archived source tarballs and tries to install an older version instead.}
 
 \item{repos}{
@@ -30,12 +30,13 @@ archived source tarballs and tries to install an older version instead.}
     builds: see the section on \sQuote{Binary packages} for those.
   }
 
-\item{...}{Other arguments passed on to \code{\link{install}}.}
+\item{...}{Other arguments passed on to \code{install.packages}.}
 }
 \description{
 If you are installing an package that contains compiled code, you will
 need to have an R development environment installed.  You can check
-if you do by running \code{\link{has_devel}}.
+if you do by running \code{devtools::has_devel} (you need the
+\code{devtools} package for this).
 }
 \author{
 Jeremy Stephens

@@ -3,16 +3,17 @@
 #'
 #' If you are installing an package that contains compiled code, you will
 #' need to have an R development environment installed.  You can check
-#' if you do by running \code{\link{has_devel}}.
+#' if you do by running \code{devtools::has_devel} (you need the
+#' \code{devtools} package for this).
 #'
 #' @export
 #' @family package installation
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most
 #'   recent version of the package, this function simply calls
-#'   \code{\link{install}}. Otherwise, it looks at the list of
+#'   \code{install.packages}. Otherwise, it looks at the list of
 #'   archived source tarballs and tries to install an older version instead.
-#' @param ... Other arguments passed on to \code{\link{install}}.
+#' @param ... Other arguments passed on to \code{install.packages}.
 #' @inheritParams utils::install.packages
 #' @author Jeremy Stephens
 #' @importFrom utils available.packages contrib.url install.packages
