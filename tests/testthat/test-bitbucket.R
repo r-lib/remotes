@@ -36,6 +36,7 @@ test_that("remote_download.bitbucket_remote", {
   )
 })
 
+
 test_that("remote_metadata.bitbucket_remote", {
 
   expect_equal(
@@ -46,4 +47,33 @@ test_that("remote_metadata.bitbucket_remote", {
   expect_null(
     remote_metadata.bitbucket_remote(list())$RemoteSha
   )
+})
+
+
+test_that("bitbucket passwords", {
+
+  if (Sys.getenv("BITBUCKET_PASSWORD") == "") {
+    skip("Need BitBucket credentials")
+  }
+
+  skip_on_cran()
+  skip_if_offline()
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(lib)
+
+  install_bitbucket(
+    "csardigabor/falsy", lib = lib, quiet = TRUE,
+    password = Sys.getenv("BITBUCKET_PASSWORD")
+  )
+
+  expect_silent(packageDescription("falsy"))
+  expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
+
 })

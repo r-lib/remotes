@@ -56,15 +56,15 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
     x$ref, ".zip", sep = "")
 
   if (!is.null(x$password)) {
-    auth <- httr::authenticate(
+    auth <- list(
       user = x$auth_user %||% x$username,
-      password = x$password,
-      type = "basic")
+      password = x$password
+    )
   } else {
     auth <- NULL
   }
 
-  download(dest, src, auth)
+  download(dest, src, basic_auth = auth)
 }
 
 #' @export
