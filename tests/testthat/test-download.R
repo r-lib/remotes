@@ -48,11 +48,11 @@ test_that("os_type", {
 test_that("download basic auth", {
 
   with_mock(
-    `utils::download.file` = function(url, ...) { message(url); 0 },
-    expect_message(
+    `utils::download.file` = function(url, ...) { print(url); 0 },
+    expect_output(
       download(
-        "http://foo.bar.com",
         tempfile(),
+        "http://foo.bar.com",
         basic_auth = list(user = "user", password = "password")
       ),
       "http://user:password@foo.bar.com"
