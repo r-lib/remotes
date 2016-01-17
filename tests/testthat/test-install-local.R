@@ -18,7 +18,12 @@ test_that("install_local", {
   dir <- tempfile()
   on.exit(unlink(dir), add = TRUE)
   dir.create(dir)
-  pkg <- download.packages("falsy", dir, type = "source")
+
+  repos <- getOption("repos")
+  if (length(repos) == 0) repos <- character()
+  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+
+  pkg <- download.packages("falsy", dir, repos = repos, type = "source")
 
   install_local(pkg[, 2], lib = lib)
 
