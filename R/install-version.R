@@ -15,6 +15,8 @@
 #' @param ... Other arguments passed on to \code{\link{install}}.
 #' @inheritParams utils::install.packages
 #' @author Jeremy Stephens
+#' @importFrom utils available.packages contrib.url install.packages
+
 install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
 
   contriburl <- contrib.url(repos, type)
