@@ -72,3 +72,51 @@ test_that("install_svn subdir", {
   )
 })
 
+test_that("remote_download.svn_remote error", {
+
+  x <- list(url = "http://foo.bar.com")
+
+  with_mock(
+    `base::system2` = function(...) { 1 },
+    expect_error(
+      remote_download.svn_remote(x),
+      "There seems to be a problem retrieving"
+    )
+  )
+})
+
+test_that("downloading an SVN revision", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  x <- list(
+    url = "https://github.com/mangothecat/simplegraph",
+    revision = "r28"
+  )
+
+  bundle <- remote_download.svn_remote(x)
+  on.exit(unlink(bundle), add = TRUE)
+
+  expect_output(
+    print(list.files(bundle)),
+    "DESCRIPTION"
+  )
+})
+
+test_that("downloading a wrong SVN revision", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  x <- list(
+    url = "https://github.com/mangothecat/simplegraph",
+    revision = "xxx"
+  )
+
+  expect_error(
+    remote_download.svn_remote(x),
+    "There was a problem switching to the requested SVN revision"
+  )
+})
+
