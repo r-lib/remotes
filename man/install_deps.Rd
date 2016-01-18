@@ -4,8 +4,8 @@
 \alias{install_deps}
 \title{Install package dependencies if needed.}
 \usage{
-install_deps(pkgdir, dependencies = NA, threads = getOption("Ncpus", 1),
-  repos = getOption("repos"), type = getOption("pkgType"), ...,
+install_deps(pkgdir = ".", dependencies = NA, threads = getOption("Ncpus",
+  1), repos = getOption("repos"), type = getOption("pkgType"), ...,
   upgrade = TRUE, quiet = FALSE)
 }
 \arguments{

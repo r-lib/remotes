@@ -1,5 +1,5 @@
 
-install <- function(pkgdir, dependencies = NA, quiet = TRUE, ...) {
+install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
@@ -37,7 +37,7 @@ safe_install_packages <- function(...) {
 #' @examples
 #' \dontrun{install_deps(".")}
 
-install_deps <- function(pkgdir, dependencies = NA,
+install_deps <- function(pkgdir = ".", dependencies = NA,
                          threads = getOption("Ncpus", 1),
                          repos = getOption("repos"),
                          type = getOption("pkgType"),

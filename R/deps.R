@@ -89,7 +89,7 @@ package_deps <- function(packages, dependencies = NA,
 #' @export
 #' @rdname package_deps
 
-dev_package_deps <- function(pkgdir, dependencies = NA,
+dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
                              type = getOption("pkgType")) {
 
@@ -148,7 +148,7 @@ compare_versions <- function(installed, cran) {
   )
 }
 
-install_dev_remotes <- function(pkgdir, ...) {
+install_dev_remotes <- function(pkgdir = ".", ...) {
 
   pkg <- load_pkg_description(pkgdir)
   if (!has_dev_remotes(pkg)) {
