@@ -59,3 +59,40 @@ test_that("download basic auth", {
     )
   )
 })
+
+test_that("download fallback to curl, https", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  with_mock(
+    `remotes::get_r_version` = function(...) "3.2.3",
+    download(
+      tmp <- tempfile(),
+      "https://httpbin.org/ip"
+    ),
+    expect_match(
+      paste(readLines(tmp), collapse = "\n"),
+      "origin"
+    )
+  )
+})
+
+test_that("download with curl, basic auth", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  with_mock(
+    `remotes::get_r_version` = function(...) "3.2.3",
+    download(
+      tmp <- tempfile(),
+      "http://httpbin.org/basic-auth/user/passwd",
+      basic_auth = list(user = "user", password = "passwd")
+    ),
+    expect_match(
+      paste(readLines(tmp), collapse = "\n"),
+      '"authenticated": true'
+    )
+  )
+})

@@ -92,3 +92,11 @@ test_that("in_dir", {
   expect_equal(getwd(), wd)
 
 })
+
+test_that("get_r_version", {
+
+  expect_match(
+    R.version.string,
+    get_r_version()
+  )
+})
