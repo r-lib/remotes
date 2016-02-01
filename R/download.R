@@ -15,7 +15,7 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
   }
 
   if (compareVersion(get_r_version(), "3.2.0") == -1) {
-    curl_download(real_url, path, quet)
+    curl_download(real_url, path, quiet)
 
   } else {
 
@@ -63,5 +63,5 @@ curl_download <- function(url, path, quiet) {
     stop("The 'curl' package is required if R is older than 3.2.0")
   }
 
-  curl_download(url, path, quiet = quiet)
+  curl::curl_download(url, path, quiet = quiet)
 }
