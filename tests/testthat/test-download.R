@@ -66,7 +66,7 @@ test_that("download fallback to curl, https", {
   skip_if_offline()
 
   with_mock(
-    `remotes::get_r_version` = function(...) "3.2.3",
+    `remotes::get_r_version` = function(...) "3.0.0",
     download(
       tmp <- tempfile(),
       "https://httpbin.org/ip"
@@ -84,7 +84,7 @@ test_that("download with curl, basic auth", {
   skip_if_offline()
 
   with_mock(
-    `remotes::get_r_version` = function(...) "3.2.3",
+    `remotes::get_r_version` = function(...) "3.0.0",
     download(
       tmp <- tempfile(),
       "http://httpbin.org/basic-auth/user/passwd",
