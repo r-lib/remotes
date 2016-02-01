@@ -26,5 +26,5 @@ Suggests:
     git2r,
     pingr,
     testthat
-Depends: R (>= 3.2.0)
+Depends: R (>= 3.0.0)
 RoxygenNote: 5.0.1
