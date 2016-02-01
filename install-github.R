@@ -477,8 +477,21 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
     real_url <- paste0(url, sep, "access_token=", auth_token)
   }
 
+  if (compareVersion(get_r_version(), "3.2.0") == -1) {
+    curl_download(real_url, path, quiet)
+
+  } else {
+
+    base_download(real_url, path, quiet)
+  }
+
+  path
+ }
+
+base_download <- function(url, path, quiet) {
+
   status <- utils::download.file(
-    real_url,
+    url,
     path,
     method = download_method(),
     quiet = quiet,
@@ -505,6 +518,15 @@ download_method <- function() {
 
 os_type <- function() {
   .Platform$OS.type
+}
+
+curl_download <- function(url, path, quiet) {
+
+  if (!pkg_installed("curl")) {
+    stop("The 'curl' package is required if R is older than 3.2.0")
+  }
+
+  curl::curl_download(url, path, quiet = quiet)
 }
 
 # Extract the commit hash from a git archive. Git archives include the SHA1
@@ -1821,6 +1843,10 @@ with_something <- function(set, reset = set) {
 }
 
 in_dir <- with_something(setwd)
+
+get_r_version <- function() {
+  paste(R.version$major, sep = ".", R.version$minor)
+}
 
 
   install_github(...)
