@@ -1,7 +1,9 @@
 
 install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
 
-  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
+  dep_deps <- if (isTRUE(dependencies)) NA else dependencies
+
+  install_deps(pkgdir, dependencies = dep_deps, quiet = quiet, ...)
 
   safe_install_packages(
       pkgdir,
