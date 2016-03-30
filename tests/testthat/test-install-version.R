@@ -113,7 +113,7 @@ test_that("install_version for archives pacakges", {
     `remotes::install_url` = function(url, ...) url,
     expect_equal(
       install_version("igraph0", type = "source", lib = lib, repos = repos),
-      "http://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+      "https://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
     )
   )
 })
