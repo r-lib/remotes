@@ -1,9 +1,7 @@
 
 install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
 
-  dep_deps <- if (isTRUE(dependencies)) NA else dependencies
-
-  install_deps(pkgdir, dependencies = dep_deps, quiet = quiet, ...)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
   safe_install_packages(
       pkgdir,
@@ -54,9 +52,11 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     type = type
   )
 
+  dep_deps <- if (isTRUE(dependencies)) NA else dependencies
+
   update(
     packages,
-    dependencies = dependencies,
+    dependencies = dep_deps,
     ...,
     Ncpus = threads,
     quiet = quiet,
