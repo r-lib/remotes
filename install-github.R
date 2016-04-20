@@ -462,6 +462,8 @@ parse_additional_repositories <- function(pkg) {
   }
 }
 
+#' @importFrom utils compareVersion
+
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
                      quiet = TRUE) {
 
@@ -1447,32 +1449,7 @@ remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL) {
 
 install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
 
-  contriburl <- contrib.url(repos, type)
-  available <- available.packages(contriburl)
-
-  if (package %in% row.names(available)) {
-    current.version <- available[package, 'Version']
-    if (is.null(version) || version == current.version) {
-      return(install.packages(package, repos = repos, contriburl = contriburl,
-        type = type, ...))
-    }
-  }
-
-  info <- package_find_repo(package, repos)
-
-  if (is.null(version)) {
-    # Grab the latest one: only happens if pulled from CRAN
-    package.path <- row.names(info)[nrow(info)]
-  } else {
-    package.path <- paste(package, "/", package, "_", version, ".tar.gz",
-      sep = "")
-    if (!(package.path %in% row.names(info))) {
-      stop(sprintf("version '%s' is invalid for package '%s'", version,
-        package))
-    }
-  }
-
-  url <- paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
+  url <- download_version_url(package, version, repos, type)
   install_url(url, ...)
 }
 
@@ -1500,11 +1477,85 @@ package_find_repo <- function(package, repos) {
   stop(sprintf("couldn't find package '%s'", package))
 }
 
+
+#' Download a specified version of a CRAN package
+#'
+#' It downloads the package to a temporary file, and
+#' returns the name of the file.
+#'
+#' @inheritParams install_version
+#' @return Name of the downloaded file.
+#'
+#' @export
+
+download_version <- function(package, version = NULL,
+                             repos = getOption("repos"),
+                             type = getOption("pkgType"), ...) {
+
+  url <- download_version_url(package, version, repos, type)
+  download(path = tempfile(), url = url)
+}
+
+download_version_url <- function(package, version, repos, type) {
+
+  contriburl <- contrib.url(repos, type)
+  available <- available.packages(contriburl)
+
+  if (package %in% row.names(available)) {
+    current.version <- available[package, 'Version']
+    if (is.null(version) || version == current.version) {
+      return(steal_download_url(package, available, repos, contriburl,
+                                type))
+    }
+  }
+
+  info <- package_find_repo(package, repos)
+
+  if (is.null(version)) {
+    # Grab the latest one: only happens if pulled from CRAN
+    package.path <- row.names(info)[nrow(info)]
+  } else {
+    package.path <- paste(package, "/", package, "_", version, ".tar.gz",
+      sep = "")
+    if (!(package.path %in% row.names(info))) {
+      stop(sprintf("version '%s' is invalid for package '%s'", version,
+        package))
+    }
+  }
+
+  paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
+}
+
+#' @importFrom utils download.file download.packages capture.output
+
+steal_download_url <- function(package, available, repos, contriburl,
+                               type) {
+  myurl <- NULL
+  on.exit(suppressMessages(untrace(download.file)), add = TRUE)
+  suppressMessages(trace(
+    download.file,
+    print = FALSE,
+    function() {
+      myurl <<- get("url", envir = parent.frame())
+      stop()
+    }
+  ))
+  suppressWarnings(
+    capture.output(type = "output",
+    capture.output(type = "message",
+      download.packages(
+        package, destdir = tempdir(),
+        available = available,
+        repos = repos, contriburl = contriburl,
+        type = type
+      )
+  )))
+  myurl
+}
+
 install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
 
-  dep_deps <- if (isTRUE(dependencies)) NA else dependencies
-
-  install_deps(pkgdir, dependencies = dep_deps, quiet = quiet, ...)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
   safe_install_packages(
       pkgdir,
@@ -1555,9 +1606,11 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     type = type
   )
 
+  dep_deps <- if (isTRUE(dependencies)) NA else dependencies
+
   update(
     packages,
-    dependencies = dependencies,
+    dependencies = dep_deps,
     ...,
     Ncpus = threads,
     quiet = quiet,
