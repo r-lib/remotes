@@ -86,5 +86,8 @@ test_that("source_pkg", {
 
   skip_on_os("windows")
 
-  expect_match(file.info(file.path(pkg_dir, "configure"))$mode, "7..")
+  expect_match(
+    as.character(file.info(file.path(pkg_dir, "configure"))$mode),
+    "7.."
+  )
 })
