@@ -1,4 +1,6 @@
 
+#' @importFrom utils compareVersion
+
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
                      quiet = TRUE) {
 
