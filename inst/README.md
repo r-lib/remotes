@@ -107,9 +107,9 @@ manual for details.
 #### BioConductor packages
 
 BioConductor packages are automatically detected and their
-dependencies are installed from BioConductor. Note that you
-need to have the `BiocInstaller` package installed to
-install BioConductor packages with `remotes`.
+dependencies are installed from BioConductor. The `BiocInstaller`
+package, which is needed to install them, is also automatically
+installed temporarily.
 
 #### Currently supported remote types
 

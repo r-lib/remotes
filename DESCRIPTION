@@ -7,6 +7,8 @@ Authors@R: c(
     person("Winston", "Chang", role = "aut"),
     person("Jim", "Hester", role = "aut"),
     person("RStudio", role = "cph"),
+    person("Martin", "Morgan", role = "aut"),
+    person("Dan", "Tenenbaum", role = "aut"),
     person("Mango Solutions", role = "cph")
     )
 Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
@@ -21,7 +23,6 @@ Imports:
     methods,
     utils
 Suggests:
-    BiocInstaller,
     curl,
     git2r,
     pingr,

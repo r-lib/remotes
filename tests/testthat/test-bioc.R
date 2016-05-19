@@ -13,8 +13,6 @@ test_that("installing bioc packages", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
-  loadNamespace("BiocInstaller")
-
   libpath <- .libPaths()
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
