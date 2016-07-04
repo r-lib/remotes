@@ -86,6 +86,25 @@ package_deps <- function(packages, dependencies = NA,
   )
 }
 
+#' \code{local_package_deps} extracts dependencies from a
+#' local DESCRIPTION file.
+#'
+#' @export
+#' @rdname package_deps
+
+local_package_deps <- function(pkgdir = ".", dependencies = NA) {
+  pkg <- load_pkg_description(pkgdir)
+
+  dependencies <- tolower(standardise_dep(dependencies))
+  dependencies <- intersect(dependencies, names(pkg))
+
+  parsed <- lapply(pkg[tolower(dependencies)], parse_deps)
+  unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
+}
+
+#' \code{dev_package_deps} lists the status of the dependencies
+#' of a local package.
+#'
 #' @export
 #' @rdname package_deps
 
@@ -95,14 +114,9 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   pkg <- load_pkg_description(pkgdir)
   install_dev_remotes(pkgdir)
-
   repos <- c(repos, parse_additional_repositories(pkg))
 
-  dependencies <- tolower(standardise_dep(dependencies))
-  dependencies <- intersect(dependencies, names(pkg))
-
-  parsed <- lapply(pkg[tolower(dependencies)], parse_deps)
-  deps <- unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
+  deps <- local_package_deps(pkgdir = pkgdir, dependencies = dependencies)
 
   if (is_bioconductor(pkg)) {
     bioc_repos <- bioc_install_repos()

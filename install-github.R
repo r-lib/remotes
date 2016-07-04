@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  
+
 available_packages <- function(repos, type) {
   suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
 }
@@ -199,12 +199,9 @@ package_deps <- function(packages, dependencies = NA,
 #' @export
 #' @rdname package_deps
 
-dev_package_deps <- function(pkgdir = ".", dependencies = NA,
-                             repos = getOption("repos"),
-                             type = getOption("pkgType")) {
+local_package_deps <- function(pkgdir = ".") {
 
   pkg <- load_pkg_description(pkgdir)
-  install_dev_remotes(pkgdir)
 
   repos <- c(repos, parse_additional_repositories(pkg))
 
@@ -222,6 +219,20 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
     if (length(missing_repos) > 0)
       repos[missing_repos] <- bioc_repos[missing_repos]
   }
+
+  deps
+}
+
+#' @export
+#' @rdname package_deps
+
+dev_package_deps <- function(pkgdir = ".", dependencies = NA,
+                             repos = getOption("repos"),
+                             type = getOption("pkgType")) {
+
+  install_dev_remotes(pkgdir)
+
+  deps <- local_package_deps(pkgdir)
 
   package_deps(deps, repos = repos, type = type)
 }
