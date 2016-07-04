@@ -4,8 +4,7 @@
 \alias{install_svn}
 \title{Install a package from a SVN repository}
 \usage{
-install_svn(url, subdir = NULL, args = character(0), ...,
-  revision = NULL)
+install_svn(url, subdir = NULL, args = character(0), ..., revision = NULL)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -14,7 +13,8 @@ private repository.}
 \item{subdir}{A sub-directory withing a svn repository that contains the
 package we are interested in installing.}
 
-\item{args}{A character vector providing extra options to pass on to \command{svn}.}
+\item{args}{A character vector providing extra options to pass on to
+\command{svn}.}
 
 \item{...}{Other arguments passed on to \code{install.packages}.}
 

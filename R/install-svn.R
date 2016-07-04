@@ -1,25 +1,25 @@
 
 #' Install a package from a SVN repository
 #'
-#' This function requires \code{svn} to be installed on your system in order to
+#' This function requires \command{svn} to be installed on your system in order to
 #' be used.
 #'
 #' It is vectorised so you can install multiple packages with
 #' a single command.
 #'
 #' @inheritParams install_git
-#' @param subdir A sub-directory withing a svn repository that may contain the
+#' @param subdir A sub-directory withing a svn repository that contains the
 #'   package we are interested in installing. 
-#' @param args A character vector providing extra arguments to pass on to
-#    svn.
+#' @param args A character vector providing extra options to pass on to
+#'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
 #' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' install_svn("https://github.com/hadley/stringr/trunk")
-#' install_svn("https://github.com/hadley/httr/branches/oauth")
+#' install_svn("svn://github.com/hadley/stringr/trunk")
+#' install_svn("svn://github.com/hadley/httr/branches/oauth")
 #'}
 install_svn <- function(url, subdir = NULL, args = character(0),
   ..., revision = NULL) {
