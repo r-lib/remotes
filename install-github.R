@@ -199,7 +199,7 @@ package_deps <- function(packages, dependencies = NA,
 #' @export
 #' @rdname package_deps
 
-local_package_deps <- function(pkgdir = ".") {
+local_package_deps <- function(pkgdir = ".", repos) {
 
   pkg <- load_pkg_description(pkgdir)
 
@@ -232,7 +232,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   install_dev_remotes(pkgdir)
 
-  deps <- local_package_deps(pkgdir)
+  deps <- local_package_deps(pkgdir, repos)
 
   package_deps(deps, repos = repos, type = type)
 }
