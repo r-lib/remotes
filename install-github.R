@@ -3,6 +3,94 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
+  
+bioc_version <- function() {
+  bver <- get(
+    ".BioC_version_associated_with_R_version",
+    envir = asNamespace("tools"),
+    inherits = FALSE
+  )
+
+  if (is.function(bver)) bver() else bver
+}
+
+## This is mostly from https://bioconductor.org/biocLite.R
+
+#' Deduce the URLs of the BioConductor repositories
+#'
+#' @return A named character vector of the URLs of the
+#' BioConductor repositories, appropriate for the current
+#' R version.
+#'
+#' @export
+
+bioc_install_repos <- function() {
+
+  vers <- getRversion()
+  biocVers <- bioc_version()
+
+  a <- NULL
+
+  p <- file.path(Sys.getenv("HOME"), ".R", "repositories")
+  if (file.exists(p)) {
+    a <- ("tools" %:::% ".read_repositories")(p)
+    if (!"BioCsoft" %in% rownames(a)) a <- NULL
+  }
+
+  if (is.null(a)) {
+    p <- file.path(R.home("etc"), "repositories")
+    a <- ("tools" %:::% ".read_repositories")(p)
+  }
+
+  ## add a conditional for Bioc releases occuring WITHIN
+  ## a single R minor version. This is so that a user with a
+  ## version of R (whose etc/repositories file references the
+  ## no-longer-latest URL) and without BiocInstaller
+  ## will be pointed to the most recent repository suitable
+  ## for their version of R
+  if (vers >= "3.2.2" && vers < "3.3.0") {
+    ## transitioning to https support; check availability
+    con <- file(fl <- tempfile(), "w")
+    sink(con, type = "message")
+    tryCatch(
+      { xx <- close(file("https://bioconductor.org")) },
+      error = function(e) { message(conditionMessage(e)) }
+    )
+    sink(type = "message")
+    close(con)
+
+    if (!length(readLines(fl))) {
+      a[, "URL"] <- sub("^http:", "https:", a[, "URL"])
+    }
+  }
+  if (vers >= "3.3.0") {
+    a[, "URL"] <- sub(as.character(biocVers), "3.3", a[, "URL"])
+
+  } else if (vers >= "3.2") {
+    a[, "URL"] <- sub(as.character(biocVers), "3.2", a[, "URL"])
+
+  } else if (vers == "3.1.1") {
+    ## R-3.1.1's etc/repositories file at the time of the release
+    ## of Bioc 3.0 pointed to the 2.14 repository, but we want
+    ## new installations to access the 3.0 repository
+    a[, "URL"] <- sub(as.character(biocVers), "3.0", a[, "URL"])
+
+  } else if (vers == "3.1.0") {
+    ## R-devel points to 2.14 repository
+    a[, "URL"] <- sub(as.character(biocVers), "2.14", a[, "URL"])
+
+  } else if (vers >= "2.15" && vers < "2.16") {
+    a[, "URL"] <- sub(as.character(biocVers), "2.11", a[, "URL"])
+    biocVers <- numeric_version("2.11")
+  }
+
+  repos <- intersect(
+    rownames(a),
+    c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+  )
+
+  structure(a[repos, "URL"], names = repos)
+}
 
 available_packages <- function(repos, type) {
   suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
@@ -196,33 +284,25 @@ package_deps <- function(packages, dependencies = NA,
   )
 }
 
+#' \code{local_package_deps} extracts dependencies from a
+#' local DESCRIPTION file.
+#'
 #' @export
 #' @rdname package_deps
 
-local_package_deps <- function(pkgdir = ".", repos) {
-
+local_package_deps <- function(pkgdir = ".", dependencies = NA) {
   pkg <- load_pkg_description(pkgdir)
-
-  repos <- c(repos, parse_additional_repositories(pkg))
 
   dependencies <- tolower(standardise_dep(dependencies))
   dependencies <- intersect(dependencies, names(pkg))
 
   parsed <- lapply(pkg[tolower(dependencies)], parse_deps)
-  deps <- unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
-
-  if (is_bioconductor(pkg)) {
-    bioc_repos <- BiocInstaller::biocinstallRepos()
-
-    missing_repos <- setdiff(names(bioc_repos), names(repos))
-
-    if (length(missing_repos) > 0)
-      repos[missing_repos] <- bioc_repos[missing_repos]
-  }
-
-  deps
+  unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
 }
 
+#' \code{dev_package_deps} lists the status of the dependencies
+#' of a local package.
+#'
 #' @export
 #' @rdname package_deps
 
@@ -230,9 +310,20 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
                              type = getOption("pkgType")) {
 
+  pkg <- load_pkg_description(pkgdir)
   install_dev_remotes(pkgdir)
+  repos <- c(repos, parse_additional_repositories(pkg))
 
-  deps <- local_package_deps(pkgdir, repos)
+  deps <- local_package_deps(pkgdir = pkgdir, dependencies = dependencies)
+
+  if (is_bioconductor(pkg)) {
+    bioc_repos <- bioc_install_repos()
+
+    missing_repos <- setdiff(names(bioc_repos), names(repos))
+
+    if (length(missing_repos) > 0)
+      repos[missing_repos] <- bioc_repos[missing_repos]
+  }
 
   package_deps(deps, repos = repos, type = type)
 }
@@ -1270,43 +1361,40 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 
 #' Install a package from a SVN repository
 #'
-#' This function requires \code{svn} to be installed on your system in order to
+#' This function requires \command{svn} to be installed on your system in order to
 #' be used.
 #'
 #' It is vectorised so you can install multiple packages with
 #' a single command.
 #'
 #' @inheritParams install_git
-#' @param subdir A sub-directory withing a svn repository that may contain the
-#'   package we are interested in installing. By default, this
-#'   points to the 'trunk' directory.
-#' @param args A character vector providing extra arguments to pass on to
-#    svn.
+#' @param subdir A sub-directory withing a svn repository that contains the
+#'   package we are interested in installing. 
+#' @param args A character vector providing extra options to pass on to
+#'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
-#' @param branch Name of branch or tag to use, if not trunk.
 #' @param ... Other arguments passed on to \code{install.packages}.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' install_svn("https://github.com/hadley/stringr")
-#' install_svn("https://github.com/hadley/httr", branch = "oauth")
+#' install_svn("svn://github.com/hadley/stringr/trunk")
+#' install_svn("svn://github.com/hadley/httr/branches/oauth")
 #'}
-install_svn <- function(url, subdir = NULL, branch = NULL, args = character(0),
+install_svn <- function(url, subdir = NULL, args = character(0),
   ..., revision = NULL) {
 
-  remotes <- lapply(url, svn_remote, svn_subdir = subdir, branch = branch,
+  remotes <- lapply(url, svn_remote, svn_subdir = subdir,
     revision = revision, args = args)
 
   install_remotes(remotes, ...)
 }
 
-svn_remote <- function(url, svn_subdir = NULL, branch = NULL, revision = revision,
+svn_remote <- function(url, svn_subdir = NULL, revision = revision,
   args = character(0)) {
   remote("svn",
     url = url,
     svn_subdir = svn_subdir,
-    branch = branch,
     revision = revision,
     args = args
   )
@@ -1320,17 +1408,14 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
 
   bundle <- tempfile()
   svn_binary_path <- svn_path()
-
-  args <- c('co')
-  if (!is.null(x$branch)) {
-    url <- file.path(x$url, "branches", x$branch)
-  } else {
-    url <- file.path(x$url, "trunk")
-  }
+  url <- x$url
+  args <- "export"
+  if (!is.null(x$revision))
+    args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  }
-  args <- c(args, x$args, url, bundle)
+  } 
+  args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
   request <- system2(svn_binary_path, args, stdout = FALSE, stderr = FALSE)
@@ -1338,16 +1423,6 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
   # This is only looking for an error code above 0-success
   if (request > 0) {
     stop("There seems to be a problem retrieving this SVN-URL.", call. = FALSE)
-  }
-
-  if (!is.null(x$revision)) {
-    pwd <- setwd(bundle)
-    on.exit(setwd(pwd))
-
-    request <- system2(svn_binary_path, paste('update -r', x$revision))
-    if (request > 0) {
-      stop("There was a problem switching to the requested SVN revision", call. = FALSE)
-    }
   }
 
   bundle
@@ -1854,6 +1929,8 @@ wrap_command <- function(x) {
 
 `%||%` <- function (a, b) if (!is.null(a)) a else b
 
+`%:::%` <- function (p, f) get(f, envir = asNamespace(p))
+
 is_bioconductor <- function(x) {
   !is.null(x$biocviews)
 }
@@ -1913,6 +1990,14 @@ in_dir <- with_something(setwd)
 get_r_version <- function() {
   paste(R.version$major, sep = ".", R.version$minor)
 }
+
+set_libpaths <- function(paths) {
+  old <- .libPaths()
+  .libPaths(paths)
+  invisible(old)
+}
+
+with_libpaths <- with_something(set_libpaths, .libPaths)
 
 
   install_github(...)
