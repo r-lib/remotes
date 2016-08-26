@@ -29,12 +29,14 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
 base_download <- function(url, path, quiet) {
 
-  status <- utils::download.file(
-    url,
-    path,
-    method = download_method(),
-    quiet = quiet,
-    mode = "wb"
+  suppressWarnings(
+    status <- utils::download.file(
+      url,
+      path,
+      method = download_method(),
+      quiet = quiet,
+      mode = "wb"
+    )
   )
 
   if (status != 0)  stop("Cannot download file from ", url, call. = FALSE)
