@@ -111,9 +111,9 @@ test_that("install_version for archives pacakges", {
 
   with_mock(
     `remotes::install_url` = function(url, ...) url,
-    expect_equal(
+    expect_match(
       install_version("igraph0", type = "source", lib = lib, repos = repos),
-      "https://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+      "https?://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
     )
   )
 })
