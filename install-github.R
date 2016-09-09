@@ -108,6 +108,11 @@ write_dcf <- function(path, desc) {
     indent = 0
   )
 }
+
+get_desc_field <- function(path, field) {
+  dcf <- read_dcf(path)
+  dcf[[field]]
+}
 # Decompress pkg, if needed
 source_pkg <- function(path, subdir = NULL, before_install = NULL) {
   if (!file.info(path)$isdir) {
@@ -149,16 +154,16 @@ decompress <- function(src, target) {
     outdir <- getrootdir(as.vector(utils::unzip(src, list = TRUE)$Name))
 
   } else if (grepl("\\.tar$", src)) {
-    utils::untar(src, exdir = target)
-    outdir <- getrootdir(utils::untar(src, list = TRUE))
+    untar(src, exdir = target)
+    outdir <- getrootdir(untar(src, list = TRUE))
 
   } else if (grepl("\\.(tar\\.gz|tgz)$", src)) {
-    utils::untar(src, exdir = target, compressed = "gzip")
-    outdir <- getrootdir(utils::untar(src, compressed = "gzip", list = TRUE))
+    untar(src, exdir = target, compressed = "gzip")
+    outdir <- getrootdir(untar(src, compressed = "gzip", list = TRUE))
 
   } else if (grepl("\\.(tar\\.bz2|tbz)$", src)) {
-    utils::untar(src, exdir = target, compressed = "bzip2")
-    outdir <- getrootdir(utils::untar(src, compressed = "bzip2", list = TRUE))
+    untar(src, exdir = target, compressed = "bzip2")
+    outdir <- getrootdir(untar(src, compressed = "bzip2", list = TRUE))
 
   } else {
     ext <- gsub("^[^.]*\\.", "", src)
@@ -194,7 +199,7 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
     "-d", shQuote(target)
   )
 
-  system_check(unzip, args, quiet = TRUE)
+  system_check(unzip, args)
 }
 
 #' Find all dependencies of a CRAN or dev package.
@@ -564,6 +569,65 @@ parse_additional_repositories <- function(pkg) {
   }
 }
 
+has_devel <- function() {
+  tryCatch(
+    has_devel2(),
+    error = function(e) FALSE
+  )
+}
+
+## This is similar to devtools:::has_devel(), with some
+## very minor differences.
+
+has_devel2 <- function() {
+  foo_path <- file.path(tempfile(fileext = ".c"))
+
+  cat("void foo(int *bar) { *bar=1; }\n", file = foo_path)
+  on.exit(unlink(foo_path))
+
+  R(c("CMD", "SHLIB", basename(foo_path)), dirname(foo_path))
+  dylib <- sub("\\.c$", .Platform$dynlib.ext, foo_path)
+  on.exit(unlink(dylib), add = TRUE)
+
+  dll <- dyn.load(dylib)
+  on.exit(dyn.unload(dylib), add = TRUE)
+
+  stopifnot(.C(dll$foo, 0L)[[1]] == 1L)
+  TRUE
+}
+
+missing_devel_warning <- function(pkgdir) {
+  pkgname <- tryCatch(
+    get_desc_field(file.path(pkgdir, "DESCRIPTION"), "Package"),
+    error = function(e) NULL
+  ) %||% "<unknown>"
+
+  sys <- sys_type()
+
+  warning(
+    "Package ",
+    pkgname,
+    " has compiled code, but no suitable ",
+    "compiler(s) were found. Installation will likely fail.\n  ",
+    if (sys == "windows") "Install Rtools and make sure it is in the PATH.",
+    if (sys == "macos") "Install XCode and make sure it works.",
+    if (sys == "linux") "Install compilers via your Linux package manager."
+  )
+}
+
+R <- function(args, path = tempdir()) {
+
+  r <- file.path(R.home("bin"), "R")
+
+  args <- c(
+    "--no-site-file", "--no-environ", "--no-save",
+    "--no-restore", "--quiet",
+    args
+  )
+
+  system_check(r, args, path = path)
+}
+
 #' @importFrom utils compareVersion
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
@@ -620,10 +684,6 @@ download_method <- function() {
   } else {
     "auto"
   }
-}
-
-os_type <- function() {
-  .Platform$OS.type
 }
 
 curl_download <- function(url, path, quiet) {
@@ -1592,8 +1652,15 @@ download_version_url <- function(package, version, repos, type) {
   if (package %in% row.names(available)) {
     current.version <- available[package, 'Version']
     if (is.null(version) || version == current.version) {
-      return(steal_download_url(package, available, repos, contriburl,
-                                type))
+      row <- available[which(rownames(available) == package)[1], ]
+      return(paste0(
+        row[["Repository"]],
+        "/",
+        row[["Package"]],
+        "_",
+        row[["Version"]],
+        ".tar.gz"
+      ))
     }
   }
 
@@ -1614,42 +1681,19 @@ download_version_url <- function(package, version, repos, type) {
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
 }
 
-#' @importFrom utils download.file download.packages capture.output
-
-steal_download_url <- function(package, available, repos, contriburl,
-                               type) {
-  myurl <- NULL
-  on.exit(suppressMessages(untrace(download.file)), add = TRUE)
-  suppressMessages(trace(
-    download.file,
-    print = FALSE,
-    function() {
-      myurl <<- get("url", envir = parent.frame())
-      stop()
-    }
-  ))
-  suppressWarnings(
-    capture.output(type = "output",
-    capture.output(type = "message",
-      download.packages(
-        package, destdir = tempdir(),
-        available = available,
-        repos = repos, contriburl = contriburl,
-        type = type
-      )
-  )))
-  myurl
-}
-
 install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
+
+  if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
+    missing_devel_warning(pkgdir)
+  }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
   safe_install_packages(
-      pkgdir,
-      repos = NULL,
-      quiet = quiet,
-      type = "source",
+    pkgdir,
+    repos = NULL,
+    quiet = quiet,
+    type = "source",
     ...
   )
 
@@ -1888,45 +1932,54 @@ load_pkg_description <- function(path) {
 
   desc
 }
-#' Run a system command and check if it succeeds.
-#'
-#' @param cmd the command to run.
-#' @param args a vector of command arguments.
-#' @param quiet if \code{FALSE}, the command to be run will be echoed.
-#' @param ... additional arguments passed to \code{\link[base]{system}}
-#' @return \code{TRUE} if the command succeeds, an error will be thrown if the
-#' command fails.
-#' @noRd
-system_check <- function(cmd, args = character(), quiet = FALSE, ...) {
-  full <- paste(shQuote(cmd), " ", paste(args, collapse = " "), sep = "")
 
-  if (!quiet) {
-    message(wrap_command(full))
-    message()
-  }
+system_check <- function(command, args = character(), quiet = TRUE,
+                         error = TRUE, path = ".") {
 
-  result <- suppressWarnings(
-    system(full, intern = quiet, ignore.stderr = quiet, ...)
+  out <- tempfile()
+  err <- tempfile()
+  on.exit(unlink(out), add = TRUE)
+  on.exit(unlink(err), add = TRUE)
+
+  ## We suppress warnings, they are given if the command
+  ## exits with a non-zero status
+  res <- in_dir(
+    path,
+    suppressWarnings(
+      system2(command, args = args, stdout = out, stderr = err)
+    )
   )
 
-  if (quiet) {
-    status <- attr(result, "status") %||% 0
-  } else {
-    status <- result
+  res <- list(
+    stdout = tryCatch(
+      suppressWarnings(win2unix(read_char(out))),
+      error = function(e) ""
+    ),
+    stderr = tryCatch(
+      suppressWarnings(win2unix(read_char(err))),
+      error = function(e) ""
+    ),
+    status = res
+  )
+
+  if (error && res$status != 0) {
+    stop("Command ", command, " failed ", res$stderr)
   }
 
-  if (!identical(as.character(status), "0")) {
-    stop("Command failed (", status, ")", call. = FALSE)
+  if (! quiet) {
+    if (! identical(res$stdout, NA_character_)) cat(res$stdout)
+    if (! identical(res$stderr, NA_character_)) cat(res$stderr)
   }
 
-  invisible(TRUE)
+  res
 }
 
+win2unix <- function(str) {
+  gsub("\r\n", "\n", str, fixed = TRUE)
+}
 
-wrap_command <- function(x) {
-  lines <- strwrap(x, getOption("width") - 2, exdent = 2)
-  continue <- c(rep(" \\", length(lines) - 1), "")
-  paste(lines, continue, collapse = "\n")
+read_char <- function(path, ...) {
+  readChar(path, nchars = file.info(path)$size, ...)
 }
 
 `%||%` <- function (a, b) if (!is.null(a)) a else b
@@ -2000,6 +2053,29 @@ set_libpaths <- function(paths) {
 }
 
 with_libpaths <- with_something(set_libpaths, .libPaths)
+
+untar <- function(tarfile, ...) {
+  extras <- if (os_type() == "windows") "--force-local"
+  utils::untar(tarfile, extras = extras, ...)
+}
+
+os_type <- function() {
+  .Platform$OS.type
+}
+
+sys_type <- function() {
+  if (.Platform$OS.type == "windows") {
+    "windows"
+  } else if (Sys.info()["sysname"] == "Darwin") {
+    "macos"
+  } else if (Sys.info()["sysname"] == "Linux") {
+    "linux"
+  } else if (.Platform$OS.type == "unix") {
+    "unix"
+  } else {
+    stop("Unknown OS")
+  }
+}
 
 
   install_github(...)
