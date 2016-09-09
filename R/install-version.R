@@ -75,8 +75,15 @@ download_version_url <- function(package, version, repos, type) {
   if (package %in% row.names(available)) {
     current.version <- available[package, 'Version']
     if (is.null(version) || version == current.version) {
-      return(steal_download_url(package, available, repos, contriburl,
-                                type))
+      row <- available[which(rownames(available) == package)[1], ]
+      return(paste0(
+        row[["Repository"]],
+        "/",
+        row[["Package"]],
+        "_",
+        row[["Version"]],
+        ".tar.gz"
+      ))
     }
   }
 
@@ -95,31 +102,4 @@ download_version_url <- function(package, version, repos, type) {
   }
 
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
-}
-
-#' @importFrom utils download.file download.packages capture.output
-
-steal_download_url <- function(package, available, repos, contriburl,
-                               type) {
-  myurl <- NULL
-  on.exit(suppressMessages(untrace(download.file)), add = TRUE)
-  suppressMessages(trace(
-    download.file,
-    print = FALSE,
-    function() {
-      myurl <<- get("url", envir = parent.frame())
-      stop()
-    }
-  ))
-  suppressWarnings(
-    capture.output(type = "output",
-    capture.output(type = "message",
-      download.packages(
-        package, destdir = tempdir(),
-        available = available,
-        repos = repos, contriburl = contriburl,
-        type = type
-      )
-  )))
-  myurl
 }
