@@ -9,9 +9,9 @@ system_check <- function(command, args = character(), quiet = TRUE,
 
   ## We suppress warnings, they are given if the command
   ## exits with a non-zero status
-  res <- suppressWarnings(
-    in_dir(
-      path,
+  res <- in_dir(
+    path,
+    suppressWarnings(
       system2(command, args = args, stdout = out, stderr = err)
     )
   )
