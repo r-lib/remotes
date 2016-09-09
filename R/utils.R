@@ -75,3 +75,21 @@ untar <- function(tarfile, ...) {
   extras <- if (os_type() == "windows") "--force-local"
   utils::untar(tarfile, extras = extras, ...)
 }
+
+os_type <- function() {
+  .Platform$OS.type
+}
+
+sys_type <- function() {
+  if (.Platform$OS.type == "windows") {
+    "windows"
+  } else if (Sys.info()["sysname"] == "Darwin") {
+    "macos"
+  } else if (Sys.info()["sysname"] == "Linux") {
+    "linux"
+  } else if (.Platform$OS.type == "unix") {
+    "unix"
+  } else {
+    stop("Unknown OS")
+  }
+}

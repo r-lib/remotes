@@ -11,3 +11,8 @@ write_dcf <- function(path, desc) {
     indent = 0
   )
 }
+
+get_desc_field <- function(path, field) {
+  dcf <- read_dcf(path)
+  dcf[[field]]
+}
