@@ -36,8 +36,8 @@ test_that("package_find_repo() works correctly with multiple repos", {
   package <- "ROI.plugin.glpk"
   res <- package_find_repo(package, repos = repos)
 
-  expect_equal(NROW(res), 1L)
-  expect_equal(res$repo, "http://cran.rstudio.com")
+  expect_true(NROW(res) >= 1)
+  expect_equal(res$repo[1], "http://cran.rstudio.com")
   expect_match(rownames(res), package)
 })
 
