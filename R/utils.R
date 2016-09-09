@@ -71,9 +71,19 @@ set_libpaths <- function(paths) {
 
 with_libpaths <- with_something(set_libpaths, .libPaths)
 
+## There are two kinds of tar on windows, one needs --force-local
+## not to interpret : characters, the other does not. We try both ways.
+
 untar <- function(tarfile, ...) {
-  extras <- if (os_type() == "windows") "--force-local"
-  utils::untar(tarfile, extras = extras, ...)
+  if (os_type() == "windows") {
+    tryCatch(
+      utils::untar(tarfile, extras = "--force-local", ...),
+      error = function(e) utils::untar(tarfile, ...)
+    )
+
+  } else {
+    utils::untar(tarfile, ...)
+  }
 }
 
 os_type <- function() {
