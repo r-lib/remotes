@@ -3,7 +3,7 @@ context("Decompress")
 
 test_that("decompress various file types", {
 
-  types <- c("zip", "tar", "tar.gz", "tgz", "tar.bz2", "tbz")
+  types <- c("zip", "tar", "tar.gz", "tgz")
 
   for (type in types) {
 
@@ -22,7 +22,7 @@ test_that("decompress various file types", {
 
 test_that("decompress with internal unzip", {
 
-  types <- c("zip", "tar", "tar.gz", "tgz", "tar.bz2", "tbz")
+  types <- c("zip", "tar", "tar.gz", "tgz")
 
   for (type in types) {
 
