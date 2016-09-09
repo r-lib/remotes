@@ -1,6 +1,6 @@
 
 system_check <- function(command, args = character(), quiet = TRUE,
-                         error = TRUE) {
+                         error = TRUE, path = ".") {
 
   out <- tempfile()
   err <- tempfile()
@@ -9,8 +9,11 @@ system_check <- function(command, args = character(), quiet = TRUE,
 
   ## We suppress warnings, they are given if the command
   ## exits with a non-zero status
-  suppressWarnings(
-    res <- system2(command, args = args, stdout = out, stderr = err)
+  res <- suppressWarnings(
+    in_dir(
+      path,
+      system2(command, args = args, stdout = out, stderr = err)
+    )
   )
 
   res <- list(

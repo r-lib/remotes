@@ -57,10 +57,6 @@ download_method <- function() {
   }
 }
 
-os_type <- function() {
-  .Platform$OS.type
-}
-
 curl_download <- function(url, path, quiet) {
 
   if (!pkg_installed("curl")) {
