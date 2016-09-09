@@ -36,8 +36,8 @@ test_that("package_find_repo() works correctly with multiple repos", {
   package <- "ROI.plugin.glpk"
   res <- package_find_repo(package, repos = repos)
 
-  expect_equal(NROW(res), 1L)
-  expect_equal(res$repo, "http://cran.rstudio.com")
+  expect_true(NROW(res) >= 1)
+  expect_equal(res$repo[1], "http://cran.rstudio.com")
   expect_match(rownames(res), package)
 })
 
@@ -111,9 +111,9 @@ test_that("install_version for archives pacakges", {
 
   with_mock(
     `remotes::install_url` = function(url, ...) url,
-    expect_equal(
+    expect_match(
       install_version("igraph0", type = "source", lib = lib, repos = repos),
-      "https://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+      "https?://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
     )
   )
 })

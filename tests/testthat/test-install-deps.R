@@ -17,14 +17,14 @@ test_that("installing packages with dependencies", {
   .libPaths(lib)
 
   install_github(
-    "cran/dotenv",
+    "cran/desc",
     lib = lib,
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("dotenv"))
-  expect_equal(packageDescription("dotenv")$RemoteRepo, "dotenv")
-  expect_silent(packageDescription("falsy"))
-  expect_silent(packageDescription("magrittr"))
+  expect_silent(packageDescription("desc"))
+  expect_equal(packageDescription("desc")$RemoteRepo, "desc")
+  expect_silent(packageDescription("R6"))
+  expect_silent(packageDescription("crayon"))
 
 })

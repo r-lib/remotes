@@ -9,7 +9,7 @@ skip_if_offline <- function(host = "httpbin.org", port = 80) {
   if (is.na(res)) skip("No internet connection")
 }
 
-skip_if_over_rate_limit <- function() {
+skip_if_over_rate_limit <- function(by = 5) {
 
   tmp <- tempfile()
   download(
@@ -19,5 +19,5 @@ skip_if_over_rate_limit <- function() {
   )
 
   res <- fromJSONFile(tmp)$rate$remaining
-  if (is.null(res) || res <= 2) skip("Over the GitHub rate limit")
+  if (is.null(res) || res <= by) skip("Over the GitHub rate limit")
 }

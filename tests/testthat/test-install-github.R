@@ -222,14 +222,14 @@ test_that("github_pull", {
   .libPaths(lib)
 
   install_github(
-    "gaborcsardi/pkgconfig",
-    ref = github_pull(7),
+    "MangoTheCat/pkgsnap",
+    ref = github_pull(10),
     lib = lib,
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("pkgconfig"))
-  expect_equal(packageDescription("pkgconfig")$RemoteRepo, "pkgconfig")
+  expect_silent(packageDescription("pkgsnap"))
+  expect_equal(packageDescription("pkgsnap")$RemoteRepo, "pkgsnap")
 
 })
 

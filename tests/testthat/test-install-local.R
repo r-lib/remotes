@@ -23,11 +23,11 @@ test_that("install_local", {
   if (length(repos) == 0) repos <- character()
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
-  pkg <- download.packages("falsy", dir, repos = repos, type = "source")
+  pkg <- download.packages("pkgconfig", dir, repos = repos, type = "source")
 
   install_local(pkg[, 2], lib = lib)
 
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteType, "local")
+  expect_silent(packageDescription("pkgconfig"))
+  expect_equal(packageDescription("pkgconfig")$RemoteType, "local")
 
 })

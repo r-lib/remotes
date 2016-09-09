@@ -1,40 +1,46 @@
-#' Run a system command and check if it succeeds.
-#'
-#' @param cmd the command to run.
-#' @param args a vector of command arguments.
-#' @param quiet if \code{FALSE}, the command to be run will be echoed.
-#' @param ... additional arguments passed to \code{\link[base]{system}}
-#' @return \code{TRUE} if the command succeeds, an error will be thrown if the
-#' command fails.
-#' @noRd
-system_check <- function(cmd, args = character(), quiet = FALSE, ...) {
-  full <- paste(shQuote(cmd), " ", paste(args, collapse = " "), sep = "")
 
-  if (!quiet) {
-    message(wrap_command(full))
-    message()
-  }
+system_check <- function(command, args = character(), quiet = TRUE,
+                         error = TRUE) {
 
-  result <- suppressWarnings(
-    system(full, intern = quiet, ignore.stderr = quiet, ...)
+  out <- tempfile()
+  err <- tempfile()
+  on.exit(unlink(out), add = TRUE)
+  on.exit(unlink(err), add = TRUE)
+
+  ## We suppress warnings, they are given if the command
+  ## exits with a non-zero status
+  suppressWarnings(
+    res <- system2(command, args = args, stdout = out, stderr = err)
   )
 
-  if (quiet) {
-    status <- attr(result, "status") %||% 0
-  } else {
-    status <- result
+  res <- list(
+    stdout = tryCatch(
+      suppressWarnings(win2unix(read_char(out))),
+      error = function(e) ""
+    ),
+    stderr = tryCatch(
+      suppressWarnings(win2unix(read_char(err))),
+      error = function(e) ""
+    ),
+    status = res
+  )
+
+  if (error && res$status != 0) {
+    stop("Command ", command, " failed ", res$stderr)
   }
 
-  if (!identical(as.character(status), "0")) {
-    stop("Command failed (", status, ")", call. = FALSE)
+  if (! quiet) {
+    if (! identical(res$stdout, NA_character_)) cat(res$stdout)
+    if (! identical(res$stderr, NA_character_)) cat(res$stderr)
   }
 
-  invisible(TRUE)
+  res
 }
 
+win2unix <- function(str) {
+  gsub("\r\n", "\n", str, fixed = TRUE)
+}
 
-wrap_command <- function(x) {
-  lines <- strwrap(x, getOption("width") - 2, exdent = 2)
-  continue <- c(rep(" \\", length(lines) - 1), "")
-  paste(lines, continue, collapse = "\n")
+read_char <- function(path, ...) {
+  readChar(path, nchars = file.info(path)$size, ...)
 }

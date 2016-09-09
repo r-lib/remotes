@@ -15,7 +15,7 @@ test_that("install_svn", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_svn("https://github.com/mangothecat/simplegraph")
+  install_svn("https://github.com/mangothecat/simplegraph/trunk")
 
   expect_silent(packageDescription("simplegraph"))
   expect_equal(packageDescription("simplegraph")$RemoteType, "svn")
@@ -38,7 +38,7 @@ test_that("install_svn branch", {
 
   install_svn(
     "https://github.com/mangothecat/simplegraph",
-    branch = "remotes-test"
+    subdir = "branches/remotes-test"
   )
 
   expect_silent(packageDescription("simplegraph"))
@@ -64,7 +64,7 @@ test_that("install_svn subdir", {
     `remotes::install` = function(dir, ...) { print(list.files(dir)); TRUE },
     expect_output(
       install_svn(
-        "https://github.com/dmlc/xgboost",
+        "https://github.com/dmlc/xgboost/trunk",
         subdir = "R-package"
       ),
       "DESCRIPTION"
@@ -91,7 +91,7 @@ test_that("downloading an SVN revision", {
   skip_if_offline()
 
   x <- list(
-    url = "https://github.com/mangothecat/simplegraph",
+    url = "https://github.com/mangothecat/simplegraph/trunk",
     revision = "r28"
   )
 
@@ -110,13 +110,12 @@ test_that("downloading a wrong SVN revision", {
   skip_if_offline()
 
   x <- list(
-    url = "https://github.com/mangothecat/simplegraph",
+    url = "https://github.com/mangothecat/simplegraph/trunk",
     revision = "xxx"
   )
 
   expect_error(
-    remote_download.svn_remote(x),
-    "There was a problem switching to the requested SVN revision"
+    remote_download.svn_remote(x)
   )
 })
 
