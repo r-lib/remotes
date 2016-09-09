@@ -84,5 +84,5 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
     "-d", shQuote(target)
   )
 
-  system_check(unzip, args, quiet = TRUE)
+  system_check(unzip, args)
 }
