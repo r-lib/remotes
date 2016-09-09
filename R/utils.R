@@ -70,3 +70,8 @@ set_libpaths <- function(paths) {
 }
 
 with_libpaths <- with_something(set_libpaths, .libPaths)
+
+untar <- function(tarfile, ...) {
+  extras <- if (os_type() == "windows") "--force-local"
+  utils::untar(tarfile, extras = extras, ...)
+}

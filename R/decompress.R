@@ -39,16 +39,16 @@ decompress <- function(src, target) {
     outdir <- getrootdir(as.vector(utils::unzip(src, list = TRUE)$Name))
 
   } else if (grepl("\\.tar$", src)) {
-    utils::untar(src, exdir = target)
-    outdir <- getrootdir(utils::untar(src, list = TRUE))
+    untar(src, exdir = target)
+    outdir <- getrootdir(untar(src, list = TRUE))
 
   } else if (grepl("\\.(tar\\.gz|tgz)$", src)) {
-    utils::untar(src, exdir = target, compressed = "gzip")
-    outdir <- getrootdir(utils::untar(src, compressed = "gzip", list = TRUE))
+    untar(src, exdir = target, compressed = "gzip")
+    outdir <- getrootdir(untar(src, compressed = "gzip", list = TRUE))
 
   } else if (grepl("\\.(tar\\.bz2|tbz)$", src)) {
-    utils::untar(src, exdir = target, compressed = "bzip2")
-    outdir <- getrootdir(utils::untar(src, compressed = "bzip2", list = TRUE))
+    untar(src, exdir = target, compressed = "bzip2")
+    outdir <- getrootdir(untar(src, compressed = "bzip2", list = TRUE))
 
   } else {
     ext <- gsub("^[^.]*\\.", "", src)
