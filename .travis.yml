@@ -30,3 +30,4 @@ env:
   matrix:
     - RVERSION=release
     - RVERSION=devel COVERAGE=true
+  NOT_CRAN=true
