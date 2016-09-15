@@ -3,6 +3,14 @@
 
 `%:::%` <- function (p, f) get(f, envir = asNamespace(p))
 
+vlapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, logical(1L), ..., USE.NAMES = USE.NAMES)
+}
+
+viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
+}
+
 is_bioconductor <- function(x) {
   !is.null(x$biocviews)
 }

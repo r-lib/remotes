@@ -256,7 +256,7 @@ parse_github_repo_spec <- function(repo) {
   params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
   if (params$invalid != "")
     stop(sprintf("Invalid git repo: %s", repo))
-  params <- params[sapply(params, nchar) > 0]
+  params <- params[viapply(params, nchar) > 0]
 
   params
 }
