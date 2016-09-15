@@ -88,7 +88,7 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
 
   dest <- tempfile(fileext = paste0(".zip"))
   src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
-  src <- paste0(src_root, "/zipball/", x$ref)
+  src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
 
   if (github_has_submodules(x)) {
     warning("GitHub repo contains submodules, may not function as expected!",
