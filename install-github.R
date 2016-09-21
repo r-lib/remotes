@@ -400,12 +400,13 @@ dev_remote_type <- function(remotes = "") {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
     tryCatch(
-      fun <- get(x = paste0("install_", tolower(type)),
-        envir = asNamespace("remotes"),
-        mode = "function",
-        inherits = FALSE),
+      fun <- get(x = paste0("install_", tolower(type)), mode = "function"),
       error = function(e) {
-        stop("Malformed remote specification '", x, "'", call. = FALSE)
+        stop(
+          "Malformed remote specification '", x, "'",
+          ", error: ", conditionMessage(e),
+          call. = FALSE
+        )
       })
     list(repository = repo, type = type, fun = fun)
   }
