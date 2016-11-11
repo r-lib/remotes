@@ -693,7 +693,7 @@ curl_download <- function(url, path, quiet) {
     stop("The 'curl' package is required if R is older than 3.2.0")
   }
 
-  curl::curl_download(url, path, quiet = quiet)
+  curl::curl_download(url, path, quiet = quiet, mode = "wb")
 }
 
 # Extract the commit hash from a git archive. Git archives include the SHA1
