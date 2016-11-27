@@ -50,15 +50,18 @@ download_method <- function() {
   if (compareVersion(get_r_version(), "3.3") == -1) {
     
     if (os_type() == "windows") {
-      return("wininet")
+      "wininet"
+      
+    } else if (isTRUE(unname(capabilities("libcurl")))) {
+      "libcurl"
+      
+    } else {
+      "auto"
+    }
     
-      } else if (isTRUE(unname(capabilities("libcurl")))) {
-      return("libcurl")
-    
-      }
+  } else {
+    "auto"
   }
-  
-  "auto"
 }
 
 curl_download <- function(url, path, quiet) {
