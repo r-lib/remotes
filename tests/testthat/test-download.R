@@ -2,21 +2,29 @@
 context("Download")
 
 test_that("download_method", {
-
+  
   with_mock(
-    `base::capabilities` = function(...) c(libcurl = TRUE),
-    expect_equal(download_method(), "libcurl")
+    `remotes::get_r_version` = function(...) "3.3.0",
+    expect_equal(download_method(), "auto")
   )
 
   with_mock(
-    `base::capabilities` = function(...) c(libcurl = FALSE),
+    `remotes::get_r_version` = function(...) "3.2.5",
     `remotes::os_type` = function() "windows",
     expect_equal(download_method(), "wininet")
   )
 
   with_mock(
-    `base::capabilities` = function(...) c(libcurl = FALSE),
+    `remotes::get_r_version` = function(...) "3.2.5",
     `remotes::os_type` = function() "unix",
+    `base::capabilities` = function(...) c(libcurl = TRUE),
+    expect_equal(download_method(), "libcurl")
+  )
+
+  with_mock(
+    `remotes::get_r_version` = function(...) "3.2.5",
+    `remotes::os_type` = function() "unix",
+    `base::capabilities` = function(...) c(libcurl = FALSE),
     expect_equal(download_method(), "auto")
   )
 

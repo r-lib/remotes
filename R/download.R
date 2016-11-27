@@ -45,16 +45,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-
-  if (isTRUE(unname(capabilities("libcurl")))) {
-    "libcurl"
-
-  } else if (os_type() == "windows") {
-    "wininet"
-
-  } else {
-    "auto"
+  
+  # R versions newer than 3.3.0 have correct default methods
+  if (compareVersion(get_r_version(), "3.3") == -1) {
+    
+    if (os_type() == "windows") {
+      return("wininet")
+    
+      } else if (isTRUE(unname(capabilities("libcurl")))) {
+      return("libcurl")
+    
+      }
   }
+  
+  "auto"
 }
 
 curl_download <- function(url, path, quiet) {
