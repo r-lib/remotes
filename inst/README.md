@@ -127,6 +127,18 @@ installed temporarily.
   and archived packages as well.
 * All dependencies of a package in a local directory via
   `install_deps`.
+  
+### Download methods
+
+* For R older the 3.2, `curl` package is required as `remotes` fallbacks to
+`curl::curl_download` in that case
+* For R newer than 3.3, default `download.file` method is used. (`method = "auto"`)
+* For in between version, 
+    * `method = "wininet"` is used on windows OS
+    * `method = "libcurl"` is used on other OS, if available.
+
+See `help("download.file")` for informations on these methods and for setting
+proxies if needed.
 
 ### Notes
 
