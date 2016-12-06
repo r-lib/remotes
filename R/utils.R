@@ -107,3 +107,15 @@ sys_type <- function() {
     stop("Unknown OS")
   }
 }
+
+is_dir <- function(path) {
+  file.info(path)$isdir
+}
+
+untar_description <- function(tarball, dir = tempfile()) {
+  files <- untar(tarball, list = TRUE)
+  desc <- grep("^[^/]+/DESCRIPTION$", files, value = TRUE)
+  if (length(desc) < 1) stop("No 'DESCRIPTION' file in package")
+  untar(tarball, desc, exdir = dir)
+  file.path(dir, desc)
+}
