@@ -210,7 +210,7 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
 #' \code{update()} method installs outdated or missing packages from CRAN.
 #'
 #' @param packages A character vector of package names.
-#' @param pkgdir path to a package directory.
+#' @param pkgdir path to a package directory, or to a package tarball.
 #' @param dependencies Which dependencies do you want to check?
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
@@ -675,13 +675,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-
-  if (isTRUE(unname(capabilities("libcurl")))) {
-    "libcurl"
-
-  } else if (os_type() == "windows") {
-    "wininet"
-
+  
+  # R versions newer than 3.3.0 have correct default methods
+  if (compareVersion(get_r_version(), "3.3") == -1) {
+    
+    if (os_type() == "windows") {
+      "wininet"
+      
+    } else if (isTRUE(unname(capabilities("libcurl")))) {
+      "libcurl"
+      
+    } else {
+      "auto"
+    }
+    
   } else {
     "auto"
   }
@@ -1124,7 +1131,7 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
 
   dest <- tempfile(fileext = paste0(".zip"))
   src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
-  src <- paste0(src_root, "/zipball/", x$ref)
+  src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
 
   if (github_has_submodules(x)) {
     warning("GitHub repo contains submodules, may not function as expected!",
@@ -1292,7 +1299,7 @@ parse_github_repo_spec <- function(repo) {
   params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
   if (params$invalid != "")
     stop(sprintf("Invalid git repo: %s", repo))
-  params <- params[sapply(params, nchar) > 0]
+  params <- params[viapply(params, nchar) > 0]
 
   params
 }
@@ -1924,8 +1931,17 @@ parse_deps <- function(string) {
 }
 
 load_pkg_description <- function(path) {
+
   path <- normalizePath(path)
-  path_desc <- file.path(path, "DESCRIPTION")
+
+  if (!is_dir(path)) {
+    dir <- tempfile()
+    path_desc <- untar_description(path, dir = dir)
+    on.exit(unlink(dir, recursive = TRUE))
+
+  } else {
+    path_desc <- file.path(path, "DESCRIPTION")
+  }
 
   desc <- read_dcf(path_desc)
   names(desc) <- tolower(names(desc))
@@ -1986,6 +2002,10 @@ read_char <- function(path, ...) {
 `%||%` <- function (a, b) if (!is.null(a)) a else b
 
 `%:::%` <- function (p, f) get(f, envir = asNamespace(p))
+
+viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
+}
 
 is_bioconductor <- function(x) {
   !is.null(x$biocviews)
@@ -2086,6 +2106,18 @@ sys_type <- function() {
   } else {
     stop("Unknown OS")
   }
+}
+
+is_dir <- function(path) {
+  file.info(path)$isdir
+}
+
+untar_description <- function(tarball, dir = tempfile()) {
+  files <- untar(tarball, list = TRUE)
+  desc <- grep("^[^/]+/DESCRIPTION$", files, value = TRUE)
+  if (length(desc) < 1) stop("No 'DESCRIPTION' file in package")
+  untar(tarball, desc, exdir = dir)
+  file.path(dir, desc)
 }
 
 
