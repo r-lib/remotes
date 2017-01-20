@@ -13,7 +13,8 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
   if (!is.null(auth_token)) {
     sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
-    real_url <- paste0(url, sep, "access_token=", auth_token)
+    token_name <- if (grepl("gitlab", url, fixed = TRUE)) "private_token=" else "access_token="
+    real_url <- paste0(url, sep, token_name, auth_token)
   }
 
   if (compareVersion(get_r_version(), "3.2.0") == -1) {
