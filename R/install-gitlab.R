@@ -77,8 +77,9 @@ remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   }
 
   dest <- tempfile(fileext = paste0(".zip"))
-  src_root <- paste0("https://", x$host, "/api/v3/projects/", x$username, "%2F", x$repo)
-  src <- paste0(src_root, "/repository/archive.zip?", utils::URLencode(x$ref, reserved = TRUE))
+  src_root <- file.path("https:/", x$host, x$username, x$ repo)
+  #src_root <- paste0("https://", x$host, "/api/v3/projects/", x$username, "%2F", x$repo)
+  src <- paste0(src_root, "/repository/archive.zip?ref=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (gitlab_has_submodules(x)) {
     warning("GitLab repo contains submodules, may not function as expected!",
