@@ -159,10 +159,9 @@ gitlab_release <- function() structure(NA_integer_, class = "gitlab_release")
 gitlab_resolve_ref <- function(x, params, auth_token) UseMethod("gitlab_resolve_ref")
 
 #' @export
-gitlab_resolve_ref.default <- function(x, params) {
+gitlab_resolve_ref.default <- function(x, params, auth_token) {
   params$ref <- x
   params
-  auth_token
 }
 
 #' @export
