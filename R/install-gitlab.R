@@ -174,9 +174,9 @@ gitlab_resolve_ref.NULL <- function(x, params) {
 
 #' @export
 gitlab_resolve_ref.gitlab_merge <- function(x, params, auth_token) {
-  # GET /projects/:user/:repo/merge_request/:number
+  # GET /projects/:user/:repo/merge_request?iid=:number
   if (is.null(auth_token)) stop("The GitLab merge request API requires authentication.")
-  path <- paste0("projects/", paste0(params$username, "%2F", params$repo), "/merge_requests?iid=", x)
+  path <- paste0("projects/", params$username, "%2F", params$repo, "/merge_requests?iid=", x)
   response <- tryCatch(
     gitlab_GET(path, pat = auth_token),
     error = function(e) e
@@ -195,22 +195,22 @@ gitlab_resolve_ref.gitlab_merge <- function(x, params, auth_token) {
 
 # Retrieve the ref for the latest release
 #' @export
-gitlab_resolve_ref.gitlab_release <- function(x, params) {
-  # GET /repos/:user/:repo/releases
-  path <- paste("repos", params$username, params$repo, "releases", sep = "/")
+gitlab_resolve_ref.gitlab_release <- function(x, params, auth_token) {
+  # GET /projects/:id/repository/tags
+  path <- paste0("projects/", params$username, "%2F", params$repo, "/repository/tags")
   response <- tryCatch(
-    gitlab_GET(path),
+    gitlab_GET(path, pat = auth_token),
     error = function(e) e
   )
 
-  if (methods::is(response, "error") || !is.null(response$message)) {
+  if (methods::is(response, "error") || is.null(response[[1]])) {
     stop("Cannot find repo ", params$username, "/", params$repo, ".")
   }
 
   if (length(response) == 0L)
     stop("No releases found for repo ", params$username, "/", params$repo, ".")
 
-  params$ref <- response[[1L]]$tag_name
+  params$ref <- response[[1L]]$name
   params
 }
 
