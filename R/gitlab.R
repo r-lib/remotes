@@ -1,5 +1,5 @@
 
-gitlab_GET <- function(path, ..., pat = github_pat()) {
+gitlab_GET <- function(path, ..., pat = gitlab_pat()) {
 
   url <- paste0("https://www.gitlab.com/api/v3/", path)
 
@@ -16,7 +16,7 @@ gitlab_commit <- function(username, repo, ref = "master") {
                    "repository/commits", ref)
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = gitlab_pat())
+  download(tmp, url, meta$auth_token %||% auth_token %||% gitlab_pat())
 
   fromJSONFile(tmp)
 }

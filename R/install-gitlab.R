@@ -57,7 +57,7 @@ gitlab_remote <- function(repo, ref = NULL, subdir = NULL,
                        host = "www.gitlab.com") {
 
   meta <- parse_git_repo(repo)
-  meta <- gitlab_resolve_ref(meta$ref %||% ref, meta)
+  meta <- gitlab_resolve_ref(meta$ref %||% ref, meta, meta$auth_token  %||% auth_token %||% gitlab_pat())
 
   remote("gitlab",
     host = host,
@@ -78,7 +78,6 @@ remote_download.gitlab_remote <- function(x, quiet = FALSE) {
 
   dest <- tempfile(fileext = paste0(".zip"))
   src_root <- file.path("https:/", x$host, x$username, x$ repo)
-  #src_root <- paste0("https://", x$host, "/api/v3/projects/", x$username, "%2F", x$repo)
   src <- paste0(src_root, "/repository/archive.zip?ref=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (gitlab_has_submodules(x)) {
@@ -157,37 +156,40 @@ gitlab_merge <- function(merge) structure(merge, class = "gitlab_merge")
 #' @export
 gitlab_release <- function() structure(NA_integer_, class = "gitlab_release")
 
-gitlab_resolve_ref <- function(x, params) UseMethod("gitlab_resolve_ref")
+gitlab_resolve_ref <- function(x, params, auth_token) UseMethod("gitlab_resolve_ref")
 
 #' @export
 gitlab_resolve_ref.default <- function(x, params) {
   params$ref <- x
   params
+  auth_token
 }
 
 #' @export
 gitlab_resolve_ref.NULL <- function(x, params) {
   params$ref <- "master"
   params
+  auth_token
 }
 
 #' @export
-gitlab_resolve_ref.gitlab_merge <- function(x, params) {
+gitlab_resolve_ref.gitlab_merge <- function(x, params, auth_token) {
   # GET /projects/:user/:repo/merge_request/:number
-  path <- file.path("projects", paste0(params$username, "%2F", params$repo), "merge_requests", x)
+  if (is.null(auth_token)) stop("The GitLab merge request API requires authentication.")
+  path <- paste0("projects/", paste0(params$username, "%2F", params$repo), "/merge_requests?iid=", x)
   response <- tryCatch(
-    gitlab_GET(path),
+    gitlab_GET(path, pat = auth_token),
     error = function(e) e
   )
 
   ## Just because libcurl might download the error page...
-  if (methods::is(response, "error") || is.null(response$head)) {
+  if (methods::is(response, "error") || is.null(response[[1]]$id)) {
     stop("Cannot find GitLab merge request ", params$username, "/",
          params$repo, "#", x)
   }
 
-  params$username <- response$head$user$login
-  params$ref <- response$head$ref
+  params$username <- response[[1]]$author$username
+  params$ref <- response[[1]]$source_branch
   params
 }
 
