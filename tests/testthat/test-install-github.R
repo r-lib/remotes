@@ -320,3 +320,10 @@ test_that("update.package_deps", {
   )
 
 })
+
+test_that("parse_github_repo_spec trailing slash, issue #54", {
+  expect_equal(
+    parse_github_repo_spec("foo/bar/baz/"),
+    parse_github_repo_spec("foo/bar/baz")
+  )
+})

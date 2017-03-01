@@ -243,7 +243,7 @@ github_resolve_ref.github_release <- function(x, params) {
 parse_github_repo_spec <- function(repo) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
-  subdir_rx <- "(?:/([^@#]*[^@#/]))?"
+  subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
   ref_rx <- "(?:@([^*].*))"
   pull_rx <- "(?:#([0-9]+))"
   release_rx <- "(?:@([*]release))"
