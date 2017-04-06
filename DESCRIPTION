@@ -23,11 +23,13 @@ Imports:
     methods,
     utils
 Suggests:
+    crancache,
     curl,
     git2r,
     pingr,
     testthat
 Depends:
     R (>= 3.0.0)
+Remotes: r-hub/crancache
 RoxygenNote: 6.0.1
 SystemRequirements: Subversion for install_svn, git for install_git

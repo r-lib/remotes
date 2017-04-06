@@ -53,6 +53,14 @@ pkg_installed <- function(pkg) {
   }
 }
 
+has_package <- function(pkg) {
+  if (pkg %in% loadedNamespaces()) {
+    TRUE
+  } else {
+    requireNamespace(pkg, quietly = TRUE)
+  }
+}
+
 with_something <- function(set, reset = set) {
   function(new, code) {
     old <- set(new)
