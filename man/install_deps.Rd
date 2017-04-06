@@ -41,4 +41,3 @@ Install package dependencies if needed.
 \examples{
 \dontrun{install_deps(".")}
 }
-

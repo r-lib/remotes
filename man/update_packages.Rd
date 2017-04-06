@@ -39,4 +39,3 @@ update_packages(c("plyr", "ggplot2"))
 \code{\link{package_deps}} to see which packages are out of date/
   missing.
 }
-

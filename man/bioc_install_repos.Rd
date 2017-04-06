@@ -14,4 +14,3 @@ R version.
 \description{
 Deduce the URLs of the BioConductor repositories
 }
-

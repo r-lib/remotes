@@ -26,4 +26,3 @@ parse_github_repo_spec("jimhester/covr#47")
 parse_github_repo_spec("hadley/dplyr@*release")
 parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
 }
-

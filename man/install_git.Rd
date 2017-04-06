@@ -33,4 +33,3 @@ install_git("git://github.com/hadley/stringr.git")
 install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 }
 }
-

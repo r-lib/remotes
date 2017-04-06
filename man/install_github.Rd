@@ -63,4 +63,3 @@ install_github("hadley/private", auth_token = "abc")
 \seealso{
 \code{\link{github_pull}}
 }
-

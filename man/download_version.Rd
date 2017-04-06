@@ -39,4 +39,3 @@ Name of the downloaded file.
 It downloads the package to a temporary file, and
 returns the name of the file.
 }
-

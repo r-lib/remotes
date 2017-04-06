@@ -41,4 +41,3 @@ if you do by running \code{devtools::has_devel} (you need the
 \author{
 Jeremy Stephens
 }
-

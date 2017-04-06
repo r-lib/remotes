@@ -34,4 +34,3 @@ install_svn("svn://github.com/hadley/stringr/trunk")
 install_svn("svn://github.com/hadley/httr/branches/oauth")
 }
 }
-

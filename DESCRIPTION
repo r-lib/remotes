@@ -29,5 +29,5 @@ Suggests:
     testthat
 Depends:
     R (>= 3.0.0)
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 6.0.1
 SystemRequirements: Subversion for install_svn, git for install_git

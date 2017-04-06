@@ -23,4 +23,3 @@ a single command.
 install_url("https://github.com/hadley/stringr/archive/master.zip")
 }
 }
-
