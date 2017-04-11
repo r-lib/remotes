@@ -23,7 +23,7 @@ safe_install_packages <- function(...) {
   lib <- paste(.libPaths(), collapse = ":")
 
   if (has_package("crancache")) {
-    i.p <- crancache::install.packages
+    i.p <- crancache::install_packages
   } else {
     i.p <- utils::install.packages
   }
