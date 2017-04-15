@@ -5,6 +5,13 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
     missing_devel_warning(pkgdir)
   }
 
+  ## Check for circular dependencies. We need to know about the root
+  ## of the install process.
+  if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
+  if (check_for_circular_dependencies(pkgdir, quiet)) {
+    return(invisible(FALSE))
+  }
+
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
   safe_install_packages(
