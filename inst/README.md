@@ -4,11 +4,11 @@
 > Install R Packages from 'GitHub', 'BitBucket', or other local or remote repositories
 
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Linux Build Status](https://travis-ci.org/MangoTheCat/remotes.svg?branch=master)](https://travis-ci.org/MangoTheCat/remotes)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/MangoTheCat/remotes?svg=true)](https://ci.appveyor.com/project/gaborcsardi/remotes)
+[![Linux Build Status](https://travis-ci.org/r-pkgs/remotes.svg?branch=master)](https://travis-ci.org/r-pkgs/remotes)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-pkgs/remotes?svg=true)](https://ci.appveyor.com/project/gaborcsardi/remotes)
 [![](http://www.r-pkg.org/badges/version/remotes)](http://www.r-pkg.org/pkg/remotes)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/remotes)](http://www.r-pkg.org/pkg/remotes)
-[![Coverage Status](https://img.shields.io/codecov/c/github/MangoTheCat/remotes/master.svg)](https://codecov.io/github/MangoTheCat/remotes?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/github/r-pkgs/remotes/master.svg)](https://codecov.io/github/r-pkgs/remotes?branch=master)
 
 Download and install R packages stored in 'GitHub',
 'BitBucket', or plain 'subversion' or 'git' repositories. This package
@@ -27,14 +27,14 @@ version of `remotes` installed, you can use that to install the new
 versions:
 
 ```r
-remotes::install_github("mangothecat/remotes")
+remotes::install_github("r-pkgs/remotes")
 ```
 
 Otherwise you can call the supplied `install-github.R`
 file directly, from within R:
 
 ```r
-source("https://raw.githubusercontent.com/MangoTheCat/remotes/master/install-github.R")$value("mangothecat/remotes")
+source("https://raw.githubusercontent.com/r-pkgs/remotes/master/install-github.R")$value("r-pkgs/remotes")
 ```
 
 ## Usage
