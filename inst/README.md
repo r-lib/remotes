@@ -60,7 +60,7 @@ You can use it to install any R package from GitHub via sourcing a URL.
 E.g. to install `remotes` itself:
 
 ```r
-source("https://install-github/r-pkgs/remotes")
+source("https://install-github.me/r-pkgs/remotes")
 ```
 
 ## Usage
