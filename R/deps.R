@@ -55,10 +55,7 @@ package_deps <- function(packages, dependencies = NA,
     type <- "binary"
   }
 
-  if (length(repos) == 0)
-    repos <- character()
-
-  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+  repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
 
   deps <- sort(find_deps(packages, cran, top_dep = dependencies))
@@ -365,4 +362,14 @@ parse_additional_repositories <- function(pkg) {
   if (has_additional_repositories(pkg)) {
     strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
   }
+}
+
+fix_repositories <- function(repos) {
+  if (length(repos) == 0)
+    repos <- character()
+
+  # Override any existing default values that would open a GUI
+  # with the cloud mirror
+  repos[repos == "@CRAN@"] <- "http://cloud.r-project.org"
+  repos
 }

@@ -258,10 +258,7 @@ package_deps <- function(packages, dependencies = NA,
     type <- "binary"
   }
 
-  if (length(repos) == 0)
-    repos <- character()
-
-  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+  repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
 
   deps <- sort(find_deps(packages, cran, top_dep = dependencies))
