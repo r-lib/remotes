@@ -368,8 +368,8 @@ fix_repositories <- function(repos) {
   if (length(repos) == 0)
     repos <- character()
 
-  # Override any existing default values that would open a GUI
-  # with the cloud mirror
+  # Override any existing default values with the cloud mirror
+  # Reason: A "@CRAN@" value would open a GUI for choosing a mirror
   repos[repos == "@CRAN@"] <- "http://cloud.r-project.org"
   repos
 }
