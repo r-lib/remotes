@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-
+  
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -63,8 +63,11 @@ bioc_install_repos <- function() {
       a[, "URL"] <- sub("^http:", "https:", a[, "URL"])
     }
   }
-  if (vers >= "3.3.0") {
-    a[, "URL"] <- sub(as.character(biocVers), "3.3", a[, "URL"])
+  if (vers >= "3.4") {
+    a[, "URL"] <- sub(as.character(biocVers), "3.5", a[, "URL"]) 
+
+  } else if (vers >= "3.3.0") {
+    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
 
   } else if (vers >= "3.2") {
     a[, "URL"] <- sub(as.character(biocVers), "3.2", a[, "URL"])
@@ -90,6 +93,29 @@ bioc_install_repos <- function() {
   )
 
   structure(a[repos, "URL"], names = repos)
+}
+
+## A environment to hold which packages are being installed so packages
+## with circular dependencies can be skipped the second time.
+
+installing <- new.env(parent = emptyenv())
+
+is_root_install <- function() is.null(installing$packages)
+
+exit_from_root_install <- function() installing$packages <- NULL
+
+check_for_circular_dependencies <- function(pkgdir, quiet) {
+  pkgdir <- normalizePath(pkgdir)
+  pkg <- get_desc_field(file.path(pkgdir, "DESCRIPTION"), "Package")
+
+  if (pkg %in% installing$packages) {
+    if (!quiet) message("Skipping ", pkg, ", it is already being installed")
+    TRUE
+
+  } else {
+    installing$packages <- c(installing$packages, pkg)
+    FALSE
+  }
 }
 
 available_packages <- function(repos, type) {
@@ -190,7 +216,7 @@ getrootdir <- function(file_list) {
 }
 
 my_unzip <- function(src, target, unzip = getOption("unzip")) {
-  if (unzip == "internal") {
+  if (unzip %in% c("internal", "")) {
     return(utils::unzip(src, exdir = target))
   }
 
@@ -567,6 +593,16 @@ parse_additional_repositories <- function(pkg) {
   }
 }
 
+fix_repositories <- function(repos) {
+  if (length(repos) == 0)
+    repos <- character()
+
+  # Override any existing default values with the cloud mirror
+  # Reason: A "@CRAN@" value would open a GUI for choosing a mirror
+  repos[repos == "@CRAN@"] <- "http://cloud.r-project.org"
+  repos
+}
+
 has_devel <- function() {
   tryCatch(
     has_devel2(),
@@ -672,20 +708,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-
+  
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-
+    
     if (os_type() == "windows") {
       "wininet"
-
+      
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-
+      
     } else {
       "auto"
     }
-
+    
   } else {
     "auto"
   }
@@ -1283,7 +1319,7 @@ github_resolve_ref.github_release <- function(x, params) {
 parse_github_repo_spec <- function(repo) {
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
-  subdir_rx <- "(?:/([^@#]*[^@#/]))?"
+  subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
   ref_rx <- "(?:@([^*].*))"
   pull_rx <- "(?:#([0-9]+))"
   release_rx <- "(?:@([*]release))"
@@ -1436,7 +1472,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing.
+#'   package we are interested in installing. 
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
@@ -1481,7 +1517,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  }
+  } 
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
@@ -1692,6 +1728,13 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
     missing_devel_warning(pkgdir)
   }
 
+  ## Check for circular dependencies. We need to know about the root
+  ## of the install process.
+  if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
+  if (check_for_circular_dependencies(pkgdir, quiet)) {
+    return(invisible(FALSE))
+  }
+
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
 
   safe_install_packages(
@@ -1709,12 +1752,18 @@ safe_install_packages <- function(...) {
 
   lib <- paste(.libPaths(), collapse = ":")
 
+  if (has_package("crancache")) {
+    i.p <- crancache::install_packages
+  } else {
+    i.p <- utils::install.packages
+  }
+
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
       R_LIBS_SITE = lib,
       R_PROFILE_USER = tempfile()),
-    utils::install.packages(...)
+    i.p(...)
   )
 }
 
@@ -2047,6 +2096,14 @@ pkg_installed <- function(pkg) {
     TRUE
   } else {
     FALSE
+  }
+}
+
+has_package <- function(pkg) {
+  if (pkg %in% loadedNamespaces()) {
+    TRUE
+  } else {
+    requireNamespace(pkg, quietly = TRUE)
   }
 }
 
