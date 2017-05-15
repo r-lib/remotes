@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  
+
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -258,10 +258,7 @@ package_deps <- function(packages, dependencies = NA,
     type <- "binary"
   }
 
-  if (length(repos) == 0)
-    repos <- character()
-
-  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+  repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
 
   deps <- sort(find_deps(packages, cran, top_dep = dependencies))
@@ -675,20 +672,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-  
+
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-    
+
     if (os_type() == "windows") {
       "wininet"
-      
+
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-      
+
     } else {
       "auto"
     }
-    
+
   } else {
     "auto"
   }
@@ -1439,7 +1436,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing. 
+#'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
@@ -1484,7 +1481,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  } 
+  }
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
