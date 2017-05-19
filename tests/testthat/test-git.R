@@ -1,0 +1,82 @@
+
+context("Git")
+
+test_that("git_extract_sha1", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  sha <- "fbae60ced0afee0e7c0f8dc3b5b1bb48d303f3dd"
+  url <- paste0(
+    "https://api.github.com/repos/hadley/devtools/zipball/",
+    sha
+  )
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  download(tmp, url, auth_token = github_pat())
+
+  expect_equal(
+    git_extract_sha1(tmp),
+    sha
+  )
+})
+
+
+test_that("git not quiet", {
+
+  with_mock(
+    `remotes:::check_git_path` = function(...) "/foo/git",
+    `base::system` = function(...) "0",
+    expect_message(
+      git(args = c("arg1", "arg2"), quiet = FALSE),
+      "['\"]/foo/git['\"] arg1arg2"
+    )
+  )
+})
+
+
+test_that("git error", {
+
+  with_mock(
+    `remotes::check_git_path` = function(...) "/foo/git",
+    `base::system` = function(...) structure("foo", status = "1"),
+    expect_error(
+      git(args = "arg"),
+      "Command failed"
+    )
+  )
+})
+
+
+test_that("git_path", {
+
+  tmp <- tempfile()
+  expect_error(
+    git_path(tmp),
+    "does not exist"
+  )
+
+  cat("Hello", file = tmp)
+  expect_equal(git_path(tmp), tmp)
+
+  with_mock(
+    `base::Sys.which` = function(...) "",
+    `remotes::os_type` = function() "windows",
+    `base::file.exists` = function(...) FALSE,
+    expect_null(git_path())
+  )
+})
+
+
+test_that("check_git_path", {
+
+  with_mock(
+    `remotes::git_path` = function(...) NULL,
+    expect_error(
+      check_git_path(),
+      "Git does not seem to be installed on your system"
+    )
+  )
+})
