@@ -28,7 +28,6 @@ Imports:
     utils,
     withr
 Suggests:
-    crancache,
     curl,
     git2r,
     pingr,
