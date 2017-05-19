@@ -5,6 +5,7 @@
 #' if you do by running \code{\link[pkgbuild]{has_build_tools}}.
 #'
 #' @export
+#' @importFrom utils available.packages contrib.url install.packages
 #' @family package installation
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most

@@ -38,6 +38,7 @@
 #' }
 #'
 #' @export
+#' @importFrom utils installed.packages
 #' @examples
 #' \dontrun{
 #' package_deps("devtools")

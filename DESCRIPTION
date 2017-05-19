@@ -21,6 +21,8 @@ BugReports: https://github.com/r-pkgs/remotes/issues
 Imports:
     BiocInstaller,
     httr,
+    jsonlite,
+    methods,
     pkgbuild,
     pkgload,
     utils,

@@ -73,6 +73,9 @@ install_remotes <- function(remotes, ...) {
 }
 
 # Add metadata
+
+#' @importFrom utils modifyList
+
 add_metadata <- function(pkg_path, meta) {
   # During installation, the DESCRIPTION file is read and an package.rds file
   # created with most of the information from the DESCRIPTION file. Functions
@@ -146,6 +149,8 @@ remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
 remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")
 remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
+
+#' @importFrom utils packageDescription
 
 package2remote <- function(name, repos = getOption("repos"), type = getOption("pkgType")) {
 

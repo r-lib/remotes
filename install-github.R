@@ -1676,6 +1676,7 @@ package_find_repo <- function(package, repos) {
 #' @return Name of the downloaded file.
 #'
 #' @export
+#' @importFrom utils contrib.url
 
 download_version <- function(package, version = NULL,
                              repos = getOption("repos"),
