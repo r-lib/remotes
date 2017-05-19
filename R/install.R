@@ -1,5 +1,6 @@
 
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
+install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE,
+                    force_deps = FALSE, ...) {
 
   if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
     missing_devel_warning(pkgdir)
@@ -12,7 +13,8 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
     return(invisible(FALSE))
   }
 
-  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
+               force_deps = force_deps, ...)
 
   safe_install_packages(
     pkgdir,

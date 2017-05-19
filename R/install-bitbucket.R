@@ -10,6 +10,7 @@
 #'   to \code{username})
 #' @param password your password
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
+#'   This argument is only used if \code{repo} does not specify a reference.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
 #'   \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
@@ -21,10 +22,15 @@
 #' install_bitbucket("dannavarro/lsr-package")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
-                              auth_user = NULL, password = NULL, ...) {
+                              auth_user = NULL, password = NULL,
+                              force = FALSE, ...) {
 
   remotes <- lapply(repo, bitbucket_remote, ref = ref,
     subdir = subdir, auth_user = auth_user, password = password)
+
+  if (!isTRUE(force)) {
+    remotes <- Filter(different_sha, remotes)
+  }
 
   install_remotes(remotes, ...)
 }
@@ -33,6 +39,8 @@ bitbucket_remote <- function(repo, ref = NULL, subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL) {
 
   meta <- parse_git_repo(repo)
+
+  meta$ref <- meta$ref %||% ref %||% "master"
 
   remote("bitbucket",
     repo = meta$repo,
@@ -89,4 +97,18 @@ remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
     RemoteSha = sha,
     RemoteSubdir = x$subdir
   )
+}
+
+#' @export
+remote_package_name.bitbucket_remote <- function(remote, ...) {
+  remote_package_name.github_remote(
+    remote,
+    url = "https://bitbucket.org",
+    ...
+  )
+}
+
+#' @export
+remote_sha.bitbucket_remote <-function(remote, ...) {
+  remote_sha.github_remote(remote, url = "https://bitbucket.org", ...)
 }

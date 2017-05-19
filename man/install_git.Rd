@@ -5,7 +5,7 @@
 \title{Install a package from a git repository}
 \usage{
 install_git(url, subdir = NULL, branch = NULL, git = c("auto", "git2r",
-  "external"), ...)
+  "external"), force = FALSE, ...)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -19,6 +19,9 @@ contain the package we are interested in installing.}
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,
 otherwise an external git installation.}
+
+\item{force}{Force installation even if the git SHA1 has not changed since
+the previous install.}
 
 \item{...}{passed on to \code{install.packages}}
 }

@@ -13,6 +13,8 @@
 #' @param git Whether to use the \code{git2r} package, or an external
 #'   git client via system. Default is \code{git2r} if it is installed,
 #'   otherwise an external git installation.
+#' @param force Force installation even if the git SHA1 has not changed since
+#'   the previous install.
 #' @param ... passed on to \code{install.packages}
 #' @export
 #' @examples
@@ -21,10 +23,16 @@
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
 install_git <- function(url, subdir = NULL, branch = NULL,
-                        git = c("auto", "git2r", "external"), ...) {
+                        git = c("auto", "git2r", "external"),
+                        force = FALSE, ...) {
 
   git_remote <- select_git_remote(match.arg(git))
   remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+
+  if (!isTRUE(force)) {
+    remotes <- Filter(different_sha, remotes)
+  }
+
   install_remotes(remotes, ...)
 }
 
@@ -117,6 +125,59 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
     RemoteSha = xgit_remote_sha1(x$url),
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
+}
+
+#' @export
+remote_package_name.git_remote <- function(remote, ...) {
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp))
+  description_path <- paste0(collapse = "/", c(remote$subdir, "DESCRIPTION"))
+  ## Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
+  ## or server doesn't support that return NULL
+  res <- try(
+    silent = TRUE,
+    system_check(
+      git_path(),
+      args = c("archive", "-o", tmp, "--remote", remote$url,
+        if (is.null(remote$branch)) "HEAD" else remote$branch,
+        description_path),
+      quiet = TRUE))
+
+  if (inherits(res, "try-error")) {
+    return(NA)
+  }
+
+  ## git archive return a tar file, so extract it to tempdir and read the DCF
+  untar(tmp, files = description_path, exdir = tempdir())
+
+  read_dcf(file.path(tempdir(), description_path))$Package
+}
+
+#' @export
+remote_package_name.xgit_remote <- function(remote, ...) {
+  TODO
+}
+
+remote_sha.git_remote <- function(remote, ...) {
+  if (!is.null(remote$sha)) {
+    return(remote$sha)
+  }
+
+  tryCatch({
+    res <- git2r::remote_ls(remote$url, ...)
+    branch <- remote$branch %||% "master"
+    found <- grep(pattern = paste0("/", branch), x = names(res))
+
+    if (length(found) == 0) {
+      return(NA)
+    }
+    unname(res[found[1]])
+  }, error = function(e) NA)
+}
+
+remote_sha.xgit_remote <- function(remote, ...) {
+  TODO
 }
 
 #' @importFrom utils read.delim

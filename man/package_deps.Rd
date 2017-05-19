@@ -13,7 +13,8 @@ package_deps(packages, dependencies = NA, repos = getOption("repos"),
 local_package_deps(pkgdir = ".", dependencies = NA)
 
 dev_package_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"))
+  repos = getOption("repos"), type = getOption("pkgType"),
+  force_deps = FALSE)
 
 \method{update}{package_deps}(object, ..., quiet = FALSE, upgrade = TRUE)
 }
@@ -36,6 +37,9 @@ automatically to "binary" to avoid interactive prompts during package
 installation.}
 
 \item{pkgdir}{path to a package directory, or to a package tarball.}
+
+\item{force_deps}{whether to force installation of dependencies even if their
+SHA1 reference hasn't changed from the currently installed version.}
 
 \item{object}{A \code{package_deps} object.}
 

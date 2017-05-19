@@ -5,7 +5,7 @@
 \title{Install a package directly from bitbucket}
 \usage{
 install_bitbucket(repo, ref = "master", subdir = NULL, auth_user = NULL,
-  password = NULL, ...)
+  password = NULL, force = FALSE, ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -15,6 +15,7 @@ specify \code{subdir} and/or \code{ref} using the respective parameters
 precedence.}
 
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
+This argument is only used if \code{repo} does not specify a reference.
 Defaults to master.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
@@ -24,6 +25,9 @@ a package hosted in a private repository (and your username is different
 to \code{username})}
 
 \item{password}{your password}
+
+\item{force}{Force installation even if the git SHA1 has not changed since
+the previous install.}
 
 \item{...}{Other arguments passed on to \code{install.packages}.}
 }
