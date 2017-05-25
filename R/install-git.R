@@ -142,6 +142,7 @@ read_gitmodules <- function(file) {
   modules <- gsub('\n(\\[submodule \\".*?\\"\\])', '%split%\\1', modules)
   modules <- strsplit(modules, '%split%')
   modules <- lapply(unlist(modules), parse_module)
+  modules <- modules[sapply(modules, function(x) all(c("name", "path", "url", "branch") %in% names(x)))]
   modules
 }
 
@@ -161,6 +162,12 @@ parse_module <- function(module_string) {
   branch <- gsub('.*= *(.*)',
                  '\\1',
                  module_strings[grepl('branch', module_strings)])
+
+  # if there is no url string return an empty list, which we filter out later
+  if(!any(grepl('url', module_strings))){
+    return(list())
+  }
+
   # if there is no branch string, set branch to NULL
   if(!any(grepl('branch', module_strings))){
     branch <- NULL
