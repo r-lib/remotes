@@ -23,7 +23,7 @@ install_local <- function(path, subdir = NULL, ...) {
 
 local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0)) {
   remote("local",
-    path = path,
+    path = normalizePath(path),
     subdir = subdir
   )
 }
