@@ -29,18 +29,12 @@ safe_install_packages <- function(...) {
 
   lib <- paste(.libPaths(), collapse = ":")
 
-  if (has_package("crancache")) {
-    i.p <- crancache::install_packages
-  } else {
-    i.p <- utils::install.packages
-  }
-
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
       R_LIBS_SITE = lib,
       R_PROFILE_USER = tempfile()),
-    i.p(...)
+    utils::install.packages(...)
   )
 }
 

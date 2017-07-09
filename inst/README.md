@@ -30,8 +30,6 @@ Indeed most of the code was copied over from `devtools`.
 * Supports the `Remotes` field in `DESCRIPTION`. See more
   [here](https://github.com/hadley/devtools/blob/master/vignettes/dependencies.Rmd).
 * Supports the `Additional_repositories` in `DESCRIPTION`.
-* Supports the `crancache` package to transparently cache CRAN packages.
-  See more [here](https://github.com/r-hub/crancache#readme).
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
 * Does not contain compiled code, so no compiler is needed.
