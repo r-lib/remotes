@@ -4,7 +4,7 @@
 > Install R Packages from GitHub, BitBucket, or other local or remote
 > repositories
 
-[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Linux Build Status](https://travis-ci.org/r-lib/remotes.svg?branch=master)](https://travis-ci.org/r-lib/remotes)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-lib/remotes?svg=true)](https://ci.appveyor.com/project/gaborcsardi/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
