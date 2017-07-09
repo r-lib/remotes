@@ -22,6 +22,7 @@ Imports:
     methods,
     utils
 Suggests:
+    crancache,
     curl,
     git2r,
     pingr,
