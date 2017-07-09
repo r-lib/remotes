@@ -5,7 +5,6 @@ cache: packages
 r:
  - release
  - devel
- - oldrel
 
 after_success:
   - test $TRAVIS_R_VERSION_STRING = 'release' && Rscript -e 'covr::codecov()'
