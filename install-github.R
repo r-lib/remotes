@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  
+
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -64,7 +64,7 @@ bioc_install_repos <- function() {
     }
   }
   if (vers >= "3.4") {
-    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"]) 
+    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
 
   } else if (vers >= "3.3.0") {
     a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
@@ -630,25 +630,6 @@ has_devel2 <- function() {
   TRUE
 }
 
-missing_devel_warning <- function(pkgdir) {
-  pkgname <- tryCatch(
-    get_desc_field(file.path(pkgdir, "DESCRIPTION"), "Package"),
-    error = function(e) NULL
-  ) %||% "<unknown>"
-
-  sys <- sys_type()
-
-  warning(
-    "Package ",
-    pkgname,
-    " has compiled code, but no suitable ",
-    "compiler(s) were found. Installation will likely fail.\n  ",
-    if (sys == "windows") "Install Rtools and make sure it is in the PATH.",
-    if (sys == "macos") "Install XCode and make sure it works.",
-    if (sys == "linux") "Install compilers via your Linux package manager."
-  )
-}
-
 R <- function(args, path = tempdir()) {
 
   r <- file.path(R.home("bin"), "R")
@@ -708,20 +689,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-  
+
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-    
+
     if (os_type() == "windows") {
       "wininet"
-      
+
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-      
+
     } else {
       "auto"
     }
-    
+
   } else {
     "auto"
   }
@@ -1472,7 +1453,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing. 
+#'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
@@ -1517,7 +1498,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  } 
+  }
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
@@ -1746,25 +1727,6 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
   )
 
   invisible(TRUE)
-}
-
-safe_install_packages <- function(...) {
-
-  lib <- paste(.libPaths(), collapse = ":")
-
-  if (has_package("crancache")) {
-    i.p <- crancache::install_packages
-  } else {
-    i.p <- utils::install.packages
-  }
-
-  with_envvar(
-    c(R_LIBS = lib,
-      R_LIBS_USER = lib,
-      R_LIBS_SITE = lib,
-      R_PROFILE_USER = tempfile()),
-    i.p(...)
-  )
 }
 
 #' Install package dependencies if needed.
