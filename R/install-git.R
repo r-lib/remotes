@@ -8,6 +8,7 @@
 #' @param url Location of package. The url should point to a public or
 #'   private repository.
 #' @param branch Name of branch or tag to use, if not master.
+#' @param submodules if \code{TRUE} download submodules before installing.
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
 #' @param git Whether to use the \code{git2r} package, or an external
@@ -20,11 +21,12 @@
 #' install_git("git://github.com/hadley/stringr.git")
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
-install_git <- function(url, subdir = NULL, branch = NULL,
+install_git <- function(url, subdir = NULL, branch = NULL, submodules = FALSE,
                         git = c("auto", "git2r", "external"), ...) {
 
   git_remote <- select_git_remote(match.arg(git))
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch,
+                    submodules=submodules)
   install_remotes(remotes, ...)
 }
 
@@ -38,20 +40,24 @@ select_git_remote <- function(git) {
 }
 
 
-git_remote_git2r <- function(url, subdir = NULL, branch = NULL) {
+git_remote_git2r <- function(url, subdir = NULL, branch = NULL,
+                             submodules = submodules) {
   remote("git2r",
     url = url,
     subdir = subdir,
-    branch = branch
+    branch = branch,
+    submodules = submodules
   )
 }
 
 
-git_remote_xgit <- function(url, subdir = NULL, branch = NULL) {
+git_remote_xgit <- function(url, subdir = NULL, branch = NULL,
+                            submodules = submodules) {
   remote("xgit",
     url = url,
     subdir = subdir,
-    branch = branch
+    branch = branch,
+    submodules = submodules
   )
 }
 
@@ -129,4 +135,54 @@ xgit_remote_sha1 <- function(url, ref = "master") {
   names(refs_df) <- c("sha", "ref")
 
   refs_df$sha[1]
+}
+
+read_gitmodules <- function(file) {
+  modules <- readChar(file, file.info(file)$size)
+  modules <- gsub('\n(\\[submodule \\".*?\\"\\])', '%split%\\1', modules)
+  modules <- strsplit(modules, '%split%')
+  modules <- lapply(unlist(modules), parse_module)
+  modules
+}
+
+parse_module <- function(module_string) {
+  module_strings <- unlist(strsplit(module_string, '\n'))
+  module <- module_string[-1]
+
+  name <- gsub('\\[submodule \\"(.*?)\\"\\]',
+               '\\1',
+               module_strings[grepl('submodule', module_strings)])
+  path <- gsub('.*= *(.*)',
+               '\\1',
+               module_strings[grepl('path', module_strings)])
+  url <- gsub('.*= *(.*)',
+              '\\1',
+              module_strings[grepl('url', module_strings)])
+  branch <- gsub('.*= *(.*)',
+                 '\\1',
+                 module_strings[grepl('branch', module_strings)])
+  # if there is no branch string, set branch to NULL
+  if(!any(grepl('branch', module_strings))){
+    branch <- NULL
+  }
+
+
+  list(name = name, path = path, url = url, branch = branch)
+}
+
+download_module <- function(module_list, source) {
+  # convert git@ ssh syntax to http:// syntax
+  module_list$url <- gsub("git@(.*):(.*)/(.*).git", "http://\\1/\\2/\\3", module_list$url)
+
+  message("Downloading submodule ", module_list$name, " from ", module_list$url)
+  git2r::clone(module_list$url,
+               file.path(source, module_list$path),
+               branch = module_list$branch,
+               progress = FALSE)
+
+  return(TRUE)
+}
+
+download_modules <- function(modules_list, ...) {
+  invisible(vapply(modules_list, download_module, ..., FUN.VALUE = logical(1)))
 }

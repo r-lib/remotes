@@ -42,7 +42,8 @@ Attempting to install from a source repository that uses submodules
 raises a warning. Because the zipped sources provided by GitHub do not
 include submodules, this may lead to unexpected behaviour or compilation
 failure in source packages. In this case, cloning the repository manually
-may yield better results.
+using \code{\link{install_git}} with \code{submodules=TRUE} may yield
+better results.
 }
 \examples{
 \dontrun{
