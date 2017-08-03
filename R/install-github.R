@@ -13,6 +13,7 @@
 #' @param ref Desired git reference. Could be a commit, tag, or branch
 #'   name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.
 #' @param subdir subdirectory within repo that contains the R package.
+#' @param submodules if \code{TRUE} download submodules before installing.
 #' @param auth_token To install from a private repo, generate a personal
 #'   access token (PAT) in \url{https://github.com/settings/applications} and
 #'   supply to this argument. This is safer than using a password because
@@ -47,17 +48,19 @@
 #' }
 install_github <- function(repo, username = NULL,
                            ref = "master", subdir = NULL,
+                           submodules = FALSE,
                            auth_token = github_pat(),
                            host = "api.github.com", ...) {
 
   remotes <- lapply(repo, github_remote, username = username, ref = ref,
-    subdir = subdir, auth_token = auth_token, host = host)
+    subdir = subdir, submodules = submodules, auth_token = auth_token,
+    host = host)
 
   install_remotes(remotes, ...)
 }
 
 github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
-                       auth_token = github_pat(), sha = NULL,
+                       submodules = FALSE, auth_token = github_pat(), sha = NULL,
                        host = "api.github.com") {
 
   meta <- parse_git_repo(repo)
@@ -74,6 +77,7 @@ github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
     host = host,
     repo = meta$repo,
     subdir = meta$subdir %||% subdir,
+    submodules = submodules,
     username = meta$username,
     ref = meta$ref,
     sha = sha,

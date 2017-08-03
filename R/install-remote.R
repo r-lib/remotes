@@ -63,7 +63,7 @@ remote <- function(type, ...) {
 }
 is.remote <- function(x) inherits(x, "remote")
 
-is.git_remote <- function(x) inherits(x, "git2r_remote") || inherits(x, "xgit_remote")
+is.git_remote <- function(x) inherits(x, "git2r_remote") || inherits(x, "xgit_remote") || inherits(x, "github_remote")
 
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
 remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")
