@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  
+
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -64,7 +64,7 @@ bioc_install_repos <- function() {
     }
   }
   if (vers >= "3.4") {
-    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"]) 
+    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
 
   } else if (vers >= "3.3.0") {
     a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
@@ -708,20 +708,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-  
+
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-    
+
     if (os_type() == "windows") {
       "wininet"
-      
+
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-      
+
     } else {
       "auto"
     }
-    
+
   } else {
     "auto"
   }
@@ -1136,7 +1136,7 @@ github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
                        host = "api.github.com") {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta)
+  meta <- resolve_ref(meta$ref %||% ref, meta)
 
   if (is.null(meta$username)) {
     meta$username <- username %||% getOption("github.user") %||%
@@ -1242,22 +1242,22 @@ github_pull <- function(pull) structure(pull, class = "github_pull")
 #' @export
 github_release <- function() structure(NA_integer_, class = "github_release")
 
-github_resolve_ref <- function(x, params) UseMethod("github_resolve_ref")
+resolve_ref <- function(x, params) UseMethod("resolve_ref")
 
 #' @export
-github_resolve_ref.default <- function(x, params) {
+resolve_ref.default <- function(x, params) {
   params$ref <- x
   params
 }
 
 #' @export
-github_resolve_ref.NULL <- function(x, params) {
+resolve_ref.NULL <- function(x, params) {
   params$ref <- "master"
   params
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params) {
+resolve_ref.github_pull <- function(x, params) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
@@ -1278,7 +1278,7 @@ github_resolve_ref.github_pull <- function(x, params) {
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params) {
+resolve_ref.github_release <- function(x, params) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
@@ -1472,7 +1472,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing. 
+#'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
@@ -1517,7 +1517,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  } 
+  }
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
