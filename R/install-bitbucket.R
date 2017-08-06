@@ -64,25 +64,11 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
     message("Downloading bitbucket repo ", x$username, "/", x$repo, "@", x$ref)
   }
+
   dest <- tempfile(fileext = paste0(".zip"))
-  src <- paste("https://bitbucket.org/", x$username, "/", tolower(x$repo), "/get/",
-               x$ref, ".zip", sep = "")
-  if (!is.null(x$auth_token)) {
-    user_pwd <- strsplit(x$auth_token, ":")[[1]]
-    if (length(user_pwd) != 2) {
-      # stop if no colon in auth_token
-      stop("`auth_token` needs a username and password separated by a colon",
-           call. = FALSE)
-    }
-    auth <- httr::authenticate(
-      user = user_pwd[1],
-      password = user_pwd[2],
-      type = "basic"
-    )
-  } else {
-    auth <- NULL
-  }
-  download(dest, src, auth)
+  src <-  paste0("https://bitbucket.org/", x$username, "/", tolower(x$repo),
+                 "/get/", utils::URLencode(x$ref, reserved = TRUE), ".zip")
+  download(dest, src, x$auth_token)
 }
 
 #' @export
