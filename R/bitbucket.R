@@ -71,7 +71,7 @@ resolve_ref.bitbucket_pull <- function(x, params, ...) {
     error = function(e) e
   )
   ## Just because libcurl might download the error page...
-  if (methods::is(response, "error") || is.null(response$head)) {
+  if (methods::is(response, "error") || is.null(response)) {
     stop("Cannot find Bitbucket pull request ", params$username, "/",
          params$repo, "#", x)
   }

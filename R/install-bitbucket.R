@@ -31,12 +31,13 @@ install_bitbucket <- function(repo, username = NULL, ref = "master",
   remotes <- lapply(repo, bitbucket_remote, username = username, ref = ref,
                     subdir = subdir, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, quiet = quiet, ...)
+  install_remotes(remotes, ...)
 }
 
 
 bitbucket_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
-                             auth_token = bitbucket_pat(), sha = NULL, host = "https://api.bitbucket.org") {
+                             auth_token = bitbucket_pat(), sha = NULL,
+                             host = "https://api.bitbucket.org") {
 
   meta <- parse_bitbucket_repo(repo)
   meta$host <- host
@@ -73,12 +74,16 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
 
 #' @export
 remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
-  if (!is.null(bundle)) {
+  # Determine sha as efficiently as possible
+  if (!is.null(x$sha)) {
+    # Might be cached already (because re-installing)
+    sha <- x$sha
+  } else if (!is.null(bundle)) {
     # Might be able to get from zip archive
     sha <- git_extract_sha1(bundle)
   } else {
-    # Otherwise can lookup with remote_ls
-    sha <- remote_sha(x)
+    # Otherwise can use github api
+    sha <- bitbucket_commit(x$username, x$repo, x$ref)$hash
   }
 
   list(
@@ -90,23 +95,6 @@ remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
     RemoteSha = sha,
     RemoteSubdir = x$subdir
   )
-}
-
-
-#' @export
-remote_sha.bitbucket_remote <- function(remote, url = "https://bitbucket.org", ...) {
-  if (!is.null(remote$sha)) {
-    return(remote$sha)
-  }
-  tryCatch({
-    git_url <- paste0(url, "/", remote$username, "/", remote$repo, ".git")
-    res <- git2r::remote_ls(git_url, ...)
-    found <- grep(pattern = paste0("/", remote$ref), x = names(res))
-    if (length(found) == 0) {
-      return(NA)
-    }
-    unname(res[found[1]])
-  }, error = function(e) NA)
 }
 
 #' @export
