@@ -13,6 +13,16 @@ bitbucket_pat <- function() {
   pat
 }
 
+bitbucket_commit <- function(username, repo, ref = "master", api_version = "2.0") {
+
+  url <- paste0("https://api.bitbucket.org/", api_version, "/repositories/",
+                username, "/", repo, "/commit/", ref)
+  tmp <- tempfile()
+  download(tmp, url, auth_token = bitbucket_pat())
+
+  fromJSONFile(tmp)
+}
+
 parse_repo <- function(path, rx, nms) {
   replace <- stats::setNames(sprintf("\\%d", seq_along(nms)), nms)
   params <- lapply(replace, function(r) gsub(rx, r, path, perl = TRUE))
