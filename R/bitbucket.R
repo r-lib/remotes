@@ -1,11 +1,8 @@
-bitbucket_GET <- function(path, ..., host = "https://api.bitbucket.org",
-                          api_version = "2.0", process_content = TRUE) {
-  req <- httr::GET(host, path = file.path(api_version, path), ...)
-  if (process_content) {
-    bitbucket_response(req)
-  } else {
-    req
-  }
+bitbucket_GET <- function(path, ..., pat = bitbucket_pat(), api_version = "2.0") {
+  url <- paste0("https://api.bitbucket.org/", api_version, "/", path)
+  tmp <- tempfile()
+  download(tmp, url, auth_token = pat)
+  fromJSONFile(tmp)
 }
 
 
@@ -59,9 +56,15 @@ resolve_ref.bitbucket_pull <- function(x, params, ...) {
   # https://confluence.atlassian.com/bitbucket/pullrequests-resource-423626332.html#pullrequestsResource-GETaspecificpullrequest
   path <- file.path("repositories", params$username, params$repo,
                     "pullrequests", x)
-  response <- bitbucket_GET(path, ..., host = params$host,
-                            api_version = "2.0")
-
+  response <- tryCatch(
+    bitbucket_GET(path, ..., api_version = "2.0"),
+    error = function(e) e
+  )
+  ## Just because libcurl might download the error page...
+  if (methods::is(response, "error") || is.null(response$head)) {
+    stop("Cannot find Bitbucket pull request ", params$username, "/",
+         params$repo, "#", x)
+  }
   params$username <- response$author$username
   params$ref <- response$source$branch$name
   params
