@@ -8,26 +8,6 @@ bitbucket_GET <- function(path, ..., host = "https://api.bitbucket.org",
   }
 }
 
-bitbucket_response <- function(req) {
-  text <- httr::content(req, as = "text")
-  parsed <- jsonlite::fromJSON(text, simplifyVector = FALSE)
-  if (httr::status_code(req) >= 400) {
-    stop(bitbucket_error(req))
-  }
-  parsed
-}
-
-bitbucket_error <- function(req) {
-  text <- httr::content(req, as = "text")
-  parsed <- jsonlite::fromJSON(text, simplifyVector = FALSE)
-  errors <- vapply(parsed, `[[`, "message", FUN.VALUE = character(1))
-  structure(
-    list(
-      call = sys.call(-1),
-      message = paste0("(", httr::status_code(req), ")\n",
-                       paste("* ", errors, collapse = "\n"))
-    ), class = c("condition", "error", "bitbucket_error"))
-}
 
 bitbucket_pat <- function() {
   pat <- Sys.getenv("BITBUCKET_PAT")
