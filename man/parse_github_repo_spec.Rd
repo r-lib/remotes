@@ -2,7 +2,7 @@
 % Please edit documentation in R/install-github.R
 \name{parse_github_repo_spec}
 \alias{parse_github_repo_spec}
-\title{Parse a concise GitHub repo specification}
+\title{Parse a GitHub repo specification}
 \usage{
 parse_github_repo_spec(repo)
 }
@@ -18,11 +18,17 @@ List with members: \code{username}, \code{repo}, \code{subdir}
 The current format is:
 \code{[username/]repo[/subdir][#pull|@ref|@*release]}
 The \code{*release} suffix represents the latest release.
+Browser, HTTPS, and SSH remote URLs are also acceptable; the prefixes
+\code{https://github.com/} and \code{git@github.com:} and the suffix
+\code{.git} are simply ignored for parsing.
 }
 \examples{
 parse_github_repo_spec("metacran/crandb")
-parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+parse_github_repo_spec("jeroen/curl@v0.9.3")
 parse_github_repo_spec("jimhester/covr#47")
 parse_github_repo_spec("hadley/dplyr@*release")
 parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+parse_github_repo_spec("https://github.com/jimhester/covr")
+parse_github_repo_spec("https://github.com/jeroen/curl.git")
+parse_github_repo_spec("git@github.com:metacran/crandb.git")
 }

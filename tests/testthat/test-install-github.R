@@ -327,3 +327,18 @@ test_that("parse_github_repo_spec trailing slash, issue #54", {
     parse_github_repo_spec("foo/bar/baz")
   )
 })
+
+test_that("parse_github_repo_spec accepts SSH, HTTPS, and browser URLs", {
+  expect_identical(
+    parse_github_repo_spec("jimhester/covr"),
+    parse_github_repo_spec("https://github.com/jimhester/covr")
+  )
+  expect_identical(
+    parse_github_repo_spec("jeroen/curl"),
+    parse_github_repo_spec("https://github.com/jeroen/curl.git")
+  )
+  expect_identical(
+    parse_github_repo_spec("metacran/crandb"),
+    parse_github_repo_spec("git@github.com:metacran/crandb.git")
+  )
+})

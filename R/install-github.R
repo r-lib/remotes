@@ -221,11 +221,15 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-#' Parse a concise GitHub repo specification
+#' Parse a GitHub repo specification
 #'
 #' The current format is:
 #' \code{[username/]repo[/subdir][#pull|@ref|@*release]}
 #' The \code{*release} suffix represents the latest release.
+#' Browser, HTTPS, and SSH remote URLs are also acceptable; the prefixes
+#' \code{https://github.com/} and \code{git@github.com:} and the suffix
+#' \code{.git} are simply ignored for parsing.
+#'
 #'
 #' @param repo Character scalar, the repo specification.
 #' @return List with members: \code{username}, \code{repo}, \code{subdir}
@@ -235,12 +239,21 @@ github_resolve_ref.github_release <- function(x, params) {
 #' @export
 #' @examples
 #' parse_github_repo_spec("metacran/crandb")
-#' parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+#' parse_github_repo_spec("jeroen/curl@v0.9.3")
 #' parse_github_repo_spec("jimhester/covr#47")
 #' parse_github_repo_spec("hadley/dplyr@*release")
 #' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+#' parse_github_repo_spec("https://github.com/jimhester/covr")
+#' parse_github_repo_spec("https://github.com/jeroen/curl.git")
+#' parse_github_repo_spec("git@github.com:metacran/crandb.git")
 
 parse_github_repo_spec <- function(repo) {
+
+  repo <- gsub("\\.git$", "", repo)
+  prefixes <- c("^https://github.com/", "^git@github.com:")
+  prefixes_rx <- paste(prefixes, collapse = "|")
+  repo <- gsub(prefixes_rx, "", repo)
+
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
