@@ -2,7 +2,7 @@
 % Please edit documentation in R/install-github.R
 \name{parse_github_repo_spec}
 \alias{parse_github_repo_spec}
-\title{Parse a concise GitHub repo specification}
+\title{Parse a GitHub repo specification}
 \usage{
 parse_github_repo_spec(repo)
 }
@@ -18,11 +18,26 @@ List with members: \code{username}, \code{repo}, \code{subdir}
 The current format is:
 \code{[username/]repo[/subdir][#pull|@ref|@*release]}
 The \code{*release} suffix represents the latest release.
+HTTPS and SSH remote URLs and the repo's browser URL, e.g.,
+\code{https://github.com/r-lib/remotes.git} or
+\code{git@github.com:r-lib/remotes.git} or
+\code{https://github.com/r-lib/remotes}, are also acceptable
+ways to specify the simple case of \code{username/repo}.
 }
 \examples{
 parse_github_repo_spec("metacran/crandb")
-parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+parse_github_repo_spec("jeroen/curl@v0.9.3")
 parse_github_repo_spec("jimhester/covr#47")
-parse_github_repo_spec("hadley/dplyr@*release")
-parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+parse_github_repo_spec("tidyverse/dplyr@*release")
+parse_github_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba")
+parse_github_repo_spec("https://github.com/jeroen/curl.git")
+parse_github_repo_spec("git@github.com:metacran/crandb.git")
+parse_github_repo_spec("https://github.com/jimhester/covr")
+parse_github_repo_spec("https://github.example.com/user/repo.git")
+parse_github_repo_spec("git@github.example.com:user/repo.git")
+
+\dontrun{
+## browser-style URLs cannot be used to specify additional info
+parse_github_repo_spec("https://github.com/r-lib/remotes/pull/108")
+}
 }
