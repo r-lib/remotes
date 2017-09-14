@@ -1,14 +1,14 @@
 
 context("Install from GitHub")
 
-test_that("github_resolve_ref.github_release", {
+test_that("resolve_ref.github_release", {
 
   skip_on_cran()
   skip_if_offline()
   skip_if_over_rate_limit()
 
   expect_error(
-    github_resolve_ref.github_release(
+    resolve_ref.github_release(
       NA,
       list(username = "hadley", repo = "devtools")
     ),
@@ -16,18 +16,18 @@ test_that("github_resolve_ref.github_release", {
   )
 })
 
-test_that("github_resolve_ref.NULL", {
+test_that("resolve_ref.NULL", {
 
   expect_equal(
-    github_resolve_ref(NULL, list()),
+    resolve_ref(NULL, list()),
     list(ref = "master")
   )
 })
 
-test_that("github_resolve_ref.github_pull", {
+test_that("resolve_ref.github_pull", {
 
   expect_error(
-    github_resolve_ref(
+    resolve_ref(
       github_pull("1"),
       list(userame = "gaborcsardi", repo = "pkgconfig")
     ),
@@ -35,14 +35,14 @@ test_that("github_resolve_ref.github_pull", {
   )
 })
 
-test_that("github_resolve_ref.github_release", {
+test_that("resolve_ref.github_release", {
 
   skip_on_cran()
   skip_if_offline()
   skip_if_over_rate_limit()
 
   expect_error(
-    github_resolve_ref(
+    resolve_ref(
       github_release(),
       list(userame = "gaborcsardi", repo = "xxxxxxxxxx")
     ),

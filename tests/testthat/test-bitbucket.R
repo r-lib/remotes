@@ -1,99 +1,34 @@
 
 context("Install from Bitbucket")
 
-test_that("", {
+test_that("Bitbucket repos parsed correctly", {
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest"),
+               list(username = "imanuelcostigan", repo = "devtest"))
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest@v1.2"),
+               list(username = "imanuelcostigan", repo = "devtest", ref = "v1.2"))
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest#1"),
+               list(username = "imanuelcostigan", repo = "devtest",
+                    ref = bitbucket_pull("1")))
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest/somerepo"),
+               list(username = "imanuelcostigan", repo = "devtest", subdir = "somerepo"))
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest/somerepo@v1.0"),
+               list(username = "imanuelcostigan", repo = "devtest", subdir = "somerepo",
+                    ref = "v1.0"))
+  expect_equal(parse_bitbucket_repo("imanuelcostigan/devtest/somerepo#1"),
+               list(username = "imanuelcostigan", repo = "devtest", subdir = "somerepo",
+                    ref = bitbucket_pull("1")))
+})
 
+test_that("Bitbucket remote build works", {
+  # Bitbucket API is not queried for this test
   skip_on_cran()
+  skip_on_travis()
+  skip_on_appveyor()
   skip_if_offline()
-
-  Sys.unsetenv("R_TESTS")
-
-  lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
-  dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
-
-  install_bitbucket("csardigabor/showimage", lib = lib, quiet = TRUE)
-
-  expect_silent(packageDescription("showimage"))
-  expect_equal(packageDescription("showimage")$RemoteRepo, "showimage")
-
-})
-
-
-test_that("remote_download.bitbucket_remote", {
-
-  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "master")
-
-  with_mock(
-    `remotes::download` = function(...) { },
-    expect_message(
-      remote_download.bitbucket_remote(x),
-      "Downloading bitbucket repo csardigabor/pkgconfig@master"
-    )
-  )
-})
-
-
-test_that("remote_metadata.bitbucket_remote", {
-
-  expect_equal(
-    remote_metadata.bitbucket_remote(list(sha = "foobar"))$RemoteSha,
-    "foobar"
-  )
-
-  expect_null(
-    remote_metadata.bitbucket_remote(list())$RemoteSha
-  )
-})
-
-
-test_that("bitbucket passwords", {
-
-  if (Sys.getenv("BITBUCKET_PASSWORD") == "") {
-    skip("Need BitBucket credentials")
-  }
-
-  skip_on_cran()
-  skip_if_offline()
-
-  Sys.unsetenv("R_TESTS")
-
-  lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
-  dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
-
-  install_bitbucket(
-    "csardigabor/falsy", lib = lib, quiet = TRUE,
-    password = Sys.getenv("BITBUCKET_PASSWORD")
-  )
-
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
-
-})
-
-
-test_that("more bitbucket password", {
-
-  x <- list(
-    username = "username",
-    repo = "repo",
-    ref = "master",
-    auth_user = "user",
-    password = "pass"
-  )
-
-  with_mock(
-    `remotes::download` = function(dest, src, basic_auth) basic_auth,
-    expect_equal(
-      remote_download.bitbucket_remote(x),
-      list(user = "user", password = "pass")
-    )
-  )
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest")$repo, "devtest")
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest")$username, "imanuelcostigan")
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest/dir")$subdir, "dir")
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest@v1.2")$ref, "v1.2")
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest#1")$ref, "doc-branch")
+  expect_equal(bitbucket_remote("imanuelcostigan/devtest#1")$username, "imanuelcostigan")
 })

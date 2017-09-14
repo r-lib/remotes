@@ -60,7 +60,7 @@ github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
                        host = "api.github.com") {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta)
+  meta <- resolve_ref(meta$ref %||% ref, meta)
 
   if (is.null(meta$username)) {
     meta$username <- username %||% getOption("github.user") %||%
@@ -166,22 +166,23 @@ github_pull <- function(pull) structure(pull, class = "github_pull")
 #' @export
 github_release <- function() structure(NA_integer_, class = "github_release")
 
-github_resolve_ref <- function(x, params) UseMethod("github_resolve_ref")
+
+resolve_ref <- function(x, params) UseMethod("resolve_ref")
 
 #' @export
-github_resolve_ref.default <- function(x, params) {
+resolve_ref.default <- function(x, params) {
   params$ref <- x
   params
 }
 
 #' @export
-github_resolve_ref.NULL <- function(x, params) {
+resolve_ref.NULL <- function(x, params) {
   params$ref <- "master"
   params
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params) {
+resolve_ref.github_pull <- function(x, params) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
@@ -202,7 +203,7 @@ github_resolve_ref.github_pull <- function(x, params) {
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params) {
+resolve_ref.github_release <- function(x, params) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
