@@ -328,7 +328,7 @@ test_that("parse_github_repo_spec trailing slash, issue #54", {
   )
 })
 
-test_that("parse_github_repo_spec accepts SSH, HTTPS, and browser URLs", {
+test_that("parse_github_repo_spec accepts browser, HTTPS, and SSH URLs", {
   expect_identical(
     parse_github_repo_spec("jimhester/covr"),
     parse_github_repo_spec("https://github.com/jimhester/covr")

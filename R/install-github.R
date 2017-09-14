@@ -241,18 +241,19 @@ github_resolve_ref.github_release <- function(x, params) {
 #' parse_github_repo_spec("metacran/crandb")
 #' parse_github_repo_spec("jeroen/curl@v0.9.3")
 #' parse_github_repo_spec("jimhester/covr#47")
-#' parse_github_repo_spec("hadley/dplyr@*release")
-#' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+#' parse_github_repo_spec("tidyverse/dplyr@*release")
+#' parse_github_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba")
 #' parse_github_repo_spec("https://github.com/jimhester/covr")
 #' parse_github_repo_spec("https://github.com/jeroen/curl.git")
 #' parse_github_repo_spec("git@github.com:metacran/crandb.git")
 
 parse_github_repo_spec <- function(repo) {
 
-  repo <- gsub("\\.git$", "", repo)
   prefixes <- c("^https://github.com/", "^git@github.com:")
   prefixes_rx <- paste(prefixes, collapse = "|")
-  repo <- gsub(prefixes_rx, "", repo)
+  if (grepl(prefixes_rx, repo)) {
+    repo <- gsub(prefixes_rx, "", gsub("\\.git$", "", repo))
+  }
 
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
