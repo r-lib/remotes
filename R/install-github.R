@@ -221,11 +221,16 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-#' Parse a concise GitHub repo specification
+#' Parse a GitHub repo specification
 #'
 #' The current format is:
 #' \code{[username/]repo[/subdir][#pull|@ref|@*release]}
 #' The \code{*release} suffix represents the latest release.
+#' HTTPS and SSH remote URLs and the repo's browser URL, e.g.,
+#' \code{https://github.com/r-lib/remotes.git} or
+#' \code{git@github.com:r-lib/remotes.git} or
+#' \code{https://github.com/r-lib/remotes}, are also acceptable
+#' ways to specify the simple case of \code{username/repo}.
 #'
 #' @param repo Character scalar, the repo specification.
 #' @return List with members: \code{username}, \code{repo}, \code{subdir}
@@ -235,12 +240,35 @@ github_resolve_ref.github_release <- function(x, params) {
 #' @export
 #' @examples
 #' parse_github_repo_spec("metacran/crandb")
-#' parse_github_repo_spec("jeroenooms/curl@v0.9.3")
+#' parse_github_repo_spec("jeroen/curl@v0.9.3")
 #' parse_github_repo_spec("jimhester/covr#47")
-#' parse_github_repo_spec("hadley/dplyr@*release")
-#' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+#' parse_github_repo_spec("tidyverse/dplyr@*release")
+#' parse_github_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba")
+#' parse_github_repo_spec("https://github.com/jeroen/curl.git")
+#' parse_github_repo_spec("git@github.com:metacran/crandb.git")
+#' parse_github_repo_spec("https://github.com/jimhester/covr")
+#' parse_github_repo_spec("https://github.example.com/user/repo.git")
+#' parse_github_repo_spec("git@github.example.com:user/repo.git")
+#'
+#' \dontrun{
+#' ## browser-style URLs cannot be used to specify additional info
+#' parse_github_repo_spec("https://github.com/r-lib/remotes/pull/108")
+#' }
 
 parse_github_repo_spec <- function(repo) {
+
+  re <- "github[^/:]*[/:]([^/]+)/([^/]+)/?(.*)$"
+  m <- regexec(re, repo)
+  match <- regmatches(repo, m)[[1]]
+  if (length(match) > 0) {
+    if (nchar(match[4]) > 0) {
+      stop(
+        "A browser URL must end with repo name, e.g., 'https://github.com/r-lib/remotes'.",
+        call. = FALSE)
+    }
+    repo <- paste(match[2], gsub("\\.git", "", match[3]), sep = "/")
+  }
+
   username_rx <- "(?:([^/]+)/)?"
   repo_rx <- "([^/@#]+)"
   subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
@@ -249,7 +277,7 @@ parse_github_repo_spec <- function(repo) {
   release_rx <- "(?:@([*]release))"
   ref_or_pull_or_release_rx <- sprintf("(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx)
   github_rx <- sprintf("^(?:%s%s%s%s|(.*))$",
-    username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx)
+                       username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx)
 
   param_names <- c("username", "repo", "subdir", "ref", "pull", "release", "invalid")
   replace <- stats::setNames(sprintf("\\%d", seq_along(param_names)), param_names)
