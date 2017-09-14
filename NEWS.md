@@ -1,6 +1,9 @@
 
 # 1.1.0
 
+* Accept browser, HTTPS, or SSH URL in GitHub repo specification,
+  @jennybc, #90, #108
+
 * URL encode GitHub references, to allow installing from non-alphanumeric
   branch or tags, @krlmlr #38
 
