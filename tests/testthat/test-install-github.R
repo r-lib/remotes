@@ -328,11 +328,7 @@ test_that("parse_github_repo_spec trailing slash, issue #54", {
   )
 })
 
-test_that("parse_github_repo_spec accepts browser, HTTPS, and SSH URLs", {
-  expect_identical(
-    parse_github_repo_spec("jimhester/covr"),
-    parse_github_repo_spec("https://github.com/jimhester/covr")
-  )
+test_that("parse_github_repo_spec accepts HTTPS, SSH, and browser URLs (github.com and GHE)", {
   expect_identical(
     parse_github_repo_spec("jeroen/curl"),
     parse_github_repo_spec("https://github.com/jeroen/curl.git")
@@ -340,5 +336,36 @@ test_that("parse_github_repo_spec accepts browser, HTTPS, and SSH URLs", {
   expect_identical(
     parse_github_repo_spec("metacran/crandb"),
     parse_github_repo_spec("git@github.com:metacran/crandb.git")
+  )
+  expect_identical(
+    parse_github_repo_spec("jimhester/covr"),
+    parse_github_repo_spec("https://github.com/jimhester/covr")
+  )
+  expect_identical(
+    parse_github_repo_spec("jennybc/foo"),
+    parse_github_repo_spec("https://github.ubc.ca/jennybc/foo.git")
+  )
+  expect_identical(
+    parse_github_repo_spec("jennybc/foo"),
+    parse_github_repo_spec("git@github.ubc.ca:jennybc/foo.git")
+  )
+  expect_identical(
+    parse_github_repo_spec("jennybc/foo"),
+    parse_github_repo_spec("https://github.ubc.ca/jennybc/foo")
+  )
+})
+
+test_that("parse_github_repo_spec insists that browser URLs ends with repo", {
+  expect_error(
+    parse_github_repo_spec("https://github.com/r-lib/remotes/commit/975bed7"),
+    "must end with repo name"
+  )
+  expect_error(
+    parse_github_repo_spec("https://github.com/r-lib/remotes/pull/108"),
+    "must end with repo name"
+  )
+  expect_error(
+    parse_github_repo_spec("https://github.com/r-lib/remotes/releases/tag/1.0.0"),
+    "must end with repo name"
   )
 })
