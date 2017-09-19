@@ -369,3 +369,10 @@ test_that("parse_github_repo_spec insists that browser URLs ends with repo", {
     "must end with repo name"
   )
 })
+
+test_that("parse_github_repo_spec catches invalid spec", {
+  expect_error(
+    parse_github_repo_spec("/$&@R64&3"),
+    "Invalid git repo specification"
+  )
+})
