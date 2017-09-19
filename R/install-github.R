@@ -269,23 +269,26 @@ parse_github_repo_spec <- function(repo) {
     repo <- paste(match[2], gsub("\\.git", "", match[3]), sep = "/")
   }
 
-  username_rx <- "(?:([^/]+)/)?"
-  repo_rx <- "([^/@#]+)"
-  subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
-  ref_rx <- "(?:@([^*].*))"
-  pull_rx <- "(?:#([0-9]+))"
-  release_rx <- "(?:@([*]release))"
-  ref_or_pull_or_release_rx <- sprintf("(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx)
-  github_rx <- sprintf("^(?:%s%s%s%s|(.*))$",
-                       username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx)
+  username_rx <- "(?:(?<username>[^/]+)/)?"
+  repo_rx     <- "(?<repo>[^/@#]+)"
+  subdir_rx   <- "(?:/(?<subdir>[^@#]*[^@#/])/?)?"
+  ref_rx      <- "(?:@(?<ref>[^*].*))"
+  pull_rx     <- "(?:#(?<pull>[0-9]+))"
+  release_rx  <- "(?:@(?<release>[*]release))"
 
-  param_names <- c("username", "repo", "subdir", "ref", "pull", "release", "invalid")
-  replace <- stats::setNames(sprintf("\\%d", seq_along(param_names)), param_names)
-  params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
-  if (params$invalid != "")
-    stop(sprintf("Invalid git repo: %s", repo))
-  params <- params[viapply(params, nchar) > 0]
+  ref_or_pull_or_release_rx <- sprintf(
+    "(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx
+  )
+  github_rx  <- sprintf(
+    "^(?:%s%s%s%s|(?<catchall>.*))$",
+    username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx
+  )
+  params <- as.list(rematch2::re_match(text = repo, pattern = github_rx))
 
+  params <- params[viapply(params, nchar) > 0 & grepl("^[^\\.]", names(params))]
+  if (!is.null(params$catchall)) {
+    stop(sprintf("Invalid git repo specification: %s", repo))
+  }
   params
 }
 
