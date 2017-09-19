@@ -283,7 +283,7 @@ parse_github_repo_spec <- function(repo) {
     "^(?:%s%s%s%s|(?<catchall>.*))$",
     username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx
   )
-  params <- as.list(rematch2::re_match(text = repo, pattern = github_rx))
+  params <- as.list(re_match(text = repo, pattern = github_rx))
 
   params <- params[viapply(params, nchar) > 0 & grepl("^[^\\.]", names(params))]
   if (!is.null(params$catchall)) {
