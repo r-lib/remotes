@@ -313,7 +313,7 @@ parse_github_url <- function(repo) {
 
 parse_git_repo <- function(repo) {
 
-  if (grepl("^https://github.com/|^git@github.com:", repo)) {
+  if (grepl("^https://github|^git@github", repo)) {
     params <- parse_github_url(repo)
   } else {
     params <- parse_repo_spec(repo)
