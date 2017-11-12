@@ -7,3 +7,4 @@
 ^install-github.R$
 ^install-github.Rin$
 ^\.env$
+^revdep$
