@@ -42,5 +42,6 @@ artifacts:
     name: Bits
 
 environment:
+  NOT_CRAN: true
   GITHUB_PAT:
     secure: 7yvzq2ts1gNIhI7GL+Y9l+ISrZn3lk3uSXWvEZgms5rwVn+bJAj6sVn7RPUaBkxr
