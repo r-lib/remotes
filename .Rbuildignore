@@ -6,3 +6,4 @@
 ^appveyor.yml$
 ^install-github.R$
 ^install-github.Rin$
+^\.env$
