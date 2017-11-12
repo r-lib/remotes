@@ -69,7 +69,7 @@ test_that("install_dev_remotes", {
     install_dev_remotes,
     "dev_remote_type",
     function(remote) {
-      ret <- remotes::dev_remote_type(remote)
+      ret <- dev_remote_type(remote)
       for (i in seq_along(ret)) {
         ret[[i]]$fun <- function(...) message("install_github called")
       }
