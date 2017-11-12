@@ -73,9 +73,10 @@ test_that("github_release", {
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
-
+  expect_silent(packageDescription("falsy", lib.loc = lib))
+  expect_equal(
+    packageDescription("falsy", lib.loc = lib)$RemoteRepo,
+    "falsy")
 })
 
 test_that("install_github", {
@@ -95,9 +96,10 @@ test_that("install_github", {
 
   install_github("cran/falsy", lib = lib, quiet = TRUE)
 
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteRepo, "falsy")
-
+  expect_silent(packageDescription("falsy", lib.loc = lib))
+  expect_equal(
+    packageDescription("falsy", lib.loc = lib)$RemoteRepo,
+    "falsy")
 })
 
 test_that("error if not username, warning if given as argument", {
@@ -125,59 +127,57 @@ test_that("error if not username, warning if given as argument", {
 
 test_that("remote_download.github_remote", {
 
-  with_mock(
-    `remotes::github_has_submodules` = function(...) TRUE,
-    `remotes::download` = function(...) TRUE,
-    expect_warning(
-      remote_download.github_remote(
-        list(
-          host = "api.github.com",
-          username = "cran",
-          repo = "falsy",
-          ref = "master"
-        )
-      ),
-      "GitHub repo contains submodules"
-    )
+  mockery::stub(remote_download.github_remote, "github_has_submodules", TRUE)
+  mockery::stub(remote_download.github_remote, "download", TRUE)
+  expect_warning(
+    remote_download.github_remote(
+      list(
+        host = "api.github.com",
+        username = "cran",
+        repo = "falsy",
+        ref = "master"
+      )
+    ),
+    "GitHub repo contains submodules"
   )
 })
 
 test_that("remote_download.github_remote messages", {
 
-  with_mock(
-    `remotes::github_has_submodules` = function(...) FALSE,
-    `remotes::download` = function(...) TRUE,
-    expect_message(
-      remote_download.github_remote(
-        list(
-          host = "api.github.com",
-          username = "cran",
-          repo = "falsy",
-          ref = "master"
-        )
-      ),
-      "Downloading GitHub repo"
-    )
+  mockery::stub(remote_download.github_remote, "github_has_submodules", FALSE)
+  mockery::stub(remote_download.github_remote, "download", TRUE)
+  expect_message(
+    remote_download.github_remote(
+      list(
+        host = "api.github.com",
+        username = "cran",
+        repo = "falsy",
+        ref = "master"
+      )
+    ),
+    "Downloading GitHub repo"
   )
 })
 
 test_that("github_has_submodules with broken libcurl", {
 
-  with_mock(
-    `remotes::download` = function(path, ...) {
+  mockery::stub(
+    github_has_submodules,
+    "download",
+    function(path, ...) {
       cat('{ "message": "Not Found",',
           '  "documentation_url": "https://developer.github.com/v3"',
           '}', file = path)
-    },
-    expect_false(
-      github_has_submodules(
-        list(
-          host = "api.github.com",
-          username = "cran",
-          repo = "falsy",
-          ref = "master"
+    }
+  )
+  expect_false(
+    github_has_submodules(
+      list(
+        host = "api.github.com",
+        username = "cran",
+        repo = "falsy",
+        ref = "master"
         )
-      )
     )
   )
 })
@@ -228,9 +228,10 @@ test_that("github_pull", {
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("pkgsnap"))
-  expect_equal(packageDescription("pkgsnap")$RemoteRepo, "pkgsnap")
-
+  expect_silent(packageDescription("pkgsnap", lib.loc = lib))
+  expect_equal(
+    packageDescription("pkgsnap", lib.loc = lib)$RemoteRepo,
+    "pkgsnap")
 })
 
 test_that("type = 'both' works well", {
@@ -263,13 +264,14 @@ test_that("update.package_deps", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  with_mock(
-    `remotes::install_packages` = function(...) { },
-    expect_message(
-      update(object, quiet = FALSE),
-      "Skipping 1 packages? not available: falsy"
-    )
+  mockery::stub(update, "install_packages", NULL)
+  expect_message(
+    update(object, quiet = FALSE),
+    "Skipping 1 packages? not available: falsy"
   )
+})
+
+test_that("update.package_deps 2", {
 
   object <- data.frame(
     stringsAsFactors = FALSE,
@@ -280,13 +282,14 @@ test_that("update.package_deps", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  with_mock(
-    `remotes::install_packages` = function(...) { },
-    expect_message(
-      update(object, quiet = FALSE),
-      "Skipping 1 packages? ahead of CRAN: falsy"
-    )
+  mockery::stub(update, "install_packages", NULL)
+  expect_message(
+    update(object, quiet = FALSE),
+    "Skipping 1 packages? ahead of CRAN: falsy"
   )
+})
+
+test_that("update.package_deps 3", {
 
   object <- data.frame(
     stringsAsFactors = FALSE,
@@ -297,12 +300,12 @@ test_that("update.package_deps", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  with_mock(
-    `remotes::install_packages` = function(packages, ...) packages,
-    expect_equal(
-      update(object, upgrade = FALSE),
-      "magrittr"
-    )
+  mockery::stub(
+    update.package_deps,
+    "install_packages",
+    function(packages, ...) packages)
+  expect_equal(
+    update(object, upgrade = FALSE),
+    "magrittr"
   )
-
 })

@@ -21,9 +21,10 @@ test_that("install_version", {
 
   install_version("pkgconfig", "1.0.0", lib = lib, repos = repos)
 
-  expect_silent(packageDescription("pkgconfig"))
-  expect_equal(packageDescription("pkgconfig")$Version, "1.0.0")
-
+  expect_silent(packageDescription("pkgconfig", lib.loc = lib))
+  expect_equal(
+    packageDescription("pkgconfig", lib.loc = lib)$Version,
+    "1.0.0")
 })
 
 test_that("package_find_repo() works correctly with multiple repos", {
@@ -61,7 +62,7 @@ test_that("install_version for current version", {
 
   install_version("pkgconfig", NULL, lib = lib, repos = repos, type = "source")
 
-  expect_silent(packageDescription("pkgconfig"))
+  expect_silent(packageDescription("pkgconfig", lib.loc = lib))
 
 })
 
@@ -100,7 +101,7 @@ test_that("install_version and non-existing package", {
 })
 
 
-test_that("install_version for archives pacakges", {
+test_that("install_version for archives packages", {
 
   skip_on_cran()
   skip_if_offline()
@@ -109,11 +110,9 @@ test_that("install_version for archives pacakges", {
   if (length(repos) == 0) repos <- character()
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
-  with_mock(
-    `remotes::install_url` = function(url, ...) url,
-    expect_match(
-      install_version("igraph0", type = "source", lib = lib, repos = repos),
-      "https?://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
-    )
+  mockery::stub(install_version, "install_url", function(url, ...) url)
+  expect_match(
+    install_version("igraph0", type = "source", lib = lib, repos = repos),
+    "https?://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
   )
 })

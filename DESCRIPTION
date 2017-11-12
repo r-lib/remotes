@@ -22,9 +22,9 @@ Imports:
     methods,
     utils
 Suggests:
-    crancache,
     curl,
     git2r,
+    mockery,
     pingr,
     testthat
 Depends:

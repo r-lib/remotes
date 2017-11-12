@@ -13,7 +13,6 @@ install:
 # Adapt as necessary starting from here
 
 build_script:
-  - travis-tool.sh github_package r-hub/crancache
   - travis-tool.sh install_deps
 
 test_script:
@@ -40,3 +39,9 @@ artifacts:
 
   - path: '\*_*.zip'
     name: Bits
+
+environment:
+  USE_RTOOLS: true
+  NOT_CRAN: true
+  GITHUB_PAT:
+    secure: 7yvzq2ts1gNIhI7GL+Y9l+ISrZn3lk3uSXWvEZgms5rwVn+bJAj6sVn7RPUaBkxr

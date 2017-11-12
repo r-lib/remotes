@@ -2,32 +2,23 @@
 context("Download")
 
 test_that("download_method", {
-  
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.3.0",
-    expect_equal(download_method(), "auto")
-  )
 
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.2.5",
-    `remotes::os_type` = function() "windows",
-    expect_equal(download_method(), "wininet")
-  )
+  mockery::stub(download_method, "get_r_version", "3.3.0")
+  expect_equal(download_method(), "auto")
 
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.2.5",
-    `remotes::os_type` = function() "unix",
-    `base::capabilities` = function(...) c(libcurl = TRUE),
-    expect_equal(download_method(), "libcurl")
-  )
+  mockery::stub(download_method, "get_r_version", "3.2.5")
+  mockery::stub(download_method, "os_type", "windows")
+  expect_equal(download_method(), "wininet")
 
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.2.5",
-    `remotes::os_type` = function() "unix",
-    `base::capabilities` = function(...) c(libcurl = FALSE),
-    expect_equal(download_method(), "auto")
-  )
+  mockery::stub(download_method, "get_r_version", "3.2.5")
+  mockery::stub(download_method, "os_type", "unix")
+  mockery::stub(download_method, "capabilities", c(libcurl = TRUE))
+  expect_equal(download_method(), "libcurl")
 
+  mockery::stub(download_method, "get_r_version", "3.2.5")
+  mockery::stub(download_method, "os_type", "unix")
+  mockery::stub(download_method, "capabilities", c(libcurl = FALSE))
+  expect_equal(download_method(), "auto")
 })
 
 test_that("download", {
@@ -55,16 +46,18 @@ test_that("os_type", {
 
 test_that("download basic auth", {
 
-  with_mock(
-    `utils::download.file` = function(url, ...) { print(url); 0 },
-    expect_output(
-      download(
-        tempfile(),
-        "http://foo.bar.com",
-        basic_auth = list(user = "user", password = "password")
-      ),
-      "http://user:password@foo.bar.com"
-    )
+  mockery::stub(
+    download,
+    "base_download",
+    function(url, ...) { print(url); 0 })
+
+  expect_output(
+    download(
+      tempfile(),
+      "http://foo.bar.com",
+      basic_auth = list(user = "user", password = "password")
+    ),
+    "http://user:password@foo.bar.com"
   )
 })
 
@@ -73,17 +66,9 @@ test_that("download fallback to curl, https", {
   skip_on_cran()
   skip_if_offline()
 
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.0.0",
-    download(
-      tmp <- tempfile(),
-      "https://httpbin.org/ip"
-    ),
-    expect_match(
-      paste(readLines(tmp), collapse = "\n"),
-      "origin"
-    )
-  )
+  mockery::stub(download, "get_r_version", "3.0.0")
+  download(tmp <- tempfile(), "https://httpbin.org/ip")
+  expect_match(paste(readLines(tmp), collapse = "\n"), "origin")
 })
 
 test_that("download with curl, basic auth", {
@@ -91,16 +76,14 @@ test_that("download with curl, basic auth", {
   skip_on_cran()
   skip_if_offline()
 
-  with_mock(
-    `remotes::get_r_version` = function(...) "3.0.0",
-    download(
-      tmp <- tempfile(),
-      "http://httpbin.org/basic-auth/user/passwd",
-      basic_auth = list(user = "user", password = "passwd")
-    ),
-    expect_match(
-      paste(readLines(tmp), collapse = "\n"),
-      '"authenticated": true'
-    )
+  mockery::stub(download, "get_r_version", "3.0.0")
+  download(
+    tmp <- tempfile(),
+    "http://httpbin.org/basic-auth/user/passwd",
+    basic_auth = list(user = "user", password = "passwd")
+  )
+  expect_match(
+    paste(readLines(tmp), collapse = "\n"),
+    '"authenticated": true'
   )
 })

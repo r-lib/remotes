@@ -22,9 +22,11 @@ test_that("install_git", {
     "Downloading git repo"
   )
 
-  expect_silent(packageDescription("pkgconfig"))
-  expect_equal(packageDescription("pkgconfig")$RemoteUrl, url)
-
+  expect_silent(packageDescription("pkgconfig", lib.loc = .libPaths()[1]))
+  expect_equal(
+    packageDescription("pkgconfig", lib.loc = .libPaths()[1])$RemoteUrl,
+    url
+  )
 })
 
 
@@ -54,8 +56,8 @@ test_that("install_git with command line git", {
     "Downloading git repo"
   )
 
-  expect_silent(packageDescription("falsy"))
-  expect_equal(packageDescription("falsy")$RemoteUrl, url)
+  expect_silent(packageDescription("falsy", lib.loc = lib))
+  expect_equal(packageDescription("falsy", lib.loc = lib)$RemoteUrl, url)
 
 })
 
