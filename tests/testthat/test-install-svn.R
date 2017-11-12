@@ -63,18 +63,16 @@ test_that("install_svn subdir", {
   .libPaths(lib)
 
   mockery::stub(
-    install_remote,
-    "install",
-    depth = 3,
-    function(pkgdir, ...) { print(list.files(pkgdir)); TRUE })
+    install_svn,
+    "install_remotes",
+    function(remotes, ...) remotes)
 
-  expect_output(
-    install_svn(
-      "https://github.com/dmlc/xgboost/trunk",
-      subdir = "R-package"
-    ),
-    "DESCRIPTION"
+  rem <- install_svn(
+    "https://github.com/dmlc/xgboost/trunk",
+    subdir = "R-package"
   )
+
+  expect_equal(rem[[1]]$svn_subdir, "R-package")
 })
 
 test_that("remote_download.svn_remote error", {
