@@ -58,7 +58,9 @@ bioc_install_repos <- function() {
       a[, "URL"] <- sub("^http:", "https:", a[, "URL"])
     }
   }
-  if (vers >= "3.4") {
+  if (vers >= "3.5") {
+    "3.6"
+  } else if (vers >= "3.4") {
     a[, "URL"] <- sub(as.character(biocVers), "3.5", a[, "URL"])
 
   } else if (vers >= "3.3.0") {
