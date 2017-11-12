@@ -1,7 +1,7 @@
 # 1.1.0.9000
 
-* Accept browser, HTTPS, or SSH URL in GitHub repo specification,
-  @jennybc, #90, #109
+* Accept HTTPS, SSH, or various browser URLs in GitHub repo specification,
+  @jennybc, #90, #109, #112
 
 # 1.1.0
 
