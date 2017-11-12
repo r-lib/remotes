@@ -19,9 +19,10 @@ test_that("installing bioc packages", {
 
   install_github("Bioconductor-mirror/Biobase", lib = lib, quiet = TRUE)
 
-  expect_silent(packageDescription("Biobase"))
-  expect_equal(packageDescription("Biobase")$RemoteRepo, "Biobase")
+  expect_silent(packageDescription("Biobase", lib.loc = lib))
+  expect_equal(
+    packageDescription("Biobase", lib.loc = lib)$RemoteRepo,
+    "Biobase")
 
-  expect_silent(packageDescription("BiocGenerics"))
-
+  expect_silent(packageDescription("BiocGenerics", lib.loc = lib))
 })

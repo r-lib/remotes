@@ -32,8 +32,10 @@ test_that("decompress with internal unzip", {
     dec <- tempfile()
     on.exit(unlink(dec, recursive = TRUE), add = TRUE)
 
-    with_mock(
-      `base::getOption` = function(x, default = NULL) {
+    mockery::stub(
+      decompress,
+      "getOption",
+      function(x, default = NULL) {
         if (x == "unzip") {
           "internal"
         } else {
@@ -43,9 +45,10 @@ test_that("decompress with internal unzip", {
             default
           }
         }
-      },
-      decompress(archive, dec)
+      }
     )
+
+    decompress(archive, dec)
 
     expect_true(
       file.exists(file.path(dec, "foo", "R", "foo.R")),

@@ -17,9 +17,10 @@ test_that("install_svn", {
 
   install_svn("https://github.com/mangothecat/simplegraph/trunk")
 
-  expect_silent(packageDescription("simplegraph"))
-  expect_equal(packageDescription("simplegraph")$RemoteType, "svn")
-
+  expect_silent(packageDescription("simplegraph", lib.loc = lib))
+  expect_equal(
+    packageDescription("simplegraph", lib.loc = lib)$RemoteType,
+    "svn")
 })
 
 test_that("install_svn branch", {
@@ -41,9 +42,10 @@ test_that("install_svn branch", {
     subdir = "branches/remotes-test"
   )
 
-  expect_silent(packageDescription("simplegraph"))
-  expect_equal(packageDescription("simplegraph")$RemoteType, "svn")
-
+  expect_silent(packageDescription("simplegraph", lib.loc = lib))
+  expect_equal(
+    packageDescription("simplegraph", lib.loc = lib)$RemoteType,
+    "svn")
 })
 
 test_that("install_svn subdir", {
@@ -60,15 +62,18 @@ test_that("install_svn subdir", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  with_mock(
-    `remotes::install` = function(dir, ...) { print(list.files(dir)); TRUE },
-    expect_output(
-      install_svn(
-        "https://github.com/dmlc/xgboost/trunk",
-        subdir = "R-package"
-      ),
-      "DESCRIPTION"
-    )
+  mockery::stub(
+    install_remote,
+    "install",
+    depth = 3,
+    function(pkgdir, ...) { print(list.files(pkgdir)); TRUE })
+
+  expect_output(
+    install_svn(
+      "https://github.com/dmlc/xgboost/trunk",
+      subdir = "R-package"
+    ),
+    "DESCRIPTION"
   )
 })
 
@@ -76,12 +81,10 @@ test_that("remote_download.svn_remote error", {
 
   x <- list(url = "http://foo.bar.com")
 
-  with_mock(
-    `base::system2` = function(...) { 1 },
-    expect_error(
-      remote_download.svn_remote(x),
-      "There seems to be a problem retrieving"
-    )
+  mockery::stub(remote_download.svn_remote, "system2", 1)
+  expect_error(
+    remote_download.svn_remote(x),
+    "There seems to be a problem retrieving"
   )
 })
 
@@ -131,14 +134,11 @@ test_that("svn_path", {
   cat("Hello", file = tmp)
   expect_equal(svn_path(tmp), tmp)
 
-  with_mock(
-    `base::Sys.which` = function(...) "",
-    `remotes::os_type` = function() "windows",
-    `base::file.exists` = function(...) FALSE,
-    expect_error(
-      svn_path(),
-      "SVN does not seem to be installed on your system"
-    )
+  mockery::stub(svn_path, "Sys.which", "")
+  mockery::stub(svn_path, "os_type", "windows")
+  mockery::stub(svn_path, "file.exists", FALSE)
+  expect_error(
+    svn_path(),
+    "SVN does not seem to be installed on your system"
   )
-
 })

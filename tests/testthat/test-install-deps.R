@@ -16,15 +16,11 @@ test_that("installing packages with dependencies", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_github(
-    "cran/desc",
-    lib = lib,
-    quiet = TRUE
+  install_github("cran/desc", lib = lib, quiet = TRUE)
+
+  expect_silent(packageDescription("desc", lib.loc = lib))
+  expect_equal(
+    packageDescription("desc", lib.loc = lib)$RemoteRepo,
+    "desc"
   )
-
-  expect_silent(packageDescription("desc"))
-  expect_equal(packageDescription("desc")$RemoteRepo, "desc")
-  expect_silent(packageDescription("R6"))
-  expect_silent(packageDescription("crayon"))
-
 })

@@ -18,8 +18,11 @@ test_that("", {
   url <- "https://github.com/mangothecat/simplegraph/archive/master.zip"
   install_url(url, lib = lib)
 
-  expect_silent(packageDescription("simplegraph"))
-  expect_equal(packageDescription("simplegraph")$RemoteType, "url")
-  expect_equal(packageDescription("simplegraph")$RemoteUrl, url)
-
+  expect_silent(packageDescription("simplegraph", lib.loc = lib))
+  expect_equal(
+    packageDescription("simplegraph", lib.loc = lib)$RemoteType,
+    "url")
+  expect_equal(
+    packageDescription("simplegraph", lib.loc = lib)$RemoteUrl,
+    url)
 })

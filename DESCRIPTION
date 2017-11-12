@@ -25,6 +25,7 @@ Suggests:
     crancache,
     curl,
     git2r,
+    mockery,
     pingr,
     testthat
 Depends:

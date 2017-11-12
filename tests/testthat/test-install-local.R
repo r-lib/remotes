@@ -27,7 +27,8 @@ test_that("install_local", {
 
   install_local(pkg[, 2], lib = lib)
 
-  expect_silent(packageDescription("pkgconfig"))
-  expect_equal(packageDescription("pkgconfig")$RemoteType, "local")
-
+  expect_silent(packageDescription("pkgconfig", lib.loc = lib))
+  expect_equal(
+    packageDescription("pkgconfig", lib.loc = lib)$RemoteType,
+    "local")
 })

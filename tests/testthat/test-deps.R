@@ -54,22 +54,30 @@ test_that("compare_versions", {
 
 test_that("install_dev_remotes", {
 
-  with_mock(
-    `remotes::load_pkg_description` = function(...) {
+  mockery::stub(
+    install_dev_remotes,
+    "load_pkg_description",
+    function(...) {
       list(
         package = "foo",
         remotes = "github::hadley/testthat,klutometis/roxygen"
       )
-    },
-    `remotes::install_github` = function(...) {
-      message("install_github called")
-    },
-    expect_message(
-      install_dev_remotes("ize"),
-      "install_github called"
-    )
+    }
   )
 
+  mockery::stub(
+    install_dev_remotes,
+    "dev_remote_type",
+    function(remote) {
+      ret <- remotes::dev_remote_type(remote)
+      for (i in seq_along(ret)) {
+        ret[[i]]$fun <- function(...) message("install_github called")
+      }
+      ret
+    }
+  )
+
+  expect_message(install_dev_remotes("ize"), "install_github called")
 })
 
 
@@ -136,13 +144,15 @@ test_that("update_packages", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  with_mock(
-    `remotes::package_deps` = function(...) object,
-    `remotes::update.package_deps` = function(x, ...) x$package,
-    expect_equal(
-      update_packages("dotenv"),
-      c("dotenv", "falsy", "magrittr")
-    )
+  mockery::stub(update_packages, "package_deps", object)
+  mockery::stub(
+    update_packages,
+    "update.package_deps",
+    function(x, ...) x$package)
+
+  expect_equal(
+    update_packages("dotenv"),
+    c("dotenv", "falsy", "magrittr")
   )
 })
 
