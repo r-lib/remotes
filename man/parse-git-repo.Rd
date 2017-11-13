@@ -2,11 +2,11 @@
 % Please edit documentation in R/install-github.R
 \name{parse-git-repo}
 \alias{parse-git-repo}
-\alias{parse_github_repo_spec}
+\alias{parse_repo_spec}
 \alias{parse_github_url}
 \title{Parse a remote git repo specification}
 \usage{
-parse_github_repo_spec(repo)
+parse_repo_spec(repo)
 
 parse_github_url(repo)
 }
@@ -22,17 +22,16 @@ A remote repo can be specified in two ways:
 \describe{
 \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
 and various GitHub browser URLs}
-\item{via this shorthand}{\code{parse_github_repo_spec()} handles this
-concise form:
+\item{via this shorthand}{\code{parse_repo_spec()} handles this concise form:
 \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
 }
 }
 \examples{
-parse_github_repo_spec("metacran/crandb")
-parse_github_repo_spec("jimhester/covr#47")        ## pull request
-parse_github_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
-parse_github_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
-parse_github_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
+parse_repo_spec("metacran/crandb")
+parse_repo_spec("jimhester/covr#47")        ## pull request
+parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
+parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
+parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 
 parse_github_url("https://github.com/jeroen/curl.git")
 parse_github_url("git@github.com:metacran/crandb.git")

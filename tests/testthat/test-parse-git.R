@@ -21,10 +21,10 @@ test_that("pull request and latest release, via spec and URL", {
   )
 })
 
-test_that("parse_github_repo_spec trailing slash, issue #54", {
+test_that("parse_repo_spec trailing slash, issue #54", {
   expect_equal(
-    parse_github_repo_spec("foo/bar/baz/"),
-    parse_github_repo_spec("foo/bar/baz")
+    parse_repo_spec("foo/bar/baz/"),
+    parse_repo_spec("foo/bar/baz")
   )
 })
 
@@ -81,9 +81,9 @@ test_that("parse_github_url() accepts all forms of URL (github.com and GHE)", {
   )
 })
 
-test_that("parse_github_repo_spec catches invalid spec", {
+test_that("parse_repo_spec catches invalid spec", {
   expect_error(
-    parse_github_repo_spec("/$&@R64&3"),
+    parse_repo_spec("/$&@R64&3"),
     "Invalid git repo specification"
   )
 })
