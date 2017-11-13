@@ -227,7 +227,7 @@ github_resolve_ref.github_release <- function(x, params) {
 #' \describe{
 #' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
 #' and various GitHub browser URLs}
-#' \item{via this shorthand}{\code{parse_repo_spec()} handles this concise form:
+#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
 #' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
 #' }
 #'
@@ -279,6 +279,10 @@ parse_repo_spec <- function(repo) {
 
   params[grepl("^[^\\.]", names(params))]
 }
+
+#' @export
+#' @rdname parse-git-repo
+parse_github_repo_spec <- parse_repo_spec
 
 #' @export
 #' @rdname parse-git-repo
