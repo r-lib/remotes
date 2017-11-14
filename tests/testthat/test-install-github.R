@@ -234,20 +234,6 @@ test_that("github_pull", {
     "pkgsnap")
 })
 
-test_that("pull request, release, alternative notation", {
-
-  expect_equal(
-    parse_git_repo("gaborcsardi/pkgconfig#7")$ref,
-    github_pull("7")
-  )
-
-  expect_equal(
-    parse_git_repo("gaborcsardi/pkgconfig@*release")$ref,
-    github_release()
-  )
-
-})
-
 test_that("type = 'both' works well", {
 
   skip_on_cran()
@@ -321,61 +307,5 @@ test_that("update.package_deps 3", {
   expect_equal(
     update(object, upgrade = FALSE),
     "magrittr"
-  )
-})
-
-test_that("parse_github_repo_spec trailing slash, issue #54", {
-  expect_equal(
-    parse_github_repo_spec("foo/bar/baz/"),
-    parse_github_repo_spec("foo/bar/baz")
-  )
-})
-
-test_that("parse_github_repo_spec accepts HTTPS, SSH, and browser URLs (github.com and GHE)", {
-  expect_identical(
-    parse_github_repo_spec("jeroen/curl"),
-    parse_github_repo_spec("https://github.com/jeroen/curl.git")
-  )
-  expect_identical(
-    parse_github_repo_spec("metacran/crandb"),
-    parse_github_repo_spec("git@github.com:metacran/crandb.git")
-  )
-  expect_identical(
-    parse_github_repo_spec("jimhester/covr"),
-    parse_github_repo_spec("https://github.com/jimhester/covr")
-  )
-  expect_identical(
-    parse_github_repo_spec("jennybc/foo"),
-    parse_github_repo_spec("https://github.ubc.ca/jennybc/foo.git")
-  )
-  expect_identical(
-    parse_github_repo_spec("jennybc/foo"),
-    parse_github_repo_spec("git@github.ubc.ca:jennybc/foo.git")
-  )
-  expect_identical(
-    parse_github_repo_spec("jennybc/foo"),
-    parse_github_repo_spec("https://github.ubc.ca/jennybc/foo")
-  )
-})
-
-test_that("parse_github_repo_spec insists that browser URLs ends with repo", {
-  expect_error(
-    parse_github_repo_spec("https://github.com/r-lib/remotes/commit/975bed7"),
-    "must end with repo name"
-  )
-  expect_error(
-    parse_github_repo_spec("https://github.com/r-lib/remotes/pull/108"),
-    "must end with repo name"
-  )
-  expect_error(
-    parse_github_repo_spec("https://github.com/r-lib/remotes/releases/tag/1.0.0"),
-    "must end with repo name"
-  )
-})
-
-test_that("parse_github_repo_spec catches invalid spec", {
-  expect_error(
-    parse_github_repo_spec("/$&@R64&3"),
-    "Invalid git repo specification"
   )
 })
