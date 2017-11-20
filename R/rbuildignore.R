@@ -11,16 +11,18 @@ get_rbuildignore_exclusions <- function(path) {
 
 copy_without_excluded <- function(source, target, exclude) {
   files <- dir(source, recursive = TRUE)
+  included_files <- get_files_from_exclude(files, exclude)
+  ret <- copy_files_deep(source, target, included_files)
+  setNames(ret, included_files)
+}
+
+get_files_from_exclude <- function(files, exclude) {
   if (length(exclude) > 0) {
     exclude_rx <- paste0("(?:", exclude, ")", collapse = "|")
-    included <- !grepl(exclude_rx, files,ignore.case = TRUE, perl = TRUE)
+    files[!grepl(exclude_rx, files, ignore.case = TRUE, perl = TRUE)]
   } else {
-    included <- rep(TRUE, length(files))
+    files
   }
-
-  ret <- rep(NA, length(files))
-  ret[included] <- copy_files_deep(source, target, files[included])
-  ret
 }
 
 copy_files_deep <- function(source, target, files) {
