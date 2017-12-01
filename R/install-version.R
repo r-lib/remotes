@@ -11,9 +11,9 @@
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most
 #'   recent version of the package, this function simply calls
-#'   \code{install.packages}. Otherwise, it looks at the list of
+#'   \code{\link[utils]{install.packages}}. Otherwise, it looks at the list of
 #'   archived source tarballs and tries to install an older version instead.
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @inheritParams utils::install.packages
 #' @author Jeremy Stephens
 #' @importFrom utils available.packages contrib.url install.packages

@@ -31,7 +31,7 @@ the \code{GITHUB_PAT} environment variable.}
 \item{host}{GitHub API host to use. Override with your GitHub enterprise
 hostname, for example, \code{"github.hostname.com/api/v3"}.}
 
-\item{...}{Other arguments passed on to \code{install.packages}.}
+\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 }
 \description{
 This function is vectorised on \code{repo} so you can install multiple

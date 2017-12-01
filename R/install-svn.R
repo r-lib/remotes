@@ -9,11 +9,11 @@
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing. 
+#'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @export
 #'
 #' @examples
@@ -54,7 +54,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  } 
+  }
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))

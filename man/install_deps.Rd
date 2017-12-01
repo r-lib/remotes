@@ -21,7 +21,7 @@ install_deps(pkgdir = ".", dependencies = NA, threads = getOption("Ncpus",
   just check this package, not its dependencies).}
 
 \item{threads}{Number of threads to start, passed to
-\code{install.packages} as \code{Ncpus}.}
+\code{\link[utils]{install.packages}} as \code{Ncpus}.}
 
 \item{repos}{A character vector giving repositories to use.}
 
@@ -29,7 +29,7 @@ install_deps(pkgdir = ".", dependencies = NA, threads = getOption("Ncpus",
 automatically to "binary" to avoid interactive prompts during package
 installation.}
 
-\item{...}{additional arguments passed to \code{\link{install.packages}}.}
+\item{...}{additional arguments passed to \code{\link[utils]{install.packages}}.}
 
 \item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
 

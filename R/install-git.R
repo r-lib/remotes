@@ -13,7 +13,7 @@
 #' @param git Whether to use the \code{git2r} package, or an external
 #'   git client via system. Default is \code{git2r} if it is installed,
 #'   otherwise an external git installation.
-#' @param ... passed on to \code{install.packages}
+#' @param ... passed on to \code{\link[utils]{install.packages}}
 #' @export
 #' @examples
 #' \dontrun{

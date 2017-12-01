@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  
+
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -64,7 +64,7 @@ bioc_install_repos <- function() {
     }
   }
   if (vers >= "3.4") {
-    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"]) 
+    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
 
   } else if (vers >= "3.3.0") {
     a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
@@ -562,7 +562,7 @@ standardise_dep <- function(x) {
 
 #' Update packages that are missing or out-of-date.
 #'
-#' Works similarly to \code{install.packages()} but doesn't install packages
+#' Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
 #' that are already installed, and also upgrades out dated dependencies.
 #'
 #' @param packages Character vector of packages to update.
@@ -708,20 +708,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-  
+
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-    
+
     if (os_type() == "windows") {
       "wininet"
-      
+
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-      
+
     } else {
       "auto"
     }
-    
+
   } else {
     "auto"
   }
@@ -957,7 +957,7 @@ remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
 #' @param git Whether to use the \code{git2r} package, or an external
 #'   git client via system. Default is \code{git2r} if it is installed,
 #'   otherwise an external git installation.
-#' @param ... passed on to \code{install.packages}
+#' @param ... passed on to \code{\link[utils]{install.packages}}
 #' @export
 #' @examples
 #' \dontrun{
@@ -1096,7 +1096,7 @@ xgit_remote_sha1 <- function(url, ref = "master") {
 #'   the \code{GITHUB_PAT} environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
 #'   hostname, for example, \code{"github.hostname.com/api/v3"}.
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @details
 #' Attempting to install from a source repository that uses submodules
 #' raises a warning. Because the zipped sources provided by GitHub do not
@@ -1472,11 +1472,11 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 #'
 #' @inheritParams install_git
 #' @param subdir A sub-directory withing a svn repository that contains the
-#'   package we are interested in installing. 
+#'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @export
 #'
 #' @examples
@@ -1517,7 +1517,7 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
     args <- paste("-r", x$revision, args)
   if (!is.null(x$svn_subdir)) {
     url <- file.path(url, x$svn_subdir);
-  } 
+  }
   args <- c(x$args, args, url, bundle)
 
   message(shQuote(svn_binary_path), " ", paste0(args, collapse = " "))
@@ -1575,7 +1575,7 @@ svn_path <- function(svn_binary_name = NULL) {
 #' @param url location of package on internet. The url should point to a
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @export
 #'
 #' @examples
@@ -1629,9 +1629,9 @@ remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL) {
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most
 #'   recent version of the package, this function simply calls
-#'   \code{install.packages}. Otherwise, it looks at the list of
+#'   \code{\link[utils]{install.packages}}. Otherwise, it looks at the list of
 #'   archived source tarballs and tries to install an older version instead.
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @inheritParams utils::install.packages
 #' @author Jeremy Stephens
 #' @importFrom utils available.packages contrib.url install.packages
@@ -1771,8 +1771,8 @@ safe_install_packages <- function(...) {
 #'
 #' @inheritParams package_deps
 #' @param threads Number of threads to start, passed to
-#'   \code{install.packages} as \code{Ncpus}.
-#' @param ... additional arguments passed to \code{\link{install.packages}}.
+#'   \code{\link[utils]{install.packages}} as \code{Ncpus}.
+#' @param ... additional arguments passed to \code{\link[utils]{install.packages}}.
 #' @export
 #' @examples
 #' \dontrun{install_deps(".")}

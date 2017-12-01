@@ -20,7 +20,7 @@
 #'   the \code{GITHUB_PAT} environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
 #'   hostname, for example, \code{"github.hostname.com/api/v3"}.
-#' @param ... Other arguments passed on to \code{install.packages}.
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @details
 #' Attempting to install from a source repository that uses submodules
 #' raises a warning. Because the zipped sources provided by GitHub do not

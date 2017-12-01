@@ -333,7 +333,7 @@ standardise_dep <- function(x) {
 
 #' Update packages that are missing or out-of-date.
 #'
-#' Works similarly to \code{install.packages()} but doesn't install packages
+#' Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
 #' that are already installed, and also upgrades out dated dependencies.
 #'
 #' @param packages Character vector of packages to update.
