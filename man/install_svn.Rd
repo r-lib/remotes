@@ -16,7 +16,7 @@ package we are interested in installing.}
 \item{args}{A character vector providing extra options to pass on to
 \command{svn}.}
 
-\item{...}{Other arguments passed on to \code{install.packages}.}
+\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 
 \item{revision}{svn revision, if omitted updates to latest}
 }

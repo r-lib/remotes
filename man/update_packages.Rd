@@ -26,7 +26,7 @@ automatically to "binary" to avoid interactive prompts during package
 installation.}
 }
 \description{
-Works similarly to \code{install.packages()} but doesn't install packages
+Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
 that are already installed, and also upgrades out dated dependencies.
 }
 \examples{

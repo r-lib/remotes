@@ -12,7 +12,7 @@ install_version(package, version = NULL, repos = getOption("repos"),
 
 \item{version}{If the specified version is NULL or the same as the most
 recent version of the package, this function simply calls
-\code{install.packages}. Otherwise, it looks at the list of
+\code{\link[utils]{install.packages}}. Otherwise, it looks at the list of
 archived source tarballs and tries to install an older version instead.}
 
 \item{repos}{
@@ -30,7 +30,7 @@ archived source tarballs and tries to install an older version instead.}
     builds: see the section on \sQuote{Binary packages} for those.
   }
 
-\item{...}{Other arguments passed on to \code{install.packages}.}
+\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 }
 \description{
 If you are installing an package that contains compiled code, you will

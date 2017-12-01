@@ -25,7 +25,7 @@ to \code{username})}
 
 \item{password}{your password}
 
-\item{...}{Other arguments passed on to \code{install.packages}.}
+\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 }
 \description{
 This function is vectorised so you can install multiple packages in
