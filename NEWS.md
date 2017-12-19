@@ -1,4 +1,5 @@
-# 1.1.0.9000
+
+# 1.1.1
 
 * Accept HTTPS, SSH, or various browser URLs in GitHub repo specification,
   @jennybc, #90, #109, #112
