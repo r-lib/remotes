@@ -77,6 +77,8 @@ test_that("install_svn subdir", {
 
 test_that("remote_download.svn_remote error", {
 
+  skip_on_cran()
+
   x <- list(url = "http://foo.bar.com")
 
   mockery::stub(remote_download.svn_remote, "system2", 1)
