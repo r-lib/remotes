@@ -3,7 +3,7 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-
+  
 bioc_version <- function() {
   bver <- get(
     ".BioC_version_associated_with_R_version",
@@ -63,8 +63,10 @@ bioc_install_repos <- function() {
       a[, "URL"] <- sub("^http:", "https:", a[, "URL"])
     }
   }
-  if (vers >= "3.4") {
-    a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
+  if (vers >= "3.5") {
+    "3.6"
+  } else if (vers >= "3.4") {
+    a[, "URL"] <- sub(as.character(biocVers), "3.5", a[, "URL"])
 
   } else if (vers >= "3.3.0") {
     a[, "URL"] <- sub(as.character(biocVers), "3.4", a[, "URL"])
@@ -708,20 +710,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-
+  
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-
+    
     if (os_type() == "windows") {
       "wininet"
-
+      
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-
+      
     } else {
       "auto"
     }
-
+    
   } else {
     "auto"
   }
@@ -1297,48 +1299,108 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-#' Parse a concise GitHub repo specification
+#' Parse a remote git repo specification
 #'
-#' The current format is:
-#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}
-#' The \code{*release} suffix represents the latest release.
+#' A remote repo can be specified in two ways:
+#' \describe{
+#' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
+#' and various GitHub browser URLs}
+#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
+#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+#' }
 #'
 #' @param repo Character scalar, the repo specification.
 #' @return List with members: \code{username}, \code{repo}, \code{subdir}
-#'   \code{ref}, \code{pull}, \code{release}. Members that do not
-#'   appear in the input repo specification are omitted.
+#'   \code{ref}, \code{pull}, \code{release}, some which will be empty.
 #'
-#' @export
+#' @name parse-git-repo
 #' @examples
-#' parse_github_repo_spec("metacran/crandb")
-#' parse_github_repo_spec("jeroenooms/curl@v0.9.3")
-#' parse_github_repo_spec("jimhester/covr#47")
-#' parse_github_repo_spec("hadley/dplyr@*release")
-#' parse_github_repo_spec("mangothecat/remotes@550a3c7d3f9e1493a2ba")
+#' parse_repo_spec("metacran/crandb")
+#' parse_repo_spec("jimhester/covr#47")        ## pull request
+#' parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
+#' parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
+#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
+#'
+#' parse_github_url("https://github.com/jeroen/curl.git")
+#' parse_github_url("git@github.com:metacran/crandb.git")
+#' parse_github_url("https://github.com/jimhester/covr")
+#' parse_github_url("https://github.example.com/user/repo.git")
+#' parse_github_url("git@github.example.com:user/repo.git")
+#'
+#' parse_github_url("https://github.com/r-lib/remotes/pull/108")
+#' parse_github_url("https://github.com/r-lib/remotes/tree/name-of-branch")
+#' parse_github_url("https://github.com/r-lib/remotes/commit/1234567")
+#' parse_github_url("https://github.com/r-lib/remotes/releases/latest")
+#' parse_github_url("https://github.com/r-lib/remotes/releases/tag/1.0.0")
+NULL
 
-parse_github_repo_spec <- function(repo) {
-  username_rx <- "(?:([^/]+)/)?"
-  repo_rx <- "([^/@#]+)"
-  subdir_rx <- "(?:/([^@#]*[^@#/])/?)?"
-  ref_rx <- "(?:@([^*].*))"
-  pull_rx <- "(?:#([0-9]+))"
-  release_rx <- "(?:@([*]release))"
-  ref_or_pull_or_release_rx <- sprintf("(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx)
-  github_rx <- sprintf("^(?:%s%s%s%s|(.*))$",
-    username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx)
+#' @export
+#' @rdname parse-git-repo
+parse_repo_spec <- function(repo) {
+  username_rx <- "(?:(?<username>[^/]+)/)?"
+  repo_rx     <- "(?<repo>[^/@#]+)"
+  subdir_rx   <- "(?:/(?<subdir>[^@#]*[^@#/])/?)?"
+  ref_rx      <- "(?:@(?<ref>[^*].*))"
+  pull_rx     <- "(?:#(?<pull>[0-9]+))"
+  release_rx  <- "(?:@(?<release>[*]release))"
+  ref_or_pull_or_release_rx <- sprintf(
+    "(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx
+  )
+  spec_rx  <- sprintf(
+    "^%s%s%s%s$", username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx
+  )
+  params <- as.list(re_match(text = repo, pattern = spec_rx))
 
-  param_names <- c("username", "repo", "subdir", "ref", "pull", "release", "invalid")
-  replace <- stats::setNames(sprintf("\\%d", seq_along(param_names)), param_names)
-  params <- lapply(replace, function(r) gsub(github_rx, r, repo, perl = TRUE))
-  if (params$invalid != "")
-    stop(sprintf("Invalid git repo: %s", repo))
-  params <- params[viapply(params, nchar) > 0]
+  if (is.na(params$.match)) {
+    stop(sprintf("Invalid git repo specification: '%s'", repo))
+  }
 
-  params
+  params[grepl("^[^\\.]", names(params))]
+}
+
+#' @export
+#' @rdname parse-git-repo
+parse_github_repo_spec <- parse_repo_spec
+
+#' @export
+#' @rdname parse-git-repo
+parse_github_url <- function(repo) {
+  prefix_rx <- "(?:github[^/:]+[/:])"
+  username_rx <- "(?:(?<username>[^/]+)/)"
+  repo_rx     <- "(?<repo>[^/@#]+)"
+  ref_rx <- "(?:(?:tree|commit|releases/tag)/(?<ref>.+$))"
+  pull_rx <- "(?:pull/(?<pull>.+$))"
+  release_rx <- "(?:releases/)(?<release>.+$)"
+  ref_or_pull_or_release_rx <- sprintf(
+    "(?:/(%s|%s|%s))?", ref_rx, pull_rx, release_rx
+  )
+  url_rx  <- sprintf(
+    "%s%s%s%s",
+    prefix_rx, username_rx, repo_rx, ref_or_pull_or_release_rx
+  )
+  params <- as.list(re_match(text = repo, pattern = url_rx))
+
+  if (is.na(params$.match)) {
+    stop(sprintf("Invalid GitHub URL: '%s'", repo))
+  }
+  if (params$ref == "" && params$pull == "" && params$release == "") {
+    params$repo <- gsub("\\.git$", "", params$repo)
+  }
+  if (params$release == "latest") {
+    params$release <- "*release"
+  }
+
+  params[grepl("^[^\\.]", names(params))]
 }
 
 parse_git_repo <- function(repo) {
-  params <- parse_github_repo_spec(repo)
+
+  if (grepl("^https://github|^git@github", repo)) {
+    params <- parse_github_url(repo)
+  } else {
+    params <- parse_repo_spec(repo)
+  }
+  params <- params[viapply(params, nchar) > 0]
 
   if (!is.null(params$pull)) {
     params$ref <- github_pull(params$pull)
@@ -1377,7 +1439,7 @@ install_local <- function(path, subdir = NULL, ...) {
 
 local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0)) {
   remote("local",
-    path = path,
+    path = normalizePath(path),
     subdir = subdir
   )
 }
@@ -1752,8 +1814,8 @@ safe_install_packages <- function(...) {
 
   lib <- paste(.libPaths(), collapse = ":")
 
-  if (has_package("crancache")) {
-    i.p <- crancache::install_packages
+  if (has_package("crancache") && has_package("callr")) {
+    i.p <- "crancache" %::% "install_packages"
   } else {
     i.p <- utils::install.packages
   }
@@ -2049,6 +2111,8 @@ read_char <- function(path, ...) {
 
 `%:::%` <- function (p, f) get(f, envir = asNamespace(p))
 
+`%::%` <- function (p, f) get(f, envir = asNamespace(p))
+
 viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
@@ -2172,6 +2236,45 @@ untar_description <- function(tarball, dir = tempfile()) {
   if (length(desc) < 1) stop("No 'DESCRIPTION' file in package")
   untar(tarball, desc, exdir = dir)
   file.path(dir, desc)
+}
+
+## copied from rematch2@180fb61
+re_match <- function(text, pattern, perl = TRUE, ...) {
+
+  stopifnot(is.character(pattern), length(pattern) == 1, !is.na(pattern))
+  text <- as.character(text)
+
+  match <- regexpr(pattern, text, perl = perl, ...)
+
+  start  <- as.vector(match)
+  length <- attr(match, "match.length")
+  end    <- start + length - 1L
+
+  matchstr <- substring(text, start, end)
+  matchstr[ start == -1 ] <- NA_character_
+
+  res <- data.frame(
+    stringsAsFactors = FALSE,
+    .text = text,
+    .match = matchstr
+  )
+
+  if (!is.null(attr(match, "capture.start"))) {
+
+    gstart  <- attr(match, "capture.start")
+    glength <- attr(match, "capture.length")
+    gend    <- gstart + glength - 1L
+
+    groupstr <- substring(text, gstart, gend)
+    groupstr[ gstart == -1 ] <- NA_character_
+    dim(groupstr) <- dim(gstart)
+
+    res <- cbind(groupstr, res, stringsAsFactors = FALSE)
+  }
+
+  names(res) <- c(attr(match, "capture.names"), ".text", ".match")
+  class(res) <- c("tbl_df", "tbl", class(res))
+  res
 }
 
 
