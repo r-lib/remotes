@@ -29,7 +29,7 @@ safe_install_packages <- function(...) {
 
   lib <- paste(.libPaths(), collapse = ":")
 
-  if (has_package("crancache")) {
+  if (has_package("crancache") && has_package("callr")) {
     i.p <- "crancache" %::% "install_packages"
   } else {
     i.p <- utils::install.packages
