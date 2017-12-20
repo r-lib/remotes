@@ -1,4 +1,4 @@
 library(testthat)
 library(remotes)
 
-test_check("remotes", reporter = "summary")
+test_check("remotes")
