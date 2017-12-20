@@ -8,7 +8,7 @@ test_that("decompress various file types", {
   for (type in types) {
 
     fname <- paste0("foo.", type)
-    archive <- system.file(package = packageName(), "archives", fname)
+    archive <- file.path("archives", fname)
     dec <- tempfile()
     decompress(archive, dec)
 
@@ -27,7 +27,7 @@ test_that("decompress with internal unzip", {
   for (type in types) {
 
     fname <- paste0("foo.", type)
-    archive <- system.file(package = packageName(), "archives", fname)
+    archive <- file.path("archives", fname)
 
     dec <- tempfile()
     on.exit(unlink(dec, recursive = TRUE), add = TRUE)
@@ -72,16 +72,16 @@ test_that("decompress errors on unknown file types", {
 
 test_that("source_pkg", {
 
-  foo_dir <- system.file(package = packageName(), "archives", "foo")
+  foo_dir <- file.path("archives", "foo")
   expect_equal(source_pkg(foo_dir), foo_dir)
 
-  bad_dir <- system.file(package = packageName(), "archives")
+  bad_dir <- "archives"
   expect_error(
     source_pkg(bad_dir),
     "Does not appear to be an R package"
   )
 
-  foo_tgz <- system.file(package = packageName(), "archives", "foo.tar.gz")
+  foo_tgz <- file.path("archives", "foo.tar.gz")
   pkg_dir <- source_pkg(foo_tgz)
   on.exit(unlink(pkg_dir, recursive = TRUE), add = TRUE)
   expect_true(file.exists(file.path(pkg_dir, "R", "foo.R")))
