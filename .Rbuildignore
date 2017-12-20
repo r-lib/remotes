@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
-^README.md$
+^README.markdown$
 ^.travis.yml$
 ^appveyor.yml$
 ^install-github.R$
