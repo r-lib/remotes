@@ -13,11 +13,10 @@ test_that("installing bioc packages", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
-
-  install_github("Bioconductor-mirror/Biobase", lib = lib, quiet = TRUE)
+  withr::with_libpaths(
+    lib,
+    install_github("Bioconductor-mirror/Biobase", lib = lib, quiet = TRUE)
+  )
 
   expect_silent(packageDescription("Biobase", lib.loc = lib))
   expect_equal(

@@ -26,7 +26,8 @@ Suggests:
     git2r,
     mockery,
     pingr,
-    testthat
+    testthat,
+    withr
 Depends:
     R (>= 3.0.0)
 RoxygenNote: 6.0.1
