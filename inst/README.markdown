@@ -129,8 +129,7 @@ See more about the `Remotes` field in this
 
 `remotes` supports the `Additional_repositories` field in
 `DESCRIPTION`. This is a way to specify dependencies from non-CRAN
-package repositories. See the [Writing R extensions]
-(https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies)
+package repositories. See the [Writing R extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies)
 manual for details.
 
 #### BioConductor packages
