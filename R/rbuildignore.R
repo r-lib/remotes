@@ -13,7 +13,7 @@ copy_without_excluded <- function(source, target, exclude) {
   files <- dir(source, recursive = TRUE)
   included_files <- get_files_from_exclude(files, exclude)
   ret <- copy_files_deep(source, target, included_files)
-  utils::setNames(ret, included_files)
+  stats::setNames(ret, included_files)
 }
 
 get_files_from_exclude <- function(files, exclude) {
