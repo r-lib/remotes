@@ -26,7 +26,7 @@ Suggests:
     git2r,
     mockery,
     pingr,
-    testthat,
+    testthat (>= 2.0.0),
     withr
 Depends:
     R (>= 3.0.0)
