@@ -1,5 +1,5 @@
 copy_without_rbuildignore <- function(source, target) {
-  if (!file.info(source)$isdir) {
+  if (!isTRUE(file.info(source)$isdir)) {
     return(file.copy(source, target))
   }
 
