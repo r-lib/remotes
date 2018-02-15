@@ -10,6 +10,7 @@
 #' @param branch Name of branch or tag to use, if not master.
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
+#' @param credentials A git2r credentials object passed through to clone.
 #' @param git Whether to use the \code{git2r} package, or an external
 #'   git client via system. Default is \code{git2r} if it is installed,
 #'   otherwise an external git installation.
@@ -21,10 +22,12 @@
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
 install_git <- function(url, subdir = NULL, branch = NULL,
+                        credentials = NULL,
                         git = c("auto", "git2r", "external"), ...) {
 
   git_remote <- select_git_remote(match.arg(git))
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch,
+                    credentials = credentials)
   install_remotes(remotes, ...)
 }
 
@@ -38,10 +41,12 @@ select_git_remote <- function(git) {
 }
 
 
-git_remote_git2r <- function(url, subdir = NULL, branch = NULL) {
+git_remote_git2r <- function(url, subdir = NULL, credentials = NULL,
+                             branch = NULL) {
   remote("git2r",
     url = url,
     subdir = subdir,
+    credentials = credentials,
     branch = branch
   )
 }
@@ -62,7 +67,8 @@ remote_download.git2r_remote <- function(x, quiet = FALSE) {
   }
 
   bundle <- tempfile()
-  git2r::clone(x$url, bundle, progress = FALSE)
+  git2r::clone(x$url, bundle, credentials = x$credentials,
+               progress = FALSE)
 
   if (!is.null(x$branch)) {
     r <- git2r::repository(bundle)
