@@ -19,9 +19,7 @@
 #' @param quiet If \code{TRUE}, suppress output.
 #' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
 #' @param repos A character vector giving repositories to use.
-#' @param type Type of package to \code{update}.  If "both", will switch
-#'   automatically to "binary" to avoid interactive prompts during package
-#'   installation.
+#' @param type Type of package to \code{update}.
 #'
 #' @param object A \code{package_deps} object.
 #' @param ... Additional arguments passed to \code{install_packages}.
@@ -50,10 +48,6 @@
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType")) {
-
-  if (identical(type, "both")) {
-    type <- "binary"
-  }
 
   repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
@@ -277,8 +271,7 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
                              dependencies = FALSE, quiet = NULL) {
-  if (identical(type, "both"))
-    type <- "binary"
+
   if (is.null(quiet))
     quiet <- !identical(type, "source")
 

@@ -234,19 +234,6 @@ test_that("github_pull", {
     "pkgsnap")
 })
 
-test_that("type = 'both' works well", {
-
-  skip_on_cran()
-  skip_if_offline()
-  skip_if_over_rate_limit()
-
-  expect_equal(
-    package_deps("falsy", type = "both"),
-    package_deps("falsy", type = "binary")
-  )
-
-})
-
 ## -2 = not installed, but available on CRAN
 ## -1 = installed, but out of date
 ##  0 = installed, most recent version

@@ -25,9 +25,7 @@ install_deps(pkgdir = ".", dependencies = NA, threads = getOption("Ncpus",
 
 \item{repos}{A character vector giving repositories to use.}
 
-\item{type}{Type of package to \code{update}.  If "both", will switch
-automatically to "binary" to avoid interactive prompts during package
-installation.}
+\item{type}{Type of package to \code{update}.}
 
 \item{...}{additional arguments passed to \code{\link[utils]{install.packages}}.}
 

@@ -31,9 +31,7 @@ dev_package_deps(pkgdir = ".", dependencies = NA,
 
 \item{repos}{A character vector giving repositories to use.}
 
-\item{type}{Type of package to \code{update}.  If "both", will switch
-automatically to "binary" to avoid interactive prompts during package
-installation.}
+\item{type}{Type of package to \code{update}.}
 
 \item{pkgdir}{path to a package directory, or to a package tarball.}
 
