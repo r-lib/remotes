@@ -250,9 +250,7 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
 #' @param quiet If \code{TRUE}, suppress output.
 #' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
 #' @param repos A character vector giving repositories to use.
-#' @param type Type of package to \code{update}.  If "both", will switch
-#'   automatically to "binary" to avoid interactive prompts during package
-#'   installation.
+#' @param type Type of package to \code{update}.
 #'
 #' @param object A \code{package_deps} object.
 #' @param ... Additional arguments passed to \code{install_packages}.
@@ -281,10 +279,6 @@ my_unzip <- function(src, target, unzip = getOption("unzip")) {
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType")) {
-
-  if (identical(type, "both")) {
-    type <- "binary"
-  }
 
   repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
@@ -508,8 +502,7 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
                              dependencies = FALSE, quiet = NULL) {
-  if (identical(type, "both"))
-    type <- "binary"
+
   if (is.null(quiet))
     quiet <- !identical(type, "source")
 
@@ -604,6 +597,19 @@ fix_repositories <- function(repos) {
   repos[repos == "@CRAN@"] <- "http://cloud.r-project.org"
   repos
 }
+
+## The checking code looks for the objects in the package namespace, so defining
+## dll here removes the following NOTE
+## Registration problem:
+##   Evaluating ‘dll$foo’ during check gives error
+## ‘object 'dll' not found’:
+##    .C(dll$foo, 0L)
+## See https://github.com/wch/r-source/blob/d4e8fc9832f35f3c63f2201e7a35fbded5b5e14c/src/library/tools/R/QC.R##L1950-L1980
+## Setting the class is needed to avoid a note about returning the wrong class.
+## The local object is found first in the actual call, so current behavior is
+## unchanged.
+
+dll <- list(foo = structure(list(), class = "NativeSymbolInfo"))
 
 has_devel <- function() {
   tryCatch(
@@ -1784,7 +1790,7 @@ download_version_url <- function(package, version, repos, type) {
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
 }
 
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
+install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = getOption("repos")) {
 
   if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
     missing_devel_warning(pkgdir)
@@ -1797,7 +1803,7 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ...) {
     return(invisible(FALSE))
   }
 
-  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ...)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ..., repos = repos)
 
   safe_install_packages(
     pkgdir,
