@@ -17,6 +17,13 @@ install_remote <- function(remote, ..., quiet = FALSE) {
   source <- source_pkg(bundle, subdir = remote$subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
 
+  # check if there are submodules, download them if there are.
+  if (file.exists(file.path(source, ".gitmodules")) &&
+      is.git_remote(remote) && remote$submodules) {
+    submodules <- read_gitmodules(file.path(source, ".gitmodules"))
+    download_modules(submodules, source=source)
+  }
+
   add_metadata(source, remote_metadata(remote, bundle, source))
 
   # Because we've modified DESCRIPTION, its original MD5 value is wrong
@@ -55,6 +62,8 @@ remote <- function(type, ...) {
   structure(list(...), class = c(paste0(type, "_remote"), "remote"))
 }
 is.remote <- function(x) inherits(x, "remote")
+
+is.git_remote <- function(x) inherits(x, "git2r_remote") || inherits(x, "xgit_remote") || inherits(x, "github_remote")
 
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
 remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")

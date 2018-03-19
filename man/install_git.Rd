@@ -4,8 +4,8 @@
 \alias{install_git}
 \title{Install a package from a git repository}
 \usage{
-install_git(url, subdir = NULL, branch = NULL, git = c("auto", "git2r",
-  "external"), ...)
+install_git(url, subdir = NULL, branch = NULL, submodules = FALSE,
+  git = c("auto", "git2r", "external"), ...)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -15,6 +15,8 @@ private repository.}
 contain the package we are interested in installing.}
 
 \item{branch}{Name of branch or tag to use, if not master.}
+
+\item{submodules}{if \code{TRUE} download submodules before installing.}
 
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,
