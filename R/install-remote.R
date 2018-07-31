@@ -77,7 +77,7 @@ remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_m
 remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
 
-remote_package_name <- function(remote, ...) remote$repo
+remote_package_name.default <- function(remote, ...) remote$repo
 remote_sha.default <- function(remote, ...) NA_character_
 
 different_sha <- function(remote_sha = NULL,
