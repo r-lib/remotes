@@ -18,8 +18,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' install_svn("svn://github.com/hadley/stringr/trunk")
-#' install_svn("svn://github.com/hadley/httr/branches/oauth")
+#' install_svn("https://github.com/hadley/stringr/trunk")
+#' install_svn("https://github.com/hadley/httr/branches/oauth")
 #'}
 install_svn <- function(url, subdir = NULL, args = character(0),
   ..., revision = NULL) {
@@ -30,7 +30,7 @@ install_svn <- function(url, subdir = NULL, args = character(0),
   install_remotes(remotes, ...)
 }
 
-svn_remote <- function(url, svn_subdir = NULL, revision = revision,
+svn_remote <- function(url, svn_subdir = NULL, revision = NULL,
   args = character(0)) {
   remote("svn",
     url = url,
@@ -102,4 +102,42 @@ svn_path <- function(svn_binary_name = NULL) {
   }
 
   stop("SVN does not seem to be installed on your system.", call. = FALSE)
+}
+
+#' @export
+remote_package_name.svn_remote <- function(remote, ...) {
+  description_url <- file.path(full_svn_url(remote), "DESCRIPTION")
+  tmp_file <- tempfile()
+  on.exit(rm(tmp_file))
+  response <- system2(svn_path(), paste("cat", description_url), stdout = tmp_file)
+  if (!identical(response, 0L)) {
+    stop("There was a problem retrieving the current SVN revision", call. = FALSE)
+  }
+  read_dcf(tmp_file)$Package
+}
+
+#' @export
+remote_sha.svn_remote <- function(remote, ...) {
+  svn_revision(full_svn_url(remote))
+}
+
+svn_revision <- function(url = NULL, svn_binary_path = svn_path()) {
+  request <- system2(svn_binary_path, paste("info --xml", url), stdout = TRUE)
+  if (!is.null(attr(request, "status")) && !identical(attr(request, "status"), 0L)) {
+    stop("There was a problem retrieving the current SVN revision", call. = FALSE)
+  }
+  gsub(".*<commit[[:space:]]+revision=\"([[:digit:]]+)\">.*", "\\1", paste(collapse = "\n", request))
+}
+
+full_svn_url <- function(x) {
+  url <- x$url
+  if (!is.null(x$svn_subdir)) {
+    url <- file.path(url, x$svn_subdir)
+  }
+
+  url
+}
+
+format.svn_remote <- function(x, ...) {
+  "SVN"
 }

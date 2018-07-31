@@ -30,7 +30,7 @@ a single command.
 }
 \examples{
 \dontrun{
-install_svn("svn://github.com/hadley/stringr/trunk")
-install_svn("svn://github.com/hadley/httr/branches/oauth")
+install_svn("https://github.com/hadley/stringr/trunk")
+install_svn("https://github.com/hadley/httr/branches/oauth")
 }
 }
