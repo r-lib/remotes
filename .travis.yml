@@ -2,6 +2,7 @@ language: r
 dist: trusty
 sudo: false
 cache: packages
+latex: false
 
 r:
  - 3.2
