@@ -42,7 +42,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 
   url <- file.path(paste0("https://", host),
                    "repos", username, repo, "contents", paste0(subdir, "DESCRIPTION"))
-  url <- paste0(url, "?ref=", URLencode(ref))
+  url <- paste0(url, "?ref=", utils::URLencode(ref))
 
   tmp <- tempfile()
   download(tmp, url, auth_token = github_pat())
