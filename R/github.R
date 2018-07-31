@@ -1,7 +1,7 @@
 
-github_GET <- function(path, ..., pat = github_pat()) {
+github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 
-  url <- paste0("https://api.github.com/", path)
+  url <- file.path(paste0("https://", host), path)
 
   tmp <- tempfile()
   download(tmp, url, auth_token = pat)
@@ -9,13 +9,14 @@ github_GET <- function(path, ..., pat = github_pat()) {
   fromJSONFile(tmp)
 }
 
-github_commit <- function(username, repo, ref = "master") {
+github_commit <- function(username, repo, ref = "master",
+  host = "api.github.com", pat = github_pat()) {
 
-  url <- file.path("https://api.github.com",
+  url <- file.path(paste0("https://", host),
                    "repos", username, repo, "commits", ref)
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = github_pat())
+  download(tmp, url, auth_token = pat)
 
   fromJSONFile(tmp)
 }
@@ -27,10 +28,24 @@ github_commit <- function(username, repo, ref = "master") {
 #'
 #' @keywords internal
 #' @noRd
-github_pat <- function() {
+github_pat <- function(quiet = TRUE) {
   pat <- Sys.getenv('GITHUB_PAT')
   if (identical(pat, "")) return(NULL)
 
-  message("Using github PAT from envvar GITHUB_PAT")
+  if (!quiet) {
+    message("Using github PAT from envvar GITHUB_PAT")
+  }
   pat
+}
+
+github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...) {
+
+  url <- file.path(paste0("https://", host),
+                   "repos", username, repo, "contents", paste0(subdir, "DESCRIPTION"))
+  url <- paste0(url, "?=", URLencode(ref))
+
+  tmp <- tempfile()
+  download(tmp, url, auth_token = github_pat())
+
+  rawToChar(base64enc::base64decode(gsub("\\\\n", "", fromJSONFile(tmp)$content)))
 }

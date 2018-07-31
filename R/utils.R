@@ -168,3 +168,8 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
   class(res) <- c("tbl_df", "tbl", class(res))
   res
 }
+
+is_installed <- function(pkg, version = 0) {
+  installed_version <- tryCatch(utils::packageVersion(pkg), error = function(e) NA)
+  !is.na(installed_version) && installed_version >= version
+}

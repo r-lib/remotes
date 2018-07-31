@@ -336,3 +336,31 @@ parse_git_repo <- function(repo) {
 
   params
 }
+
+#' @export
+remote_package_name.github_remote <- function(remote, ...) {
+
+  desc <- github_DESCRIPTION(username = remote$username, repo = remote$repo,
+    host = remote$host, ref = remote$ref, pat = remote$auth_token)
+
+  if (is.null(desc)) {
+    return(NA_character_)
+  }
+
+  tmp <- tempfile()
+  writeLines(desc, tmp)
+  on.exit(unlink(tmp))
+
+  read_dcf(tmp)$Package
+}
+
+#' @export
+remote_sha.github_remote <- function(remote, ...) {
+  github_commit(username = remote$username, repo = remote$repo,
+    host = remote$host, ref = remote$ref, pat = remote$auth_token)$sha %||% NA_character_
+}
+
+#' @export
+format.github_remote <- function(x, ...) {
+  "GitHub"
+}
