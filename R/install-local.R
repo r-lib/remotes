@@ -47,3 +47,30 @@ remote_metadata.local_remote <- function(x, bundle = NULL, source = NULL) {
     RemoteSubdir = x$subdir
   )
 }
+
+#' @export
+remote_package_name.local_remote <- function(remote, ...) {
+  is_tarball <- !dir.exists(remote$path)
+  if (is_tarball) {
+    # Assume the name is the name of the tarball
+    return(sub("_.*$", "", basename(remote$path)))
+  }
+  description_path <- file.path(remote$path, "DESCRIPTION")
+
+  read_dcf(description_path)$Package
+}
+
+#' @export
+remote_sha.local_remote <- function(remote, ...) {
+  is_tarball <- !dir.exists(remote$path)
+  if (is_tarball) {
+    return(NA_character_)
+  }
+
+  read_dcf(file.path(remote$path, "DESCRIPTION"))$Version
+}
+
+#' @export
+format.local_remote <- function(x, ...) {
+  "local"
+}

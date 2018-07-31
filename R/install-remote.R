@@ -164,11 +164,7 @@ package2remote <- function(name, repos = getOption("repos"), type = getOption("p
       subdir = x$RemoteSubdir,
       sha = {
         # Packages installed locally might have RemoteSha == NA_character_
-        sha <- x$RemoteSha
-        if (is.null(sha) || (length(sha) == 1 && is.na(sha))) {
-          sha <- x$Version
-        }
-        sha
+        x$RemoteSha %||% x$Version
       },
       username = x$RemoteUsername,
       repo = x$RemoteRepo),
