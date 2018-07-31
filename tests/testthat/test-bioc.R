@@ -20,8 +20,8 @@ test_that("installing bioc packages", {
 
   expect_silent(packageDescription("Biobase", lib.loc = lib))
   expect_equal(
-    packageDescription("Biobase", lib.loc = lib)$RemoteRepo,
-    "Biobase")
+    packageDescription("Biobase", lib.loc = lib)$RemoteUrl,
+    "https://git.bioconductor.org/packages/Biobase")
 
   expect_silent(packageDescription("BiocGenerics", lib.loc = lib))
 })
