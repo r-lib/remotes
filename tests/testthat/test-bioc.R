@@ -15,7 +15,7 @@ test_that("installing bioc packages", {
 
   withr::with_libpaths(
     lib,
-    install_github("Bioconductor-mirror/Biobase", lib = lib, quiet = TRUE)
+    install_git("https://git.bioconductor.org/packages/Biobase", lib = lib, quiet = TRUE)
   )
 
   expect_silent(packageDescription("Biobase", lib.loc = lib))
