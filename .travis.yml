@@ -9,6 +9,10 @@ r:
  - release
  - devel
 
+install:
+  - R CMD INSTALL .
+  - R -e 'remotes::install_deps(dependencies = TRUE)'
+
 after_success:
   - test $TRAVIS_R_VERSION_STRING = 'release' && Rscript -e 'covr::codecov()'
 
