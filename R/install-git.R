@@ -90,6 +90,71 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
   )
 }
 
+#' @export
+remote_package_name.git2r_remote <- function(remote, ...) {
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp))
+  description_path <- paste0(collapse = "/", c(remote$subdir, "DESCRIPTION"))
+
+  # Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
+  # or server doesn't support that return NA
+  res <- try(silent = TRUE,
+    system_check(git_path(),
+      args = c("archive", "-o", tmp, "--remote", remote$url,
+        if (is.null(remote$branch)) "HEAD" else remote$branch,
+        description_path),
+      quiet = TRUE))
+
+  if (inherits(res, "try-error")) {
+    return(NA_character_)
+  }
+
+  # git archive returns a tar file, so extract it to tempdir and read the DCF
+  utils::untar(tmp, files = description_path, exdir = tempdir())
+
+  read_dcf(file.path(tempdir(), description_path))$Package
+}
+
+#' @export
+remote_sha.git2r_remote <- function(remote, ...) {
+  tryCatch({
+    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
+
+    branch <- remote$branch %||% "master"
+
+    found <- grep(pattern = paste0("/", branch), x = names(res))
+
+    # If none found, assume it is a Sha1, so return the ref
+    if (length(found) == 0) {
+      return(remote$ref)
+    }
+
+    unname(res[found[1]])
+  }, error = function(e) NA_character_)
+}
+#' @export
+remote_sha.git_remote <- function(remote, ...) {
+  tryCatch({
+    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
+
+    branch <- remote$branch %||% "master"
+
+    found <- grep(pattern = paste0("/", branch), x = names(res))
+
+    # If none found, assume it is a Sha1, so return the ref
+    if (length(found) == 0) {
+      return(remote$ref)
+    }
+
+    unname(res[found[1]])
+  }, error = function(e) NA_character_)
+}
+
+#' @export
+format.git_remote <- function(x, ...) {
+  "Git"
+}
 
 #' @export
 remote_download.xgit_remote <- function(x, quiet = FALSE) {
@@ -114,14 +179,21 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
-    RemoteSha = xgit_remote_sha1(x$url),
+    RemoteSha = remote_sha(x),
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
 }
 
 #' @importFrom utils read.delim
 
-xgit_remote_sha1 <- function(url, ref = "master") {
+#' @export
+remote_package_name.xgit_remote <- remote_package_name.git2r_remote
+
+#' @export
+remote_sha.xgit_remote <- function(remote, ...) {
+  url <- remote$url
+  ref <- remote$ref
+
   refs <- git(paste("ls-remote", url, ref))
 
   refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
