@@ -13,9 +13,10 @@ test_that("installing bioc packages", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
+  bioc_branch <- paste0("RELEASE_", gsub("[.]", "_", bioc_version()))
   withr::with_libpaths(
     lib,
-    install_git("https://git.bioconductor.org/packages/Biobase", lib = lib, quiet = TRUE)
+    install_git("https://git.bioconductor.org/packages/Biobase", lib = lib, quiet = TRUE, branch = bioc_branch)
   )
 
   expect_silent(packageDescription("Biobase", lib.loc = lib))
