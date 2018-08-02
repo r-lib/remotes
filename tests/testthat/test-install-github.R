@@ -233,18 +233,3 @@ test_that("github_pull", {
     packageDescription("pkgsnap", lib.loc = lib)$RemoteRepo,
     "pkgsnap")
 })
-
-test_that("type = 'both' works well", {
-
-  skip_on_cran()
-  skip_if_offline()
-  skip_if_over_rate_limit()
-
-  # -6 is the remote column, which includes the pkg_type
-  # as an attribute, so we remove it from the comparison
-  expect_equal(
-    package_deps("falsy", type = "both")[-6],
-    package_deps("falsy", type = "binary")[-6]
-  )
-
-})

@@ -127,9 +127,20 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
       repos[missing_repos] <- bioc_repos[missing_repos]
   }
 
-  rbind(
+  combine_deps(
     package_deps(deps, repos = repos, type = type),
     remote_deps(pkg))
+}
+
+combine_deps <- function(cran_deps, remote_deps) {
+  deps <- rbind(cran_deps, remote_deps)
+
+  # Only keep the remotes that are specified in the cran_deps
+  # Keep only the Non-CRAN remotes if there are duplicates as we want to install
+  # the development version rather than the CRAN version. The remotes will
+  # always be specified after the CRAN dependencies, so using fromLast will
+  # filter out the CRAN dependencies.
+  deps[!duplicated(deps$package, fromLast = TRUE), ]
 }
 
 ## -2 = not installed, but available on CRAN
@@ -167,55 +178,6 @@ compare_versions <- function(inst, remote, is_cran) {
   vapply(seq_along(inst),
     function(i) compare_var(inst[[i]], remote[[i]], is_cran[[i]]),
     integer(1))
-}
-
-install_dev_remotes <- function(pkgdir = ".", ...) {
-
-  pkg <- load_pkg_description(pkgdir)
-  if (!has_dev_remotes(pkg)) {
-    return()
-  }
-
-  types <- dev_remote_type(pkg[["remotes"]])
-
-  lapply(types, function(type) type$fun(type$repository, ...))
-}
-
-# Parse the remotes field split into pieces and get install_ functions for each
-# remote type
-dev_remote_type <- function(remotes = "") {
-
-  if (!nchar(remotes)) {
-    return()
-  }
-
-  dev_packages <- trim_ws(unlist(strsplit(remotes, ",[[:space:]]*")))
-
-  parse_one <- function(x) {
-    pieces <- strsplit(x, "::", fixed = TRUE)[[1]]
-
-    if (length(pieces) == 1) {
-      type <- "github"
-      repo <- pieces
-    } else if (length(pieces) == 2) {
-      type <- pieces[1]
-      repo <- pieces[2]
-    } else {
-      stop("Malformed remote specification '", x, "'", call. = FALSE)
-    }
-    tryCatch(
-      fun <- get(x = paste0("install_", tolower(type)), mode = "function"),
-      error = function(e) {
-        stop(
-          "Malformed remote specification '", x, "'",
-          ", error: ", conditionMessage(e),
-          call. = FALSE
-        )
-      })
-    list(repository = repo, type = type, fun = fun)
-  }
-
-  lapply(dev_packages, parse_one)
 }
 
 has_dev_remotes <- function(pkg) {
@@ -428,7 +390,7 @@ parse_one_remote <- function(x) {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
   fun <- tryCatch(get(paste0(tolower(type), "_remote"),
-      envir = asNamespace("devtools"), mode = "function", inherits = FALSE),
+      envir = asNamespace("remotes"), mode = "function", inherits = FALSE),
     error = function(e) stop("Unknown remote type: ", type, call. = FALSE))
 
   fun(repo)
