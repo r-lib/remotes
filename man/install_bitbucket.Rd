@@ -5,7 +5,7 @@
 \title{Install a package directly from bitbucket}
 \usage{
 install_bitbucket(repo, ref = "master", subdir = NULL, auth_user = NULL,
-  password = NULL, ...)
+  password = NULL, host = "https://api.bitbucket.org/2.0", ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -24,6 +24,9 @@ a package hosted in a private repository (and your username is different
 to \code{username})}
 
 \item{password}{your password}
+
+\item{host}{GitHub API host to use. Override with your GitHub enterprise
+hostname, for example, \code{"github.hostname.com/api/v3"}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 }
