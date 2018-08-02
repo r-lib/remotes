@@ -17,10 +17,4 @@ test_that("", {
   install_cran("pkgconfig", lib = lib, force = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
-  expect_equal(
-    packageDescription("pkgconfig", lib.loc = lib)$RemoteType,
-    NULL)
-  expect_equal(
-    packageDescription("pkgconfig", lib.loc = lib)$RemoteUrl,
-    NULL)
 })

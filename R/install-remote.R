@@ -27,6 +27,13 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
     return(invisible(FALSE))
   }
 
+  if (inherits(remote, "cran_remote")) {
+    install_packages(
+      package_name, repos = remote$repos, type = remote$pkg_type,
+      ..., quiet = quiet)
+    return(invisible(TRUE))
+  }
+
   bundle <- remote_download(remote, quiet = quiet)
   on.exit(unlink(bundle), add = TRUE)
 
