@@ -307,7 +307,7 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   }
 
   if (any(object$is_cran & behind)) {
-    install_packages(object$remote[object$is_cran & behind], repos = attr(object, "repos"),
+    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
       type = attr(object, "type"), ...)
   }
 
