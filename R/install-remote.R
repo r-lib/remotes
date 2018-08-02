@@ -194,3 +194,10 @@ package2remote <- function(name, repos = getOption("repos"), type = getOption("p
 format.remotes <- function(x, ...) {
   vapply(x, format, character(1))
 }
+
+#' @export
+`[.remotes` <- function(x,i,...) {
+  r <- NextMethod("[")
+  mostattributes(r) <- attributes(x)
+  r
+}

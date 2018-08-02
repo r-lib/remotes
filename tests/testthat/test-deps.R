@@ -36,16 +36,16 @@ test_that("compare_versions", {
   expect_equal(
     compare_versions(
       c("1.0.0", "1.0.0", "1.0.0"),
-      c("1.0.1", "0.9.0", "1.0.0")
-    ),
+      c("1.0.1", "0.9.0", "1.0.0"),
+      c(TRUE, TRUE, TRUE)),
     c(-1L, 1L, 0L)
   )
 
   expect_equal(
     compare_versions(
       c(NA, "1.0.0"),
-      c("1.0.0", NA)
-    ),
+      c("1.0.0", NA),
+      c(TRUE, TRUE)),
     c(-2L, 2L)
   )
 
@@ -176,5 +176,65 @@ test_that("Additional_repositories field", {
   expect_equal(
     parse_additional_repositories(pkg),
     c("http://packages.ropensci.org", "http://foo.bar.com")
+  )
+})
+
+test_that("update.package_deps", {
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", "1.0"),
+    available = c("1.0", NA, "1.0"),
+    diff = c(CURRENT, UNAVAILABLE, CURRENT),
+    is_cran = c(TRUE, TRUE, TRUE)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  mockery::stub(update, "install_packages", NULL)
+  expect_message(
+    update(object, quiet = FALSE),
+    "Skipping 1 packages? not available: falsy"
+  )
+})
+
+test_that("update.package_deps 2", {
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.1", "1.0"),
+    available = c("1.0", "1.0", "1.0"),
+    diff = c(CURRENT, AHEAD, CURRENT),
+    is_cran = c(TRUE, TRUE, TRUE)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  mockery::stub(update, "install_packages", NULL)
+  expect_message(
+    update(object, quiet = FALSE),
+    "Skipping 1 packages? ahead of CRAN: falsy"
+  )
+})
+
+test_that("update.package_deps 3", {
+
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", NA),
+    available = c("1.0", "1.1", "1.0"),
+    diff = c(CURRENT, BEHIND, UNINSTALLED),
+    is_cran = c(TRUE, TRUE, TRUE)
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  mockery::stub(
+    update.package_deps,
+    "install_packages",
+    function(packages, ...) packages)
+  expect_equal(
+    update(object, upgrade = FALSE),
+    NULL
   )
 })

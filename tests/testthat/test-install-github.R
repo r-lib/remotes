@@ -234,65 +234,15 @@ test_that("github_pull", {
     "pkgsnap")
 })
 
-## -2 = not installed, but available on CRAN
-## -1 = installed, but out of date
-##  0 = installed, most recent version
-##  1 = installed, version ahead of CRAN
-##  2 = package not on CRAN
+test_that("type = 'both' works well", {
 
-test_that("update.package_deps", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
 
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.0", "1.0"),
-    available = c("1.0", NA, "1.0"),
-    diff = c(0L, 2L, 0L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(update, "install_packages", NULL)
-  expect_message(
-    update(object, quiet = FALSE),
-    "Skipping 1 packages? not available: falsy"
-  )
-})
-
-test_that("update.package_deps 2", {
-
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.1", "1.0"),
-    available = c("1.0", "1.0", "1.0"),
-    diff = c(0L, 1L, 0L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(update, "install_packages", NULL)
-  expect_message(
-    update(object, quiet = FALSE),
-    "Skipping 1 packages? ahead of CRAN: falsy"
-  )
-})
-
-test_that("update.package_deps 3", {
-
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.0", NA),
-    available = c("1.0", "1.1", "1.0"),
-    diff = c(0L, -1L, -2L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(
-    update.package_deps,
-    "install_packages",
-    function(packages, ...) packages)
   expect_equal(
-    update(object, upgrade = FALSE),
-    "magrittr"
+    package_deps("falsy", type = "both"),
+    package_deps("falsy", type = "binary")
   )
+
 })
