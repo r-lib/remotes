@@ -23,6 +23,7 @@ Imports:
     utils
 Suggests:
     curl,
+    covr,
     git2r (>= 0.23.0),
     mockery,
     pingr,
