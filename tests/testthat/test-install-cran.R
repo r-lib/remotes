@@ -5,6 +5,10 @@ test_that("", {
   skip_on_cran()
   skip_if_offline()
 
+  repos <- getOption("repos")
+  if (length(repos) == 0) repos <- character()
+  repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
+
   Sys.unsetenv("R_TESTS")
 
   lib <- tempfile()
@@ -14,7 +18,7 @@ test_that("", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_cran("pkgconfig", lib = lib, force = TRUE)
+  install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
 })
