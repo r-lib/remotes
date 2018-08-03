@@ -17,10 +17,7 @@ test_that("install_git", {
   .libPaths(lib)
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
-  expect_message(
-    install_git(url, lib = lib, quiet = FALSE, ref = "travis"),
-    "Downloading git repo"
-  )
+  install_git(url, lib = lib, ref = "travis", quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = .libPaths()[1]))
   expect_equal(
@@ -58,10 +55,7 @@ test_that("install_git with command line git", {
   .libPaths(lib)
 
   url <- "https://github.com/cran/falsy.git"
-  expect_message(
-    install_git(url, git = "external", lib = lib, quiet = FALSE),
-    "Downloading git repo"
-  )
+  install_git(url, git = "external", lib = lib, quiet = TRUE)
 
   expect_silent(packageDescription("falsy", lib.loc = lib))
   expect_equal(packageDescription("falsy", lib.loc = lib)$RemoteUrl, url)

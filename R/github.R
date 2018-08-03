@@ -47,10 +47,3 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 
   base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
 }
-
-build_url <- function(host, ...) {
-  if (!grepl("^[[:alpha:]]+://", host)) {
-    host <- paste0("https://", host)
-  }
-  file.path(host, ...)
-}

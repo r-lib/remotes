@@ -47,6 +47,8 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
 #' BioConductor repositories, appropriate for the current
 #' R version.
 #'
+#' @param r_ver R version to use.
+#' @param bioc_ver corresponding to the R version to use.
 #' @export
 
 bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version()) {

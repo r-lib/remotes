@@ -253,3 +253,10 @@ base64_decode <- function(x) {
   }
   rawToChar(out)
 }
+
+build_url <- function(host, ...) {
+  if (!grepl("^[[:alpha:]]+://", host)) {
+    host <- paste0("https://", host)
+  }
+  do.call(file.path, as.list(c(host, ...)))
+}
