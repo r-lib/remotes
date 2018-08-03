@@ -18,7 +18,7 @@ test_that("install_git", {
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
   expect_message(
-    install_git(url, lib = lib, quiet = FALSE, branch = "travis"),
+    install_git(url, lib = lib, quiet = FALSE, ref = "travis"),
     "Downloading git repo"
   )
 
@@ -27,6 +27,13 @@ test_that("install_git", {
     packageDescription("pkgconfig", lib.loc = .libPaths()[1])$RemoteUrl,
     url
   )
+
+  remote <- package2remote("pkgconfig", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "git_remote")
+  expect_equal(remote$url, url)
+  expect_equal(remote$ref, "travis")
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 

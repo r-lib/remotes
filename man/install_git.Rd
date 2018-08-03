@@ -4,7 +4,7 @@
 \alias{install_git}
 \title{Install a package from a git repository}
 \usage{
-install_git(url, subdir = NULL, branch = NULL, git = c("auto", "git2r",
+install_git(url, subdir = NULL, ref = NULL, git = c("auto", "git2r",
   "external"), ...)
 }
 \arguments{
@@ -14,7 +14,7 @@ private repository.}
 \item{subdir}{A sub-directory within a git repository that may
 contain the package we are interested in installing.}
 
-\item{branch}{Name of branch or tag to use, if not master.}
+\item{ref}{Name of branch, tag or SHA reference to use, if not master.}
 
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,
@@ -30,6 +30,6 @@ or an external git client installed.
 \examples{
 \dontrun{
 install_git("git://github.com/hadley/stringr.git")
-install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
+install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 }
 }
