@@ -3,8 +3,6 @@
 
 `%:::%` <- function (p, f) get(f, envir = asNamespace(p))
 
-`%::%` <- function (p, f) get(f, envir = asNamespace(p))
-
 viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }

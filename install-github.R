@@ -2191,14 +2191,6 @@ get_r_version <- function() {
   paste(R.version$major, sep = ".", R.version$minor)
 }
 
-set_libpaths <- function(paths) {
-  old <- .libPaths()
-  .libPaths(paths)
-  invisible(old)
-}
-
-with_libpaths <- with_something(set_libpaths, .libPaths)
-
 ## There are two kinds of tar on windows, one needs --force-local
 ## not to interpret : characters, the other does not. We try both ways.
 
