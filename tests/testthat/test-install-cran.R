@@ -18,7 +18,7 @@ test_that("", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE)
+  install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE, quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
 })
