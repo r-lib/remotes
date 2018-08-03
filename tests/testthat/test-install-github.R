@@ -233,3 +233,19 @@ test_that("github_pull", {
     packageDescription("pkgsnap", lib.loc = lib)$RemoteRepo,
     "pkgsnap")
 })
+
+test_that("remote_sha.github_remote errors if remote doesn't exist", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_error(remote_sha(github_remote("arst/arst")), "cannot open URL")
+})
+
+test_that("remote_sha.github_remote returns expected value if remote does exist", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_equal(remote_sha(github_remote("r-lib/devtools@v1.8.0")), "ad9aac7b9a522354e1ff363a86f389e32cec181b")
+})
