@@ -100,6 +100,16 @@ test_that("install_github", {
   expect_equal(
     packageDescription("falsy", lib.loc = lib)$RemoteRepo,
     "falsy")
+
+  remote <- package2remote("falsy", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "github_remote")
+  expect_equal(remote$host, "api.github.com")
+  expect_equal(remote$username, "cran")
+  expect_equal(remote$repo, "falsy")
+  expect_equal(remote$ref, "master")
+  expect_equal(remote$subdir, NULL)
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 test_that("error if not username, warning if given as argument", {
