@@ -12,12 +12,12 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 github_commit <- function(username, repo, ref = "master",
   host = "api.github.com", pat = github_pat()) {
 
-  url <- build_url(host, "repos", username, repo, "commits", ref)
+  url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
 
   tmp <- tempfile()
   download(tmp, url, auth_token = pat)
 
-  fromJSONFile(tmp)
+  get_json_field(readLines(tmp, warn = FALSE), "sha")
 }
 
 #' Retrieve Github personal access token.

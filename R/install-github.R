@@ -131,7 +131,7 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
     sha <- git_extract_sha1(bundle)
   } else {
     # Otherwise can use github api
-    sha <- github_commit(x$username, x$repo, x$ref)$sha
+    sha <- github_commit(x$username, x$repo, x$ref)
   }
 
   list(
@@ -357,7 +357,7 @@ remote_package_name.github_remote <- function(remote, ...) {
 #' @export
 remote_sha.github_remote <- function(remote, ...) {
   github_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token)$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, pat = remote$auth_token)
 }
 
 #' @export
