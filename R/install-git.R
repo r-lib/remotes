@@ -78,7 +78,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
     r <- git2r::repository(bundle)
     sha <- git2r::commits(r)[[1]]$sha
   } else {
-    sha <- NULL
+    sha <- NA_character_
   }
 
   list(
@@ -118,23 +118,6 @@ remote_package_name.git2r_remote <- function(remote, ...) {
 
 #' @export
 remote_sha.git2r_remote <- function(remote, ...) {
-  tryCatch({
-    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
-
-    branch <- remote$branch %||% "master"
-
-    found <- grep(pattern = paste0("/", branch), x = names(res))
-
-    # If none found, assume it is a Sha1, so return the ref
-    if (length(found) == 0) {
-      return(remote$ref)
-    }
-
-    unname(res[found[1]])
-  }, error = function(e) NA_character_)
-}
-#' @export
-remote_sha.git_remote <- function(remote, ...) {
   tryCatch({
     res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
 

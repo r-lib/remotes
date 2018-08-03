@@ -61,6 +61,23 @@ test_that("install_git with command line git", {
 
 })
 
+test_that("remote_metadata.xgit_remote", {
+
+  r <- remote_metadata.xgit_remote(
+    list(url = "foo", subdir = "foo2", ref = "foo3")
+  )
+
+  e <- list(
+    RemoteType = "git",
+    RemoteUrl = "foo",
+    RemoteSubdir = "foo2",
+    RemoteRef = "foo3",
+    RemoteSha = NA_character_,
+    RemoteArgs = NULL
+  )
+
+  expect_equal(r, e)
+})
 
 test_that("remote_metadata.git2r_remote", {
 
@@ -73,7 +90,7 @@ test_that("remote_metadata.git2r_remote", {
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteRef = "foo3",
-    RemoteSha = NULL
+    RemoteSha = NA_character_
   )
 
   expect_equal(r, e)
