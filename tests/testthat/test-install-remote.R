@@ -19,6 +19,10 @@ test_that("local_sha returns NA if package is not installed", {
 })
 
 test_that("remote_sha.github_remote errors if remote doesn't exist", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
   expect_error(remote_sha(github_remote("arst/arst")), "cannot open URL")
 })
 
