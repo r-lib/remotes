@@ -50,15 +50,6 @@ test_that("JSON parser nested arrays", {
 
 })
 
-test_that("JSON parser escaped characters", {
-
-  cases <- list(
-    list('1\\n2\\n3', "1\\n2\\n3"),
-    list('1\\u1234xx', "1\\u1234xx")
-  )
-
-})
-
 test_that("JSON parser, real examples", {
 
   inp <- '
