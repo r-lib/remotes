@@ -82,7 +82,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
   }
 
   list(
-    RemoteType = "git",
+    RemoteType = "git2r",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
@@ -163,7 +163,7 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
 #' @export
 remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
   list(
-    RemoteType = "git",
+    RemoteType = "xgit",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,

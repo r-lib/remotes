@@ -29,6 +29,7 @@ install_cran(c("httpuv", "shiny"))
 }
 }
 \seealso{
-Other package installation: \code{\link{install_gitlab}},
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_gitlab}},
   \code{\link{install_version}}
 }

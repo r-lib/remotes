@@ -39,8 +39,8 @@ if you do by running \code{devtools::has_devel} (you need the
 \code{devtools} package for this).
 }
 \seealso{
-Other package installation: \code{\link{install_cran}},
-  \code{\link{install_gitlab}}
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_cran}}, \code{\link{install_gitlab}}
 }
 \author{
 Jeremy Stephens

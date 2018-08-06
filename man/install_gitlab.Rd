@@ -33,6 +33,6 @@ install_github("jimhester/covr")
 }
 }
 \seealso{
-Other package installation: \code{\link{install_cran}},
-  \code{\link{install_version}}
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_cran}}, \code{\link{install_version}}
 }

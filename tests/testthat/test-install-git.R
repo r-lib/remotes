@@ -6,6 +6,7 @@ test_that("install_git", {
   skip_on_cran()
   skip_if_offline()
   skip_if_over_rate_limit()
+  skip_if_not_installed("git2r")
 
   Sys.unsetenv("R_TESTS")
 
@@ -14,7 +15,7 @@ test_that("install_git", {
   dir.create(lib)
   libpath <- .libPaths()
   on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
+  .libPaths(c(lib, libpath))
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
   install_git(url, lib = lib, ref = "travis", quiet = TRUE)
@@ -27,7 +28,7 @@ test_that("install_git", {
 
   remote <- package2remote("pkgconfig", lib = lib)
   expect_s3_class(remote, "remote")
-  expect_s3_class(remote, "git_remote")
+  expect_s3_class(remote, "git2r_remote")
   expect_equal(remote$url, url)
   expect_equal(remote$ref, "travis")
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
@@ -69,7 +70,7 @@ test_that("remote_metadata.xgit_remote", {
   )
 
   e <- list(
-    RemoteType = "git",
+    RemoteType = "xgit",
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteRef = "foo3",
@@ -87,7 +88,7 @@ test_that("remote_metadata.git2r_remote", {
   )
 
   e <- list(
-    RemoteType = "git",
+    RemoteType = "git2r",
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteRef = "foo3",
