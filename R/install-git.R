@@ -135,7 +135,12 @@ remote_sha.git2r_remote <- function(remote, ...) {
 }
 
 #' @export
-format.git_remote <- function(x, ...) {
+format.xgit_remote <- function(x, ...) {
+  "Git"
+}
+
+#' @export
+format.git2r_remote <- function(x, ...) {
   "Git"
 }
 
