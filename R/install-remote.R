@@ -212,12 +212,3 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
 format.remotes <- function(x, ...) {
   vapply(x, format, character(1))
 }
-
-# This is needed because rbind uses subsetting, and we need to preserve
-# attributes when rbinding. The default method drops the attributes.
-#' @rawNamespace S3method("[",remotes)
-`[.remotes` <- function(x,i,...) {
-  r <- NextMethod("[")
-  mostattributes(r) <- attributes(x)
-  r
-}
