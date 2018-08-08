@@ -74,7 +74,7 @@ getrootdir <- function(file_list) {
   getdir(file_list[which.min(slashes)])
 }
 
-my_unzip <- function(src, target, unzip = getOption("unzip")) {
+my_unzip <- function(src, target, unzip = getOption("unzip", "internal")) {
   if (unzip %in% c("internal", "")) {
     return(utils::unzip(src, exdir = target))
   }
