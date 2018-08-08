@@ -109,6 +109,11 @@ local_sha <- function(name) {
   package2remote(name)$sha %||% NA_character_
 }
 
+# Convert an installed package to its equivalent remote. This constructs the
+# remote from metadata stored in the package's DESCRIPTION file; the metadata
+# is added to the package when it is installed by remotes. If the package is
+# installed some other way, such as by `install.packages()` there will be no
+# meta-data, so there we construct a generic CRAN remote.
 package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), type = getOption("pkgType")) {
 
   x <- tryCatch(utils::packageDescription(name, lib.loc = lib), error = function(e) NA, warning = function(e) NA)
@@ -124,7 +129,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
 
   if (is.null(x$RemoteType)) {
 
-    # Packages installed with install.packages() or locally without devtools
+    # Packages installed with install.packages() or locally without remotes
     return(remote("cran",
         name = x$Package,
         repos = repos,
