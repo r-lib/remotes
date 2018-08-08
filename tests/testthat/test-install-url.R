@@ -31,6 +31,4 @@ test_that("install_url", {
   expect_s3_class(remote, "url_remote")
   expect_equal(remote$url, url)
   expect_equal(remote$subdir, NULL)
-  expect_equal(remote$config, NULL)
-  expect_equal(remote$pkg_type, NULL)
 })
