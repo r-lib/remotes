@@ -389,11 +389,14 @@ parse_one_remote <- function(x) {
   } else {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
-  fun <- tryCatch(get(paste0(tolower(type), "_remote"),
-      envir = asNamespace("remotes"), mode = "function", inherits = FALSE),
-    error = function(e) stop("Unknown remote type: ", type, call. = FALSE))
+  tryCatch({
+    fun <- get(paste0(tolower(type), "_remote"),
+      envir = asNamespace("remotes"), mode = "function", inherits = FALSE)
 
-  fun(repo)
+    res <- fun(repo)
+    }, error = function(e) stop("Unknown remote type: ", type, call. = FALSE)
+  )
+  res
 }
 
 split_remotes <- function(x) {
