@@ -428,6 +428,7 @@ remote_deps <- function(pkg) {
       installed = installed,
       available = available,
       diff = diff,
+      is_cran = FALSE,
       stringsAsFactors = FALSE
       ),
     class = c("package_deps", "data.frame"))
