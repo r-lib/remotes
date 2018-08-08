@@ -1,4 +1,4 @@
-#' Instlal a package from GitLab
+#' Install a package from GitLab
 #'
 #' This function is vectorised on \code{repo} so you can install multiple
 #' packages in a single command. Like other remotes the repository will skip
@@ -14,7 +14,7 @@
 #' @family package installation
 #' @examples
 #' \dontrun{
-#' install_github("jimhester/covr")
+#' install_gitlab("jimhester/covr")
 #' }
 install_gitlab <- function(repo,
                            auth_token = gitlab_pat(),
@@ -119,9 +119,9 @@ gitlab_commit <- function(username, repo, ref = "master",
   fromJSONFile(tmp)$id
 }
 
-#' Retrieve Gitlab personal access token.
+#' Retrieve GitLab personal access token.
 #'
-#' A github personal access token
+#' A GitLab personal access token
 #' Looks in env var \code{GITLAB_PAT}
 #'
 #' @keywords internal

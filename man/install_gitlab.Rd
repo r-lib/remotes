@@ -2,9 +2,10 @@
 % Please edit documentation in R/install-gitlab.R
 \name{install_gitlab}
 \alias{install_gitlab}
-\title{Instlal a package from GitLab}
+\title{Install a package from GitLab}
 \usage{
-install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com", ...)
+install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com",
+  ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -29,10 +30,11 @@ not changed since the previous installation.
 }
 \examples{
 \dontrun{
-install_github("jimhester/covr")
+install_gitlab("jimhester/covr")
 }
 }
 \seealso{
 Other package installation: \code{\link{install_bioc}},
   \code{\link{install_cran}}, \code{\link{install_version}}
 }
+\concept{package installation}
