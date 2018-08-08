@@ -249,7 +249,7 @@ test_that("remote_sha.github_remote errors if remote doesn't exist", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
-  expect_error(remote_sha(github_remote("arst/arst")), "cannot open URL")
+  expect_error(remote_sha(github_remote("arst/arst")))
 })
 
 test_that("remote_sha.github_remote returns expected value if remote does exist", {
