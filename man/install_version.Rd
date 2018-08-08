@@ -45,3 +45,4 @@ Other package installation: \code{\link{install_bioc}},
 \author{
 Jeremy Stephens
 }
+\concept{package installation}

@@ -49,3 +49,4 @@ Other package installation: \code{\link{install_cran}},
   \code{\link{install_gitlab}},
   \code{\link{install_version}}
 }
+\concept{package installation}

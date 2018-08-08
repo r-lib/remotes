@@ -2,12 +2,12 @@
 % Please edit documentation in R/install-gitlab.R
 \name{gitlab_pat}
 \alias{gitlab_pat}
-\title{Retrieve Gitlab personal access token.}
+\title{Retrieve GitLab personal access token.}
 \usage{
 gitlab_pat(quiet = TRUE)
 }
 \description{
-A github personal access token
+A GitLab personal access token
 Looks in env var \code{GITLAB_PAT}
 }
 \keyword{internal}

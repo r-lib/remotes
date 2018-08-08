@@ -4,8 +4,9 @@
 \alias{install_bitbucket}
 \title{Install a package directly from bitbucket}
 \usage{
-install_bitbucket(repo, ref = "master", subdir = NULL, auth_user = NULL,
-  password = NULL, host = "https://api.bitbucket.org/2.0", ...)
+install_bitbucket(repo, ref = "master", subdir = NULL,
+  auth_user = NULL, password = NULL,
+  host = "https://api.bitbucket.org/2.0", ...)
 }
 \arguments{
 \item{repo}{Repository address in the format

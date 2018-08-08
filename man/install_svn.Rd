@@ -4,7 +4,8 @@
 \alias{install_svn}
 \title{Install a package from a SVN repository}
 \usage{
-install_svn(url, subdir = NULL, args = character(0), ..., revision = NULL)
+install_svn(url, subdir = NULL, args = character(0), ...,
+  revision = NULL)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
