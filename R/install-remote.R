@@ -213,7 +213,9 @@ format.remotes <- function(x, ...) {
   vapply(x, format, character(1))
 }
 
-#' @export
+# This is needed because rbind uses subsetting, and we need to preserve
+# attributes when rbinding. The default method drops the attributes.
+#' @rawNamespace S3method("[",remotes)
 `[.remotes` <- function(x,i,...) {
   r <- NextMethod("[")
   mostattributes(r) <- attributes(x)
