@@ -4,7 +4,8 @@
 \alias{install_svn}
 \title{Install a package from a SVN repository}
 \usage{
-install_svn(url, subdir = NULL, args = character(0), ..., revision = NULL)
+install_svn(url, subdir = NULL, args = character(0), ...,
+  revision = NULL)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -30,7 +31,7 @@ a single command.
 }
 \examples{
 \dontrun{
-install_svn("svn://github.com/hadley/stringr/trunk")
-install_svn("svn://github.com/hadley/httr/branches/oauth")
+install_svn("https://github.com/hadley/stringr/trunk")
+install_svn("https://github.com/hadley/httr/branches/oauth")
 }
 }

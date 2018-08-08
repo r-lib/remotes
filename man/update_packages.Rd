@@ -4,8 +4,8 @@
 \alias{update_packages}
 \title{Update packages that are missing or out-of-date.}
 \usage{
-update_packages(packages, dependencies = NA, repos = getOption("repos"),
-  type = getOption("pkgType"))
+update_packages(packages, dependencies = NA,
+  repos = getOption("repos"), type = getOption("pkgType"))
 }
 \arguments{
 \item{packages}{Character vector of packages to update.}

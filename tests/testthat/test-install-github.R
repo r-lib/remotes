@@ -100,6 +100,16 @@ test_that("install_github", {
   expect_equal(
     packageDescription("falsy", lib.loc = lib)$RemoteRepo,
     "falsy")
+
+  remote <- package2remote("falsy", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "github_remote")
+  expect_equal(remote$host, "api.github.com")
+  expect_equal(remote$username, "cran")
+  expect_equal(remote$repo, "falsy")
+  expect_equal(remote$ref, "master")
+  expect_equal(remote$subdir, NULL)
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 test_that("error if not username, warning if given as argument", {
@@ -234,65 +244,18 @@ test_that("github_pull", {
     "pkgsnap")
 })
 
-## -2 = not installed, but available on CRAN
-## -1 = installed, but out of date
-##  0 = installed, most recent version
-##  1 = installed, version ahead of CRAN
-##  2 = package not on CRAN
+test_that("remote_sha.github_remote errors if remote doesn't exist", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
 
-test_that("update.package_deps", {
-
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.0", "1.0"),
-    available = c("1.0", NA, "1.0"),
-    diff = c(0L, 2L, 0L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(update, "install_packages", NULL)
-  expect_message(
-    update(object, quiet = FALSE),
-    "Skipping 1 packages? not available: falsy"
-  )
+  expect_error(remote_sha(github_remote("arst/arst")))
 })
 
-test_that("update.package_deps 2", {
+test_that("remote_sha.github_remote returns expected value if remote does exist", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
 
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.1", "1.0"),
-    available = c("1.0", "1.0", "1.0"),
-    diff = c(0L, 1L, 0L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(update, "install_packages", NULL)
-  expect_message(
-    update(object, quiet = FALSE),
-    "Skipping 1 packages? ahead of CRAN: falsy"
-  )
-})
-
-test_that("update.package_deps 3", {
-
-  object <- data.frame(
-    stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.0", NA),
-    available = c("1.0", "1.1", "1.0"),
-    diff = c(0L, -1L, -2L)
-  )
-  class(object) <- c("package_deps", "data.frame")
-
-  mockery::stub(
-    update.package_deps,
-    "install_packages",
-    function(packages, ...) packages)
-  expect_equal(
-    update(object, upgrade = FALSE),
-    "magrittr"
-  )
+  expect_equal(remote_sha(github_remote("r-lib/devtools@v1.8.0")), "ad9aac7b9a522354e1ff363a86f389e32cec181b")
 })

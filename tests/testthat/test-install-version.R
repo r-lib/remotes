@@ -19,7 +19,7 @@ test_that("install_version", {
   if (length(repos) == 0) repos <- character()
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
-  install_version("pkgconfig", "1.0.0", lib = lib, repos = repos)
+  install_version("pkgconfig", "1.0.0", lib = lib, repos = repos, quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
   expect_equal(
@@ -60,7 +60,7 @@ test_that("install_version for current version", {
   if (length(repos) == 0) repos <- character()
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
-  install_version("pkgconfig", NULL, lib = lib, repos = repos, type = "source")
+  install_version("pkgconfig", NULL, lib = lib, repos = repos, type = "source", quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
 
@@ -111,8 +111,8 @@ test_that("install_version for archives packages", {
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
   mockery::stub(install_version, "install_url", function(url, ...) url)
-  expect_match(
+  expect_match(fixed = TRUE,
     install_version("igraph0", type = "source", lib = lib, repos = repos),
-    "https?://cran.rstudio.com/src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+    "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
   )
 })

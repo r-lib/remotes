@@ -9,5 +9,5 @@ test_that("github_pat", {
   Sys.setenv(GITHUB_PAT = "badcafe")
   expect_equal(github_pat(), "badcafe")
 
-  expect_message(github_pat(), "Using github PAT from envvar GITHUB_PAT")
+  expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
 })

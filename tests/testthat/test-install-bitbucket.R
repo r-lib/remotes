@@ -21,6 +21,15 @@ test_that("", {
   expect_equal(
     packageDescription("showimage", lib.loc = lib)$RemoteRepo,
     "showimage")
+
+  remote <- package2remote("showimage", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "bitbucket_remote")
+  expect_equal(remote$host, "https://api.bitbucket.org/2.0")
+  expect_equal(remote$repo, "showimage")
+  expect_equal(remote$username, "csardigabor")
+  expect_equal(remote$ref, "master")
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 
