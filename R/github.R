@@ -10,14 +10,26 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 }
 
 github_commit <- function(username, repo, ref = "master",
-  host = "api.github.com", pat = github_pat()) {
+  host = "api.github.com", pat = github_pat(), use_curl = is_installed("curl")) {
 
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
-
   tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
 
-  get_json_field(readLines(tmp, warn = FALSE), "sha")
+  if (isTRUE(use_curl)) {
+    h <- curl::new_handle()
+    headers <- c(
+      "Accept" = "application/vnd.github.VERSION.sha",
+      if (!is.null(pat)) {
+        c("Authorization" = paste0("token ", pat))
+      }
+    )
+    curl::handle_setheaders(h, .list = headers)
+    curl::curl_download(url, tmp, handle = h)
+    readChar(tmp, file.info(tmp)$size)
+  } else {
+    download(tmp, url, auth_token = pat)
+    get_json_field(readLines(tmp, warn = FALSE), "sha")
+  }
 }
 
 #' Retrieve Github personal access token.
