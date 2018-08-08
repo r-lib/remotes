@@ -64,7 +64,7 @@ test_that("installing bioc packages", {
   withr::with_libpaths(
     lib,
     install_git("https://git.bioconductor.org/packages/Biobase",
-      ref = bioc_branch,
+      branch = bioc_branch,
       lib = lib,
       quiet = TRUE)
   )
