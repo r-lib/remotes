@@ -4,9 +4,9 @@
 \alias{install_deps}
 \title{Install package dependencies if needed.}
 \usage{
-install_deps(pkgdir = ".", dependencies = NA, threads = getOption("Ncpus",
-  1), repos = getOption("repos"), type = getOption("pkgType"), ...,
-  upgrade = TRUE, quiet = FALSE)
+install_deps(pkgdir = ".", dependencies = NA,
+  threads = getOption("Ncpus", 1), repos = getOption("repos"),
+  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE)
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}

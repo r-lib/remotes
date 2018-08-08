@@ -4,7 +4,12 @@
 \alias{bioc_install_repos}
 \title{Deduce the URLs of the BioConductor repositories}
 \usage{
-bioc_install_repos()
+bioc_install_repos(r_ver = getRversion(), bioc_ver = bioc_version())
+}
+\arguments{
+\item{r_ver}{R version to use.}
+
+\item{bioc_ver}{corresponding to the R version to use.}
 }
 \value{
 A named character vector of the URLs of the

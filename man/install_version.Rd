@@ -38,6 +38,11 @@ need to have an R development environment installed.  You can check
 if you do by running \code{devtools::has_devel} (you need the
 \code{devtools} package for this).
 }
+\seealso{
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_cran}}, \code{\link{install_gitlab}}
+}
 \author{
 Jeremy Stephens
 }
+\concept{package installation}

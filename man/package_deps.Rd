@@ -15,7 +15,8 @@ local_package_deps(pkgdir = ".", dependencies = NA)
 dev_package_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"))
 
-\method{update}{package_deps}(object, ..., quiet = FALSE, upgrade = TRUE)
+\method{update}{package_deps}(object, ..., quiet = FALSE,
+  upgrade = TRUE)
 }
 \arguments{
 \item{packages}{A character vector of package names.}
@@ -60,12 +61,6 @@ Find all the dependencies of a package and determine whether they are ahead
 or behind CRAN. A \code{print()} method identifies mismatches (if any)
 between local and CRAN versions of each dependent package; an
 \code{update()} method installs outdated or missing packages from CRAN.
-
-\code{local_package_deps} extracts dependencies from a
-local DESCRIPTION file.
-
-\code{dev_package_deps} lists the status of the dependencies
-of a local package.
 }
 \examples{
 \dontrun{

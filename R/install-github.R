@@ -87,7 +87,7 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   }
 
   dest <- tempfile(fileext = paste0(".zip"))
-  src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
+  src_root <- build_url(x$host, "repos", x$username, x$repo)
   src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
 
   if (github_has_submodules(x)) {
@@ -99,7 +99,7 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
 }
 
 github_has_submodules <- function(x) {
-  src_root <- paste0("https://", x$host, "/repos/", x$username, "/", x$repo)
+  src_root <- build_url(x$host, "repos", x$username, x$repo)
   src_submodules <- paste0(src_root, "/contents/.gitmodules?ref=", x$ref)
 
   tmp <- tempfile()
@@ -131,7 +131,7 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
     sha <- git_extract_sha1(bundle)
   } else {
     # Otherwise can use github api
-    sha <- github_commit(x$username, x$repo, x$ref)$sha
+    sha <- github_commit(x$username, x$repo, x$ref)
   }
 
   list(
@@ -335,4 +335,32 @@ parse_git_repo <- function(repo) {
   }
 
   params
+}
+
+#' @export
+remote_package_name.github_remote <- function(remote, ...) {
+
+  desc <- github_DESCRIPTION(username = remote$username, repo = remote$repo,
+    host = remote$host, ref = remote$ref, pat = remote$auth_token)
+
+  if (is.null(desc)) {
+    return(NA_character_)
+  }
+
+  tmp <- tempfile()
+  writeLines(desc, tmp)
+  on.exit(unlink(tmp))
+
+  read_dcf(tmp)$Package
+}
+
+#' @export
+remote_sha.github_remote <- function(remote, ...) {
+  github_commit(username = remote$username, repo = remote$repo,
+    host = remote$host, ref = remote$ref, pat = remote$auth_token)
+}
+
+#' @export
+format.github_remote <- function(x, ...) {
+  "GitHub"
 }
