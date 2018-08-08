@@ -14,7 +14,7 @@
 #'   \sQuote{release} (the default if none specified), or numeric release
 #'   numbers (e.g. \sQuote{3.3}).
 #' @param mirror The bioconductor git mirror to use
-#' @param ... Other arguments passed on to \code{\link{install}}
+#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @export
 #' @family package installation
 #' @examples
@@ -28,13 +28,13 @@
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
 install_bioc <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages"),
-  git = c("auto", "git2r", "external"), ..., quiet = FALSE) {
+  git = c("auto", "git2r", "external"), ...) {
 
   bioc_remote <- select_bioc_git_remote(match.arg(git))
 
   remotes <- lapply(repo, bioc_remote, mirror = mirror)
 
-  install_remotes(remotes, ..., quiet = quiet)
+  install_remotes(remotes, ...)
 }
 
 select_bioc_git_remote <- function(git) {

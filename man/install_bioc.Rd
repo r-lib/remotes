@@ -6,7 +6,7 @@
 \usage{
 install_bioc(repo, mirror = getOption("BioC_git",
   "https://git.bioconductor.org/packages"), git = c("auto", "git2r",
-  "external"), ..., quiet = FALSE)
+  "external"), ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -21,7 +21,7 @@ numbers (e.g. \sQuote{3.3}).}
 git client via system. Default is \code{git2r} if it is installed,
 otherwise an external git installation.}
 
-\item{...}{Other arguments passed on to \code{\link{install}}}
+\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
 }
 \description{
 This function requires \code{git} to be installed on your system in order to
