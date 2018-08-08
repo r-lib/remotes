@@ -240,13 +240,13 @@ bioconductor_branch <- function(release, sha) {
   }
 }
 
-bioconductor_release <- memoise::memoise(function() {
+bioconductor_release <- function() {
   tmp <- tempfile()
   download.file("http://bioconductor.org/config.yaml", tmp, quiet = TRUE)
 
   gsub("release_version:[[:space:]]+\"([[:digit:].]+)\"", "\\1",
        grep("release_version:", readLines(tmp), value = TRUE))
-})
+}
 
 #' @export
 format.bioc_git2r_remote <- function(x, ...) {
