@@ -7,7 +7,7 @@
 #'
 #' @param url Location of package. The url should point to a public or
 #'   private repository.
-#' @param branch Name of branch, tag or SHA reference to use, if not master.
+#' @param branch Name of branch, tag or SHA reference to use, if not HEAD.
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
 #' @param git Whether to use the \code{git2r} package, or an external
@@ -121,7 +121,7 @@ remote_sha.git2r_remote <- function(remote, ...) {
   tryCatch({
     res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
 
-    branch <- remote$branch %||% "master"
+    branch <- remote$branch %||% "HEAD"
 
     found <- grep(pattern = paste0("/", branch), x = names(res))
 
