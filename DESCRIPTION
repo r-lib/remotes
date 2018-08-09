@@ -26,6 +26,7 @@ Suggests:
     covr,
     git2r (>= 0.23.0),
     mockery,
+    pkgbuild,
     pingr,
     testthat,
     withr
