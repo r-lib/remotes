@@ -23,7 +23,7 @@ test_that("install_url", {
     packageDescription("simplegraph", lib.loc = lib)$RemoteType,
     "url")
   expect_equal(
-    packageDescription("simplegraph", lib.loc = lib)$RemoteUrl,
+    trim_ws(packageDescription("simplegraph", lib.loc = lib)$RemoteUrl),
     url)
 
   remote <- package2remote("simplegraph", lib = lib)
