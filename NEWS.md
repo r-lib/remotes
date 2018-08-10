@@ -1,4 +1,10 @@
 
+* `install_gitlab()` and `install_bioc()` remote types added (#135)
+
+* Code in remotes now uses the same SHA updating logic for remotes as devtools,
+including checking if the SHA of the remote has changed since the last
+installation. (#135)
+
 # 1.1.1
 
 * Accept HTTPS, SSH, or various browser URLs in GitHub repo specification,
