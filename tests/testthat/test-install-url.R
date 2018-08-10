@@ -29,6 +29,7 @@ test_that("install_url", {
   remote <- package2remote("simplegraph", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "url_remote")
+  expect_equal(format(remote), "URL")
   expect_equal(remote$url, url)
   expect_equal(remote$subdir, NULL)
 })

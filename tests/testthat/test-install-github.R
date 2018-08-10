@@ -104,6 +104,7 @@ test_that("install_github", {
   remote <- package2remote("falsy", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "github_remote")
+  expect_equal(format(remote), "GitHub")
   expect_equal(remote$host, "api.github.com")
   expect_equal(remote$username, "cran")
   expect_equal(remote$repo, "falsy")
