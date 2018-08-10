@@ -1,5 +1,5 @@
 # Decompress pkg, if needed
-source_pkg <- function(path, subdir = NULL, before_install = NULL) {
+source_pkg <- function(path, subdir = NULL) {
   if (!file.info(path)$isdir) {
     bundle <- path
     outdir <- tempfile(pattern = "remotes")
@@ -22,10 +22,6 @@ source_pkg <- function(path, subdir = NULL, before_install = NULL) {
   if (file.exists(config_path)) {
     Sys.chmod(config_path, "777")
   }
-
-  # Call before_install for bundles (if provided)
-  if (!is.null(bundle) && !is.null(before_install))
-    before_install(bundle, pkg_path)
 
   pkg_path
 }
