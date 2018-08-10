@@ -22,11 +22,8 @@
 #'   hostname, for example, \code{"github.hostname.com/api/v3"}.
 #' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @details
-#' Attempting to install from a source repository that uses submodules
-#' raises a warning. Because the zipped sources provided by GitHub do not
-#' include submodules, this may lead to unexpected behaviour or compilation
-#' failure in source packages. In this case, cloning the repository manually
-#' may yield better results.
+#' If the repository uses submodules a command-line git client is required to
+#' clone the submodules.
 #' @export
 #' @seealso \code{\link{github_pull}}
 #' @examples
@@ -60,7 +57,7 @@ github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
                        host = "api.github.com") {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta)
+  meta <- github_resolve_ref(meta$ref %||% ref, meta, auth_token)
 
   if (is.null(meta$username)) {
     meta$username <- username %||% getOption("github.user") %||%
@@ -89,11 +86,6 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".zip"))
   src_root <- build_url(x$host, "repos", x$username, x$repo)
   src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
-
-  if (github_has_submodules(x)) {
-    warning("GitHub repo contains submodules, may not function as expected!",
-            call. = FALSE)
-  }
 
   download(dest, src, auth_token = x$auth_token)
 }

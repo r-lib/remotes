@@ -1,4 +1,7 @@
 
+* Submodules are now installed if they exist and a git client is available
+  (#138, #133, #103, #82).
+
 * `install_gitlab()` and `install_bioc()` remote types added (#135)
 
 * Code in remotes now uses the same SHA updating logic for remotes as devtools,
