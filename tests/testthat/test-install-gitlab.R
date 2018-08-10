@@ -24,6 +24,7 @@ test_that("install_gitlab", {
   remote <- package2remote("falsy", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "gitlab_remote")
+  expect_equal(format(remote), "GitLab")
   expect_equal(remote$host, "gitlab.com")
   expect_equal(remote$username, "jimhester")
   expect_equal(remote$repo, "falsy")

@@ -25,6 +25,7 @@ test_that("", {
   remote <- package2remote("showimage", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "bitbucket_remote")
+  expect_equal(format(remote), "Bitbucket")
   expect_equal(remote$host, "https://api.bitbucket.org/2.0")
   expect_equal(remote$repo, "showimage")
   expect_equal(remote$username, "csardigabor")

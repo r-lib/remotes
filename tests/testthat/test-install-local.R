@@ -35,6 +35,7 @@ test_that("install_local", {
   remote <- package2remote("pkgconfig", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "local_remote")
+  expect_equal(format(remote), "local")
   expect_equal(remote$path, normalizePath(pkg[, 2]))
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
