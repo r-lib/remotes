@@ -61,6 +61,12 @@ test_that("install_git with command line git", {
   expect_silent(packageDescription("falsy", lib.loc = lib))
   expect_equal(packageDescription("falsy", lib.loc = lib)$RemoteUrl, url)
 
+  remote <- package2remote("falsy", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "xgit_remote")
+  expect_equal(remote$url, url)
+  expect_equal(remote$branch, NULL)
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 test_that("remote_metadata.xgit_remote", {
