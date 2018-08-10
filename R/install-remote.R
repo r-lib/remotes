@@ -87,15 +87,7 @@ remote_sha <- function(remote, ...) UseMethod("remote_sha")
 remote_package_name.default <- function(remote, ...) remote$repo
 remote_sha.default <- function(remote, ...) NA_character_
 
-different_sha <- function(remote_sha = NULL,
-                          local_sha = NULL) {
-  if (is.null(remote_sha)) {
-    remote_sha <- remote_sha(remote)
-  }
-
-  if (is.null(local_sha)) {
-    local_sha <- local_sha(remote_package_name(remote))
-  }
+different_sha <- function(remote_sha, local_sha) {
 
   same <- remote_sha == local_sha
   same <- isTRUE(same) && !is.na(same)
@@ -198,14 +190,8 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       repo = x$RemoteRepo,
       release = x$RemoteRelease,
       sha = x$RemoteSha,
-      branch = x$RemoteBranch),
-
-    # packages installed with install_cran
-    cran = remote("cran",
-      name = x$Package,
-      repos = eval(parse(text = x$RemoteRepos)),
-      pkg_type = x$RemotePkgType,
-      sha = x$RemoteSha))
+      branch = x$RemoteBranch)
+  )
 }
 
 #' @export
