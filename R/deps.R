@@ -394,7 +394,7 @@ parse_one_remote <- function(x) {
       envir = asNamespace("remotes"), mode = "function", inherits = FALSE)
 
     res <- fun(repo)
-    }, error = function(e) stop("Unknown remote type: ", type, call. = FALSE)
+    }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
   )
   res
 }
