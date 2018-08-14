@@ -280,7 +280,11 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
 install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
-                             dependencies = FALSE, quiet = NULL) {
+                             dependencies = FALSE, quiet = NULL,
+                             # These are options to `install()` used when
+                             # installing remotes, but can get passed to us by
+                             # `...` so we just ignore them here
+                             build, build_opts) {
 
   if (is.null(quiet))
     quiet <- !identical(type, "source")
