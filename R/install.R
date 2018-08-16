@@ -1,5 +1,7 @@
 
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = getOption("repos")) {
+install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
+  TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"), ..., repos =
+  getOption("repos")) {
 
   if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
     missing_devel_warning(pkgdir)
@@ -12,7 +14,16 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = 
     return(invisible(FALSE))
   }
 
-  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ..., repos = repos)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
+    build = build, build_opts = build_opts, repos = repos, ...)
+
+  if (isTRUE(build)) {
+    dir <- tempfile()
+    dir.create(dir)
+    on.exit(unlink(dir), add = TRUE)
+
+    pkgdir <- safe_build_package(pkgdir, build_opts, dir, quiet)
+  }
 
   safe_install_packages(
     pkgdir,
@@ -24,6 +35,7 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = 
 
   invisible(TRUE)
 }
+
 
 safe_install_packages <- function(...) {
 
@@ -42,6 +54,42 @@ safe_install_packages <- function(...) {
       R_PROFILE_USER = tempfile()),
     i.p(...)
   )
+}
+
+safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = is_installed("pkgbuild")) {
+  if (use_pkgbuild) {
+    vignettes <- TRUE
+    manual <- FALSE
+    has_no_vignettes <- grepl("--no-build-vignettes", build_opts)
+    if (any(has_no_vignettes)) {
+      vignettes <- FALSE
+    }
+    has_no_manual <- grepl("--no-manual", build_opts)
+    if (!any(has_no_manual)) {
+      manual <- TRUE
+    }
+    build_opts <- build_opts[!(has_no_vignettes | has_no_manual)]
+    pkgbuild::build(pkgdir, dest_path = dest_path, binary = FALSE,
+      vignettes = vignettes, manual = manual, args = build_opts, quiet = quiet)
+  } else {
+    # No pkgbuild, so we need to call R CMD build ourselves
+
+    lib <- paste(.libPaths(), collapse = ":")
+    env <- c(R_LIBS = lib,
+      R_LIBS_USER = lib,
+      R_LIBS_SITE = lib,
+      R_PROFILE_USER = tempfile())
+
+    pkgdir <- normalizePath(pkgdir)
+
+    in_dir(dest_path, {
+      with_envvar(env, {
+        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet)
+      })
+    })
+
+    file.path(dest_path, gsub("^[*] building .(.*).$", "\\1", output[length(output)]))
+  }
 }
 
 #' Install package dependencies if needed.

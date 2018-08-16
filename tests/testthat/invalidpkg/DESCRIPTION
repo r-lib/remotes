@@ -1,0 +1,10 @@
+Package: invalidpkg
+Title: Tools to make developing R code easier
+License: MIT
+Description: Package description.
+Author: Bugs Bunny
+Maintainer: Bugs Bunny <bunny@acme.com>
+Version: 1.0.0
+Suggests:
+  testthat
+  foobar

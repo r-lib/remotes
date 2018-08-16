@@ -27,7 +27,8 @@ test_that("package2remotes looks for the DESCRIPTION in .libPaths", {
    expect_equal(package2remote("noremotes")$sha, NA_character_)
    withr::with_temp_libpaths({
      expect_equal(package2remote("noremotes")$sha, NA_character_)
-     install("noremotes", quiet = TRUE)
+     # This is not a real package, so we can't actually build it
+     install("noremotes", quiet = TRUE, build = FALSE)
      expect_equal(package2remote("noremotes")$sha, "1.0.0")
 
      # Load the namespace, as packageDescription looks in loaded namespaces
