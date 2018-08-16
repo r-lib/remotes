@@ -9,6 +9,30 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
+rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
+  if (os_type() == "windows") {
+    real_cmd <- file.path(path, "Rcmd.exe")
+    args <- c(cmd, args)
+  } else {
+    real_cmd <- file.path(path, "R")
+    args <- c("CMD", cmd, args)
+  }
+
+  outfile <- tempfile()
+  status <- system2(real_cmd, args, stderr = NULL, stdout = outfile)
+  out <- readLines(outfile, warn = FALSE)
+
+  if (status != 0) {
+    cat(out, sep = "\n")
+    stop(sprintf("Error running '%s' (status '%i')", cmd, status), call. = FALSE)
+  }
+  if (!quiet) {
+    cat(out, sep = "\n")
+  }
+
+  out
+}
+
 is_bioconductor <- function(x) {
   !is.null(x$biocviews)
 }
