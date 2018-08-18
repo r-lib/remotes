@@ -284,3 +284,8 @@ build_url <- function(host, ...) {
   }
   do.call(file.path, as.list(c(host, ...)))
 }
+
+download_url <- function(url) {
+  scheme <- if (isTRUE(capabilities("libcurl"))) "https://" else "http://"
+  paste0(scheme, url)
+}
