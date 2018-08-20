@@ -127,12 +127,7 @@ test_that("error if not username, warning if given as argument", {
 
   expect_error(
     install_github("falsy", lib = lib, quiet = TRUE),
-    "Unknown username"
-  )
-
-  expect_warning(
-    install_github("falsy", username = "cran", lib = lib, quiet = TRUE),
-    "Username parameter is deprecated"
+    "Invalid git repo specification"
   )
 })
 

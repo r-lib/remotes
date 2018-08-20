@@ -1,3 +1,7 @@
+* `remote_package_name.github_remote` and `remote_sha.github_remote` will
+  lookup package name locally if possible and use faster REST APIs if the curl
+  package is installed. This makes the remote lookup about 10x faster when the
+  remote package has not changed since the last install.
 
 * Submodules are now installed if they exist and a git client is available
   (#138, #133, #103, #82).
