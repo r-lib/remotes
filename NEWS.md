@@ -1,3 +1,6 @@
+* When installing set warnings to be errors, to catch cases where packages are
+  only partially installed. This often happens on windows when the package dll
+  is opened in another R process (#113).
 
 * Submodules are now installed if they exist and a git client is available
   (#138, #133, #103, #82).
