@@ -76,6 +76,9 @@ test_that("parse_submodules warns and returns empty for invalid submodules", {
 })
 
 test_that("Can install a repo with a submodule", {
+
+  if (is.null(git_path())) skip("git is not installed")
+
   dir <- tempfile()
   dir.create(dir)
   on.exit(unlink(dir, recursive = TRUE))
