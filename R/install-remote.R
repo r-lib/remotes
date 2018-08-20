@@ -11,9 +11,9 @@
 install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   stopifnot(is.remote(remote))
 
-  remote_sha <- remote_sha(remote)
   package_name <- remote_package_name(remote)
   local_sha <- local_sha(package_name)
+  remote_sha <- remote_sha(remote, local_sha)
 
   if (!isTRUE(force) &&
     !different_sha(remote_sha = remote_sha, local_sha = local_sha)) {
@@ -134,6 +134,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   switch(x$RemoteType,
     github = remote("github",
       host = x$RemoteHost,
+      package = x$RemotePackage,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,

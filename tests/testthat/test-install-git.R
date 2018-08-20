@@ -5,7 +5,6 @@ test_that("install_git with git2r", {
 
   skip_on_cran()
   skip_if_offline()
-  skip_if_over_rate_limit()
   skip_if_not_installed("git2r")
 
   Sys.unsetenv("R_TESTS")
@@ -76,12 +75,7 @@ test_that("install_git with command line git", {
 
   skip_on_cran()
   skip_if_offline()
-  skip_if_over_rate_limit()
   if (is.null(git_path())) skip("git is not installed")
-
-  skip_on_cran()
-  skip_if_offline()
-  skip_if_over_rate_limit()
 
   Sys.unsetenv("R_TESTS")
 

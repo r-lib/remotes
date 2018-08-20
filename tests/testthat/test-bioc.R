@@ -51,7 +51,6 @@ test_that("installing bioc packages", {
 
   skip_on_cran()
   skip_if_offline()
-  skip_if_over_rate_limit()
 
   Sys.unsetenv("R_TESTS")
 
