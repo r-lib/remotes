@@ -40,6 +40,8 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   source <- source_pkg(bundle, subdir = remote$subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
 
+  update_submodules(source, quiet)
+
   add_metadata(source, remote_metadata(remote, bundle, source))
 
   # Because we've modified DESCRIPTION, its original MD5 value is wrong

@@ -136,26 +136,8 @@ test_that("error if not username, warning if given as argument", {
   )
 })
 
-test_that("remote_download.github_remote", {
-
-  mockery::stub(remote_download.github_remote, "github_has_submodules", TRUE)
-  mockery::stub(remote_download.github_remote, "download", TRUE)
-  expect_warning(
-    remote_download.github_remote(
-      list(
-        host = "api.github.com",
-        username = "cran",
-        repo = "falsy",
-        ref = "master"
-      )
-    ),
-    "GitHub repo contains submodules"
-  )
-})
-
 test_that("remote_download.github_remote messages", {
 
-  mockery::stub(remote_download.github_remote, "github_has_submodules", FALSE)
   mockery::stub(remote_download.github_remote, "download", TRUE)
   expect_message(
     remote_download.github_remote(
@@ -167,29 +149,6 @@ test_that("remote_download.github_remote messages", {
       )
     ),
     "Downloading GitHub repo"
-  )
-})
-
-test_that("github_has_submodules with broken libcurl", {
-
-  mockery::stub(
-    github_has_submodules,
-    "download",
-    function(path, ...) {
-      cat('{ "message": "Not Found",',
-          '  "documentation_url": "https://developer.github.com/v3"',
-          '}', file = path)
-    }
-  )
-  expect_false(
-    github_has_submodules(
-      list(
-        host = "api.github.com",
-        username = "cran",
-        repo = "falsy",
-        ref = "master"
-        )
-    )
   )
 })
 
