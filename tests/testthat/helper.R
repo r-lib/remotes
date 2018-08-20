@@ -21,3 +21,11 @@ skip_if_over_rate_limit <- function(by = 5) {
   res <- fromJSONFile(tmp)$rate$remaining
   if (is.null(res) || res <= by) skip("Over the GitHub rate limit")
 }
+
+expect_equal_named_lists <- function(object, expected, ...) {
+  expect_true(!is.null(names(object)) && !is.null(names(expected)))
+  expect_true(is.list(object) && is.list(expected))
+  object <- object[order(names(object))]
+  expected <- expected[order(names(expected))]
+  expect_equal(!!object, !!expected)
+}
