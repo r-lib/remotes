@@ -1,0 +1,7 @@
+Package: submodule
+Title: Foo Bar
+Description: Seriously. Foo Bar.
+Version: 1.0.0
+Author: Gabor Csardi
+Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
+License: MIT + file LICENSE
