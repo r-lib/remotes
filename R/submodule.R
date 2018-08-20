@@ -11,36 +11,28 @@ parse_submodules <- function(file) {
   # escaping them as \" and \\
   double_quoted_string_with_escapes <- '(?:\\\\.|[^"])*'
 
-  sections <- regexpr(
-    sprintf('^[[:space:]]*\\[submodule "(%s)"\\][[:space:]]*$', double_quoted_string_with_escapes),
+  # Otherwise extract section names
+  section_names <- re_match(
     x,
-    perl = TRUE)
+    sprintf('^[[:space:]]*\\[submodule "(?<submodule>%s)"\\][[:space:]]*$', double_quoted_string_with_escapes)
+  )$submodule
 
   # If no sections found return the empty list
-  if (all(sections == -1)) {
+  if (all(is.na(section_names))) {
     return(list())
   }
-
-  # Otherwise extract section names
-  section_names <- get_captures(x, sections)
 
   # Extract name = value
   # The variable names are case-insensitive, allow only alphanumeric characters
   # and -, and must start with an alphabetic character.
   variable_name <- "[[:alpha:]][[:alnum:]-]*"
-  mappings <- regexpr(
-    sprintf('^[[:space:]]*(%s)[[:space:]]*=[[:space:]]*(.*)[[:space:]]*$', variable_name),
+  mapping_values <- re_match(
     x,
-    perl = TRUE
+    sprintf('^[[:space:]]*(?<name>%s)[[:space:]]*=[[:space:]]*(?<value>.*)[[:space:]]*$', variable_name),
   )
 
-  mapping_values <- get_captures(x, mappings)
-
-  colnames(mapping_values) <- c("name", "value")
-
-  values <- cbind(submodule = fill(section_names), mapping_values)
-  values <- values[mappings != -1, ]
-  values <- as.data.frame(values, stringsAsFactors = FALSE)
+  values <- cbind(submodule = fill(section_names), mapping_values[c("name", "value")], stringsAsFactors = FALSE)
+  values <- values[!is.na(mapping_values$.match), ]
 
   # path and valid url are required
   if (!all(c("path", "url") %in% values$name)) {
@@ -75,8 +67,8 @@ parse_submodules <- function(file) {
 }
 
 # Adapted from https://stackoverflow.com/a/9517731/2055486
-fill <- function(x, missing = "") {
-  not_missing <- x != missing
+fill <- function(x) {
+  not_missing <- !is.na(x)
 
   res <- x[not_missing]
   res[cumsum(not_missing)]
@@ -102,10 +94,4 @@ update_submodules <- function(source, quiet) {
   for (i in seq_len(NROW(info))) {
     update_submodule(info$url[[i]], file.path(source, info$path[[i]]), info$branch[[i]], quiet)
   }
-}
-
-get_captures <- function(str, match) {
-  starts <- attr(match, "capture.start")
-  ends <- starts + attr(match, "capture.length") - 1L
-  matrix(substring(str, starts, ends), nrow = length(match))
 }
