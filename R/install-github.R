@@ -82,28 +82,6 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   download(dest, src, auth_token = x$auth_token)
 }
 
-github_has_submodules <- function(x) {
-  src_root <- build_url(x$host, "repos", x$username, x$repo)
-  src_submodules <- paste0(src_root, "/contents/.gitmodules?ref=", x$ref)
-
-  tmp <- tempfile()
-  res <- tryCatch(
-    download(tmp, src_submodules, auth_token = x$auth_token),
-    error = function(e) e
-  )
-  if (methods::is(res, "error")) return(FALSE)
-
-  ## download() sometimes just downloads the error page, because
-  ## the libcurl backend in download.file() is broken
-  ## If the request was successful (=submodules exist), then it has an
-  ## 'sha' field.
-  sha <- tryCatch(
-    fromJSONFile(tmp)$sha,
-    error = function(e) e
-  )
-  ! methods::is(sha, "error") && ! is.null(sha)
-}
-
 #' @export
 remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
   # Determine sha as efficiently as possible
