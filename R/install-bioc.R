@@ -197,7 +197,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
   tryCatch({
     url <- paste0(remote$mirror, "/", remote$repo)
 
-    res <- git2r::remote_ls(url, credentials=remote$credentials, ...)
+    res <- git2r::remote_ls(url, credentials=remote$credentials)
 
     found <- grep(pattern = paste0("/", remote$branch), x = names(res))
 

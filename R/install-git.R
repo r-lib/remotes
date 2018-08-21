@@ -119,7 +119,8 @@ remote_package_name.git2r_remote <- function(remote, ...) {
 #' @export
 remote_sha.git2r_remote <- function(remote, ...) {
   tryCatch({
-    res <- git2r::remote_ls(remote$url, credentials=remote$credentials)
+    # set suppressWarnings in git2r 0.23.0+
+    res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
 
     # This needs to be master, not HEAD because no branch is called HEAD
     branch <- remote$branch %||% "master"
@@ -132,7 +133,7 @@ remote_sha.git2r_remote <- function(remote, ...) {
     }
 
     unname(res[found[1]])
-  }, error = function(e) NA_character_)
+  }, error = function(e) { warning(e);  NA_character_})
 }
 
 #' @export
