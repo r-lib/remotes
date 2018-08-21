@@ -8,8 +8,6 @@
 #'   specify \code{subdir} and/or \code{ref} using the respective parameters
 #'   (see below); if both is specified, the values in \code{repo} take
 #'   precedence.
-#' @param username User name. Deprecated: please include username in the
-#'   \code{repo}
 #' @param ref Desired git reference. Could be a commit, tag, or branch
 #'   name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.
 #' @param subdir subdirectory within repo that contains the R package.
