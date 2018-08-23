@@ -23,18 +23,18 @@
 install_git <- function(url, subdir = NULL, branch = NULL,
                         git = c("auto", "git2r", "external"), ...) {
 
-  git_remote <- select_git_remote(match.arg(git))
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch, git = match.arg(git))
   install_remotes(remotes, ...)
 }
 
 
-select_git_remote <- function(git) {
+git_remote <- function(url, subdir = NULL, branch = NULL, git = c("auto", "git2r", "external")) {
+  git <- match.arg(git)
   if (git == "auto") {
     git <- if (pkg_installed("git2r")) "git2r" else "external"
   }
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]]
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, branch)
 }
 
 
