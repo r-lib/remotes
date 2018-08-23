@@ -286,6 +286,6 @@ build_url <- function(host, ...) {
 }
 
 download_url <- function(url) {
-  scheme <- if (isTRUE(capabilities("libcurl"))) "https://" else "http://"
+  scheme <- if (download_method_secure()) "https://" else "http://"
   paste0(scheme, url)
 }
