@@ -119,15 +119,16 @@ remote_package_name.git2r_remote <- function(remote, ...) {
 #' @export
 remote_sha.git2r_remote <- function(remote, ...) {
   tryCatch({
-    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
+    res <- git2r::remote_ls(remote$url, credentials=remote$credentials)
 
-    branch <- remote$branch %||% "HEAD"
+    # This needs to be master, not HEAD because no branch is called HEAD
+    branch <- remote$branch %||% "master"
 
     found <- grep(pattern = paste0("/", branch), x = names(res))
 
-    # If none found, assume it is a Sha1, so return the branch
+    # If none found, it is either a SHA, so return the pinned sha or NA
     if (length(found) == 0) {
-      return(remote$branch)
+      return(remote$branch %||% NA_character_)
     }
 
     unname(res[found[1]])
