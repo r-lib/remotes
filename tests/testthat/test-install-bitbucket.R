@@ -26,7 +26,7 @@ test_that("", {
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "bitbucket_remote")
   expect_equal(format(remote), "Bitbucket")
-  expect_equal(remote$host, "https://api.bitbucket.org/2.0")
+  expect_equal(remote$host, "api.bitbucket.org/2.0")
   expect_equal(remote$repo, "showimage")
   expect_equal(remote$username, "csardigabor")
   expect_equal(remote$ref, "master")
@@ -36,10 +36,17 @@ test_that("", {
 
 test_that("remote_download.bitbucket_remote", {
 
-  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "master")
+  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "master",
+    host = "api.bitbucket.org/2.0")
 
   mockery::stub(
-    remote_download.bitbucket_remote, "download", function(...) { })
+    remote_download.bitbucket_remote, "download", function(...) { }
+  )
+
+  mockery::stub(
+    remote_download.bitbucket_remote, "bitbucket_download_url", function(...) { }
+  )
+
   expect_message(
     remote_download.bitbucket_remote(x),
     "Downloading bitbucket repo csardigabor/pkgconfig@master"
@@ -52,10 +59,6 @@ test_that("remote_metadata.bitbucket_remote", {
   expect_equal(
     remote_metadata.bitbucket_remote(list(sha = "foobar"))$RemoteSha,
     "foobar"
-  )
-
-  expect_null(
-    remote_metadata.bitbucket_remote(list())$RemoteSha
   )
 })
 
@@ -78,10 +81,7 @@ test_that("bitbucket passwords", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_bitbucket(
-    "csardigabor/falsy", lib = lib, quiet = TRUE,
-    password = Sys.getenv("BITBUCKET_PASSWORD")
-  )
+  install_bitbucket("jimhester/falsy", lib = lib, quiet = TRUE)
 
   expect_silent(packageDescription("falsy", lib.loc = lib))
   expect_equal(
@@ -96,8 +96,9 @@ test_that("more bitbucket password", {
     username = "username",
     repo = "repo",
     ref = "master",
-    auth_user = "user",
-    password = "pass"
+    auth_user = "foo",
+    password = "pass",
+    host = "api.bitbucket.com/2.0"
   )
 
   mockery::stub(
@@ -105,8 +106,13 @@ test_that("more bitbucket password", {
     "download",
     function(dest, src, basic_auth) basic_auth)
 
+  mockery::stub(
+    remote_download.bitbucket_remote,
+    "bitbucket_download_url",
+    function(...) { })
+
   expect_equal(
     remote_download.bitbucket_remote(x),
-    list(user = "user", password = "pass")
+    list(user = "foo", password = "pass")
   )
 })
