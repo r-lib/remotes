@@ -284,3 +284,8 @@ build_url <- function(host, ...) {
   }
   do.call(file.path, as.list(c(host, ...)))
 }
+
+download_url <- function(url) {
+  scheme <- if (download_method_secure()) "https://" else "http://"
+  paste0(scheme, url)
+}

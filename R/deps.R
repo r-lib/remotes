@@ -377,7 +377,7 @@ fix_repositories <- function(repos) {
 
   # Override any existing default values with the cloud mirror
   # Reason: A "@CRAN@" value would open a GUI for choosing a mirror
-  repos[repos == "@CRAN@"] <- "http://cloud.r-project.org"
+  repos[repos == "@CRAN@"] <- download_url("cloud.r-project.org")
   repos
 }
 
