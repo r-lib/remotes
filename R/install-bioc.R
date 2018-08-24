@@ -27,7 +27,7 @@
 #' install_bioc("user:password@devel/SummarizedExperiment")
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
-install_bioc <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages"),
+install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
   git = c("auto", "git2r", "external"), ...) {
 
   bioc_remote <- select_bioc_git_remote(match.arg(git))
@@ -69,7 +69,7 @@ parse_bioc_repo <- function(path) {
   params
 }
 
-bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
@@ -88,7 +88,7 @@ bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.
   )
 }
 
-bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
