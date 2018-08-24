@@ -12,6 +12,8 @@
 
 * Submodules are now installed if they exist and a git client is available
   (#138, #133, #103, #82).
+* remotes now always uses https URLs for R versions that support them (@ankane,
+  #139)
 
 * `install_gitlab()` and `install_bioc()` remote types added (#135)
 
