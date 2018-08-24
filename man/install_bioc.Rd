@@ -5,8 +5,8 @@
 \title{Install a package from a Bioconductor repository}
 \usage{
 install_bioc(repo, mirror = getOption("BioC_git",
-  "https://git.bioconductor.org/packages"), git = c("auto", "git2r",
-  "external"), ...)
+  download_url("git.bioconductor.org/packages")), git = c("auto",
+  "git2r", "external"), ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
