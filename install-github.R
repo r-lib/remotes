@@ -20,6 +20,8 @@ bioc_version <- function() {
 }
 
 bioc_repos <- function(bioc_ver = bioc_version()) {
+  bioc_ver <- as.package_version(bioc_ver)
+
   a <- NULL
 
   p <- file.path(Sys.getenv("HOME"), ".R", "repositories")
@@ -33,9 +35,16 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
     a <- ("tools" %:::% ".read_repositories")(p)
   }
 
+  # BioCextra was removed in Bioc 3.6
+  if (bioc_ver < "3.6") {
+    repo_types <- c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+  } else {
+    repo_types <- c("BioCsoft", "BioCann", "BioCexp")
+  }
+
   repos <- intersect(
     rownames(a),
-    c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+    repo_types
   )
 
   default_bioc_version <- bioc_version()
@@ -156,7 +165,7 @@ get_desc_field <- function(path, field) {
   dcf[[field]]
 }
 # Decompress pkg, if needed
-source_pkg <- function(path, subdir = NULL, before_install = NULL) {
+source_pkg <- function(path, subdir = NULL) {
   if (!file.info(path)$isdir) {
     bundle <- path
     outdir <- tempfile(pattern = "remotes")
@@ -180,10 +189,6 @@ source_pkg <- function(path, subdir = NULL, before_install = NULL) {
     Sys.chmod(config_path, "777")
   }
 
-  # Call before_install for bundles (if provided)
-  if (!is.null(bundle) && !is.null(before_install))
-    before_install(bundle, pkg_path)
-
   pkg_path
 }
 
@@ -194,19 +199,9 @@ decompress <- function(src, target) {
   if (grepl("\\.zip$", src)) {
     my_unzip(src, target)
     outdir <- getrootdir(as.vector(utils::unzip(src, list = TRUE)$Name))
-
-  } else if (grepl("\\.tar$", src)) {
+  } else if (grepl("\\.(tar|tar\\.gz|tar\\.bz2|tgz|tbz)$", src)) {
     untar(src, exdir = target)
     outdir <- getrootdir(untar(src, list = TRUE))
-
-  } else if (grepl("\\.(tar\\.gz|tgz)$", src)) {
-    untar(src, exdir = target, compressed = "gzip")
-    outdir <- getrootdir(untar(src, compressed = "gzip", list = TRUE))
-
-  } else if (grepl("\\.(tar\\.bz2|tbz)$", src)) {
-    untar(src, exdir = target, compressed = "bzip2")
-    outdir <- getrootdir(untar(src, compressed = "bzip2", list = TRUE))
-
   } else {
     ext <- gsub("^[^.]*\\.", "", src)
     stop("Don't know how to decompress files with extension ", ext,
@@ -525,7 +520,11 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
 install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
-                             dependencies = FALSE, quiet = NULL) {
+                             dependencies = FALSE, quiet = NULL,
+                             # These are options to `install()` used when
+                             # installing remotes, but can get passed to us by
+                             # `...` so we just ignore them here
+                             build, build_opts) {
 
   if (is.null(quiet))
     quiet <- !identical(type, "source")
@@ -639,7 +638,7 @@ parse_one_remote <- function(x) {
       envir = asNamespace("remotes"), mode = "function", inherits = FALSE)
 
     res <- fun(repo)
-    }, error = function(e) stop("Unknown remote type: ", type, call. = FALSE)
+    }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
   )
   res
 }
@@ -829,6 +828,43 @@ curl_download <- function(url, path, quiet) {
   curl::curl_download(url, path, quiet = quiet, mode = "wb")
 }
 
+true_download_method <- function(x) {
+  if (identical(x, "auto")) {
+    auto_download_method()
+  } else {
+    x
+  }
+}
+
+auto_download_method <- function() {
+  if (isTRUE(capabilities("libcurl"))) {
+    "libcurl"
+  } else if (isTRUE(capabilities("http/ftp"))) {
+    "internal"
+  } else if (nzchar(Sys.which("wget"))) {
+    "wget"
+  } else if (nzchar(Sys.which("curl"))) {
+    "curl"
+  } else {
+    ""
+  }
+}
+
+download_method_secure <- function() {
+  method <- true_download_method(download_method())
+
+  if (method %in% c("wininet", "libcurl", "wget", "curl")) {
+    # known good methods
+    TRUE
+  } else if (identical(method, "internal")) {
+    # if internal then see if were using windows internal with inet2
+    identical(Sys.info()[["sysname"]], "Windows") && utils::setInternet2(NA)
+  } else {
+    # method with unknown properties (e.g. "lynx") or unresolved auto
+    FALSE
+  }
+}
+
 # Extract the commit hash from a git archive. Git archives include the SHA1
 # hash as the comment field of the zip central directory record
 # (see https://www.kernel.org/pub/software/scm/git/docs/git-archive.html)
@@ -919,23 +955,36 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 }
 
 github_commit <- function(username, repo, ref = "master",
-  host = "api.github.com", pat = github_pat(), use_curl = is_installed("curl")) {
+  host = "api.github.com", pat = github_pat(), use_curl = is_installed("curl"), current_sha = NULL) {
 
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
-  tmp <- tempfile()
 
   if (isTRUE(use_curl)) {
     h <- curl::new_handle()
     headers <- c(
-      "Accept" = "application/vnd.github.VERSION.sha",
+      "Accept" = "application/vnd.github.v3.sha",
       if (!is.null(pat)) {
         c("Authorization" = paste0("token ", pat))
       }
     )
+
+    if (!is.null(current_sha)) {
+      headers <- c(headers, "If-None-Match" = paste0('"', current_sha, '"'))
+    }
     curl::handle_setheaders(h, .list = headers)
-    curl::curl_download(url, tmp, handle = h)
-    readChar(tmp, file.info(tmp)$size)
+    res <- curl::curl_fetch_memory(url, handle = h)
+    if (res$status_code == 304) {
+      return(current_sha)
+    }
+    if (res$status_code >= 300) {
+      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+    }
+
+    rawToChar(res$content)
   } else {
+    tmp <- tempfile()
+    on.exit(unlink(tmp), add = TRUE)
+
     download(tmp, url, auth_token = pat)
     get_json_field(readLines(tmp, warn = FALSE), "sha")
   }
@@ -958,15 +1007,36 @@ github_pat <- function(quiet = TRUE) {
   pat
 }
 
-github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...) {
+github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
+  use_curl = is_installed("curl"), pat = github_pat()) {
 
   url <- build_url(host, "repos", username, repo, "contents", paste0(subdir, "DESCRIPTION"))
   url <- paste0(url, "?ref=", utils::URLencode(ref))
 
-  tmp <- tempfile()
-  download(tmp, url, auth_token = github_pat())
+  if (isTRUE(use_curl)) {
+    h <- curl::new_handle()
+    headers <- c(
+      "Accept" = "application/vnd.github.v3.raw",
+      if (!is.null(pat)) {
+        c("Authorization" = paste0("token ", pat))
+      }
+    )
 
-  base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    curl::handle_setheaders(h, .list = headers)
+    res <- curl::curl_fetch_memory(url, handle = h)
+    if (res$status_code >= 300) {
+      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+    }
+    rawToChar(res$content)
+  } else {
+    tmp <- tempfile()
+    on.exit(unlink(tmp), add = TRUE)
+
+    tmp <- tempfile()
+    download(tmp, url, auth_token = pat)
+
+    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+  }
 }
 #' Install a package from a Bioconductor repository
 #'
@@ -997,7 +1067,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 #' install_bioc("user:password@devel/SummarizedExperiment")
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
-install_bioc <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages"),
+install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
   git = c("auto", "git2r", "external"), ...) {
 
   bioc_remote <- select_bioc_git_remote(match.arg(git))
@@ -1039,7 +1109,7 @@ parse_bioc_repo <- function(path) {
   params
 }
 
-bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
@@ -1058,7 +1128,7 @@ bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.
   )
 }
 
-bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
@@ -1167,7 +1237,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
   tryCatch({
     url <- paste0(remote$mirror, "/", remote$repo)
 
-    res <- git2r::remote_ls(url, credentials=remote$credentials, ...)
+    res <- git2r::remote_ls(url, credentials=remote$credentials)
 
     found <- grep(pattern = paste0("/", remote$branch), x = names(res))
 
@@ -1251,13 +1321,24 @@ git_repo_sha1 <- function(r) {
 #' @inheritParams install_github
 #' @param auth_user your account username if you're attempting to install
 #'   a package hosted in a private repository (and your username is different
-#'   to \code{username})
-#' @param password your password
+#'   to \code{username}). Defaults to the \code{BITBUCKET_USER} environment
+#'   variable.
+#' @param password your password. Defaults to the \code{BITBUCKET_PASSWORD}
+#'   environment variable. See details for further information on setting
+#'   up a password.
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
 #'   \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
 #'
+#' @details To install from a private repo, or more generally, access the
+#' Bitbucket API with your own credentials, you will need to get an access
+#' token. You can create an access token following the instructions found in
+#' the
+#' \href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
+#' App Passwords documentation}. The App Password requires read-only access to
+#' your repositories and pull requests. Then store your password in the
+#' environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})
 #' @export
 #' @examples
 #' \dontrun{
@@ -1265,8 +1346,8 @@ git_repo_sha1 <- function(r) {
 #' install_bitbucket("dannavarro/lsr-package")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
-                              auth_user = NULL, password = NULL,
-                              host = "https://api.bitbucket.org/2.0", ...) {
+                              auth_user = bitbucket_user(), password = bitbucket_password(),
+                              host = "api.bitbucket.org/2.0", ...) {
 
   remotes <- lapply(repo, bitbucket_remote, ref = ref,
     subdir = subdir, auth_user = auth_user, password = password, host = host)
@@ -1275,7 +1356,8 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 }
 
 bitbucket_remote <- function(repo, ref = NULL, subdir = NULL,
-                              auth_user = NULL, password = NULL, sha = NULL, host = NULL) {
+                              auth_user = NULL, password = NULL, sha = NULL,
+                              host = NULL) {
 
   meta <- parse_git_repo(repo)
 
@@ -1298,19 +1380,10 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
   }
 
   dest <- tempfile(fileext = paste0(".zip"))
-  src <- paste0("https://bitbucket.org/", x$username, "/", tolower(x$repo), "/get/",
-    x$ref, ".zip")
 
-  if (!is.null(x$password)) {
-    auth <- list(
-      user = x$auth_user %||% x$username,
-      password = x$password
-    )
-  } else {
-    auth <- NULL
-  }
+  url <- bitbucket_download_url(x$username, x$repo, x$ref, host = x$host, auth = basic_auth(x))
 
-  download(dest, src, basic_auth = auth)
+  download(dest, url, basic_auth = basic_auth(x))
 }
 
 #' @export
@@ -1323,8 +1396,7 @@ remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
     # Might be able to get from zip archive
     sha <- git_extract_sha1(bundle)
   } else {
-    # Don't know
-    sha <- NULL
+    sha <- remote_sha(x)
   }
 
   list(
@@ -1343,13 +1415,13 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 
   bitbucket_DESCRIPTION(
     username = remote$username, repo = remote$repo,
-    host = remote$host, pat = remote$auth_token)$Package
+    host = remote$host, auth = basic_auth(remote))$Package
 }
 
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token)$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
 }
 
 #' @export
@@ -1358,24 +1430,61 @@ format.bitbucket_remote <- function(x, ...) {
 }
 
 bitbucket_commit <- function(username, repo, ref = "master",
-  host = "api.bitbucket.org/2.0", pat = NULL) {
+  host = "api.bitbucket.org/2.0", auth = NULL) {
 
   url <- build_url(host, "repositories", username, repo, "commit", ref)
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  download(tmp, url, basic_auth = auth)
 
   fromJSONFile(tmp)
 }
 
-bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", pat = NULL, ...) {
+bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
 
   url <- build_url(host, "repositories", username, repo, "src", ref, paste0(subdir, "DESCRIPTION"))
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  download(tmp, url, basic_auth = auth)
 
   read_dcf(tmp)
+}
+
+basic_auth <- function(x) {
+  if (!is.null(x$password)) {
+    list(
+      user = x$auth_user %||% x$username,
+      password = x$password
+    )
+  } else {
+    NULL
+  }
+}
+
+
+bitbucket_download_url <- function(username, repo, ref = "master",
+  host = "api.bitbucket.org/2.0", auth = NULL) {
+
+  url <- build_url(host, "repositories", username, repo)
+
+  tmp <- tempfile()
+  download(tmp, url, basic_auth = auth)
+
+  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".zip")
+}
+
+bitbucket_password <- function(quiet = TRUE) {
+  pass <- Sys.getenv("BITBUCKET_PASSWORD")
+  if (identical(pass, "")) return(NULL)
+  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PAT")
+  pass
+}
+
+bitbucket_user <- function(quiet = TRUE) {
+  user <- Sys.getenv("BITBUCKET_USER")
+  if (identical(user, "")) return(NULL)
+  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_PAT")
+  user
 }
 
 #' Attempts to install a package from CRAN.
@@ -1413,7 +1522,7 @@ remote_package_name.cran_remote <- function(remote, ...) {
 }
 
 #' @export
-remote_sha.cran_remote <- function(remote, url = "https://github.com", ...) {
+remote_sha.cran_remote <- function(remote, ...) {
   cran <- available_packages(remote$repos, remote$pkg_type)
 
   trim_ws(unname(cran[, "Version"][match(remote$name, rownames(cran))]))
@@ -1448,18 +1557,18 @@ format.cran_remote <- function(x, ...) {
 install_git <- function(url, subdir = NULL, branch = NULL,
                         git = c("auto", "git2r", "external"), ...) {
 
-  git_remote <- select_git_remote(match.arg(git))
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch, git = match.arg(git))
   install_remotes(remotes, ...)
 }
 
 
-select_git_remote <- function(git) {
+git_remote <- function(url, subdir = NULL, branch = NULL, git = c("auto", "git2r", "external")) {
+  git <- match.arg(git)
   if (git == "auto") {
     git <- if (pkg_installed("git2r")) "git2r" else "external"
   }
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]]
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, branch)
 }
 
 
@@ -1544,19 +1653,21 @@ remote_package_name.git2r_remote <- function(remote, ...) {
 #' @export
 remote_sha.git2r_remote <- function(remote, ...) {
   tryCatch({
-    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
+    # set suppressWarnings in git2r 0.23.0+
+    res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
 
-    branch <- remote$branch %||% "HEAD"
+    # This needs to be master, not HEAD because no branch is called HEAD
+    branch <- remote$branch %||% "master"
 
     found <- grep(pattern = paste0("/", branch), x = names(res))
 
-    # If none found, assume it is a Sha1, so return the branch
+    # If none found, it is either a SHA, so return the pinned sha or NA
     if (length(found) == 0) {
-      return(remote$branch)
+      return(remote$branch %||% NA_character_)
     }
 
     unname(res[found[1]])
-  }, error = function(e) NA_character_)
+  }, error = function(e) { warning(e);  NA_character_})
 }
 
 #' @export
@@ -1625,8 +1736,6 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   specify \code{subdir} and/or \code{ref} using the respective parameters
 #'   (see below); if both is specified, the values in \code{repo} take
 #'   precedence.
-#' @param username User name. Deprecated: please include username in the
-#'   \code{repo}
 #' @param ref Desired git reference. Could be a commit, tag, or branch
 #'   name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.
 #' @param subdir subdirectory within repo that contains the R package.
@@ -1639,11 +1748,8 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   hostname, for example, \code{"github.hostname.com/api/v3"}.
 #' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
 #' @details
-#' Attempting to install from a source repository that uses submodules
-#' raises a warning. Because the zipped sources provided by GitHub do not
-#' include submodules, this may lead to unexpected behaviour or compilation
-#' failure in source packages. In this case, cloning the repository manually
-#' may yield better results.
+#' If the repository uses submodules a command-line git client is required to
+#' clone the submodules.
 #' @export
 #' @seealso \code{\link{github_pull}}
 #' @examples
@@ -1661,33 +1767,27 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #' install_github("hadley/private", auth_token = "abc")
 #'
 #' }
-install_github <- function(repo, username = NULL,
+install_github <- function(repo,
                            ref = "master", subdir = NULL,
                            auth_token = github_pat(),
                            host = "api.github.com", ...) {
 
-  remotes <- lapply(repo, github_remote, username = username, ref = ref,
+  remotes <- lapply(repo, github_remote, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
 
   install_remotes(remotes, ...)
 }
 
-github_remote <- function(repo, username = NULL, ref = NULL, subdir = NULL,
+github_remote <- function(repo, ref = NULL, subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
                        host = "api.github.com") {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta)
-
-  if (is.null(meta$username)) {
-    meta$username <- username %||% getOption("github.user") %||%
-      stop("Unknown username.")
-    warning("Username parameter is deprecated. Please use ",
-      username, "/", repo, call. = FALSE)
-  }
+  meta <- github_resolve_ref(meta$ref %||% ref, meta, auth_token)
 
   remote("github",
     host = host,
+    package = meta$package,
     repo = meta$repo,
     subdir = meta$subdir %||% subdir,
     username = meta$username,
@@ -1707,34 +1807,7 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   src_root <- build_url(x$host, "repos", x$username, x$repo)
   src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
 
-  if (github_has_submodules(x)) {
-    warning("GitHub repo contains submodules, may not function as expected!",
-            call. = FALSE)
-  }
-
   download(dest, src, auth_token = x$auth_token)
-}
-
-github_has_submodules <- function(x) {
-  src_root <- build_url(x$host, "repos", x$username, x$repo)
-  src_submodules <- paste0(src_root, "/contents/.gitmodules?ref=", x$ref)
-
-  tmp <- tempfile()
-  res <- tryCatch(
-    download(tmp, src_submodules, auth_token = x$auth_token),
-    error = function(e) e
-  )
-  if (methods::is(res, "error")) return(FALSE)
-
-  ## download() sometimes just downloads the error page, because
-  ## the libcurl backend in download.file() is broken
-  ## If the request was successful (=submodules exist), then it has an
-  ## 'sha' field.
-  sha <- tryCatch(
-    fromJSONFile(tmp)$sha,
-    error = function(e) e
-  )
-  ! methods::is(sha, "error") && ! is.null(sha)
 }
 
 #' @export
@@ -1754,6 +1827,7 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
   list(
     RemoteType = "github",
     RemoteHost = x$host,
+    RemotePackage = x$package,
     RemoteRepo = x$repo,
     RemoteUsername = x$username,
     RemoteRef = x$ref,
@@ -1783,26 +1857,26 @@ github_pull <- function(pull) structure(pull, class = "github_pull")
 #' @export
 github_release <- function() structure(NA_integer_, class = "github_release")
 
-github_resolve_ref <- function(x, params) UseMethod("github_resolve_ref")
+github_resolve_ref <- function(x, params, ...) UseMethod("github_resolve_ref")
 
 #' @export
-github_resolve_ref.default <- function(x, params) {
+github_resolve_ref.default <- function(x, params, ...) {
   params$ref <- x
   params
 }
 
 #' @export
-github_resolve_ref.NULL <- function(x, params) {
+github_resolve_ref.NULL <- function(x, params, ...) {
   params$ref <- "master"
   params
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params) {
+github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
-    github_GET(path),
+    github_GET(path, pat = auth_token),
     error = function(e) e
   )
 
@@ -1819,11 +1893,11 @@ github_resolve_ref.github_pull <- function(x, params) {
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params) {
+github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
-    github_GET(path),
+    github_GET(path, pat = auth_token),
     error = function(e) e
   )
 
@@ -1838,127 +1912,26 @@ github_resolve_ref.github_release <- function(x, params) {
   params
 }
 
-#' Parse a remote git repo specification
-#'
-#' A remote repo can be specified in two ways:
-#' \describe{
-#' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
-#' and various GitHub browser URLs}
-#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
-#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
-#' }
-#'
-#' @param repo Character scalar, the repo specification.
-#' @return List with members: \code{username}, \code{repo}, \code{subdir}
-#'   \code{ref}, \code{pull}, \code{release}, some which will be empty.
-#'
-#' @name parse-git-repo
-#' @examples
-#' parse_repo_spec("metacran/crandb")
-#' parse_repo_spec("jimhester/covr#47")        ## pull request
-#' parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
-#' parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
-#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
-#'
-#' parse_github_url("https://github.com/jeroen/curl.git")
-#' parse_github_url("git@github.com:metacran/crandb.git")
-#' parse_github_url("https://github.com/jimhester/covr")
-#' parse_github_url("https://github.example.com/user/repo.git")
-#' parse_github_url("git@github.example.com:user/repo.git")
-#'
-#' parse_github_url("https://github.com/r-lib/remotes/pull/108")
-#' parse_github_url("https://github.com/r-lib/remotes/tree/name-of-branch")
-#' parse_github_url("https://github.com/r-lib/remotes/commit/1234567")
-#' parse_github_url("https://github.com/r-lib/remotes/releases/latest")
-#' parse_github_url("https://github.com/r-lib/remotes/releases/tag/1.0.0")
-NULL
-
 #' @export
-#' @rdname parse-git-repo
-parse_repo_spec <- function(repo) {
-  username_rx <- "(?:(?<username>[^/]+)/)?"
-  repo_rx     <- "(?<repo>[^/@#]+)"
-  subdir_rx   <- "(?:/(?<subdir>[^@#]*[^@#/])/?)?"
-  ref_rx      <- "(?:@(?<ref>[^*].*))"
-  pull_rx     <- "(?:#(?<pull>[0-9]+))"
-  release_rx  <- "(?:@(?<release>[*]release))"
-  ref_or_pull_or_release_rx <- sprintf(
-    "(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx
-  )
-  spec_rx  <- sprintf(
-    "^%s%s%s%s$", username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx
-  )
-  params <- as.list(re_match(text = repo, pattern = spec_rx))
+remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
+  use_curl = is_installed("curl")) {
 
-  if (is.na(params$.match)) {
-    stop(sprintf("Invalid git repo specification: '%s'", repo))
+  # If the package name was explicitly specified, use that
+  if (!is.null(remote$package)) {
+    return(remote$package)
   }
 
-  params[grepl("^[^\\.]", names(params))]
-}
-
-#' @export
-#' @rdname parse-git-repo
-parse_github_repo_spec <- parse_repo_spec
-
-#' @export
-#' @rdname parse-git-repo
-parse_github_url <- function(repo) {
-  prefix_rx <- "(?:github[^/:]+[/:])"
-  username_rx <- "(?:(?<username>[^/]+)/)"
-  repo_rx     <- "(?<repo>[^/@#]+)"
-  ref_rx <- "(?:(?:tree|commit|releases/tag)/(?<ref>.+$))"
-  pull_rx <- "(?:pull/(?<pull>.+$))"
-  release_rx <- "(?:releases/)(?<release>.+$)"
-  ref_or_pull_or_release_rx <- sprintf(
-    "(?:/(%s|%s|%s))?", ref_rx, pull_rx, release_rx
-  )
-  url_rx  <- sprintf(
-    "%s%s%s%s",
-    prefix_rx, username_rx, repo_rx, ref_or_pull_or_release_rx
-  )
-  params <- as.list(re_match(text = repo, pattern = url_rx))
-
-  if (is.na(params$.match)) {
-    stop(sprintf("Invalid GitHub URL: '%s'", repo))
-  }
-  if (params$ref == "" && params$pull == "" && params$release == "") {
-    params$repo <- gsub("\\.git$", "", params$repo)
-  }
-  if (params$release == "latest") {
-    params$release <- "*release"
+  # Otherwise if the repo is an already installed package assume that.
+  if (isTRUE(use_local)) {
+    local_name <- suppressWarnings(utils::packageDescription(remote$repo, fields = "Package"))
+    if (!is.na(local_name)) {
+      return(local_name)
+    }
   }
 
-  params[grepl("^[^\\.]", names(params))]
-}
-
-parse_git_repo <- function(repo) {
-
-  if (grepl("^https://github|^git@github", repo)) {
-    params <- parse_github_url(repo)
-  } else {
-    params <- parse_repo_spec(repo)
-  }
-  params <- params[viapply(params, nchar) > 0]
-
-  if (!is.null(params$pull)) {
-    params$ref <- github_pull(params$pull)
-    params$pull <- NULL
-  }
-
-  if (!is.null(params$release)) {
-    params$ref <- github_release()
-    params$release <- NULL
-  }
-
-  params
-}
-
-#' @export
-remote_package_name.github_remote <- function(remote, ...) {
-
+  # Otherwise lookup the package name from the remote DESCRIPTION file
   desc <- github_DESCRIPTION(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token)
+    host = remote$host, ref = remote$ref, pat = remote$auth_token, use_curl = use_curl)
 
   if (is.null(desc)) {
     return(NA_character_)
@@ -1972,9 +1945,9 @@ remote_package_name.github_remote <- function(remote, ...) {
 }
 
 #' @export
-remote_sha.github_remote <- function(remote, ...) {
+remote_sha.github_remote <- function(remote, ..., use_curl = is_installed("curl")) {
   github_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token)
+    host = remote$host, ref = remote$ref, pat = remote$auth_token, use_curl = use_curl)
 }
 
 #' @export
@@ -2081,7 +2054,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
 }
 
 #' @export
-remote_sha.gitlab_remote <- function(remote, url = "https://gitlab.com", ...) {
+remote_sha.gitlab_remote <- function(remote, ...) {
   gitlab_commit(username = remote$username, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token)
 }
@@ -2208,9 +2181,9 @@ format.local_remote <- function(x, ...) {
 install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   stopifnot(is.remote(remote))
 
-  remote_sha <- remote_sha(remote)
   package_name <- remote_package_name(remote)
   local_sha <- local_sha(package_name)
+  remote_sha <- remote_sha(remote, local_sha)
 
   if (!isTRUE(force) &&
     !different_sha(remote_sha = remote_sha, local_sha = local_sha)) {
@@ -2236,6 +2209,8 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
 
   source <- source_pkg(bundle, subdir = remote$subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
+
+  update_submodules(source, quiet)
 
   add_metadata(source, remote_metadata(remote, bundle, source))
 
@@ -2316,7 +2291,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
         sha = NA_character_))
   }
 
-  if (is.null(x$RemoteType)) {
+  if (is.null(x$RemoteType) || x$RemoteType == "cran") {
 
     # Packages installed with install.packages() or locally without remotes
     return(remote("cran",
@@ -2329,6 +2304,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   switch(x$RemoteType,
     github = remote("github",
       host = x$RemoteHost,
+      package = x$RemotePackage,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,
@@ -2342,13 +2318,13 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       ref = x$RemoteRef,
       sha = x$RemoteSha),
     xgit = remote("xgit",
-      url = x$RemoteUrl,
+      url = trim_ws(x$RemoteUrl),
       branch = x$RemoteBranch,
       sha = x$RemoteSha,
       subdir = x$RemoteSubdir,
       args = x$RemoteArgs),
     git2r = remote("git2r",
-      url = x$RemoteUrl,
+      url = trim_ws(x$RemoteUrl),
       branch = x$RemoteBranch,
       sha = x$RemoteSha,
       subdir = x$RemoteSubdir),
@@ -2360,19 +2336,19 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       sha = x$RemoteSha,
       subdir = x$RemoteSubdir),
     svn = remote("svn",
-      url = x$RemoteUrl,
+      url = trim_ws(x$RemoteUrl),
       svn_subdir = x$RemoteSubdir,
       revision = x$RemoteSha,
       args = x$RemoteArgs),
     local = remote("local",
-      path = x$RemoteUrl,
+      path = trim_ws(x$RemoteUrl),
       subdir = x$RemoteSubdir,
       sha = {
         # Packages installed locally might have RemoteSha == NA_character_
         x$RemoteSha %||% x$Version
       }),
     url = remote("url",
-      url = x$RemoteUrl,
+      url = trim_ws(x$RemoteUrl),
       subdir = x$RemoteSubdir,
       config = x$RemoteConfig,
       pkg_type = x$RemotePkgType),
@@ -2726,7 +2702,9 @@ download_version_url <- function(package, version, repos, type) {
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
 }
 
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = getOption("repos")) {
+install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
+  TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"), ..., repos =
+  getOption("repos")) {
 
   if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
     missing_devel_warning(pkgdir)
@@ -2739,7 +2717,16 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = 
     return(invisible(FALSE))
   }
 
-  install_deps(pkgdir, dependencies = dependencies, quiet = quiet, ..., repos = repos)
+  install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
+    build = build, build_opts = build_opts, repos = repos, ...)
+
+  if (isTRUE(build)) {
+    dir <- tempfile()
+    dir.create(dir)
+    on.exit(unlink(dir), add = TRUE)
+
+    pkgdir <- safe_build_package(pkgdir, build_opts, dir, quiet)
+  }
 
   safe_install_packages(
     pkgdir,
@@ -2751,6 +2738,7 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, ..., repos = 
 
   invisible(TRUE)
 }
+
 
 safe_install_packages <- function(...) {
 
@@ -2769,6 +2757,42 @@ safe_install_packages <- function(...) {
       R_PROFILE_USER = tempfile()),
     i.p(...)
   )
+}
+
+safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = is_installed("pkgbuild")) {
+  if (use_pkgbuild) {
+    vignettes <- TRUE
+    manual <- FALSE
+    has_no_vignettes <- grepl("--no-build-vignettes", build_opts)
+    if (any(has_no_vignettes)) {
+      vignettes <- FALSE
+    }
+    has_no_manual <- grepl("--no-manual", build_opts)
+    if (!any(has_no_manual)) {
+      manual <- TRUE
+    }
+    build_opts <- build_opts[!(has_no_vignettes | has_no_manual)]
+    pkgbuild::build(pkgdir, dest_path = dest_path, binary = FALSE,
+      vignettes = vignettes, manual = manual, args = build_opts, quiet = quiet)
+  } else {
+    # No pkgbuild, so we need to call R CMD build ourselves
+
+    lib <- paste(.libPaths(), collapse = ":")
+    env <- c(R_LIBS = lib,
+      R_LIBS_USER = lib,
+      R_LIBS_SITE = lib,
+      R_PROFILE_USER = tempfile())
+
+    pkgdir <- normalizePath(pkgdir)
+
+    in_dir(dest_path, {
+      with_envvar(env, {
+        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet)
+      })
+    })
+
+    file.path(dest_path, gsub("^[*] building .(.*).$", "\\1", output[length(output)]))
+  }
 }
 
 #' Install package dependencies if needed.
@@ -3011,6 +3035,222 @@ load_pkg_description <- function(path) {
 
   desc
 }
+#' Parse a remote git repo specification
+#'
+#' A remote repo can be specified in two ways:
+#' \describe{
+#' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
+#' and various GitHub browser URLs}
+#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
+#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+#' }
+#'
+#' @param repo Character scalar, the repo specification.
+#' @return List with members: \code{username}, \code{repo}, \code{subdir}
+#'   \code{ref}, \code{pull}, \code{release}, some which will be empty.
+#'
+#' @name parse-git-repo
+#' @examples
+#' parse_repo_spec("metacran/crandb")
+#' parse_repo_spec("jimhester/covr#47")        ## pull request
+#' parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
+#' parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
+#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
+#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
+#' parse_repo_spec("igraph=igraph/rigraph") ## Different package name from repo name
+#'
+#' parse_github_url("https://github.com/jeroen/curl.git")
+#' parse_github_url("git@github.com:metacran/crandb.git")
+#' parse_github_url("https://github.com/jimhester/covr")
+#' parse_github_url("https://github.example.com/user/repo.git")
+#' parse_github_url("git@github.example.com:user/repo.git")
+#'
+#' parse_github_url("https://github.com/r-lib/remotes/pull/108")
+#' parse_github_url("https://github.com/r-lib/remotes/tree/name-of-branch")
+#' parse_github_url("https://github.com/r-lib/remotes/commit/1234567")
+#' parse_github_url("https://github.com/r-lib/remotes/releases/latest")
+#' parse_github_url("https://github.com/r-lib/remotes/releases/tag/1.0.0")
+NULL
+
+#' @export
+#' @rdname parse-git-repo
+parse_repo_spec <- function(repo) {
+  package_name_rx <- "(?:(?<package>[[:alpha:]][[:alnum:].]*[[:alnum:]])=)?"
+  username_rx <- "(?:(?<username>[^/]+)/)"
+  repo_rx     <- "(?<repo>[^/@#]+)"
+  subdir_rx   <- "(?:/(?<subdir>[^@#]*[^@#/])/?)?"
+  ref_rx      <- "(?:@(?<ref>[^*].*))"
+  pull_rx     <- "(?:#(?<pull>[0-9]+))"
+  release_rx  <- "(?:@(?<release>[*]release))"
+  ref_or_pull_or_release_rx <- sprintf(
+    "(?:%s|%s|%s)?", ref_rx, pull_rx, release_rx
+  )
+  spec_rx  <- sprintf(
+    "^%s%s%s%s%s$", package_name_rx, username_rx, repo_rx, subdir_rx, ref_or_pull_or_release_rx
+  )
+  params <- as.list(re_match(text = repo, pattern = spec_rx))
+
+  if (is.na(params$.match)) {
+    stop(sprintf("Invalid git repo specification: '%s'", repo))
+  }
+
+  params[grepl("^[^\\.]", names(params))]
+}
+
+#' @export
+#' @rdname parse-git-repo
+parse_github_repo_spec <- parse_repo_spec
+
+#' @export
+#' @rdname parse-git-repo
+parse_github_url <- function(repo) {
+  prefix_rx <- "(?:github[^/:]+[/:])"
+  username_rx <- "(?:(?<username>[^/]+)/)"
+  repo_rx     <- "(?<repo>[^/@#]+)"
+  ref_rx <- "(?:(?:tree|commit|releases/tag)/(?<ref>.+$))"
+  pull_rx <- "(?:pull/(?<pull>.+$))"
+  release_rx <- "(?:releases/)(?<release>.+$)"
+  ref_or_pull_or_release_rx <- sprintf(
+    "(?:/(%s|%s|%s))?", ref_rx, pull_rx, release_rx
+  )
+  url_rx  <- sprintf(
+    "%s%s%s%s",
+    prefix_rx, username_rx, repo_rx, ref_or_pull_or_release_rx
+  )
+  params <- as.list(re_match(text = repo, pattern = url_rx))
+
+  if (is.na(params$.match)) {
+    stop(sprintf("Invalid GitHub URL: '%s'", repo))
+  }
+  if (params$ref == "" && params$pull == "" && params$release == "") {
+    params$repo <- gsub("\\.git$", "", params$repo)
+  }
+  if (params$release == "latest") {
+    params$release <- "*release"
+  }
+
+  params[grepl("^[^\\.]", names(params))]
+}
+
+parse_git_repo <- function(repo) {
+
+  if (grepl("^https://github|^git@github", repo)) {
+    params <- parse_github_url(repo)
+  } else {
+    params <- parse_repo_spec(repo)
+  }
+  params <- params[viapply(params, nchar) > 0]
+
+  if (!is.null(params$pull)) {
+    params$ref <- github_pull(params$pull)
+    params$pull <- NULL
+  }
+
+  if (!is.null(params$release)) {
+    params$ref <- github_release()
+    params$release <- NULL
+  }
+
+  params
+}
+
+parse_submodules <- function(file) {
+  if (grepl("\n", file)) {
+    x <- strsplit(file, "\n")[[1]]
+  } else {
+    x <- readLines(file)
+  }
+
+  # https://git-scm.com/docs/git-config#_syntax
+  # Subsection names are case sensitive and can contain any characters except
+  # newline and the null byte. Doublequote " and backslash can be included by
+  # escaping them as \" and \\
+  double_quoted_string_with_escapes <- '(?:\\\\.|[^"])*'
+
+  # Otherwise extract section names
+  section_names <- re_match(
+    x,
+    sprintf('^[[:space:]]*\\[submodule "(?<submodule>%s)"\\][[:space:]]*$', double_quoted_string_with_escapes)
+  )$submodule
+
+  # If no sections found return the empty list
+  if (all(is.na(section_names))) {
+    return(list())
+  }
+
+  # Extract name = value
+  # The variable names are case-insensitive, allow only alphanumeric characters
+  # and -, and must start with an alphabetic character.
+  variable_name <- "[[:alpha:]][[:alnum:]-]*"
+  mapping_values <- re_match(
+    x,
+    sprintf('^[[:space:]]*(?<name>%s)[[:space:]]*=[[:space:]]*(?<value>.*)[[:space:]]*$', variable_name),
+  )
+
+  values <- cbind(submodule = fill(section_names), mapping_values[c("name", "value")], stringsAsFactors = FALSE)
+  values <- values[!is.na(mapping_values$.match), ]
+
+  # path and valid url are required
+  if (!all(c("path", "url") %in% values$name)) {
+    warning("Invalid submodule definition, skipping submodule installation", immediate. = TRUE, call. = FALSE)
+    return(list())
+  }
+
+  # Roughly equivalent to tidyr::spread(values, name, value)
+  res <- stats::reshape(values, idvar = "submodule", timevar = "name", v.name = "value", direction = "wide")
+
+  # Set the column names, reshape prepends `value.` to path, url and branch
+  colnames(res) <- gsub("value[.]", "", colnames(res))
+
+  # path and valid url are required
+  if (any(is.na(res$url), is.na(res$path))) {
+    warning("Invalid submodule definition, skipping submodule installation", immediate. = TRUE, call. = FALSE)
+    return(list())
+  }
+
+  # branch is optional
+  if (!exists("branch", res)) {
+    res$branch <- NA_character_
+  }
+
+  # Remove unneeded attribute
+  attr(res, "reshapeWide") <- NULL
+
+  # Remove rownames
+  rownames(res) <- NULL
+
+  res
+}
+
+# Adapted from https://stackoverflow.com/a/9517731/2055486
+fill <- function(x) {
+  not_missing <- !is.na(x)
+
+  res <- x[not_missing]
+  res[cumsum(not_missing)]
+}
+
+update_submodule <- function(url, path, branch, quiet) {
+  args <- c('clone', '--depth', '1', '--no-hardlinks --recurse-submodules')
+  if (length(branch) > 0 && !is.na(branch)) {
+    args <- c(args, "--branch", branch)
+  }
+  args <- c(args, url, path)
+
+  git(paste0(args, collapse = " "), quiet = quiet)
+}
+
+update_submodules <- function(source, quiet) {
+  file <- file.path(source, ".gitmodules")
+  if (!file.exists(file)) {
+    return()
+  }
+  info <- parse_submodules(file)
+
+  for (i in seq_len(NROW(info))) {
+    update_submodule(info$url[[i]], file.path(source, info$path[[i]]), info$branch[[i]], quiet)
+  }
+}
 
 system_check <- function(command, args = character(), quiet = TRUE,
                          error = TRUE, path = ".") {
@@ -3069,6 +3309,30 @@ read_char <- function(path, ...) {
 
 viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
+}
+
+rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
+  if (os_type() == "windows") {
+    real_cmd <- file.path(path, "Rcmd.exe")
+    args <- c(cmd, args)
+  } else {
+    real_cmd <- file.path(path, "R")
+    args <- c("CMD", cmd, args)
+  }
+
+  outfile <- tempfile()
+  status <- system2(real_cmd, args, stderr = NULL, stdout = outfile)
+  out <- readLines(outfile, warn = FALSE)
+
+  if (status != 0) {
+    cat(out, sep = "\n")
+    stop(sprintf("Error running '%s' (status '%i')", cmd, status), call. = FALSE)
+  }
+  if (!quiet) {
+    cat(out, sep = "\n")
+  }
+
+  out
 }
 
 is_bioconductor <- function(x) {
@@ -3317,10 +3581,15 @@ base64_decode <- function(x) {
 }
 
 build_url <- function(host, ...) {
-  if (!grepl("^[[:alpha:]]+://", host)) {
-    host <- paste0("https://", host)
+  download_url(do.call(file.path, as.list(c(host, ...))))
+}
+
+download_url <- function(url) {
+  if (!grepl("^[[:alpha:]]+://", url)) {
+    scheme <- if (download_method_secure()) "https://" else "http://"
+    return(paste0(scheme, url))
   }
-  do.call(file.path, as.list(c(host, ...)))
+  url
 }
 
 
