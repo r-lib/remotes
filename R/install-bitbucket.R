@@ -65,7 +65,7 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
     message("Downloading bitbucket repo ", x$username, "/", x$repo, "@", x$ref)
   }
 
-  dest <- tempfile(fileext = paste0(".zip"))
+  dest <- tempfile(fileext = paste0(".tar.gz"))
 
   url <- bitbucket_download_url(x$username, x$repo, x$ref, host = x$host, auth = basic_auth(x))
 
@@ -73,16 +73,12 @@ remote_download.bitbucket_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL) {
-  # Determine sha as efficiently as possible
-  if (!is.null(x$sha)) {
-    # Might be cached already (because re-installing)
-    sha <- x$sha
-  } else if (!is.null(bundle)) {
-    # Might be able to get from zip archive
-    sha <- git_extract_sha1(bundle)
-  } else {
-    sha <- remote_sha(x)
+remote_metadata.bitbucket_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+  if (!is.null(bundle)) {
+    # Might be able to get from archive
+    sha <- git_extract_sha1_tar(bundle)
+  } else if (is.na(sha)) {
+    sha <- NULL
   }
 
   list(
@@ -156,7 +152,7 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".zip")
+  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {

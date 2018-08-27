@@ -289,3 +289,7 @@ download_url <- function(url) {
   }
   url
 }
+
+is_na <- function(x) {
+  length(x) == 1 && is.na(x)
+}

@@ -76,14 +76,14 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.svn_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.svn_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
 
   if (!is.null(bundle)) {
     in_dir(bundle, {
       revision <- svn_revision()
     })
   } else {
-    revision <- NA_character_
+    revision <- sha
   }
 
   list(

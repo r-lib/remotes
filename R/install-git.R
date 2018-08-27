@@ -73,12 +73,12 @@ remote_download.git2r_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
   if (!is.null(bundle)) {
     r <- git2r::repository(bundle)
     sha <- git2r::commits(r)[[1]]$sha
   } else {
-    sha <- NA_character_
+    sha <- NULL
   }
 
   list(
@@ -163,13 +163,17 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+  if (is_na(sha)) {
+    sha <- NULL
+  }
+
   list(
     RemoteType = "xgit",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
     RemoteBranch = x$branch,
-    RemoteSha = remote_sha(x),
+    RemoteSha = sha,
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
 }

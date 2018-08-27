@@ -112,7 +112,7 @@ test_that("remote_metadata.xgit_remote", {
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteBranch = "foo3",
-    RemoteSha = NA_character_,
+    RemoteSha = NULL,
     RemoteArgs = NULL
   )
 
@@ -130,7 +130,7 @@ test_that("remote_metadata.git2r_remote", {
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteBranch = "foo3",
-    RemoteSha = NA_character_
+    RemoteSha = NULL
   )
 
   expect_equal(r, e)
