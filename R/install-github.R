@@ -75,25 +75,21 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
     message("Downloading GitHub repo ", x$username, "/", x$repo, "@", x$ref)
   }
 
-  dest <- tempfile(fileext = paste0(".zip"))
+  dest <- tempfile(fileext = paste0(".tar.gz"))
   src_root <- build_url(x$host, "repos", x$username, x$repo)
-  src <- paste0(src_root, "/zipball/", utils::URLencode(x$ref, reserved = TRUE))
+  src <- paste0(src_root, "/tarball/", utils::URLencode(x$ref, reserved = TRUE))
 
   download(dest, src, auth_token = x$auth_token)
 }
 
 #' @export
-remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL) {
-  # Determine sha as efficiently as possible
-  if (!is.null(x$sha)) {
-    # Might be cached already (because re-installing)
-    sha <- x$sha
-  } else if (!is.null(bundle)) {
-    # Might be able to get from zip archive
-    sha <- git_extract_sha1(bundle)
-  } else {
-    # Otherwise can use github api
-    sha <- github_commit(x$username, x$repo, x$ref)
+remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+
+  if (!is.null(bundle)) {
+    # Might be able to get from archive
+    sha <- git_extract_sha1_tar(bundle)
+  } else if (is_na(sha)) {
+    sha <- NULL
   }
 
   list(

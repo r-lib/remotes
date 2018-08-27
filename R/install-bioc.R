@@ -149,13 +149,13 @@ remote_download.bioc_xgit_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
   url <- paste0(x$mirror, "/", x$repo)
 
   if (!is.null(bundle)) {
     r <- git2r::repository(bundle)
     sha <- git_repo_sha1(r)
-  } else {
+  } else if (is_na(sha)) {
     sha <- NULL
   }
 
@@ -170,13 +170,17 @@ remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL) {
 }
 
 #' @export
-remote_metadata.bioc_xgit_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.bioc_xgit_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+  if (is_na(sha)) {
+    sha <- NULL
+  }
+
   list(
     RemoteType = "bioc_xgit",
     RemoteMirror = x$mirror,
     RemoteRepo = x$repo,
     RemoteRelease = x$release,
-    RemoteSha = remote_sha(x),
+    RemoteSha = sha,
     RemoteBranch = x$branch,
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
