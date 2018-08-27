@@ -42,7 +42,7 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
 
   update_submodules(source, quiet)
 
-  add_metadata(source, remote_metadata(remote, bundle, source))
+  add_metadata(source, remote_metadata(remote, bundle, source, remote_sha))
 
   # Because we've modified DESCRIPTION, its original MD5 value is wrong
   clear_description_md5(source)
@@ -82,7 +82,7 @@ remote <- function(type, ...) {
 is.remote <- function(x) inherits(x, "remote")
 
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
-remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")
+remote_metadata <- function(x, bundle = NULL, source = NULL, sha = NULL) UseMethod("remote_metadata")
 remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
 

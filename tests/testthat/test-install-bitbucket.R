@@ -57,7 +57,7 @@ test_that("remote_download.bitbucket_remote", {
 test_that("remote_metadata.bitbucket_remote", {
 
   expect_equal(
-    remote_metadata.bitbucket_remote(list(sha = "foobar"))$RemoteSha,
+    remote_metadata.bitbucket_remote(list(), sha = "foobar")$RemoteSha,
     "foobar"
   )
 })

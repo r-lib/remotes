@@ -5,6 +5,11 @@
 
 # Development
 
+* `install_()` functions now download tarballs (.tar.gz) files rather than zip
+  archives (.zip). This results in generally smaller files and avoids issues
+  with script permissions being lost and strange behavior of some external
+  unzip programs on Windows (#96).
+
 * Do not include the BioCextra repository in versions after it was deprecated
   (R 3.5+, Bioc 3.6+).
 
