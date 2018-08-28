@@ -5,6 +5,9 @@
 
 # Development
 
+* Dependency parsing is now more robust to whitespace around the dependency
+  specifications (#73).
+
 * `install_()` functions now download tarballs (.tar.gz) files rather than zip
   archives (.zip). This results in generally smaller files and avoids issues
   with script permissions being lost and strange behavior of some external
