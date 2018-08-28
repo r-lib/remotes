@@ -6,7 +6,9 @@
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
   threads = getOption("Ncpus", 1), repos = getOption("repos"),
-  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE)
+  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE,
+  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"))
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}

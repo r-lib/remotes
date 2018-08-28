@@ -4,8 +4,8 @@
 \alias{install_git}
 \title{Install a package from a git repository}
 \usage{
-install_git(url, subdir = NULL, branch = NULL, git = c("auto",
-  "git2r", "external"), ...)
+install_git(url, subdir = NULL, branch = NULL, credentials = NULL,
+  git = c("auto", "git2r", "external"), ...)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -15,6 +15,9 @@ private repository.}
 contain the package we are interested in installing.}
 
 \item{branch}{Name of branch, tag or SHA reference to use, if not HEAD.}
+
+\item{credentials}{A git2r credentials object passed through to clone.
+Supplying this argument implies using \code{git2r} with \code{git}.}
 
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,

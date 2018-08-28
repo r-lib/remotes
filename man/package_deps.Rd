@@ -13,7 +13,7 @@ package_deps(packages, dependencies = NA, repos = getOption("repos"),
 local_package_deps(pkgdir = ".", dependencies = NA)
 
 dev_package_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"))
+  repos = getOption("repos"), type = getOption("pkgType"), ...)
 
 \method{update}{package_deps}(object, ..., quiet = FALSE,
   upgrade = TRUE)
@@ -36,9 +36,9 @@ dev_package_deps(pkgdir = ".", dependencies = NA,
 
 \item{pkgdir}{path to a package directory, or to a package tarball.}
 
-\item{object}{A \code{package_deps} object.}
-
 \item{...}{Additional arguments passed to \code{install_packages}.}
+
+\item{object}{A \code{package_deps} object.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
 

@@ -5,6 +5,9 @@
 
 # Development
 
+* `install_git()` now supports passing credentials, when it is used with `git =
+  "git2r"` (#106)
+
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
 
