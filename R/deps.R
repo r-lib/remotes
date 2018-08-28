@@ -111,7 +111,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType")) {
+                             type = getOption("pkgType"), ...) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -129,7 +129,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   combine_deps(
     package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg))
+    remote_deps(pkg, ...))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
@@ -280,11 +280,7 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
 install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
-                             dependencies = FALSE, quiet = NULL,
-                             # These are options to `install()` used when
-                             # installing remotes, but can get passed to us by
-                             # `...` so we just ignore them here
-                             build, build_opts) {
+                             dependencies = FALSE, quiet = NULL) {
 
   if (is.null(quiet))
     quiet <- !identical(type, "source")
@@ -381,7 +377,7 @@ fix_repositories <- function(repos) {
   repos
 }
 
-parse_one_remote <- function(x) {
+parse_one_remote <- function(x, ...) {
   pieces <- strsplit(x, "::", fixed = TRUE)[[1]]
 
   if (length(pieces) == 1) {
@@ -397,7 +393,7 @@ parse_one_remote <- function(x) {
     fun <- get(paste0(tolower(type), "_remote"),
       envir = asNamespace("remotes"), mode = "function", inherits = FALSE)
 
-    res <- fun(repo)
+    res <- fun(repo, ...)
     }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
   )
   res
@@ -412,13 +408,13 @@ split_remotes <- function(x) {
 }
 
 
-remote_deps <- function(pkg) {
+remote_deps <- function(pkg, ...) {
   if (!has_dev_remotes(pkg)) {
     return(NULL)
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote)
+  remote <- lapply(dev_packages, parse_one_remote, ...)
 
   package <- vapply(remote, remote_package_name, character(1), USE.NAMES = FALSE)
   installed <- vapply(package, local_sha, character(1), USE.NAMES = FALSE)
