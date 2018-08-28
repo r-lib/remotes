@@ -33,7 +33,8 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
     ...
   )
 
-  invisible(TRUE)
+  pkg_name <- load_pkg_description(pkgdir)$package
+  invisible(pkg_name)
 }
 
 

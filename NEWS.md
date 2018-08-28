@@ -5,6 +5,9 @@
 
 # Development
 
+* `install_()` functions now return the name of the package(s) which were
+  installed (#55).
+
 * Dependency parsing is now more robust to whitespace around the dependency
   specifications (#73).
 

@@ -24,14 +24,14 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
         " the SHA1 (", substr(remote_sha, 1L, 8L), ") has not changed since last install.\n",
         "  Use `force = TRUE` to force installation")
     }
-    return(invisible(FALSE))
+    return(invisible(package_name))
   }
 
   if (inherits(remote, "cran_remote")) {
     install_packages(
       package_name, repos = remote$repos, type = remote$pkg_type,
       ..., quiet = quiet)
-    return(invisible(TRUE))
+    return(invisible(package_name))
   }
 
   bundle <- remote_download(remote, quiet = quiet)
@@ -51,7 +51,7 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
 }
 
 install_remotes <- function(remotes, ...) {
-  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = logical(1)))
+  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = character(1)))
 }
 
 # Add metadata
