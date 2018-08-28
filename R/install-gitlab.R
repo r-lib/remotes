@@ -23,7 +23,7 @@ install_gitlab <- function(repo,
 
   remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host, ...)
 }
 
 gitlab_remote <- function(repo,

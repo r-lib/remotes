@@ -5,6 +5,9 @@
 
 # Development
 
+* `install_()` functions now pass arguments, including authentication
+  information and upgrade down to dependencies (#53, #86, #87).
+
 * `install_()` functions now return the name of the package(s) which were
   installed (#55).
 

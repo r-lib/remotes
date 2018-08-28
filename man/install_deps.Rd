@@ -6,7 +6,9 @@
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
   threads = getOption("Ncpus", 1), repos = getOption("repos"),
-  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE)
+  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE,
+  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"))
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}
@@ -32,6 +34,10 @@ install_deps(pkgdir = ".", dependencies = NA,
 \item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
+
+\item{build}{If \code{TRUE} build the pacakge before installing.}
+
+\item{build_opts}{Options to pass to `R CMD build`.}
 }
 \description{
 Install package dependencies if needed.

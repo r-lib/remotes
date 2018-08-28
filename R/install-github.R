@@ -47,10 +47,10 @@ install_github <- function(repo,
   remotes <- lapply(repo, github_remote, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host, ...)
 }
 
-github_remote <- function(repo, ref = NULL, subdir = NULL,
+github_remote <- function(repo, ref = "master", subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
                        host = "api.github.com") {
 
