@@ -27,7 +27,7 @@ install_svn <- function(url, subdir = NULL, args = character(0),
   remotes <- lapply(url, svn_remote, svn_subdir = subdir,
     revision = revision, args = args)
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes, args = args, ...)
 }
 
 svn_remote <- function(url, svn_subdir = NULL, revision = NULL,
