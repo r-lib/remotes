@@ -199,7 +199,8 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
 
   # Otherwise lookup the package name from the remote DESCRIPTION file
   desc <- github_DESCRIPTION(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token, use_curl = use_curl)
+    subdir = remote$subdir, host = remote$host, ref = remote$ref,
+    pat = remote$auth_token, use_curl = use_curl)
 
   if (is.null(desc)) {
     return(NA_character_)
