@@ -282,19 +282,37 @@ install_packages <- function(packages, repos = getOption("repos"),
                              type = getOption("pkgType"), ...,
                              dependencies = FALSE, quiet = NULL) {
 
+  # We want to pass only args that exist in the downstream functions
+  args_to_keep <-
+    unique(
+      names(
+        c(
+          formals(install.packages),
+          formals(download.file)
+        )
+      )
+    )
+
+  args <- list(...)
+  args <- args[names(args) %in% args_to_keep]
+
   if (is.null(quiet))
     quiet <- !identical(type, "source")
 
   message("Installing ", length(packages), " packages: ",
     paste(packages, collapse = ", "))
 
-  safe_install_packages(
-    packages,
-    repos = repos,
-    type = type,
-    ...,
-    dependencies = dependencies,
-    quiet = quiet
+  do.call(
+    safe_install_packages,
+    c(list(
+        packages,
+        repos = repos,
+        type = type,
+        dependencies = dependencies,
+        quiet = quiet
+      ),
+      args
+    )
   )
 }
 
