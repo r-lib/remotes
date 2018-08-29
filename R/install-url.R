@@ -20,7 +20,7 @@ install_url <- function(url, subdir = NULL, ...) {
   install_remotes(remotes, ...)
 }
 
-url_remote <- function(url, subdir = NULL) {
+url_remote <- function(url, subdir = NULL, ...) {
   remote("url",
     url = url,
     subdir = subdir

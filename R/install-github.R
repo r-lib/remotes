@@ -52,7 +52,7 @@ install_github <- function(repo,
 
 github_remote <- function(repo, ref = "master", subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
-                       host = "api.github.com") {
+                       host = "api.github.com", ...) {
 
   meta <- parse_git_repo(repo)
   meta <- github_resolve_ref(meta$ref %||% ref, meta, auth_token)

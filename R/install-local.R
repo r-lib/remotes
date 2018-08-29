@@ -21,7 +21,7 @@ install_local <- function(path, subdir = NULL, ...) {
   install_remotes(remotes, ...)
 }
 
-local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0)) {
+local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0), ...) {
   remote("local",
     path = normalizePath(path),
     subdir = subdir

@@ -28,7 +28,7 @@ install_gitlab <- function(repo,
 
 gitlab_remote <- function(repo,
                        auth_token = gitlab_pat(), sha = NULL,
-                       host = "gitlab.com") {
+                       host = "gitlab.com", ...) {
 
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "master"
