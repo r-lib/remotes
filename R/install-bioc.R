@@ -30,20 +30,20 @@
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
   git = c("auto", "git2r", "external"), ...) {
 
-  bioc_remote <- select_bioc_git_remote(match.arg(git))
-
-  remotes <- lapply(repo, bioc_remote, mirror = mirror)
+  remotes <- lapply(repo, bioc_remote, mirror = mirror, git = match.arg(git))
 
   install_remotes(remotes, ...)
 }
 
-select_bioc_git_remote <- function(git) {
+bioc_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
+  git = c("auto", "git2r", "external"), ...) {
+
+  git <- match.arg(git)
   if (git == "auto") {
     git <- if (pkg_installed("git2r")) "git2r" else "external"
   }
-  switch(git,
-    git2r = bioc_git2r_remote,
-    external = bioc_xgit_remote)
+
+  list(git2r = bioc_git2r_remote, external = bioc_xgit_remote)[[git]](repo, mirror)
 }
 
 # Parse concise git repo specification: [username:password@][branch/]repo[#commit]
