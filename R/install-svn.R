@@ -31,7 +31,7 @@ install_svn <- function(url, subdir = NULL, args = character(0),
 }
 
 svn_remote <- function(url, svn_subdir = NULL, revision = NULL,
-  args = character(0)) {
+  args = character(0), ...) {
   remote("svn",
     url = url,
     svn_subdir = svn_subdir,

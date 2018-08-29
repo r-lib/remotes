@@ -43,7 +43,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL) {
+                              host = NULL, ...) {
 
   meta <- parse_git_repo(repo)
 

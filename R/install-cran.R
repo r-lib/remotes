@@ -20,7 +20,7 @@ install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkg
   install_remotes(remotes, quiet = quiet, ...)
 }
 
-cran_remote <- function(pkg, repos, type) {
+cran_remote <- function(pkg, repos, type, ...) {
 
   remote("cran",
     name = pkg,
