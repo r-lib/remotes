@@ -11,6 +11,10 @@
   
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
+* Remotes can be forced to use only its internal code by setting the
+  environment variable `R_REMOTES_STANDALONE` = "true". This is useful when
+  installing optional dependencies of remotes on Windows, such as curl or git2r
+  (#147)
 
 * `install_()` functions now return the name of the package(s) which were
   installed (#55).

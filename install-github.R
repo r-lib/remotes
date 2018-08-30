@@ -3495,11 +3495,6 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
   res
 }
 
-is_installed <- function(pkg, version = 0) {
-  installed_version <- tryCatch(utils::packageVersion(pkg), error = function(e) NA)
-  !is.na(installed_version) && installed_version >= version
-}
-
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
 # https://github.com/gisle/mime-base64/blob/cf23d49e517c6ed8f4b24295f63721e8c9935010/Base64.xs#L197
 

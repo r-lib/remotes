@@ -66,7 +66,7 @@ download_method <- function() {
 
 curl_download <- function(url, path, quiet) {
 
-  if (!pkg_installed("curl")) {
+  if (pkg_installed("curl")) {
     stop("The 'curl' package is required if R is older than 3.2.0")
   }
 

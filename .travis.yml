@@ -4,18 +4,22 @@ sudo: false
 cache: packages
 latex: false
 
-r:
- - 3.2
- - oldrel
- - release
- - devel
-
 install:
   - R CMD INSTALL .
   - R -e 'remotes::install_deps(dependencies = TRUE)'
 
-after_success:
-  - test $TRAVIS_R_VERSION_STRING = 'release' && Rscript -e 'covr::codecov()'
+matrix:
+  include:
+    - r: release
+      after_success: Rscript -e 'covr::codecov()'
+    - r: release
+      env: R_REMOTES_STANDALONE=true
+
+r:
+ - 3.2
+ - 3.3
+ - oldrel
+ - devel
 
 env:
   global:

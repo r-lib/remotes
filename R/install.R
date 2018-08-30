@@ -63,7 +63,7 @@ safe_install_packages <- function(...) {
   )
 }
 
-safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = is_installed("pkgbuild")) {
+safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
   if (use_pkgbuild) {
     vignettes <- TRUE
     manual <- FALSE

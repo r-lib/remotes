@@ -31,7 +31,7 @@ install_git <- function(url, subdir = NULL, branch = NULL,
 git_remote <- function(url, subdir = NULL, branch = NULL, git = c("auto", "git2r", "external"), ...) {
   git <- match.arg(git)
   if (git == "auto") {
-    git <- if (pkg_installed("git2r")) "git2r" else "external"
+    git <- if (!is_standalone() && pkg_installed("git2r")) "git2r" else "external"
   }
 
   list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, branch)
