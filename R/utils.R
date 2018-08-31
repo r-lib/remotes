@@ -109,6 +109,49 @@ set_libpaths <- function(paths) {
 
 with_libpaths <- with_something(set_libpaths, .libPaths)
 
+set_options <- function(x) {
+  do.call(options, as.list(x))
+}
+
+with_options <- with_something(set_options)
+
+# Read the current user .Rprofile. Here is the order it is searched, from
+# ?Startup
+#
+# 'R_PROFILE_USER’ environment variable (and tilde expansion
+# will be performed).  If this is unset, a file called ‘.Rprofile’
+# is searched for in the current directory or in the user's home
+# directory (in that order).  The user profile file is sourced into
+# the workspace.
+read_rprofile_user <- function() {
+  f <- normalizePath(Sys.getenv("R_PROFILE_USER", ""), mustWork = FALSE)
+  if (file.exists(f)) {
+    return(readLines(f))
+  }
+
+  f <- ".Rprofile"
+  if (file.exists(f)) {
+    return(readLines(f))
+  }
+
+  f <- normalizePath("~/.Rprofile", mustWork = FALSE)
+  if (file.exists(f)) {
+    return(readLines(f))
+  }
+
+  character()
+}
+
+with_rprofile_user <- function(new, code) {
+  temp_rprofile <- tempfile()
+  on.exit(unlink(temp_rprofile), add = TRUE)
+
+  writeLines(c(read_rprofile_user(), new), temp_rprofile)
+  with_envvar(c("R_PROFILE_USER" = temp_rprofile), {
+    force(code)
+  })
+}
+
 ## There are two kinds of tar on windows, one needs --force-local
 ## not to interpret : characters, the other does not. We try both ways.
 
