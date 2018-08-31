@@ -5,6 +5,10 @@
 
 # Development
 
+* When installing set warnings to be errors, to catch cases where packages are
+  only partially installed. This often happens on windows when the package dll
+  is opened in another R process (#113).
+  
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
 
