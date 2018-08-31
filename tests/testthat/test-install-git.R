@@ -1,7 +1,41 @@
 
 context("Install from git repo")
 
-test_that("install_git", {
+test_that("install_git with git2r", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_not_installed("git2r")
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+  libpath <- .libPaths()
+  on.exit(.libPaths(libpath), add = TRUE)
+  .libPaths(c(lib, libpath))
+
+  url <- "https://github.com/gaborcsardi/pkgconfig.git"
+  install_git(url, lib = lib, git = "git2r", quiet = TRUE)
+
+  expect_silent(packageDescription("pkgconfig", lib.loc = lib))
+  expect_equal(
+    packageDescription("pkgconfig", lib.loc = lib)$RemoteUrl,
+    url
+  )
+
+  remote <- package2remote("pkgconfig", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "git2r_remote")
+  expect_equal(format(remote), "Git")
+  expect_equal(remote$url, url)
+  expect_equal(remote$branch, NULL)
+  expect_equal(remote_sha(remote), remote$sha)
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
+})
+
+test_that("install_git with git2r and branch", {
 
   skip_on_cran()
   skip_if_offline()
@@ -18,7 +52,7 @@ test_that("install_git", {
   .libPaths(c(lib, libpath))
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
-  install_git(url, lib = lib, branch = "travis", quiet = TRUE)
+  install_git(url, lib = lib, branch = "travis", git = "git2r", quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
   expect_equal(
@@ -32,6 +66,7 @@ test_that("install_git", {
   expect_equal(format(remote), "Git")
   expect_equal(remote$url, url)
   expect_equal(remote$branch, "travis")
+  expect_equal(remote_sha(remote), remote$sha)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
@@ -40,12 +75,7 @@ test_that("install_git with command line git", {
 
   skip_on_cran()
   skip_if_offline()
-  skip_if_over_rate_limit()
   if (is.null(git_path())) skip("git is not installed")
-
-  skip_on_cran()
-  skip_if_offline()
-  skip_if_over_rate_limit()
 
   Sys.unsetenv("R_TESTS")
 
@@ -82,7 +112,7 @@ test_that("remote_metadata.xgit_remote", {
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteBranch = "foo3",
-    RemoteSha = NA_character_,
+    RemoteSha = NULL,
     RemoteArgs = NULL
   )
 
@@ -100,7 +130,7 @@ test_that("remote_metadata.git2r_remote", {
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
     RemoteBranch = "foo3",
-    RemoteSha = NA_character_
+    RemoteSha = NULL
   )
 
   expect_equal(r, e)

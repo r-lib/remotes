@@ -1,23 +1,26 @@
 
 # Extract the commit hash from a git archive. Git archives include the SHA1
-# hash as the comment field of the zip central directory record
+# hash as the comment field of the tarball pax extended header
 # (see https://www.kernel.org/pub/software/scm/git/docs/git-archive.html)
-# Since we know it's 40 characters long we seek that many bytes minus 2
-# (to confirm the comment is exactly 40 bytes long)
-git_extract_sha1 <- function(bundle) {
+# For GitHub archives this should be the first header after the default one
+# (512 byte) header.
+git_extract_sha1_tar <- function(bundle) {
 
   # open the bundle for reading
-  conn <- file(bundle, open = "rb", raw = TRUE)
+  # We use gzcon for everything because (from ?gzcon)
+  # > Reading from a connection which does not supply a ‘gzip’ magic
+  # > header is equivalent to reading from the original connection
+  conn <- gzcon(file(bundle, open = "rb", raw = TRUE))
   on.exit(close(conn))
 
-  # seek to where the comment length field should be recorded
-  seek(conn, where = -0x2a, origin = "end")
+  # The default pax header is 512 bytes long and the first pax extended header
+  # with the comment should be 51 bytes long
+  # `52 comment=` (11 chars) + 40 byte SHA1 hash
+  len <- 0x200 + 0x33
+  res <- rawToChar(readBin(conn, "raw", n = len)[0x201:len])
 
-  # verify the comment is length 0x28
-  len <- readBin(conn, "raw", n = 2)
-  if (len[1] == 0x28 && len[2] == 0x00) {
-    # read and return the SHA1
-    rawToChar(readBin(conn, "raw", n = 0x28))
+  if (grepl("^52 comment=", res)) {
+    sub("52 comment=", "", res)
   } else {
     NULL
   }

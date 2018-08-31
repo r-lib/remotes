@@ -127,12 +127,7 @@ test_that("error if not username, warning if given as argument", {
 
   expect_error(
     install_github("falsy", lib = lib, quiet = TRUE),
-    "Unknown username"
-  )
-
-  expect_warning(
-    install_github("falsy", username = "cran", lib = lib, quiet = TRUE),
-    "Username parameter is deprecated"
+    "Invalid git repo specification"
   )
 })
 
@@ -155,25 +150,29 @@ test_that("remote_download.github_remote messages", {
 test_that("remote_metadata.github_remote", {
 
   expect_equal(
-    remote_metadata.github_remote(list(sha = "foobar"))$RemoteSha,
+    remote_metadata.github_remote(list(), sha = "foobar")$RemoteSha,
     "foobar"
   )
+})
+
+
+test_that("remote_sha.github_remote", {
 
   skip_on_cran()
   skip_if_offline()
   skip_if_over_rate_limit()
 
   expect_equal(
-    remote_metadata.github_remote(
+    remote_sha.github_remote(
       list(
         username = "cran",
         repo = "falsy",
-        ref = "1.0"
+        ref = "1.0",
+        host = "api.github.com"
       )
-    )$RemoteSha,
+    ),
     "0f39d9eb735bf16909831c0bb129063dda388375"
   )
-
 })
 
 test_that("github_pull", {

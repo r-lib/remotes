@@ -32,6 +32,19 @@ test_that("parse_deps", {
     )
   )
 
+  # Whitespace should be ignored
+  expect_equal(
+    parse_deps("devtools (>= 1.0.1) \n, foobar, foobar2 ( == 0.0.1 )"),
+    structure(
+      list(
+        name = c("devtools", "foobar", "foobar2"),
+        compare = c(">=", NA, "=="),
+        version = c("1.0.1", NA, "0.0.1")),
+      row.names = 1:3,
+      class = "data.frame"
+    )
+  )
+
 })
 
 

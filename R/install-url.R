@@ -20,7 +20,7 @@ install_url <- function(url, subdir = NULL, ...) {
   install_remotes(remotes, ...)
 }
 
-url_remote <- function(url, subdir = NULL) {
+url_remote <- function(url, subdir = NULL, ...) {
   remote("url",
     url = url,
     subdir = subdir
@@ -41,7 +41,7 @@ remote_download.url_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
   list(
     RemoteType = "url",
     RemoteUrl = x$url,

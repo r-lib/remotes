@@ -33,19 +33,9 @@ decompress <- function(src, target) {
   if (grepl("\\.zip$", src)) {
     my_unzip(src, target)
     outdir <- getrootdir(as.vector(utils::unzip(src, list = TRUE)$Name))
-
-  } else if (grepl("\\.tar$", src)) {
+  } else if (grepl("\\.(tar|tar\\.gz|tar\\.bz2|tgz|tbz)$", src)) {
     untar(src, exdir = target)
     outdir <- getrootdir(untar(src, list = TRUE))
-
-  } else if (grepl("\\.(tar\\.gz|tgz)$", src)) {
-    untar(src, exdir = target, compressed = "gzip")
-    outdir <- getrootdir(untar(src, compressed = "gzip", list = TRUE))
-
-  } else if (grepl("\\.(tar\\.bz2|tbz)$", src)) {
-    untar(src, exdir = target, compressed = "bzip2")
-    outdir <- getrootdir(untar(src, compressed = "bzip2", list = TRUE))
-
   } else {
     ext <- gsub("^[^.]*\\.", "", src)
     stop("Don't know how to decompress files with extension ", ext,

@@ -27,23 +27,23 @@
 #' install_bioc("user:password@devel/SummarizedExperiment")
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
-install_bioc <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages"),
+install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
   git = c("auto", "git2r", "external"), ...) {
 
-  bioc_remote <- select_bioc_git_remote(match.arg(git))
-
-  remotes <- lapply(repo, bioc_remote, mirror = mirror)
+  remotes <- lapply(repo, bioc_remote, mirror = mirror, git = match.arg(git))
 
   install_remotes(remotes, ...)
 }
 
-select_bioc_git_remote <- function(git) {
+bioc_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
+  git = c("auto", "git2r", "external"), ...) {
+
+  git <- match.arg(git)
   if (git == "auto") {
     git <- if (pkg_installed("git2r")) "git2r" else "external"
   }
-  switch(git,
-    git2r = bioc_git2r_remote,
-    external = bioc_xgit_remote)
+
+  list(git2r = bioc_git2r_remote, external = bioc_xgit_remote)[[git]](repo, mirror)
 }
 
 # Parse concise git repo specification: [username:password@][branch/]repo[#commit]
@@ -69,7 +69,7 @@ parse_bioc_repo <- function(path) {
   params
 }
 
-bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
@@ -88,7 +88,7 @@ bioc_git2r_remote <- function(repo, mirror = getOption("BioC_git", "https://git.
   )
 }
 
-bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", "https://git.bioconductor.org/packages")) {
+bioc_xgit_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages"))) {
   meta <- parse_bioc_repo(repo)
 
   branch <- bioconductor_branch(meta$release, meta$sha)
@@ -149,13 +149,13 @@ remote_download.bioc_xgit_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
   url <- paste0(x$mirror, "/", x$repo)
 
   if (!is.null(bundle)) {
     r <- git2r::repository(bundle)
     sha <- git_repo_sha1(r)
-  } else {
+  } else if (is_na(sha)) {
     sha <- NULL
   }
 
@@ -170,13 +170,17 @@ remote_metadata.bioc_git2r_remote <- function(x, bundle = NULL, source = NULL) {
 }
 
 #' @export
-remote_metadata.bioc_xgit_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.bioc_xgit_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+  if (is_na(sha)) {
+    sha <- NULL
+  }
+
   list(
     RemoteType = "bioc_xgit",
     RemoteMirror = x$mirror,
     RemoteRepo = x$repo,
     RemoteRelease = x$release,
-    RemoteSha = remote_sha(x),
+    RemoteSha = sha,
     RemoteBranch = x$branch,
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
@@ -197,7 +201,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
   tryCatch({
     url <- paste0(remote$mirror, "/", remote$repo)
 
-    res <- git2r::remote_ls(url, credentials=remote$credentials, ...)
+    res <- git2r::remote_ls(url, credentials=remote$credentials)
 
     found <- grep(pattern = paste0("/", remote$branch), x = names(res))
 
@@ -242,7 +246,7 @@ bioconductor_branch <- function(release, sha) {
 
 bioconductor_release <- function() {
   tmp <- tempfile()
-  utils::download.file("http://bioconductor.org/config.yaml", tmp, quiet = TRUE)
+  utils::download.file(download_url("bioconductor.org/config.yaml"), tmp, quiet = TRUE)
 
   gsub("release_version:[[:space:]]+\"([[:digit:].]+)\"", "\\1",
        grep("release_version:", readLines(tmp), value = TRUE))

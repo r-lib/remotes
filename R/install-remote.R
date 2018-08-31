@@ -11,9 +11,9 @@
 install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   stopifnot(is.remote(remote))
 
-  remote_sha <- remote_sha(remote)
   package_name <- remote_package_name(remote)
   local_sha <- local_sha(package_name)
+  remote_sha <- remote_sha(remote, local_sha)
 
   if (!isTRUE(force) &&
     !different_sha(remote_sha = remote_sha, local_sha = local_sha)) {
@@ -24,14 +24,14 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
         " the SHA1 (", substr(remote_sha, 1L, 8L), ") has not changed since last install.\n",
         "  Use `force = TRUE` to force installation")
     }
-    return(invisible(FALSE))
+    return(invisible(package_name))
   }
 
   if (inherits(remote, "cran_remote")) {
     install_packages(
       package_name, repos = remote$repos, type = remote$pkg_type,
       ..., quiet = quiet)
-    return(invisible(TRUE))
+    return(invisible(package_name))
   }
 
   bundle <- remote_download(remote, quiet = quiet)
@@ -42,7 +42,7 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
 
   update_submodules(source, quiet)
 
-  add_metadata(source, remote_metadata(remote, bundle, source))
+  add_metadata(source, remote_metadata(remote, bundle, source, remote_sha))
 
   # Because we've modified DESCRIPTION, its original MD5 value is wrong
   clear_description_md5(source)
@@ -51,7 +51,7 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
 }
 
 install_remotes <- function(remotes, ...) {
-  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = logical(1)))
+  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = character(1)))
 }
 
 # Add metadata
@@ -82,7 +82,7 @@ remote <- function(type, ...) {
 is.remote <- function(x) inherits(x, "remote")
 
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
-remote_metadata <- function(x, bundle = NULL, source = NULL) UseMethod("remote_metadata")
+remote_metadata <- function(x, bundle = NULL, source = NULL, sha = NULL) UseMethod("remote_metadata")
 remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
 
@@ -121,7 +121,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
         sha = NA_character_))
   }
 
-  if (is.null(x$RemoteType)) {
+  if (is.null(x$RemoteType) || x$RemoteType == "cran") {
 
     # Packages installed with install.packages() or locally without remotes
     return(remote("cran",
@@ -134,6 +134,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   switch(x$RemoteType,
     github = remote("github",
       host = x$RemoteHost,
+      package = x$RemotePackage,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,

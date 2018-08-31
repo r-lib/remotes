@@ -4,7 +4,8 @@ parse_deps <- function(string) {
   stopifnot(is.character(string), length(string) == 1)
   if (grepl("^\\s*$", string)) return()
 
-  pieces <- strsplit(string, ",")[[1]]
+  # Split by commas with surrounding whitespace removed
+  pieces <- strsplit(string, "[[:space:]]*,[[:space:]]*")[[1]]
 
   # Get the names
   names <- gsub("\\s*\\(.*?\\)", "", pieces)
@@ -15,8 +16,8 @@ parse_deps <- function(string) {
   have_version <- grepl("\\(.*\\)", versions_str)
   versions_str[!have_version] <- NA
 
-  compare  <- sub(".*\\((\\S+)\\s+.*\\)", "\\1", versions_str)
-  versions <- sub(".*\\(\\S+\\s+(.*)\\)", "\\1", versions_str)
+  compare  <- sub(".*\\(\\s*(\\S+)\\s+.*\\s*\\)", "\\1", versions_str)
+  versions <- sub(".*\\(\\s*\\S+\\s+(\\S*)\\s*\\)", "\\1", versions_str)
 
   # Check that non-NA comparison operators are valid
   compare_nna   <- compare[!is.na(compare)]

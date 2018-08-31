@@ -23,12 +23,12 @@ install_gitlab <- function(repo,
 
   remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host, ...)
 }
 
 gitlab_remote <- function(repo,
                        auth_token = gitlab_pat(), sha = NULL,
-                       host = "gitlab.com") {
+                       host = "gitlab.com", ...) {
 
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "master"
@@ -46,10 +46,10 @@ gitlab_remote <- function(repo,
 
 #' @export
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
-  dest <- tempfile(fileext = paste0(".zip"))
+  dest <- tempfile(fileext = paste0(".tar.gz"))
 
   src_root <- build_url(x$host, x$username, x$repo)
-  src <- paste0(src_root, "/repository/archive.zip?ref=", utils::URLencode(x$ref, reserved = TRUE))
+  src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
     message("Downloading GitLab repo ", x$username, "/", x$repo, "@", x$ref,
@@ -60,14 +60,13 @@ remote_download.gitlab_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL) {
-  # Determine sha as efficiently as possible
+remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+
   if (!is.null(bundle)) {
-    # Might be able to get from zip archive
-    sha <- git_extract_sha1(bundle)
-  } else {
-    # Otherwise can lookup with remote_ls
-    sha <- remote_sha(x)
+    # Might be able to get from archive
+    sha <- git_extract_sha1_tar(bundle)
+  } else if (is_na(sha)) {
+    sha <- NULL
   }
 
   list(
@@ -98,7 +97,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
 }
 
 #' @export
-remote_sha.gitlab_remote <- function(remote, url = "https://gitlab.com", ...) {
+remote_sha.gitlab_remote <- function(remote, ...) {
   gitlab_commit(username = remote$username, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token)
 }

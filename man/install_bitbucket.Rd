@@ -5,8 +5,8 @@
 \title{Install a package directly from bitbucket}
 \usage{
 install_bitbucket(repo, ref = "master", subdir = NULL,
-  auth_user = NULL, password = NULL,
-  host = "https://api.bitbucket.org/2.0", ...)
+  auth_user = bitbucket_user(), password = bitbucket_password(),
+  host = "api.bitbucket.org/2.0", ...)
 }
 \arguments{
 \item{repo}{Repository address in the format
@@ -22,9 +22,12 @@ Defaults to master.}
 
 \item{auth_user}{your account username if you're attempting to install
 a package hosted in a private repository (and your username is different
-to \code{username})}
+to \code{username}). Defaults to the \code{BITBUCKET_USER} environment
+variable.}
 
-\item{password}{your password}
+\item{password}{your password. Defaults to the \code{BITBUCKET_PASSWORD}
+environment variable. See details for further information on setting
+up a password.}
 
 \item{host}{GitHub API host to use. Override with your GitHub enterprise
 hostname, for example, \code{"github.hostname.com/api/v3"}.}
@@ -34,6 +37,16 @@ hostname, for example, \code{"github.hostname.com/api/v3"}.}
 \description{
 This function is vectorised so you can install multiple packages in
 a single command.
+}
+\details{
+To install from a private repo, or more generally, access the
+Bitbucket API with your own credentials, you will need to get an access
+token. You can create an access token following the instructions found in
+the
+\href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
+App Passwords documentation}. The App Password requires read-only access to
+your repositories and pull requests. Then store your password in the
+environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})
 }
 \examples{
 \dontrun{

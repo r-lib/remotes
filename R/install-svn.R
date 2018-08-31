@@ -27,11 +27,11 @@ install_svn <- function(url, subdir = NULL, args = character(0),
   remotes <- lapply(url, svn_remote, svn_subdir = subdir,
     revision = revision, args = args)
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes, args = args, ...)
 }
 
 svn_remote <- function(url, svn_subdir = NULL, revision = NULL,
-  args = character(0)) {
+  args = character(0), ...) {
   remote("svn",
     url = url,
     svn_subdir = svn_subdir,
@@ -76,14 +76,14 @@ remote_download.svn_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.svn_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.svn_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
 
   if (!is.null(bundle)) {
     in_dir(bundle, {
       revision <- svn_revision()
     })
   } else {
-    revision <- NA_character_
+    revision <- sha
   }
 
   list(

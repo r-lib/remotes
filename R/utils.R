@@ -322,8 +322,17 @@ base64_decode <- function(x) {
 }
 
 build_url <- function(host, ...) {
-  if (!grepl("^[[:alpha:]]+://", host)) {
-    host <- paste0("https://", host)
+  download_url(do.call(file.path, as.list(c(host, ...))))
+}
+
+download_url <- function(url) {
+  if (!grepl("^[[:alpha:]]+://", url)) {
+    scheme <- if (download_method_secure()) "https://" else "http://"
+    return(paste0(scheme, url))
   }
-  do.call(file.path, as.list(c(host, ...)))
+  url
+}
+
+is_na <- function(x) {
+  length(x) == 1 && is.na(x)
 }

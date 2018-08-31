@@ -15,6 +15,8 @@ bioc_version <- function() {
 }
 
 bioc_repos <- function(bioc_ver = bioc_version()) {
+  bioc_ver <- as.package_version(bioc_ver)
+
   a <- NULL
 
   p <- file.path(Sys.getenv("HOME"), ".R", "repositories")
@@ -28,9 +30,16 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
     a <- ("tools" %:::% ".read_repositories")(p)
   }
 
+  # BioCextra was removed in Bioc 3.6
+  if (bioc_ver < "3.6") {
+    repo_types <- c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+  } else {
+    repo_types <- c("BioCsoft", "BioCann", "BioCexp")
+  }
+
   repos <- intersect(
     rownames(a),
-    c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+    repo_types
   )
 
   default_bioc_version <- bioc_version()

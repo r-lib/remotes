@@ -33,7 +33,8 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
     ...
   )
 
-  invisible(TRUE)
+  pkg_name <- load_pkg_description(pkgdir)$package
+  invisible(pkg_name)
 }
 
 
@@ -104,6 +105,8 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 #' @param threads Number of threads to start, passed to
 #'   \code{\link[utils]{install.packages}} as \code{Ncpus}.
 #' @param ... additional arguments passed to \code{\link[utils]{install.packages}}.
+#' @param build If \code{TRUE} build the pacakge before installing.
+#' @param build_opts Options to pass to `R CMD build`.
 #' @export
 #' @examples
 #' \dontrun{install_deps(".")}
@@ -114,13 +117,16 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          type = getOption("pkgType"),
                          ...,
                          upgrade = TRUE,
-                         quiet = FALSE) {
+                         quiet = FALSE,
+                         build = TRUE,
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
 
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type
+    type = type,
+    ...
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
@@ -131,6 +137,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     ...,
     Ncpus = threads,
     quiet = quiet,
-    upgrade = upgrade
+    upgrade = upgrade,
+    build = build,
+    build_opts = build_opts
   )
 }

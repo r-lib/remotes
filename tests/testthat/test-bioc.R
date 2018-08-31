@@ -39,6 +39,7 @@ test_that("bioc_install_repos", {
     "Unsupported"
   )
 
+  # This particular version needs to do a connection test for https support
   skip_if_offline()
   skip_on_cran()
   expect_equal(
@@ -47,11 +48,25 @@ test_that("bioc_install_repos", {
   )
 })
 
+test_that("CRANextras exists in versions prior to Bioc 3.6", {
+  # BioCextra was removed in R 3.5
+  skip_if(getRversion() >= "3.5")
+
+  expect_equal(
+    names(bioc_repos("3.5")),
+    c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
+  )
+
+  expect_equal(
+    names(bioc_repos("3.6")),
+    c("BioCsoft", "BioCann", "BioCexp")
+  )
+})
+
 test_that("installing bioc packages", {
 
   skip_on_cran()
   skip_if_offline()
-  skip_if_over_rate_limit()
 
   Sys.unsetenv("R_TESTS")
 

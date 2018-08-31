@@ -23,18 +23,18 @@
 install_git <- function(url, subdir = NULL, branch = NULL,
                         git = c("auto", "git2r", "external"), ...) {
 
-  git_remote <- select_git_remote(match.arg(git))
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch)
+  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch, git = match.arg(git))
   install_remotes(remotes, ...)
 }
 
 
-select_git_remote <- function(git) {
+git_remote <- function(url, subdir = NULL, branch = NULL, git = c("auto", "git2r", "external"), ...) {
+  git <- match.arg(git)
   if (git == "auto") {
     git <- if (pkg_installed("git2r")) "git2r" else "external"
   }
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]]
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, branch)
 }
 
 
@@ -73,12 +73,12 @@ remote_download.git2r_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
   if (!is.null(bundle)) {
     r <- git2r::repository(bundle)
     sha <- git2r::commits(r)[[1]]$sha
   } else {
-    sha <- NA_character_
+    sha <- NULL
   }
 
   list(
@@ -119,19 +119,21 @@ remote_package_name.git2r_remote <- function(remote, ...) {
 #' @export
 remote_sha.git2r_remote <- function(remote, ...) {
   tryCatch({
-    res <- git2r::remote_ls(remote$url, credentials=remote$credentials, ...)
+    # set suppressWarnings in git2r 0.23.0+
+    res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
 
-    branch <- remote$branch %||% "HEAD"
+    # This needs to be master, not HEAD because no branch is called HEAD
+    branch <- remote$branch %||% "master"
 
     found <- grep(pattern = paste0("/", branch), x = names(res))
 
-    # If none found, assume it is a Sha1, so return the branch
+    # If none found, it is either a SHA, so return the pinned sha or NA
     if (length(found) == 0) {
-      return(remote$branch)
+      return(remote$branch %||% NA_character_)
     }
 
     unname(res[found[1]])
-  }, error = function(e) NA_character_)
+  }, error = function(e) { warning(e);  NA_character_})
 }
 
 #' @export
@@ -161,13 +163,17 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
 }
 
 #' @export
-remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL) {
+remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = NULL) {
+  if (is_na(sha)) {
+    sha <- NULL
+  }
+
   list(
     RemoteType = "xgit",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
     RemoteBranch = x$branch,
-    RemoteSha = remote_sha(x),
+    RemoteSha = sha,
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
 }

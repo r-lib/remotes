@@ -65,20 +65,20 @@ test_that("remote_download.gitlab_remote messages", {
   )
 })
 
-test_that("remote_metadata.gitlab_remote", {
+test_that("remote_sha.gitlab_remote", {
 
   skip_on_cran()
   skip_if_offline()
 
   expect_equal(
-    remote_metadata.gitlab_remote(
+    remote_sha(
       remote("gitlab",
         host = "https://gitlab.com",
         username = "jimhester",
         repo = "falsy",
         ref = "1.0"
       )
-    )$RemoteSha,
+    ),
     "0f39d9eb735bf16909831c0bb129063dda388375"
   )
 

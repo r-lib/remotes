@@ -4,7 +4,7 @@
 \alias{install_github}
 \title{Attempts to install a package directly from GitHub.}
 \usage{
-install_github(repo, username = NULL, ref = "master", subdir = NULL,
+install_github(repo, ref = "master", subdir = NULL,
   auth_token = github_pat(), host = "api.github.com", ...)
 }
 \arguments{
@@ -13,9 +13,6 @@ install_github(repo, username = NULL, ref = "master", subdir = NULL,
 specify \code{subdir} and/or \code{ref} using the respective parameters
 (see below); if both is specified, the values in \code{repo} take
 precedence.}
-
-\item{username}{User name. Deprecated: please include username in the
-\code{repo}}
 
 \item{ref}{Desired git reference. Could be a commit, tag, or branch
 name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.}
@@ -38,11 +35,8 @@ This function is vectorised on \code{repo} so you can install multiple
 packages in a single command.
 }
 \details{
-Attempting to install from a source repository that uses submodules
-raises a warning. Because the zipped sources provided by GitHub do not
-include submodules, this may lead to unexpected behaviour or compilation
-failure in source packages. In this case, cloning the repository manually
-may yield better results.
+If the repository uses submodules a command-line git client is required to
+clone the submodules.
 }
 \examples{
 \dontrun{
