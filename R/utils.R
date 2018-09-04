@@ -236,9 +236,8 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
   res
 }
 
-is_installed <- function(pkg, version = 0) {
-  installed_version <- tryCatch(utils::packageVersion(pkg), error = function(e) NA)
-  !is.na(installed_version) && installed_version >= version
+is_standalone <- function() {
+  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "true")))
 }
 
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html

@@ -40,7 +40,7 @@ bioc_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.b
 
   git <- match.arg(git)
   if (git == "auto") {
-    git <- if (pkg_installed("git2r")) "git2r" else "external"
+    git <- if (!is_standalone() && pkg_installed("git2r")) "git2r" else "external"
   }
 
   list(git2r = bioc_git2r_remote, external = bioc_xgit_remote)[[git]](repo, mirror)
