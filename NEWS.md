@@ -5,16 +5,20 @@
 
 # Development
 
+* Remotes can be forced to use only its internal code by setting the
+  environment variable `R_REMOTES_STANDALONE` = "true". This is useful when
+  installing optional dependencies of remotes on Windows, such as curl or git2r
+  (#147)
+
 * When installing set warnings to be errors, to catch cases where packages are
   only partially installed. This often happens on windows when the package dll
   is opened in another R process (#113).
   
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
-* Remotes can be forced to use only its internal code by setting the
-  environment variable `R_REMOTES_STANDALONE` = "true". This is useful when
-  installing optional dependencies of remotes on Windows, such as curl or git2r
-  (#147)
+
+* `install_git()` now supports passing credentials, when it is used with `git =
+  "git2r"` (#106)
 
 * `install_()` functions now return the name of the package(s) which were
   installed (#55).
