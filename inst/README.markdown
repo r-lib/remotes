@@ -168,10 +168,18 @@ installed temporarily.
 See `help("download.file")` for informations on these methods and for
 setting proxies if needed.
 
-### Notes
+### Standalone mode
 
-If a package in a git repository has submodules, then the installation will
-likely fail. Nevertheless, a warning is given in this case.
+remotes will use the `curl`, `git2r` and `pkgbuild` packages if they are
+installed to provide faster implementations for some aspects of the install
+process. However if you are using remotes to install or update these packages
+(or their reverse dependencies) using them during installation may fail
+(particularly on Windows).
+
+If you set the environment variable `R_REMOTES_STANDALONE=true` (e.g.
+in R `Sys.setenv(R_REMOTES_STANDALONE="true")`) you can force remotes to
+operate in standalone mode and use only its internal R implementations. This
+will allow successful installation of these packages.
 
 ## License
 

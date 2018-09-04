@@ -10,7 +10,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 }
 
 github_commit <- function(username, repo, ref = "master",
-  host = "api.github.com", pat = github_pat(), use_curl = is_installed("curl"), current_sha = NULL) {
+  host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl"), current_sha = NULL) {
 
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
 
@@ -63,7 +63,7 @@ github_pat <- function(quiet = TRUE) {
 }
 
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
-  use_curl = is_installed("curl"), pat = github_pat()) {
+  use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
 
   url <- build_url(host, "repos", username, repo, "contents", subdir, "DESCRIPTION")
   url <- paste0(url, "?ref=", utils::URLencode(ref))

@@ -65,6 +65,7 @@ test_that("download fallback to curl, https", {
 
   skip_on_cran()
   skip_if_offline()
+  skip_if(is_standalone())
 
   mockery::stub(download, "get_r_version", "3.0.0")
   download(tmp <- tempfile(), "https://httpbin.org/ip")
@@ -75,6 +76,7 @@ test_that("download with curl, basic auth", {
 
   skip_on_cran()
   skip_if_offline()
+  skip_if(is_standalone())
 
   mockery::stub(download, "get_r_version", "3.0.0")
   download(

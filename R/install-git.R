@@ -37,7 +37,7 @@ git_remote <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
 
   git <- match.arg(git)
   if (git == "auto") {
-    git <- if (pkg_installed("git2r")) "git2r" else "external"
+    git <- if (!is_standalone() && pkg_installed("git2r")) "git2r" else "external"
   }
 
   if (!is.null(credentials) && git != "git2r") {

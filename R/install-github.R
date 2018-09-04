@@ -182,7 +182,7 @@ github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL)
 
 #' @export
 remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
-  use_curl = is_installed("curl")) {
+  use_curl = !is_standalone() && pkg_installed("curl")) {
 
   # If the package name was explicitly specified, use that
   if (!is.null(remote$package)) {
@@ -214,7 +214,7 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
 }
 
 #' @export
-remote_sha.github_remote <- function(remote, ..., use_curl = is_installed("curl")) {
+remote_sha.github_remote <- function(remote, ..., use_curl = !is_standalone() && pkg_installed("curl")) {
   github_commit(username = remote$username, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token, use_curl = use_curl)
 }

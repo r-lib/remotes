@@ -97,7 +97,7 @@ different_sha <- function(remote_sha, local_sha) {
 }
 
 local_sha <- function(name) {
-  if (!is_installed(name)) {
+  if (!pkg_installed(name)) {
     return(NA_character_)
   }
   package2remote(name)$sha %||% NA_character_
