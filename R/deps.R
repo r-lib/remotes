@@ -287,8 +287,8 @@ install_packages <- function(packages, repos = getOption("repos"),
     unique(
       names(
         c(
-          formals(install.packages),
-          formals(download.file)
+          formals(utils::install.packages),
+          formals(utils::download.file)
         )
       )
     )
