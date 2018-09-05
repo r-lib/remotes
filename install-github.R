@@ -955,7 +955,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
 }
 
 github_commit <- function(username, repo, ref = "master",
-  host = "api.github.com", pat = github_pat(), use_curl = is_installed("curl"), current_sha = NULL) {
+  host = "api.github.com", pat = github_pat(), use_curl = pkg_installed("curl"), current_sha = NULL) {
 
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
 
@@ -1008,7 +1008,7 @@ github_pat <- function(quiet = TRUE) {
 }
 
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
-  use_curl = is_installed("curl"), pat = github_pat()) {
+  use_curl = pkg_installed("curl"), pat = github_pat()) {
 
   url <- build_url(host, "repos", username, repo, "contents", paste0(subdir, "DESCRIPTION"))
   url <- paste0(url, "?ref=", utils::URLencode(ref))
@@ -1914,7 +1914,7 @@ github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL)
 
 #' @export
 remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
-  use_curl = is_installed("curl")) {
+  use_curl = pkg_installed("curl")) {
 
   # If the package name was explicitly specified, use that
   if (!is.null(remote$package)) {
@@ -1945,7 +1945,7 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
 }
 
 #' @export
-remote_sha.github_remote <- function(remote, ..., use_curl = is_installed("curl")) {
+remote_sha.github_remote <- function(remote, ..., use_curl = pkg_installed("curl")) {
   github_commit(username = remote$username, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token, use_curl = use_curl)
 }
@@ -2267,7 +2267,7 @@ different_sha <- function(remote_sha, local_sha) {
 }
 
 local_sha <- function(name) {
-  if (!is_installed(name)) {
+  if (!pkg_installed(name)) {
     return(NA_character_)
   }
   package2remote(name)$sha %||% NA_character_
@@ -2759,7 +2759,7 @@ safe_install_packages <- function(...) {
   )
 }
 
-safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = is_installed("pkgbuild")) {
+safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = pkg_installed("pkgbuild")) {
   if (use_pkgbuild) {
     vignettes <- TRUE
     manual <- FALSE
