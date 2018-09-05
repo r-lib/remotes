@@ -109,3 +109,27 @@ download_method_secure <- function() {
     FALSE
   }
 }
+
+download_packages <- function (pkgs, destdir, repos = getOption("repos"),
+    contriburl = utils::contrib.url(repos, type), type = getOption("pkgType"), versions, ...) {
+
+  pool <- curl::new_pool()
+  on.exit(lapply(curl::multi_list(pool), curl::multi_cancel), add = TRUE)
+
+  save_package <- function(res) {
+    pkg <- basename(res$url)
+    if (res$status_code > 300) {
+      stop("Request failed: ", res$url, ": ", rawToChar(res$content), call. = FALSE)
+    }
+    cat("downloaded ", pkg, ":", res$status_code, "\n", sep = "")
+    writeBin(res$content, file.path(destdir, pkg))
+  }
+
+  pkg_url <- file.path(contriburl, paste0(pkgs, "_", versions, ".tgz"))
+  for (p in pkg_url) {
+    curl::curl_fetch_multi(p, save_package, pool = pool)
+  }
+  curl::multi_run(pool = pool)
+
+  matrix(ncol = 2, c(pkgs, file.path(destdir, basename(pkg_url))))
+}

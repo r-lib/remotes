@@ -269,8 +269,11 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   }
 
   if (any(object$is_cran & behind)) {
-    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), ...)
+    to_install <- object$is_cran & behind
+    dest <- tempfile()
+    dir.create(dest)
+    res <- download_packages(object$package[to_install], dest, repos = attr(object, "repos"), type = "binary", versions = object$available[to_install])
+    install_packages(res[, 2], repos = NULL, type = "binary")
   }
 
   install_remotes(object$remote[!object$is_cran & behind], ..., quiet = quiet, upgrade = upgrade)
