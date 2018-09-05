@@ -159,7 +159,7 @@ untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
     tryCatch(
       utils::untar(tarfile, extras = "--force-local", ...),
-      error = function(e) utils::untar(tarfile, ...)
+      warning = function(e) utils::untar(tarfile, ...)
     )
 
   } else {
