@@ -8,8 +8,8 @@ test_that("git_extract_sha1_tar", {
   skip_if_over_rate_limit()
 
   sha <- "fbae60ced0afee0e7c0f8dc3b5b1bb48d303f3dd"
-  url <- paste0(
-    "https://api.github.com/repos/hadley/devtools/tarball/",
+  url <- build_url(
+    "api.github.com/repos/hadley/devtools/tarball",
     sha
   )
 

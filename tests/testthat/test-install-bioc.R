@@ -55,6 +55,7 @@ test_that("install_bioc with xgit", {
 
   mirror <- getOption("BioC_git", "https://git.bioconductor.org/packages")
 
+
   # This package has no dependencies or compiled code and is old
   install_bioc("MeasurementError.cor", mirror = mirror, git = "external", lib = lib, quiet = TRUE)
 

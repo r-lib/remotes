@@ -51,6 +51,11 @@ test_that("download basic auth", {
     "base_download",
     function(url, ...) { print(url); 0 })
 
+  mockery::stub(
+    download,
+    "curl_download",
+    function(url, ...) { print(url); 0 })
+
   expect_output(
     download(
       tempfile(),

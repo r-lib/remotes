@@ -95,7 +95,7 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
       })
     })
 
-    file.path(dest_path, gsub("^[*] building .(.*).$", "\\1", output[length(output)]))
+    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output[length(output)]))
   }
 }
 
