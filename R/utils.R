@@ -335,3 +335,12 @@ download_url <- function(url) {
 is_na <- function(x) {
   length(x) == 1 && is.na(x)
 }
+
+dir.exists <- function(paths) {
+  if (getRversion() < "3.2") {
+    x <- base::file.info(paths)$isdir
+    !is.na(x) & x
+  } else {
+    ("base" %::% "dir.exists")(paths)
+  }
+}

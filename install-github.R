@@ -104,6 +104,8 @@ bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version())
   } else if (r_ver >= "3.2") {
     repos <- bioc_repos("3.2")
 
+  } else if (r_ver > "3.1.1") {
+    repos <- bioc_repos("3.0")
   } else if (r_ver == "3.1.1") {
     ## R-3.1.1's etc/repositories file at the time of the release
     ## of Bioc 3.0 pointed to the 2.14 repository, but we want
@@ -843,7 +845,7 @@ download_method <- function() {
 
 curl_download <- function(url, path, quiet) {
 
-  if (pkg_installed("curl")) {
+  if (!pkg_installed("curl")) {
     stop("The 'curl' package is required if R is older than 3.2.0")
   }
 
@@ -1311,7 +1313,7 @@ bioconductor_branch <- function(release, sha) {
 
 bioconductor_release <- function() {
   tmp <- tempfile()
-  utils::download.file(download_url("bioconductor.org/config.yaml"), tmp, quiet = TRUE)
+  download(tmp, download_url("bioconductor.org/config.yaml"), quiet = TRUE)
 
   gsub("release_version:[[:space:]]+\"([[:digit:].]+)\"", "\\1",
        grep("release_version:", readLines(tmp), value = TRUE))
@@ -2831,7 +2833,7 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
       })
     })
 
-    file.path(dest_path, gsub("^[*] building .(.*).$", "\\1", output[length(output)]))
+    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output[length(output)]))
   }
 }
 
@@ -3587,7 +3589,7 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
 }
 
 is_standalone <- function() {
-  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "true")))
+  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
 }
 
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
@@ -3684,6 +3686,15 @@ download_url <- function(url) {
 
 is_na <- function(x) {
   length(x) == 1 && is.na(x)
+}
+
+dir.exists <- function(paths) {
+  if (getRversion() < "3.2") {
+    x <- base::file.info(paths)$isdir
+    !is.na(x) & x
+  } else {
+    ("base" %::% "dir.exists")(paths)
+  }
 }
 
 

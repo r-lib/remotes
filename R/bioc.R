@@ -99,6 +99,8 @@ bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version())
   } else if (r_ver >= "3.2") {
     repos <- bioc_repos("3.2")
 
+  } else if (r_ver > "3.1.1") {
+    repos <- bioc_repos("3.0")
   } else if (r_ver == "3.1.1") {
     ## R-3.1.1's etc/repositories file at the time of the release
     ## of Bioc 3.0 pointed to the 2.14 repository, but we want

@@ -246,7 +246,7 @@ bioconductor_branch <- function(release, sha) {
 
 bioconductor_release <- function() {
   tmp <- tempfile()
-  utils::download.file(download_url("bioconductor.org/config.yaml"), tmp, quiet = TRUE)
+  download(tmp, download_url("bioconductor.org/config.yaml"), quiet = TRUE)
 
   gsub("release_version:[[:space:]]+\"([[:digit:].]+)\"", "\\1",
        grep("release_version:", readLines(tmp), value = TRUE))

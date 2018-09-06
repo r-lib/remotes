@@ -15,20 +15,20 @@ test_that("", {
   on.exit(.libPaths(libpath), add = TRUE)
   .libPaths(lib)
 
-  install_bitbucket("csardigabor/showimage", lib = lib, quiet = TRUE)
+  install_bitbucket("jimhester/withr", lib = lib, quiet = TRUE)
 
-  expect_silent(packageDescription("showimage", lib.loc = lib))
+  expect_silent(packageDescription("withr", lib.loc = lib))
   expect_equal(
-    packageDescription("showimage", lib.loc = lib)$RemoteRepo,
-    "showimage")
+    packageDescription("withr", lib.loc = lib)$RemoteRepo,
+    "withr")
 
-  remote <- package2remote("showimage", lib = lib)
+  remote <- package2remote("withr", lib = lib)
   expect_s3_class(remote, "remote")
   expect_s3_class(remote, "bitbucket_remote")
   expect_equal(format(remote), "Bitbucket")
   expect_equal(remote$host, "api.bitbucket.org/2.0")
-  expect_equal(remote$repo, "showimage")
-  expect_equal(remote$username, "csardigabor")
+  expect_equal(remote$repo, "withr")
+  expect_equal(remote$username, "jimhester")
   expect_equal(remote$ref, "master")
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
