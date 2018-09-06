@@ -237,7 +237,7 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
 }
 
 is_standalone <- function() {
-  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "true")))
+  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
 }
 
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
