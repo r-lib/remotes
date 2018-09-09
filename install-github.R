@@ -2793,11 +2793,15 @@ safe_install_packages <- function(...) {
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
-    with_options(list(warn = 2),
-      with_rprofile_user("options(warn = 2)",
-        i.p(...)
+    if (Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS") != "true") {
+      with_options(list(warn = 2),
+        with_rprofile_user("options(warn = 2)",
+          i.p(...)
+        )
       )
-    )
+    } else {
+      i.p(...)
+    }
   )
 }
 
