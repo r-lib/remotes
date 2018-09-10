@@ -11,9 +11,6 @@ test_that("install_svn", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   url <- "https://github.com/mangothecat/simplegraph/trunk"
   install_svn(url, lib = lib, quiet = TRUE)
@@ -43,9 +40,6 @@ test_that("install_svn branch", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   url <- "https://github.com/mangothecat/simplegraph"
   install_svn(
@@ -80,9 +74,6 @@ test_that("install_svn subdir", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   mockery::stub(
     install_svn,

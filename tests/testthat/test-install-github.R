@@ -62,9 +62,6 @@ test_that("github_release", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_github(
     "gaborcsardi/falsy",
@@ -90,9 +87,6 @@ test_that("install_github", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_github("cran/falsy", lib = lib, quiet = TRUE)
 
@@ -186,9 +180,6 @@ test_that("github_pull", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_github(
     "MangoTheCat/pkgsnap",

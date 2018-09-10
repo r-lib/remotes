@@ -107,10 +107,9 @@ test_that("Can install a repo with a submodule", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
-  install_local("submodule", quiet = TRUE)
-  expect_equal(submodule::foo, 1)
+  install_local("submodule", lib = lib, quiet = TRUE)
+  withr::with_libpaths(lib,
+    expect_equal(submodule::foo, 1)
+  )
 })

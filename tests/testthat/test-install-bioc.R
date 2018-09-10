@@ -21,9 +21,6 @@ test_that("install_bioc with git2r", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(c(lib, libpath))
 
   mirror <- getOption("BioC_git", "https://git.bioconductor.org/packages")
 
@@ -49,9 +46,6 @@ test_that("install_bioc with xgit", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   mirror <- getOption("BioC_git", "https://git.bioconductor.org/packages")
 

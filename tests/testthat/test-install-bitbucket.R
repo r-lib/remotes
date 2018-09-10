@@ -11,9 +11,6 @@ test_that("", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_bitbucket("jimhester/withr", lib = lib, quiet = TRUE)
 
@@ -77,9 +74,6 @@ test_that("bitbucket passwords", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_bitbucket("jimhester/falsy", lib = lib, quiet = TRUE)
 
