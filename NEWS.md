@@ -3,6 +3,9 @@
 * `install_github()`'s previously deprecated `username` argument has been
   removed. (#142)
 
+* `install_deps()`'s `threads` argument has been removed, use the `Ncpus`
+  argument instead (#153, #154)
+
 # Development
 
 * Remotes can be forced to use only its internal code by setting the

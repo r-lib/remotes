@@ -5,9 +5,9 @@
 \title{Install package dependencies if needed.}
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
-  threads = getOption("Ncpus", 1), repos = getOption("repos"),
-  type = getOption("pkgType"), ..., upgrade = TRUE, quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
+  repos = getOption("repos"), type = getOption("pkgType"), ...,
+  upgrade = TRUE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"))
 }
 \arguments{
@@ -21,9 +21,6 @@ install_deps(pkgdir = ".", dependencies = NA,
   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
   just check this package, not its dependencies).}
-
-\item{threads}{Number of threads to start, passed to
-\code{\link[utils]{install.packages}} as \code{Ncpus}.}
 
 \item{repos}{A character vector giving repositories to use.}
 
