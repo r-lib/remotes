@@ -12,9 +12,6 @@ test_that("install_git with git2r", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(c(lib, libpath))
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
   install_git(url, lib = lib, git = "git2r", quiet = TRUE)
@@ -47,9 +44,6 @@ test_that("install_git with git2r and branch", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(c(lib, libpath))
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
   install_git(url, lib = lib, branch = "travis", git = "git2r", quiet = TRUE)
@@ -82,9 +76,6 @@ test_that("install_git with command line git", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   url <- "https://github.com/cran/falsy.git"
   install_git(url, git = "external", lib = lib, quiet = TRUE)

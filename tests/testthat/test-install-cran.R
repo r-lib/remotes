@@ -14,9 +14,6 @@ test_that("", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE, quiet = TRUE)
 

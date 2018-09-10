@@ -24,16 +24,19 @@ test_that("package2remotes looks for the DESCRIPTION in .libPaths", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
-   expect_equal(package2remote("noremotes")$sha, NA_character_)
-   withr::with_temp_libpaths({
-     expect_equal(package2remote("noremotes")$sha, NA_character_)
-     # This is not a real package, so we can't actually build it
-     install("noremotes", quiet = TRUE, build = FALSE)
-     expect_equal(package2remote("noremotes")$sha, "1.0.0")
+  lib <- tempfile()
+  dir.create(lib)
+  expect_equal(package2remote("noremotes", lib = lib)$sha, NA_character_)
 
-     # Load the namespace, as packageDescription looks in loaded namespaces
-     # first.
-     loadNamespace("noremotes")
-    })
+  # This is not a real package, so we can't actually build it
+  install("noremotes", lib = lib, quiet = TRUE, build = FALSE)
+  expect_equal(package2remote("noremotes", lib = lib)$sha, "1.0.0")
+
+  # Load the namespace, as packageDescription looks in loaded namespaces
+  # first.
+  withr::with_libpaths(lib,
+    loadNamespace("noremotes")
+  )
+
   expect_equal(package2remote("noremotes")$sha, NA_character_)
 })

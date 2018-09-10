@@ -11,9 +11,6 @@ test_that("install_url", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   url <- "https://github.com/mangothecat/simplegraph/archive/master.zip"
   install_url(url, lib = lib, quiet = TRUE)

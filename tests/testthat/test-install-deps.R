@@ -12,9 +12,6 @@ test_that("installing packages with dependencies", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   install_github("cran/desc", lib = lib, quiet = TRUE)
 

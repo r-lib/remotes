@@ -11,9 +11,6 @@ test_that("install_version", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   repos <- getOption("repos")
   if (length(repos) == 0) repos <- character()
@@ -52,9 +49,6 @@ test_that("install_version for current version", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   repos <- getOption("repos")
   if (length(repos) == 0) repos <- character()

@@ -11,9 +11,6 @@ test_that("install_local", {
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
-  libpath <- .libPaths()
-  on.exit(.libPaths(libpath), add = TRUE)
-  .libPaths(lib)
 
   dir <- tempfile()
   on.exit(unlink(dir), add = TRUE)
