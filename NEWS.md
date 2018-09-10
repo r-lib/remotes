@@ -8,6 +8,8 @@
 
 # Development
 
+* `standardise_dep()` exported, for use in devtools.
+
 * Remotes can be forced to use only its internal code by setting the
   environment variable `R_REMOTES_STANDALONE` = "true". This is useful when
   installing optional dependencies of remotes on Windows, such as curl or git2r

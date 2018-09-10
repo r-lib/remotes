@@ -338,6 +338,20 @@ find_deps <- function(packages, available = available_packages(),
   unique(c(if (include_pkgs) packages, top_flat, rec_flat))
 }
 
+#' Standardise dependencies using the same logical as [install.packages]
+#'
+#' @param x The dependencies to standardise.
+#'   A character vector (selecting from "Depends", "Imports",
+#'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+#'
+#'   `TRUE` is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. `FALSE` is shorthand for no dependencies.
+#'
+#' @seealso <http://r-pkgs.had.co.nz/description.html#dependencies> for
+#' additional information on what each dependency type means.
+#' @keywords internal
+#' @export
 standardise_dep <- function(x) {
   if (identical(x, NA)) {
     c("Depends", "Imports", "LinkingTo")
