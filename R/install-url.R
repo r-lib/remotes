@@ -7,7 +7,7 @@
 #' @param url location of package on internet. The url should point to a
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @export
 #'
 #' @examples

@@ -18,7 +18,7 @@ parse_github_url(repo)
 }
 \value{
 List with members: \code{username}, \code{repo}, \code{subdir}
-  \code{ref}, \code{pull}, \code{release}, some which will be empty.
+\code{ref}, \code{pull}, \code{release}, some which will be empty.
 }
 \description{
 A remote repo can be specified in two ways:

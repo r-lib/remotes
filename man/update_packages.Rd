@@ -11,20 +11,20 @@ update_packages(packages, dependencies = NA,
 \item{packages}{Character vector of packages to update.}
 
 \item{dependencies}{Which dependencies do you want to check?
-  Can be a character vector (selecting from "Depends", "Imports",
-   "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+Can be a character vector (selecting from "Depends", "Imports",
+"LinkingTo", "Suggests", or "Enhances"), or a logical vector.
 
-  \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
-  "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-  and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
-  just check this package, not its dependencies).}
+\code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+"Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).}
 
 \item{repos}{A character vector giving repositories to use.}
 
 \item{type}{Type of package to \code{update}.}
 }
 \description{
-Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
+Works similarly to \code{\link[utils:install.packages]{utils::install.packages()}} but doesn't install packages
 that are already installed, and also upgrades out dated dependencies.
 }
 \examples{
@@ -34,6 +34,6 @@ update_packages(c("plyr", "ggplot2"))
 }
 }
 \seealso{
-\code{\link{package_deps}} to see which packages are out of date/
-  missing.
+\code{\link[=package_deps]{package_deps()}} to see which packages are out of date/
+missing.
 }

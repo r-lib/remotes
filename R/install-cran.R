@@ -1,7 +1,7 @@
 
 #' Attempts to install a package from CRAN.
 #'
-#' This function is vectorised on \code{pkgs} so you can install multiple
+#' This function is vectorised on `pkgs` so you can install multiple
 #' packages in a single command.
 #'
 #' @param pkgs Character vector of packages to install.

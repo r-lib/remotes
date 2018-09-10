@@ -2,15 +2,15 @@
 #'
 #' A remote repo can be specified in two ways:
 #' \describe{
-#' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
+#' \item{as a URL}{`parse_github_url()` handles HTTPS and SSH remote URLs
 #' and various GitHub browser URLs}
-#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
-#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+#' \item{via a shorthand}{`parse_repo_spec()` handles this concise form:
+#' `[username/]repo[/subdir][#pull|@ref|@*release]`}
 #' }
 #'
 #' @param repo Character scalar, the repo specification.
-#' @return List with members: \code{username}, \code{repo}, \code{subdir}
-#'   \code{ref}, \code{pull}, \code{release}, some which will be empty.
+#' @return List with members: `username`, `repo`, `subdir`
+#'   `ref`, `pull`, `release`, some which will be empty.
 #'
 #' @name parse-git-repo
 #' @examples

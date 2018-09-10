@@ -12,7 +12,7 @@ zip file, a tar file or a bzipped/gzipped tar file.}
 
 \item{subdir}{subdirectory within url bundle that contains the R package.}
 
-\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 This function is vectorised so you can install multiple packages in

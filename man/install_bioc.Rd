@@ -21,7 +21,7 @@ numbers (e.g. \sQuote{3.3}).}
 git client via system. Default is \code{git2r} if it is installed,
 otherwise an external git installation.}
 
-\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 This function requires \code{git} to be installed on your system in order to

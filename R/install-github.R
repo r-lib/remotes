@@ -1,29 +1,29 @@
 #' Attempts to install a package directly from GitHub.
 #'
-#' This function is vectorised on \code{repo} so you can install multiple
+#' This function is vectorised on `repo` so you can install multiple
 #' packages in a single command.
 #'
 #' @param repo Repository address in the format
-#'   \code{username/repo[/subdir][@@ref|#pull]}. Alternatively, you can
-#'   specify \code{subdir} and/or \code{ref} using the respective parameters
-#'   (see below); if both is specified, the values in \code{repo} take
+#'   `username/repo[/subdir][@@ref|#pull]`. Alternatively, you can
+#'   specify `subdir` and/or `ref` using the respective parameters
+#'   (see below); if both is specified, the values in `repo` take
 #'   precedence.
 #' @param ref Desired git reference. Could be a commit, tag, or branch
-#'   name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.
+#'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in \url{https://github.com/settings/applications} and
+#'   access token (PAT) in <https://github.com/settings/applications> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
-#'   the \code{GITHUB_PAT} environment variable.
+#'   the `GITHUB_PAT` environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
-#'   hostname, for example, \code{"github.hostname.com/api/v3"}.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#'   hostname, for example, `"github.hostname.com/api/v3"`.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @details
 #' If the repository uses submodules a command-line git client is required to
 #' clone the submodules.
 #' @export
-#' @seealso \code{\link{github_pull}}
+#' @seealso [github_pull()]
 #' @examples
 #' \dontrun{
 #' install_github("klutometis/roxygen")
@@ -112,11 +112,11 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL, sha =
 
 #' GitHub references
 #'
-#' Use as \code{ref} parameter to \code{\link{install_github}}.
+#' Use as `ref` parameter to [install_github()].
 #' Allows installing a specific pull request or the latest release.
 #'
 #' @param pull The pull request to install
-#' @seealso \code{\link{install_github}}
+#' @seealso [install_github()]
 #' @rdname github_refs
 #' @export
 github_pull <- function(pull) structure(pull, class = "github_pull")

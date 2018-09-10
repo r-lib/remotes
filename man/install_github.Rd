@@ -15,7 +15,7 @@ specify \code{subdir} and/or \code{ref} using the respective parameters
 precedence.}
 
 \item{ref}{Desired git reference. Could be a commit, tag, or branch
-name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.}
+name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{"master"}.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 
@@ -28,7 +28,7 @@ the \code{GITHUB_PAT} environment variable.}
 \item{host}{GitHub API host to use. Override with your GitHub enterprise
 hostname, for example, \code{"github.hostname.com/api/v3"}.}
 
-\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 This function is vectorised on \code{repo} so you can install multiple
@@ -55,5 +55,5 @@ install_github("hadley/private", auth_token = "abc")
 }
 }
 \seealso{
-\code{\link{github_pull}}
+\code{\link[=github_pull]{github_pull()}}
 }

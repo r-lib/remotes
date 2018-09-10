@@ -2,7 +2,7 @@
 #' Install a package from a git repository
 #'
 #' It is vectorised so you can install multiple packages with
-#' a single command. You do not need to have the \code{git2r} package,
+#' a single command. You do not need to have the `git2r` package,
 #' or an external git client installed.
 #'
 #' @param url Location of package. The url should point to a public or
@@ -11,11 +11,11 @@
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
 #' @param credentials A git2r credentials object passed through to clone.
-#'   Supplying this argument implies using \code{git2r} with \code{git}.
-#' @param git Whether to use the \code{git2r} package, or an external
-#'   git client via system. Default is \code{git2r} if it is installed,
+#'   Supplying this argument implies using `git2r` with `git`.
+#' @param git Whether to use the `git2r` package, or an external
+#'   git client via system. Default is `git2r` if it is installed,
 #'   otherwise an external git installation.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @export
 #' @examples
 #' \dontrun{

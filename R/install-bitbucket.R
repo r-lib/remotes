@@ -7,15 +7,15 @@
 #' @inheritParams install_github
 #' @param auth_user your account username if you're attempting to install
 #'   a package hosted in a private repository (and your username is different
-#'   to \code{username}). Defaults to the \code{BITBUCKET_USER} environment
+#'   to `username`). Defaults to the `BITBUCKET_USER` environment
 #'   variable.
-#' @param password your password. Defaults to the \code{BITBUCKET_PASSWORD}
+#' @param password your password. Defaults to the `BITBUCKET_PASSWORD`
 #'   environment variable. See details for further information on setting
 #'   up a password.
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
-#'   \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
+#'   <https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html>
 #'
 #' @details To install from a private repo, or more generally, access the
 #' Bitbucket API with your own credentials, you will need to get an access
@@ -24,7 +24,7 @@
 #' \href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
 #' App Passwords documentation}. The App Password requires read-only access to
 #' your repositories and pull requests. Then store your password in the
-#' environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})
+#' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
 #' @export
 #' @examples
 #' \dontrun{
