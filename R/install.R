@@ -102,8 +102,8 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 #' Install package dependencies if needed.
 #'
 #' @inheritParams package_deps
-#' @param ... additional arguments passed to \code{\link[utils]{install.packages}}.
-#' @param build If \code{TRUE} build the pacakge before installing.
+#' @param ... additional arguments passed to [utils::install.packages()].
+#' @param build If `TRUE` build the pacakge before installing.
 #' @param build_opts Options to pass to `R CMD build`.
 #' @export
 #' @examples

@@ -14,19 +14,19 @@ install_deps(pkgdir = ".", dependencies = NA,
 \item{pkgdir}{path to a package directory, or to a package tarball.}
 
 \item{dependencies}{Which dependencies do you want to check?
-  Can be a character vector (selecting from "Depends", "Imports",
-   "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+Can be a character vector (selecting from "Depends", "Imports",
+"LinkingTo", "Suggests", or "Enhances"), or a logical vector.
 
-  \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
-  "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-  and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
-  just check this package, not its dependencies).}
+\code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+"Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).}
 
 \item{repos}{A character vector giving repositories to use.}
 
 \item{type}{Type of package to \code{update}.}
 
-\item{...}{additional arguments passed to \code{\link[utils]{install.packages}}.}
+\item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 
 \item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
 
@@ -34,7 +34,7 @@ install_deps(pkgdir = ".", dependencies = NA,
 
 \item{build}{If \code{TRUE} build the pacakge before installing.}
 
-\item{build_opts}{Options to pass to `R CMD build`.}
+\item{build_opts}{Options to pass to \code{R CMD build}.}
 }
 \description{
 Install package dependencies if needed.

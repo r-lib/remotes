@@ -20,12 +20,12 @@ the \code{GITHUB_PAT} environment variable.}
 \item{host}{GitLab API host to use. Override with your GitLab enterprise
 hostname, for example, \code{"gitlab.hostname.com"}.}
 
-\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 This function is vectorised on \code{repo} so you can install multiple
 packages in a single command. Like other remotes the repository will skip
-installation if `force == FALSE` (the default) and the remote state has
+installation if \code{force == FALSE} (the default) and the remote state has
 not changed since the previous installation.
 }
 \examples{

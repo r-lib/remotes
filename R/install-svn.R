@@ -13,7 +13,7 @@
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @export
 #'
 #' @examples

@@ -1,15 +1,15 @@
 #' Install a package from GitLab
 #'
-#' This function is vectorised on \code{repo} so you can install multiple
+#' This function is vectorised on `repo` so you can install multiple
 #' packages in a single command. Like other remotes the repository will skip
 #' installation if `force == FALSE` (the default) and the remote state has
 #' not changed since the previous installation.
 #'
 #' @inheritParams install_github
 #' @param repo Repository address in the format
-#'   \code{username/repo[/subdir][@@ref]}.
+#'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
-#'   hostname, for example, \code{"gitlab.hostname.com"}.
+#'   hostname, for example, `"gitlab.hostname.com"`.
 #' @export
 #' @family package installation
 #' @examples
@@ -121,7 +121,7 @@ gitlab_commit <- function(username, repo, ref = "master",
 #' Retrieve GitLab personal access token.
 #'
 #' A GitLab personal access token
-#' Looks in env var \code{GITLAB_PAT}
+#' Looks in env var `GITLAB_PAT`
 #'
 #' @keywords internal
 #' @export

@@ -48,7 +48,7 @@ github_commit <- function(username, repo, ref = "master",
 #' Retrieve Github personal access token.
 #'
 #' A github personal access token
-#' Looks in env var \code{GITHUB_PAT}
+#' Looks in env var `GITHUB_PAT`
 #'
 #' @keywords internal
 #' @noRd

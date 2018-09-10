@@ -1,6 +1,6 @@
 #' Install a package from a Bioconductor repository
 #'
-#' This function requires \code{git} to be installed on your system in order to
+#' This function requires `git` to be installed on your system in order to
 #' be used.
 #'
 #' It is vectorised so you can install multiple packages with
@@ -9,12 +9,12 @@
 #' '
 #' @inheritParams install_git
 #' @param repo Repository address in the format
-#'   \code{[username:password@@][release/]repo[#commit]}. Valid values for
+#'   `[username:password@@][release/]repo[#commit]`. Valid values for
 #'   the release are \sQuote{devel},
 #'   \sQuote{release} (the default if none specified), or numeric release
 #'   numbers (e.g. \sQuote{3.3}).
 #' @param mirror The bioconductor git mirror to use
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @export
 #' @family package installation
 #' @examples

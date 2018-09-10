@@ -2,9 +2,9 @@
 #' Find all dependencies of a CRAN or dev package.
 #'
 #' Find all the dependencies of a package and determine whether they are ahead
-#' or behind CRAN. A \code{print()} method identifies mismatches (if any)
+#' or behind CRAN. A `print()` method identifies mismatches (if any)
 #' between local and CRAN versions of each dependent package; an
-#' \code{update()} method installs outdated or missing packages from CRAN.
+#' `update()` method installs outdated or missing packages from CRAN.
 #'
 #' @param packages A character vector of package names.
 #' @param pkgdir path to a package directory, or to a package tarball.
@@ -12,27 +12,27 @@
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
 #'
-#'   \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
-#'   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-#'   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+#'   `TRUE` is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
-#' @param quiet If \code{TRUE}, suppress output.
-#' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
+#' @param quiet If `TRUE`, suppress output.
+#' @param upgrade If `TRUE`, also upgrade any of out date dependencies.
 #' @param repos A character vector giving repositories to use.
-#' @param type Type of package to \code{update}.
+#' @param type Type of package to `update`.
 #'
-#' @param object A \code{package_deps} object.
-#' @param ... Additional arguments passed to \code{install_packages}.
+#' @param object A `package_deps` object.
+#' @param ... Additional arguments passed to `install_packages`.
 #'
 #' @return
 #'
-#' A \code{data.frame} with columns:
+#' A `data.frame` with columns:
 #'
 #' \tabular{ll}{
-#' \code{package} \tab The dependent package's name,\cr
-#' \code{installed} \tab The currently installed version,\cr
-#' \code{available} \tab The version available on CRAN,\cr
-#' \code{diff} \tab An integer denoting whether the locally installed version
+#' `package` \tab The dependent package's name,\cr
+#' `installed` \tab The currently installed version,\cr
+#' `available` \tab The version available on CRAN,\cr
+#' `diff` \tab An integer denoting whether the locally installed version
 #'   of the package is newer (1), the same (0) or older (-1) than the version
 #'   currently available on CRAN.\cr
 #' }
@@ -87,7 +87,7 @@ package_deps <- function(packages, dependencies = NA,
   res
 }
 
-#' \code{local_package_deps} extracts dependencies from a
+#' `local_package_deps` extracts dependencies from a
 #' local DESCRIPTION file.
 #'
 #' @export
@@ -103,7 +103,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
   unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
 }
 
-#' \code{dev_package_deps} lists the status of the dependencies
+#' `dev_package_deps` lists the status of the dependencies
 #' of a local package.
 #'
 #' @export
@@ -354,12 +354,12 @@ standardise_dep <- function(x) {
 
 #' Update packages that are missing or out-of-date.
 #'
-#' Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
+#' Works similarly to [utils::install.packages()] but doesn't install packages
 #' that are already installed, and also upgrades out dated dependencies.
 #'
 #' @param packages Character vector of packages to update.
 #' @inheritParams package_deps
-#' @seealso \code{\link{package_deps}} to see which packages are out of date/
+#' @seealso [package_deps()] to see which packages are out of date/
 #'   missing.
 #' @export
 #' @examples

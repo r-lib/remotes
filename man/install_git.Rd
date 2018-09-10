@@ -23,7 +23,7 @@ Supplying this argument implies using \code{git2r} with \code{git}.}
 git client via system. Default is \code{git2r} if it is installed,
 otherwise an external git installation.}
 
-\item{...}{Other arguments passed on to \code{\link[utils]{install.packages}}.}
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 It is vectorised so you can install multiple packages with
