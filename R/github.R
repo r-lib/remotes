@@ -1,12 +1,29 @@
 
-github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
+github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl")) {
 
   url <- build_url(host, path)
 
-  tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  if (isTRUE(use_curl)) {
+    h <- curl::new_handle()
+    headers <- c(
+      if (!is.null(pat)) {
+        c("Authorization" = paste0("token ", pat))
+      }
+    )
+    curl::handle_setheaders(h, .list = headers)
+    res <- curl::curl_fetch_memory(url, handle = h)
 
-  fromJSONFile(tmp)
+    if (res$status_code >= 300) {
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
+    }
+    fromJSON(rawToChar(res$content))
+  } else {
+    tmp <- tempfile()
+    download(tmp, url, auth_token = pat)
+
+    fromJSONFile(tmp)
+  }
 }
 
 github_commit <- function(username, repo, ref = "master",
@@ -32,7 +49,8 @@ github_commit <- function(username, repo, ref = "master",
       return(current_sha)
     }
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
     }
 
     rawToChar(res$content)
@@ -80,7 +98,8 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
     }
     rawToChar(res$content)
   } else {
@@ -92,4 +111,9 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 
     base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
   }
+}
+
+github_error_message <- function(res) {
+  msg <- fromJSON(rawToChar(res$content))
+  msg$message
 }
