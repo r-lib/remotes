@@ -23,6 +23,7 @@
 #'
 #' @param object A `package_deps` object.
 #' @param ... Additional arguments passed to `install_packages`.
+#' @inheritParams install_github
 #'
 #' @return
 #'
@@ -227,7 +228,16 @@ UNAVAILABLE <- 2L
 #' @rdname package_deps
 #' @importFrom stats update
 
-update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
+update.package_deps <- function(object,
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
+
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
   unknown_remotes <- object$diff == UNAVAILABLE & !object$is_cran
@@ -239,7 +249,16 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
   if (any(unknown_remotes)) {
     if (upgrade) {
-      install_remotes(object$remote[unknown_remotes], ..., quiet = quiet, upgrade = upgrade)
+      install_remotes(object$remote[unknown_remotes],
+                      dependencies = dependencies,
+                      upgrade = upgrade,
+                      force = force,
+                      quiet = quiet,
+                      build = build,
+                      build_opts = build_opts,
+                      repos = repos,
+                      type = type,
+                      ...)
     } else if (!quiet) {
       message("Skipping ", sum(unknown_remotes), " packages not available: ",
         paste(object$package[unknown_remotes], collapse = ", "))
@@ -255,7 +274,16 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead_remotes <- object$diff == AHEAD & !object$is_cran
   if (any(ahead_remotes)) {
     if (upgrade) {
-      install_remotes(object$remote[ahead_remotes], ..., quiet = quiet, upgrade = upgrade)
+      install_remotes(object$remote[ahead_remotes],
+                      dependencies = dependencies,
+                      upgrade = upgrade,
+                      force = force,
+                      quiet = quiet,
+                      build = build,
+                      build_opts = build_opts,
+                      repos = repos,
+                      type = type,
+                      ...)
     } else if (!quiet) {
       message("Skipping ", sum(ahead_remotes), " packages ahead of remote: ",
         paste(object$package[ahead_remotes], collapse = ", "))
@@ -270,10 +298,19 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
   if (any(object$is_cran & behind)) {
     install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), ...)
+      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
   }
 
-  install_remotes(object$remote[!object$is_cran & behind], ..., quiet = quiet, upgrade = upgrade)
+  install_remotes(object$remote[!object$is_cran & behind],
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 
   invisible()
 }
@@ -372,7 +409,7 @@ standardise_dep <- function(x) {
 #' that are already installed, and also upgrades out dated dependencies.
 #'
 #' @param packages Character vector of packages to update.
-#' @inheritParams package_deps
+#' @inheritParams install_github
 #' @seealso [package_deps()] to see which packages are out of date/
 #'   missing.
 #' @export
@@ -382,11 +419,27 @@ standardise_dep <- function(x) {
 #' update_packages(c("plyr", "ggplot2"))
 #' }
 
-update_packages <- function(packages, dependencies = NA,
+update_packages <- function(packages,
+                            dependencies = NA,
+                            upgrade = TRUE,
+                            force = FALSE,
+                            quiet = FALSE,
+                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
-                            type = getOption("pkgType")) {
+                            type = getOption("pkgType"),
+                            ...) {
+
   pkgs <- package_deps(packages, repos = repos, type = type)
-  update(pkgs)
+  update(pkgs,
+         dependencies = dependencies,
+         upgrade = upgrade,
+         force = force,
+         quiet = quiet,
+         build = build,
+         build_opts = build_opts,
+         repos = repos,
+         type = type,
+         ...)
 }
 
 has_additional_repositories <- function(pkg) {

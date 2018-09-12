@@ -16,6 +16,7 @@
 #'   git client via system. Default is `git2r` if it is installed,
 #'   otherwise an external git installation.
 #' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -23,12 +24,29 @@
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
 install_git <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
-                        git = c("auto", "git2r", "external"), ...) {
+                        git = c("auto", "git2r", "external"),
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
 
   remotes <- lapply(url, git_remote, subdir = subdir, branch = branch,
     credentials = credentials, git = match.arg(git))
 
-  install_remotes(remotes, credentials = credentials, ...)
+  install_remotes(remotes, credentials = credentials,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 

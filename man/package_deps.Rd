@@ -15,8 +15,11 @@ local_package_deps(pkgdir = ".", dependencies = NA)
 dev_package_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"), ...)
 
-\method{update}{package_deps}(object, ..., quiet = FALSE,
-  upgrade = TRUE)
+\method{update}{package_deps}(object, dependencies = NA,
+  upgrade = TRUE, force = FALSE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"), repos = getOption("repos"),
+  type = getOption("pkgType"), ...)
 }
 \arguments{
 \item{packages}{A character vector of package names.}
@@ -40,9 +43,17 @@ just check this package, not its dependencies).}
 
 \item{object}{A \code{package_deps} object.}
 
+\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+
+\item{force}{Force installation, even if the remote state has not changed
+since the previous install.}
+
 \item{quiet}{If \code{TRUE}, suppress output.}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{build}{If \code{TRUE} build the package before installing.}
+
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
 }
 \value{
 A \code{data.frame} with columns:

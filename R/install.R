@@ -1,7 +1,5 @@
-
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
-  TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"), ..., repos =
-  getOption("repos")) {
+install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
+                    repos, type, ...) {
 
   if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
     missing_devel_warning(pkgdir)
@@ -15,7 +13,7 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, repos = repos, ...)
+    build = build, build_opts = build_opts, repos = repos, type = type, ...)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -103,8 +101,9 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 #'
 #' @inheritParams package_deps
 #' @param ... additional arguments passed to [utils::install.packages()].
-#' @param build If `TRUE` build the pacakge before installing.
-#' @param build_opts Options to pass to `R CMD build`.
+#' @param build If `TRUE` build the package before installing.
+#' @param build_opts Options to pass to `R CMD build`, only used when `build`
+#' is `TRUE`.
 #' @export
 #' @examples
 #' \dontrun{install_deps(".")}
@@ -112,11 +111,11 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         ...,
                          upgrade = TRUE,
                          quiet = FALSE,
                          build = TRUE,
-                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         ...) {
 
   packages <- dev_package_deps(
     pkgdir,
@@ -131,10 +130,10 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
   update(
     packages,
     dependencies = dep_deps,
-    ...,
     quiet = quiet,
     upgrade = upgrade,
     build = build,
-    build_opts = build_opts
+    build_opts = build_opts,
+    ...
   )
 }

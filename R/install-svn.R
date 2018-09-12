@@ -14,6 +14,7 @@
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
 #' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #'
 #' @examples
@@ -22,12 +23,29 @@
 #' install_svn("https://github.com/hadley/httr/branches/oauth")
 #'}
 install_svn <- function(url, subdir = NULL, args = character(0),
-  ..., revision = NULL) {
+                        revision = NULL,
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
 
   remotes <- lapply(url, svn_remote, svn_subdir = subdir,
     revision = revision, args = args)
 
-  install_remotes(remotes, args = args, ...)
+  install_remotes(remotes, args = args,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 svn_remote <- function(url, svn_subdir = NULL, revision = NULL,

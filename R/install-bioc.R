@@ -15,6 +15,7 @@
 #'   numbers (e.g. \sQuote{3.3}).
 #' @param mirror The bioconductor git mirror to use
 #' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -28,11 +29,28 @@
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
-  git = c("auto", "git2r", "external"), ...) {
+                         git = c("auto", "git2r", "external"),
+                         dependencies = NA,
+                         upgrade = TRUE,
+                         force = FALSE,
+                         quiet = FALSE,
+                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         repos = getOption("repos"),
+                         type = getOption("pkgType"),
+                         ...) {
 
   remotes <- lapply(repo, bioc_remote, mirror = mirror, git = match.arg(git))
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 bioc_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
