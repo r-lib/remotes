@@ -8,6 +8,9 @@
 
 # Development
 
+* `install_()*` functions now temporally put Rtools on the PATH when necessary,
+  as long as the pkgbuild package is installed.
+
 * `standardise_dep()` exported, for use in devtools.
 
 * Remotes can be forced to use only its internal code by setting the
