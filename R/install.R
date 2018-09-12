@@ -3,8 +3,12 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
   TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"), ..., repos =
   getOption("repos")) {
 
-  if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
-    missing_devel_warning(pkgdir)
+  if (file.exists(file.path(pkgdir, "src"))) {
+    if (has_package("pkgbuild")) {
+      pkgbuild::local_build_tools(required = TRUE)
+    } else if (!has_devel()) {
+      missing_devel_warning(pkgdir)
+    }
   }
 
   ## Check for circular dependencies. We need to know about the root
