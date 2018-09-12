@@ -8,7 +8,17 @@
 #'   \item calls install
 #' }
 #' @noRd
-install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
+install_remote <- function(remote,
+                           dependencies = dependencies,
+                           upgrade = upgrade,
+                           force = force,
+                           quiet = quiet,
+                           build = build,
+                           build_opts = build_opts,
+                           repos = repos,
+                           type = type,
+                           ...) {
+
   stopifnot(is.remote(remote))
 
   package_name <- remote_package_name(remote)
@@ -47,7 +57,16 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   # Because we've modified DESCRIPTION, its original MD5 value is wrong
   clear_description_md5(source)
 
-  install(source, ..., quiet = quiet)
+  install(source,
+          dependencies = dependencies,
+          upgrade = upgrade,
+          force = force,
+          quiet = quiet,
+          build = build,
+          build_opts = build_opts,
+          repos = repos,
+          type = type,
+          ...)
 }
 
 install_remotes <- function(remotes, ...) {

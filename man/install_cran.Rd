@@ -5,7 +5,10 @@
 \title{Attempts to install a package from CRAN.}
 \usage{
 install_cran(pkgs, repos = getOption("repos"),
-  type = getOption("pkgType"), ..., quiet = FALSE)
+  type = getOption("pkgType"), dependencies = NA, upgrade = TRUE,
+  force = FALSE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"), ...)
 }
 \arguments{
 \item{pkgs}{Character vector of packages to install.}
@@ -14,9 +17,28 @@ install_cran(pkgs, repos = getOption("repos"),
 
 \item{type}{Type of package to \code{update}.}
 
-\item{...}{Additional arguments passed to \code{install_packages}.}
+\item{dependencies}{Which dependencies do you want to check?
+Can be a character vector (selecting from "Depends", "Imports",
+"LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+
+\code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+"Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).}
+
+\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+
+\item{force}{Force installation, even if the remote state has not changed
+since the previous install.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
+
+\item{build}{If \code{TRUE} build the package before installing.}
+
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
+
+\item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 This function is vectorised on \code{pkgs} so you can install multiple

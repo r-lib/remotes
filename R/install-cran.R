@@ -5,7 +5,7 @@
 #' packages in a single command.
 #'
 #' @param pkgs Character vector of packages to install.
-#' @inheritParams package_deps
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -13,11 +13,26 @@
 #' install_cran("ggplot2")
 #' install_cran(c("httpuv", "shiny"))
 #' }
-install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"), ..., quiet = FALSE) {
+install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
+                         dependencies = NA,
+                         upgrade = TRUE,
+                         force = FALSE,
+                         quiet = FALSE,
+                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         ...) {
 
   remotes <- lapply(pkgs, cran_remote, repos = repos, type = type)
 
-  install_remotes(remotes, quiet = quiet, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 cran_remote <- function(pkg, repos, type, ...) {

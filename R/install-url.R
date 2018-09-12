@@ -8,6 +8,7 @@
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
 #' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #'
 #' @examples
@@ -15,9 +16,26 @@
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
 #' }
 
-install_url <- function(url, subdir = NULL, ...) {
+install_url <- function(url, subdir = NULL,
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
   remotes <- lapply(url, url_remote, subdir = subdir)
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 url_remote <- function(url, subdir = NULL, ...) {

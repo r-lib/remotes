@@ -29,7 +29,14 @@ test_that("package2remotes looks for the DESCRIPTION in .libPaths", {
   expect_equal(package2remote("noremotes", lib = lib)$sha, NA_character_)
 
   # This is not a real package, so we can't actually build it
-  install("noremotes", lib = lib, quiet = TRUE, build = FALSE)
+  install("noremotes", lib = lib, quiet = TRUE, build = FALSE,
+          dependencies = FALSE,
+          upgrade = FALSE,
+          force = FALSE,
+          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+          repos = getOption("repos"),
+          type = getOption("pkgType"))
+
   expect_equal(package2remote("noremotes", lib = lib)$sha, "1.0.0")
 
   # Load the namespace, as packageDescription looks in loaded namespaces

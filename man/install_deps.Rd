@@ -5,10 +5,10 @@
 \title{Install package dependencies if needed.}
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"), ...,
+  repos = getOption("repos"), type = getOption("pkgType"),
   upgrade = TRUE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"))
+  "--no-build-vignettes"), ...)
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}
@@ -26,15 +26,16 @@ just check this package, not its dependencies).}
 
 \item{type}{Type of package to \code{update}.}
 
-\item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
-
 \item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
 
-\item{build}{If \code{TRUE} build the pacakge before installing.}
+\item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}.}
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
+
+\item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 Install package dependencies if needed.

@@ -25,6 +25,7 @@
 #' App Passwords documentation}. The App Password requires read-only access to
 #' your repositories and pull requests. Then store your password in the
 #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -33,12 +34,29 @@
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
-                              host = "api.bitbucket.org/2.0", ...) {
+                              host = "api.bitbucket.org/2.0",
+                              dependencies = NA,
+                              upgrade = TRUE,
+                              force = FALSE,
+                              quiet = FALSE,
+                              build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                              repos = getOption("repos"),
+                              type = getOption("pkgType"),
+                              ...) {
 
   remotes <- lapply(repo, bitbucket_remote, ref = ref,
     subdir = subdir, auth_user = auth_user, password = password, host = host)
 
-  install_remotes(remotes, auth_user = auth_user, password = password, host = host, ...)
+  install_remotes(remotes, auth_user = auth_user, password = password, host = host,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
