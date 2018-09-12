@@ -10,6 +10,7 @@
 #'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -18,12 +19,28 @@
 #' }
 install_gitlab <- function(repo,
                            auth_token = gitlab_pat(),
-                           host = "gitlab.com", ...)
-{
+                           host = "gitlab.com",
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
 
   remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, auth_token = auth_token, host = host, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 gitlab_remote <- function(repo,

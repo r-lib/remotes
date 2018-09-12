@@ -4,13 +4,42 @@
 \alias{install_local}
 \title{Install a package from a local file}
 \usage{
-install_local(path, subdir = NULL, ...)
+install_local(path, subdir = NULL, dependencies = NA, upgrade = TRUE,
+  force = FALSE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"), repos = getOption("repos"),
+  type = getOption("pkgType"), ...)
 }
 \arguments{
 \item{path}{path to local directory, or compressed file (tar, zip, tar.gz
 tar.bz2, tgz2 or tbz)}
 
 \item{subdir}{subdirectory within url bundle that contains the R package.}
+
+\item{dependencies}{Which dependencies do you want to check?
+Can be a character vector (selecting from "Depends", "Imports",
+"LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+
+\code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+"Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).}
+
+\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+
+\item{force}{Force installation, even if the remote state has not changed
+since the previous install.}
+
+\item{quiet}{If \code{TRUE}, suppress output.}
+
+\item{build}{If \code{TRUE} build the package before installing.}
+
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
+
+\item{repos}{A character vector giving repositories to use.}
+
+\item{type}{Type of package to \code{update}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }

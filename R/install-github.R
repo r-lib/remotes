@@ -18,6 +18,9 @@
 #'   the `GITHUB_PAT` environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
 #'   hostname, for example, `"github.hostname.com/api/v3"`.
+#' @param force Force installation, even if the remote state has not changed
+#'   since the previous install.
+#' @inheritParams install_deps
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @details
 #' If the repository uses submodules a command-line git client is required to
@@ -40,14 +43,32 @@
 #'
 #' }
 install_github <- function(repo,
-                           ref = "master", subdir = NULL,
+                           ref = "master",
+                           subdir = NULL,
                            auth_token = github_pat(),
-                           host = "api.github.com", ...) {
+                           host = "api.github.com",
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
 
   remotes <- lapply(repo, github_remote, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, auth_token = auth_token, host = host, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host,
+    dependencies = dependencies,
+    upgrade = upgrade,
+    force = force,
+    quiet = quiet,
+    build = build,
+    build_opts = build_opts,
+    repos = repos,
+    type = type,
+    ...)
 }
 
 github_remote <- function(repo, ref = "master", subdir = NULL,

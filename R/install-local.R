@@ -7,6 +7,7 @@
 #' @param path path to local directory, or compressed file (tar, zip, tar.gz
 #'   tar.bz2, tgz2 or tbz)
 #' @inheritParams install_url
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -16,9 +17,27 @@
 #' install_local(pkg[, 2])
 #' }
 
-install_local <- function(path, subdir = NULL, ...) {
+install_local <- function(path, subdir = NULL,
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
+
   remotes <- lapply(path, local_remote, subdir = subdir)
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0), ...) {

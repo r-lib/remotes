@@ -15,13 +15,31 @@
 #'   archived source tarballs and tries to install an older version instead.
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams utils::install.packages
+#' @inheritParams install_github
 #' @author Jeremy Stephens
 #' @importFrom utils available.packages contrib.url install.packages
 
-install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
+install_version <- function(package, version = NULL,
+                            dependencies = NA,
+                            upgrade = TRUE,
+                            force = FALSE,
+                            quiet = FALSE,
+                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            repos = getOption("repos"),
+                            type = getOption("pkgType"),
+                            ...) {
 
   url <- download_version_url(package, version, repos, type)
-  install_url(url, ...)
+  install_url(url,
+              dependencies = dependencies,
+              upgrade = upgrade,
+              force = force,
+              quiet = quiet,
+              build = build,
+              build_opts = build_opts,
+              repos = repos,
+              type = type,
+              ...)
 }
 
 package_find_repo <- function(package, repos) {

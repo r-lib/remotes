@@ -4,7 +4,10 @@
 \alias{install_version}
 \title{Install specified version of a CRAN package.}
 \usage{
-install_version(package, version = NULL, repos = getOption("repos"),
+install_version(package, version = NULL, dependencies = NA,
+  upgrade = TRUE, force = FALSE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
 \arguments{
@@ -14,6 +17,44 @@ install_version(package, version = NULL, repos = getOption("repos"),
 recent version of the package, this function simply calls
 \code{\link[utils:install.packages]{utils::install.packages()}}. Otherwise, it looks at the list of
 archived source tarballs and tries to install an older version instead.}
+
+\item{dependencies}{logical indicating whether to also install
+    uninstalled packages which these packages depend on/link
+    to/import/suggest (and so on recursively).  Not used if \code{repos
+    = NULL}.  Can also be a character vector, a subset of
+    \code{c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")}.
+
+    Only supported if \code{lib} is of length one (or missing),
+    so it is unambiguous where to install the dependent packages.  If
+    this is not the case it is ignored, with a warning.
+
+    The default, \code{NA}, means
+    \code{c("Depends", "Imports", "LinkingTo")}.
+
+    \code{TRUE} means to use
+    \code{c("Depends", "Imports", "LinkingTo", "Suggests")} for
+    \code{pkgs} and
+    \code{c("Depends", "Imports", "LinkingTo")} for added dependencies:
+    this installs all the packages needed to run \code{pkgs}, their
+    examples, tests and vignettes (if the package author specified them
+    correctly).
+
+    In all of these, \code{"LinkingTo"} is omitted for binary packages.
+  }
+
+\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+
+\item{force}{Force installation, even if the remote state has not changed
+since the previous install.}
+
+\item{quiet}{
+    logical: if true, reduce the amount of output.
+  }
+
+\item{build}{If \code{TRUE} build the package before installing.}
+
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
 
 \item{repos}{
     character vector, the base URL(s) of the repositories

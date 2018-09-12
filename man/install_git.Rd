@@ -5,7 +5,11 @@
 \title{Install a package from a git repository}
 \usage{
 install_git(url, subdir = NULL, branch = NULL, credentials = NULL,
-  git = c("auto", "git2r", "external"), ...)
+  git = c("auto", "git2r", "external"), dependencies = NA,
+  upgrade = TRUE, force = FALSE, quiet = FALSE, build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual",
+  "--no-build-vignettes"), repos = getOption("repos"),
+  type = getOption("pkgType"), ...)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -22,6 +26,31 @@ Supplying this argument implies using \code{git2r} with \code{git}.}
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,
 otherwise an external git installation.}
+
+\item{dependencies}{Which dependencies do you want to check?
+Can be a character vector (selecting from "Depends", "Imports",
+"LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+
+\code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
+"Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
+and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).}
+
+\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+
+\item{force}{Force installation, even if the remote state has not changed
+since the previous install.}
+
+\item{quiet}{If \code{TRUE}, suppress output.}
+
+\item{build}{If \code{TRUE} build the package before installing.}
+
+\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+is \code{TRUE}.}
+
+\item{repos}{A character vector giving repositories to use.}
+
+\item{type}{Type of package to \code{update}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
