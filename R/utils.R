@@ -157,10 +157,10 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    tryCatch(
-      utils::untar(tarfile, extras = "--force-local", ...),
-      warning = function(e) utils::untar(tarfile, ...)
-    )
+    status <- try(utils::untar(tarfile, extras = "--force-local", ...))
+    if(inherits(status, "try-error") || status != 0){
+        utils::untar(tarfile, ...)
+    }
 
   } else {
     utils::untar(tarfile, ...)
