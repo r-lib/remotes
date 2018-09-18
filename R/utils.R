@@ -344,3 +344,7 @@ dir.exists <- function(paths) {
     ("base" %::% "dir.exists")(paths)
   }
 }
+
+is_binary_pkg <- function(x) {
+  file_ext(x) %in% c("tgz", "zip")
+}
