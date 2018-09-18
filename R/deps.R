@@ -419,7 +419,7 @@ standardise_dep <- function(x) {
 #' update_packages(c("plyr", "ggplot2"))
 #' }
 
-update_packages <- function(packages,
+update_packages <- function(packages = TRUE,
                             dependencies = NA,
                             upgrade = TRUE,
                             force = FALSE,
@@ -428,6 +428,9 @@ update_packages <- function(packages,
                             repos = getOption("repos"),
                             type = getOption("pkgType"),
                             ...) {
+  if (isTRUE(packages)) {
+    packages <- installed.packages()[, "Package"]
+  }
 
   pkgs <- package_deps(packages, repos = repos, type = type)
   update(pkgs,
