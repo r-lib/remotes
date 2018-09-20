@@ -160,8 +160,9 @@ untar <- function(tarfile, ...) {
     status <- try(utils::untar(tarfile, extras = "--force-local", ...))
     if(inherits(status, "try-error") || status != 0){
         utils::untar(tarfile, ...)
+    } else {
+        status
     }
-
   } else {
     utils::untar(tarfile, ...)
   }
