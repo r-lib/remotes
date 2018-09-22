@@ -479,7 +479,7 @@ parse_one_remote <- function(x, ...) {
   }
   tryCatch({
     fun <- get(paste0(tolower(type), "_remote"),
-      envir = asNamespace("remotes"), mode = "function", inherits = FALSE)
+      envir = environment(sys.function()), mode = "function", inherits = FALSE)
 
     res <- fun(repo, ...)
     }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
