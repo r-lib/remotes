@@ -32,8 +32,6 @@ Suggests:
     withr
 Depends:
     R (>= 3.0.0)
-Remotes:
-    r-lib/pkgbuild
 RoxygenNote: 6.1.0
 SystemRequirements: Subversion for install_svn, git for install_git
 Encoding: UTF-8
