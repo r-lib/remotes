@@ -252,9 +252,9 @@ my_unzip <- function(src, target, unzip = getOption("unzip", "internal")) {
 #' Find all dependencies of a CRAN or dev package.
 #'
 #' Find all the dependencies of a package and determine whether they are ahead
-#' or behind CRAN. A \code{print()} method identifies mismatches (if any)
+#' or behind CRAN. A `print()` method identifies mismatches (if any)
 #' between local and CRAN versions of each dependent package; an
-#' \code{update()} method installs outdated or missing packages from CRAN.
+#' `update()` method installs outdated or missing packages from CRAN.
 #'
 #' @param packages A character vector of package names.
 #' @param pkgdir path to a package directory, or to a package tarball.
@@ -262,27 +262,28 @@ my_unzip <- function(src, target, unzip = getOption("unzip", "internal")) {
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
 #'
-#'   \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
-#'   "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-#'   and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
+#'   `TRUE` is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
-#' @param quiet If \code{TRUE}, suppress output.
-#' @param upgrade If \code{TRUE}, also upgrade any of out date dependencies.
+#' @param quiet If `TRUE`, suppress output.
+#' @param upgrade If `TRUE`, also upgrade any of out date dependencies.
 #' @param repos A character vector giving repositories to use.
-#' @param type Type of package to \code{update}.
+#' @param type Type of package to `update`.
 #'
-#' @param object A \code{package_deps} object.
-#' @param ... Additional arguments passed to \code{install_packages}.
+#' @param object A `package_deps` object.
+#' @param ... Additional arguments passed to `install_packages`.
+#' @inheritParams install_github
 #'
 #' @return
 #'
-#' A \code{data.frame} with columns:
+#' A `data.frame` with columns:
 #'
 #' \tabular{ll}{
-#' \code{package} \tab The dependent package's name,\cr
-#' \code{installed} \tab The currently installed version,\cr
-#' \code{available} \tab The version available on CRAN,\cr
-#' \code{diff} \tab An integer denoting whether the locally installed version
+#' `package` \tab The dependent package's name,\cr
+#' `installed` \tab The currently installed version,\cr
+#' `available` \tab The version available on CRAN,\cr
+#' `diff` \tab An integer denoting whether the locally installed version
 #'   of the package is newer (1), the same (0) or older (-1) than the version
 #'   currently available on CRAN.\cr
 #' }
@@ -337,7 +338,7 @@ package_deps <- function(packages, dependencies = NA,
   res
 }
 
-#' \code{local_package_deps} extracts dependencies from a
+#' `local_package_deps` extracts dependencies from a
 #' local DESCRIPTION file.
 #'
 #' @export
@@ -353,7 +354,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
   unlist(lapply(parsed, `[[`, "name"), use.names = FALSE)
 }
 
-#' \code{dev_package_deps} lists the status of the dependencies
+#' `dev_package_deps` lists the status of the dependencies
 #' of a local package.
 #'
 #' @export
@@ -477,7 +478,16 @@ UNAVAILABLE <- 2L
 #' @rdname package_deps
 #' @importFrom stats update
 
-update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
+update.package_deps <- function(object,
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
+
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
   unknown_remotes <- object$diff == UNAVAILABLE & !object$is_cran
@@ -489,7 +499,16 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
   if (any(unknown_remotes)) {
     if (upgrade) {
-      install_remotes(object$remote[unknown_remotes], ..., quiet = quiet, upgrade = upgrade)
+      install_remotes(object$remote[unknown_remotes],
+                      dependencies = dependencies,
+                      upgrade = upgrade,
+                      force = force,
+                      quiet = quiet,
+                      build = build,
+                      build_opts = build_opts,
+                      repos = repos,
+                      type = type,
+                      ...)
     } else if (!quiet) {
       message("Skipping ", sum(unknown_remotes), " packages not available: ",
         paste(object$package[unknown_remotes], collapse = ", "))
@@ -505,7 +524,16 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
   ahead_remotes <- object$diff == AHEAD & !object$is_cran
   if (any(ahead_remotes)) {
     if (upgrade) {
-      install_remotes(object$remote[ahead_remotes], ..., quiet = quiet, upgrade = upgrade)
+      install_remotes(object$remote[ahead_remotes],
+                      dependencies = dependencies,
+                      upgrade = upgrade,
+                      force = force,
+                      quiet = quiet,
+                      build = build,
+                      build_opts = build_opts,
+                      repos = repos,
+                      type = type,
+                      ...)
     } else if (!quiet) {
       message("Skipping ", sum(ahead_remotes), " packages ahead of remote: ",
         paste(object$package[ahead_remotes], collapse = ", "))
@@ -520,10 +548,19 @@ update.package_deps <- function(object, ..., quiet = FALSE, upgrade = TRUE) {
 
   if (any(object$is_cran & behind)) {
     install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), ...)
+      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
   }
 
-  install_remotes(object$remote[!object$is_cran & behind], ..., quiet = quiet, upgrade = upgrade)
+  install_remotes(object$remote[!object$is_cran & behind],
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 
   invisible()
 }
@@ -588,6 +625,20 @@ find_deps <- function(packages, available = available_packages(),
   unique(c(if (include_pkgs) packages, top_flat, rec_flat))
 }
 
+#' Standardise dependencies using the same logical as [install.packages]
+#'
+#' @param x The dependencies to standardise.
+#'   A character vector (selecting from "Depends", "Imports",
+#'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
+#'
+#'   `TRUE` is shorthand for "Depends", "Imports", "LinkingTo" and
+#'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
+#'   and is the default. `FALSE` is shorthand for no dependencies.
+#'
+#' @seealso <http://r-pkgs.had.co.nz/description.html#dependencies> for
+#' additional information on what each dependency type means.
+#' @keywords internal
+#' @export
 standardise_dep <- function(x) {
   if (identical(x, NA)) {
     c("Depends", "Imports", "LinkingTo")
@@ -604,12 +655,12 @@ standardise_dep <- function(x) {
 
 #' Update packages that are missing or out-of-date.
 #'
-#' Works similarly to \code{\link[utils]{install.packages}} but doesn't install packages
+#' Works similarly to [utils::install.packages()] but doesn't install packages
 #' that are already installed, and also upgrades out dated dependencies.
 #'
 #' @param packages Character vector of packages to update.
-#' @inheritParams package_deps
-#' @seealso \code{\link{package_deps}} to see which packages are out of date/
+#' @inheritParams install_github
+#' @seealso [package_deps()] to see which packages are out of date/
 #'   missing.
 #' @export
 #' @examples
@@ -618,11 +669,30 @@ standardise_dep <- function(x) {
 #' update_packages(c("plyr", "ggplot2"))
 #' }
 
-update_packages <- function(packages, dependencies = NA,
+update_packages <- function(packages = TRUE,
+                            dependencies = NA,
+                            upgrade = TRUE,
+                            force = FALSE,
+                            quiet = FALSE,
+                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
-                            type = getOption("pkgType")) {
+                            type = getOption("pkgType"),
+                            ...) {
+  if (isTRUE(packages)) {
+    packages <- installed.packages()[, "Package"]
+  }
+
   pkgs <- package_deps(packages, repos = repos, type = type)
-  update(pkgs)
+  update(pkgs,
+         dependencies = dependencies,
+         upgrade = upgrade,
+         force = force,
+         quiet = quiet,
+         build = build,
+         build_opts = build_opts,
+         repos = repos,
+         type = type,
+         ...)
 }
 
 has_additional_repositories <- function(pkg) {
@@ -971,14 +1041,31 @@ check_git_path <- function(git_binary_name = NULL) {
   path
 }
 
-github_GET <- function(path, ..., host = "api.github.com", pat = github_pat()) {
+github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl")) {
 
   url <- build_url(host, path)
 
-  tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  if (isTRUE(use_curl)) {
+    h <- curl::new_handle()
+    headers <- c(
+      if (!is.null(pat)) {
+        c("Authorization" = paste0("token ", pat))
+      }
+    )
+    curl::handle_setheaders(h, .list = headers)
+    res <- curl::curl_fetch_memory(url, handle = h)
 
-  fromJSONFile(tmp)
+    if (res$status_code >= 300) {
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
+    }
+    fromJSON(rawToChar(res$content))
+  } else {
+    tmp <- tempfile()
+    download(tmp, url, auth_token = pat)
+
+    fromJSONFile(tmp)
+  }
 }
 
 github_commit <- function(username, repo, ref = "master",
@@ -1004,7 +1091,8 @@ github_commit <- function(username, repo, ref = "master",
       return(current_sha)
     }
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
     }
 
     rawToChar(res$content)
@@ -1020,7 +1108,7 @@ github_commit <- function(username, repo, ref = "master",
 #' Retrieve Github personal access token.
 #'
 #' A github personal access token
-#' Looks in env var \code{GITHUB_PAT}
+#' Looks in env var `GITHUB_PAT`
 #'
 #' @keywords internal
 #' @noRd
@@ -1052,7 +1140,8 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".", call. = FALSE)
+      stop("HTTP error ", res$status_code, ".",
+           "\n", github_error_message(res), call. = FALSE)
     }
     rawToChar(res$content)
   } else {
@@ -1065,9 +1154,14 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
   }
 }
+
+github_error_message <- function(res) {
+  msg <- fromJSON(rawToChar(res$content))
+  msg$message
+}
 #' Install a package from a Bioconductor repository
 #'
-#' This function requires \code{git} to be installed on your system in order to
+#' This function requires `git` to be installed on your system in order to
 #' be used.
 #'
 #' It is vectorised so you can install multiple packages with
@@ -1076,12 +1170,13 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 #' '
 #' @inheritParams install_git
 #' @param repo Repository address in the format
-#'   \code{[username:password@@][release/]repo[#commit]}. Valid values for
+#'   `[username:password@@][release/]repo[#commit]`. Valid values for
 #'   the release are \sQuote{devel},
 #'   \sQuote{release} (the default if none specified), or numeric release
 #'   numbers (e.g. \sQuote{3.3}).
 #' @param mirror The bioconductor git mirror to use
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -1095,11 +1190,28 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 #' install_bioc("user:password@SummarizedExperiment#abc123")
 #'}
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
-  git = c("auto", "git2r", "external"), ...) {
+                         git = c("auto", "git2r", "external"),
+                         dependencies = NA,
+                         upgrade = TRUE,
+                         force = FALSE,
+                         quiet = FALSE,
+                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         repos = getOption("repos"),
+                         type = getOption("pkgType"),
+                         ...) {
 
   remotes <- lapply(repo, bioc_remote, mirror = mirror, git = match.arg(git))
 
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 bioc_remote <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
@@ -1352,15 +1464,15 @@ git_repo_sha1 <- function(r) {
 #' @inheritParams install_github
 #' @param auth_user your account username if you're attempting to install
 #'   a package hosted in a private repository (and your username is different
-#'   to \code{username}). Defaults to the \code{BITBUCKET_USER} environment
+#'   to `username`). Defaults to the `BITBUCKET_USER` environment
 #'   variable.
-#' @param password your password. Defaults to the \code{BITBUCKET_PASSWORD}
+#' @param password your password. Defaults to the `BITBUCKET_PASSWORD`
 #'   environment variable. See details for further information on setting
 #'   up a password.
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
-#'   \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
+#'   <https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html>
 #'
 #' @details To install from a private repo, or more generally, access the
 #' Bitbucket API with your own credentials, you will need to get an access
@@ -1369,7 +1481,8 @@ git_repo_sha1 <- function(r) {
 #' \href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
 #' App Passwords documentation}. The App Password requires read-only access to
 #' your repositories and pull requests. Then store your password in the
-#' environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})
+#' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -1378,12 +1491,29 @@ git_repo_sha1 <- function(r) {
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
-                              host = "api.bitbucket.org/2.0", ...) {
+                              host = "api.bitbucket.org/2.0",
+                              dependencies = NA,
+                              upgrade = TRUE,
+                              force = FALSE,
+                              quiet = FALSE,
+                              build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                              repos = getOption("repos"),
+                              type = getOption("pkgType"),
+                              ...) {
 
   remotes <- lapply(repo, bitbucket_remote, ref = ref,
     subdir = subdir, auth_user = auth_user, password = password, host = host)
 
-  install_remotes(remotes, auth_user = auth_user, password = password, host = host, ...)
+  install_remotes(remotes, auth_user = auth_user, password = password, host = host,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
@@ -1516,11 +1646,11 @@ bitbucket_user <- function(quiet = TRUE) {
 
 #' Attempts to install a package from CRAN.
 #'
-#' This function is vectorised on \code{pkgs} so you can install multiple
+#' This function is vectorised on `pkgs` so you can install multiple
 #' packages in a single command.
 #'
 #' @param pkgs Character vector of packages to install.
-#' @inheritParams package_deps
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -1528,11 +1658,26 @@ bitbucket_user <- function(quiet = TRUE) {
 #' install_cran("ggplot2")
 #' install_cran(c("httpuv", "shiny"))
 #' }
-install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"), ..., quiet = FALSE) {
+install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
+                         dependencies = NA,
+                         upgrade = TRUE,
+                         force = FALSE,
+                         quiet = FALSE,
+                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         ...) {
 
   remotes <- lapply(pkgs, cran_remote, repos = repos, type = type)
 
-  install_remotes(remotes, quiet = quiet, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 cran_remote <- function(pkg, repos, type, ...) {
@@ -1563,7 +1708,7 @@ format.cran_remote <- function(x, ...) {
 #' Install a package from a git repository
 #'
 #' It is vectorised so you can install multiple packages with
-#' a single command. You do not need to have the \code{git2r} package,
+#' a single command. You do not need to have the `git2r` package,
 #' or an external git client installed.
 #'
 #' @param url Location of package. The url should point to a public or
@@ -1572,11 +1717,12 @@ format.cran_remote <- function(x, ...) {
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
 #' @param credentials A git2r credentials object passed through to clone.
-#'   Supplying this argument implies using \code{git2r} with \code{git}.
-#' @param git Whether to use the \code{git2r} package, or an external
-#'   git client via system. Default is \code{git2r} if it is installed,
+#'   Supplying this argument implies using `git2r` with `git`.
+#' @param git Whether to use the `git2r` package, or an external
+#'   git client via system. Default is `git2r` if it is installed,
 #'   otherwise an external git installation.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -1584,12 +1730,29 @@ format.cran_remote <- function(x, ...) {
 #' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
 #'}
 install_git <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
-                        git = c("auto", "git2r", "external"), ...) {
+                        git = c("auto", "git2r", "external"),
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
 
   remotes <- lapply(url, git_remote, subdir = subdir, branch = branch,
     credentials = credentials, git = match.arg(git))
 
-  install_remotes(remotes, credentials = credentials, ...)
+  install_remotes(remotes, credentials = credentials,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 
@@ -1770,30 +1933,33 @@ remote_sha.xgit_remote <- function(remote, ...) {
 }
 #' Attempts to install a package directly from GitHub.
 #'
-#' This function is vectorised on \code{repo} so you can install multiple
+#' This function is vectorised on `repo` so you can install multiple
 #' packages in a single command.
 #'
 #' @param repo Repository address in the format
-#'   \code{username/repo[/subdir][@@ref|#pull]}. Alternatively, you can
-#'   specify \code{subdir} and/or \code{ref} using the respective parameters
-#'   (see below); if both is specified, the values in \code{repo} take
+#'   `username/repo[/subdir][@@ref|#pull]`. Alternatively, you can
+#'   specify `subdir` and/or `ref` using the respective parameters
+#'   (see below); if both is specified, the values in `repo` take
 #'   precedence.
 #' @param ref Desired git reference. Could be a commit, tag, or branch
-#'   name, or a call to \code{\link{github_pull}}. Defaults to \code{"master"}.
+#'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in \url{https://github.com/settings/applications} and
+#'   access token (PAT) in <https://github.com/settings/applications> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
-#'   the \code{GITHUB_PAT} environment variable.
+#'   the `GITHUB_PAT` environment variable.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
-#'   hostname, for example, \code{"github.hostname.com/api/v3"}.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#'   hostname, for example, `"github.hostname.com/api/v3"`.
+#' @param force Force installation, even if the remote state has not changed
+#'   since the previous install.
+#' @inheritParams install_deps
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @details
 #' If the repository uses submodules a command-line git client is required to
 #' clone the submodules.
 #' @export
-#' @seealso \code{\link{github_pull}}
+#' @seealso [github_pull()]
 #' @examples
 #' \dontrun{
 #' install_github("klutometis/roxygen")
@@ -1810,14 +1976,32 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'
 #' }
 install_github <- function(repo,
-                           ref = "master", subdir = NULL,
+                           ref = "master",
+                           subdir = NULL,
                            auth_token = github_pat(),
-                           host = "api.github.com", ...) {
+                           host = "api.github.com",
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
 
   remotes <- lapply(repo, github_remote, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, auth_token = auth_token, host = host, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host,
+    dependencies = dependencies,
+    upgrade = upgrade,
+    force = force,
+    quiet = quiet,
+    build = build,
+    build_opts = build_opts,
+    repos = repos,
+    type = type,
+    ...)
 }
 
 github_remote <- function(repo, ref = "master", subdir = NULL,
@@ -1882,11 +2066,11 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL, sha =
 
 #' GitHub references
 #'
-#' Use as \code{ref} parameter to \code{\link{install_github}}.
+#' Use as `ref` parameter to [install_github()].
 #' Allows installing a specific pull request or the latest release.
 #'
 #' @param pull The pull request to install
-#' @seealso \code{\link{install_github}}
+#' @seealso [install_github()]
 #' @rdname github_refs
 #' @export
 github_pull <- function(pull) structure(pull, class = "github_pull")
@@ -1995,16 +2179,17 @@ format.github_remote <- function(x, ...) {
 }
 #' Install a package from GitLab
 #'
-#' This function is vectorised on \code{repo} so you can install multiple
+#' This function is vectorised on `repo` so you can install multiple
 #' packages in a single command. Like other remotes the repository will skip
 #' installation if `force == FALSE` (the default) and the remote state has
 #' not changed since the previous installation.
 #'
 #' @inheritParams install_github
 #' @param repo Repository address in the format
-#'   \code{username/repo[/subdir][@@ref]}.
+#'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
-#'   hostname, for example, \code{"gitlab.hostname.com"}.
+#'   hostname, for example, `"gitlab.hostname.com"`.
+#' @inheritParams install_github
 #' @export
 #' @family package installation
 #' @examples
@@ -2013,12 +2198,28 @@ format.github_remote <- function(x, ...) {
 #' }
 install_gitlab <- function(repo,
                            auth_token = gitlab_pat(),
-                           host = "gitlab.com", ...)
-{
+                           host = "gitlab.com",
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
 
   remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, auth_token = auth_token, host = host, ...)
+  install_remotes(remotes, auth_token = auth_token, host = host,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 gitlab_remote <- function(repo,
@@ -2116,7 +2317,7 @@ gitlab_commit <- function(username, repo, ref = "master",
 #' Retrieve GitLab personal access token.
 #'
 #' A GitLab personal access token
-#' Looks in env var \code{GITLAB_PAT}
+#' Looks in env var `GITLAB_PAT`
 #'
 #' @keywords internal
 #' @export
@@ -2139,6 +2340,7 @@ gitlab_pat <- function(quiet = TRUE) {
 #' @param path path to local directory, or compressed file (tar, zip, tar.gz
 #'   tar.bz2, tgz2 or tbz)
 #' @inheritParams install_url
+#' @inheritParams install_github
 #' @export
 #' @examples
 #' \dontrun{
@@ -2148,9 +2350,28 @@ gitlab_pat <- function(quiet = TRUE) {
 #' install_local(pkg[, 2])
 #' }
 
-install_local <- function(path, subdir = NULL, ...) {
+install_local <- function(path, subdir = NULL,
+                           dependencies = NA,
+                           upgrade = TRUE,
+                           force = FALSE,
+                           quiet = FALSE,
+                           build = !is_binary_pkg(path),
+                           build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           repos = getOption("repos"),
+                           type = getOption("pkgType"),
+                           ...) {
+
   remotes <- lapply(path, local_remote, subdir = subdir)
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 local_remote <- function(path, subdir = NULL, branch = NULL, args = character(0), ...) {
@@ -2216,7 +2437,17 @@ format.local_remote <- function(x, ...) {
 #'   \item calls install
 #' }
 #' @noRd
-install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
+install_remote <- function(remote,
+                           dependencies = dependencies,
+                           upgrade = upgrade,
+                           force = force,
+                           quiet = quiet,
+                           build = build,
+                           build_opts = build_opts,
+                           repos = repos,
+                           type = type,
+                           ...) {
+
   stopifnot(is.remote(remote))
 
   package_name <- remote_package_name(remote)
@@ -2255,7 +2486,16 @@ install_remote <- function(remote, ..., force = FALSE, quiet = FALSE) {
   # Because we've modified DESCRIPTION, its original MD5 value is wrong
   clear_description_md5(source)
 
-  install(source, ..., quiet = quiet)
+  install(source,
+          dependencies = dependencies,
+          upgrade = upgrade,
+          force = force,
+          quiet = quiet,
+          build = build,
+          build_opts = build_opts,
+          repos = repos,
+          type = type,
+          ...)
 }
 
 install_remotes <- function(remotes, ...) {
@@ -2421,7 +2661,8 @@ format.remotes <- function(x, ...) {
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #'
 #' @examples
@@ -2430,12 +2671,29 @@ format.remotes <- function(x, ...) {
 #' install_svn("https://github.com/hadley/httr/branches/oauth")
 #'}
 install_svn <- function(url, subdir = NULL, args = character(0),
-  ..., revision = NULL) {
+                        revision = NULL,
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
 
   remotes <- lapply(url, svn_remote, svn_subdir = subdir,
     revision = revision, args = args)
 
-  install_remotes(remotes, args = args, ...)
+  install_remotes(remotes, args = args,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 svn_remote <- function(url, svn_subdir = NULL, revision = NULL,
@@ -2575,7 +2833,8 @@ format.svn_remote <- function(x, ...) {
 #' @param url location of package on internet. The url should point to a
 #'   zip file, a tar file or a bzipped/gzipped tar file.
 #' @param subdir subdirectory within url bundle that contains the R package.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
+#' @inheritParams install_github
 #' @export
 #'
 #' @examples
@@ -2583,9 +2842,26 @@ format.svn_remote <- function(x, ...) {
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
 #' }
 
-install_url <- function(url, subdir = NULL, ...) {
+install_url <- function(url, subdir = NULL,
+                        dependencies = NA,
+                        upgrade = TRUE,
+                        force = FALSE,
+                        quiet = FALSE,
+                        build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        repos = getOption("repos"),
+                        type = getOption("pkgType"),
+                        ...) {
   remotes <- lapply(url, url_remote, subdir = subdir)
-  install_remotes(remotes, ...)
+  install_remotes(remotes,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  repos = repos,
+                  type = type,
+                  ...)
 }
 
 url_remote <- function(url, subdir = NULL, ...) {
@@ -2636,25 +2912,43 @@ format.url_remote <- function(x, ...) {
 #'
 #' If you are installing an package that contains compiled code, you will
 #' need to have an R development environment installed.  You can check
-#' if you do by running \code{devtools::has_devel} (you need the
-#' \code{devtools} package for this).
+#' if you do by running `devtools::has_devel` (you need the
+#' `devtools` package for this).
 #'
 #' @export
 #' @family package installation
 #' @param package package name
 #' @param version If the specified version is NULL or the same as the most
 #'   recent version of the package, this function simply calls
-#'   \code{\link[utils]{install.packages}}. Otherwise, it looks at the list of
+#'   [utils::install.packages()]. Otherwise, it looks at the list of
 #'   archived source tarballs and tries to install an older version instead.
-#' @param ... Other arguments passed on to \code{\link[utils]{install.packages}}.
+#' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams utils::install.packages
+#' @inheritParams install_github
 #' @author Jeremy Stephens
 #' @importFrom utils available.packages contrib.url install.packages
 
-install_version <- function(package, version = NULL, repos = getOption("repos"), type = getOption("pkgType"), ...) {
+install_version <- function(package, version = NULL,
+                            dependencies = NA,
+                            upgrade = TRUE,
+                            force = FALSE,
+                            quiet = FALSE,
+                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            repos = getOption("repos"),
+                            type = getOption("pkgType"),
+                            ...) {
 
   url <- download_version_url(package, version, repos, type)
-  install_url(url, ...)
+  install_url(url,
+              dependencies = dependencies,
+              upgrade = upgrade,
+              force = force,
+              quiet = quiet,
+              build = build,
+              build_opts = build_opts,
+              repos = repos,
+              type = type,
+              ...)
 }
 
 package_find_repo <- function(package, repos) {
@@ -2736,13 +3030,15 @@ download_version_url <- function(package, version, repos, type) {
 
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
 }
+install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
+                    repos, type, ...) {
 
-install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
-  TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"), ..., repos =
-  getOption("repos")) {
-
-  if (file.exists(file.path(pkgdir, "src")) && ! has_devel()) {
-    missing_devel_warning(pkgdir)
+  if (file.exists(file.path(pkgdir, "src"))) {
+    if (has_package("pkgbuild")) {
+      pkgbuild::local_build_tools(required = TRUE)
+    } else if (!has_devel()) {
+      missing_devel_warning(pkgdir)
+    }
   }
 
   ## Check for circular dependencies. We need to know about the root
@@ -2753,7 +3049,7 @@ install <- function(pkgdir = ".", dependencies = NA, quiet = TRUE, build =
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, repos = repos, ...)
+    build = build, build_opts = build_opts, repos = repos, type = type, ...)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -2844,9 +3140,10 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 #' Install package dependencies if needed.
 #'
 #' @inheritParams package_deps
-#' @param ... additional arguments passed to \code{\link[utils]{install.packages}}.
-#' @param build If \code{TRUE} build the pacakge before installing.
-#' @param build_opts Options to pass to `R CMD build`.
+#' @param ... additional arguments passed to [utils::install.packages()].
+#' @param build If `TRUE` build the package before installing.
+#' @param build_opts Options to pass to `R CMD build`, only used when `build`
+#' is `TRUE`.
 #' @export
 #' @examples
 #' \dontrun{install_deps(".")}
@@ -2854,11 +3151,11 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         ...,
                          upgrade = TRUE,
                          quiet = FALSE,
                          build = TRUE,
-                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         ...) {
 
   packages <- dev_package_deps(
     pkgdir,
@@ -2873,11 +3170,11 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
   update(
     packages,
     dependencies = dep_deps,
-    ...,
     quiet = quiet,
     upgrade = upgrade,
     build = build,
-    build_opts = build_opts
+    build_opts = build_opts,
+    ...
   )
 }
 tokenize_json <- function(text) {
@@ -3089,15 +3386,15 @@ load_pkg_description <- function(path) {
 #'
 #' A remote repo can be specified in two ways:
 #' \describe{
-#' \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
+#' \item{as a URL}{`parse_github_url()` handles HTTPS and SSH remote URLs
 #' and various GitHub browser URLs}
-#' \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
-#' \code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+#' \item{via a shorthand}{`parse_repo_spec()` handles this concise form:
+#' `[username/]repo[/subdir][#pull|@ref|@*release]`}
 #' }
 #'
 #' @param repo Character scalar, the repo specification.
-#' @return List with members: \code{username}, \code{repo}, \code{subdir}
-#'   \code{ref}, \code{pull}, \code{release}, some which will be empty.
+#' @return List with members: `username`, `repo`, `subdir`
+#'   `ref`, `pull`, `release`, some which will be empty.
 #'
 #' @name parse-git-repo
 #' @examples
@@ -3695,6 +3992,10 @@ dir.exists <- function(paths) {
   } else {
     ("base" %::% "dir.exists")(paths)
   }
+}
+
+is_binary_pkg <- function(x) {
+  file_ext(x) %in% c("tgz", "zip")
 }
 
 
