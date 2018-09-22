@@ -504,9 +504,9 @@ remote_deps <- function(pkg, ...) {
   dev_packages <- split_remotes(pkg[["remotes"]])
   remote <- lapply(dev_packages, parse_one_remote, ...)
 
-  package <- vapply(remote, remote_package_name, character(1), USE.NAMES = FALSE)
-  installed <- vapply(package, local_sha, character(1), USE.NAMES = FALSE)
-  available <- vapply(remote, remote_sha, character(1), USE.NAMES = FALSE)
+  package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
+  installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
+  available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
 
