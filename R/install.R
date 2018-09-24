@@ -115,7 +115,7 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         upgrade = TRUE,
+                         upgrade = FALSE,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
