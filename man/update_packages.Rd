@@ -4,7 +4,7 @@
 \alias{update_packages}
 \title{Update packages that are missing or out-of-date.}
 \usage{
-update_packages(packages, dependencies = NA, upgrade = TRUE,
+update_packages(packages = TRUE, dependencies = NA, upgrade = TRUE,
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),
