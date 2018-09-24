@@ -83,7 +83,11 @@ github_pat <- function(quiet = TRUE) {
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
   use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
 
-  url <- build_url(host, "repos", username, repo, "contents", utils::URLencode(subdir), "DESCRIPTION")
+  if (!is.null(subdir)) {
+    subdir <- utils::URLencode(subdir)
+  }
+
+  url <- build_url(host, "repos", username, repo, "contents", subdir, "DESCRIPTION")
   url <- paste0(url, "?ref=", utils::URLencode(ref))
 
   if (isTRUE(use_curl)) {
