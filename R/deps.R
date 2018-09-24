@@ -134,6 +134,12 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
+  # If there are no dependencies there will be no remote dependencies either,
+  # so just return them (and don't force the remote_deps promise)
+  if (nrow(cran_deps) == 0) {
+    return(cran_deps)
+  }
+
   # Only keep the remotes that are specified in the cran_deps
   remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
 
