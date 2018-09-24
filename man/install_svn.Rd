@@ -5,7 +5,7 @@
 \title{Install a package from a SVN repository}
 \usage{
 install_svn(url, subdir = NULL, args = character(0), revision = NULL,
-  dependencies = NA, upgrade = TRUE, force = FALSE, quiet = FALSE,
+  dependencies = NA, upgrade = FALSE, force = FALSE, quiet = FALSE,
   build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
