@@ -349,3 +349,16 @@ dir.exists <- function(paths) {
 is_binary_pkg <- function(x) {
   file_ext(x) %in% c("tgz", "zip")
 }
+
+format_str <- function(x, width = Inf, trim = TRUE, justify = "none", ...) {
+  x <- format(x, trim = trim, justify = justify, ...)
+
+  if (width < Inf) {
+    x_width <- nchar(x, "width")
+    too_wide <- x_width > width
+    if (any(too_wide)) {
+      x[too_wide] <- paste0(substr(x[too_wide], 1, width - 3), "...")
+    }
+  }
+  x
+}

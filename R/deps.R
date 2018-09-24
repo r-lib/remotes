@@ -193,13 +193,14 @@ has_dev_remotes <- function(pkg) {
 #' @export
 print.package_deps <- function(x, show_ok = FALSE, ...) {
   class(x) <- "data.frame"
+  x$remote <-lapply(x$remote, format)
 
   ahead <- x$diff > 0L
   behind <- x$diff < 0L
   same_ver <- x$diff == 0L
 
   x$diff <- NULL
-  x[] <- lapply(x, format)
+  x[] <- lapply(x, format_str, width = 12)
 
   if (any(behind)) {
     cat("Needs update -----------------------------\n")
