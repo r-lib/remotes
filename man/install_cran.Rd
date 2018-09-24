@@ -5,7 +5,7 @@
 \title{Attempts to install a package from CRAN.}
 \usage{
 install_cran(pkgs, repos = getOption("repos"),
-  type = getOption("pkgType"), dependencies = NA, upgrade = TRUE,
+  type = getOption("pkgType"), dependencies = NA, upgrade = FALSE,
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), ...)

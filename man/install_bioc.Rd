@@ -6,7 +6,7 @@
 \usage{
 install_bioc(repo, mirror = getOption("BioC_git",
   download_url("git.bioconductor.org/packages")), git = c("auto",
-  "git2r", "external"), dependencies = NA, upgrade = TRUE,
+  "git2r", "external"), dependencies = NA, upgrade = FALSE,
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),

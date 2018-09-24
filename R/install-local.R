@@ -19,7 +19,7 @@
 
 install_local <- function(path = ".", subdir = NULL,
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = FALSE,
                            force = FALSE,
                            quiet = FALSE,
                            build = !is_binary_pkg(path),

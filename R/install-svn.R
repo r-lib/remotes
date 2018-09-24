@@ -25,7 +25,7 @@
 install_svn <- function(url, subdir = NULL, args = character(0),
                         revision = NULL,
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = FALSE,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
