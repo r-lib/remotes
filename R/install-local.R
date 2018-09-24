@@ -17,7 +17,7 @@
 #' install_local(pkg[, 2])
 #' }
 
-install_local <- function(path, subdir = NULL,
+install_local <- function(path = ".", subdir = NULL,
                            dependencies = NA,
                            upgrade = TRUE,
                            force = FALSE,
