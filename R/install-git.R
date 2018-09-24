@@ -7,7 +7,8 @@
 #'
 #' @param url Location of package. The url should point to a public or
 #'   private repository.
-#' @param branch Name of branch, tag or SHA reference to use, if not HEAD.
+#' @param ref Name of branch, tag or SHA reference to use, if not HEAD.
+#' @param branch Deprecated, synonym for ref.
 #' @param subdir A sub-directory within a git repository that may
 #'   contain the package we are interested in installing.
 #' @param credentials A git2r credentials object passed through to clone.
@@ -21,9 +22,10 @@
 #' @examples
 #' \dontrun{
 #' install_git("git://github.com/hadley/stringr.git")
-#' install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
+#' install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 #'}
-install_git <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
+install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
+                        credentials = NULL,
                         git = c("auto", "git2r", "external"),
                         dependencies = NA,
                         upgrade = TRUE,
@@ -34,7 +36,12 @@ install_git <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
                         type = getOption("pkgType"),
                         ...) {
 
-  remotes <- lapply(url, git_remote, subdir = subdir, branch = branch,
+  if (!missing(branch)) {
+    warning("`branch` is deprecated, please use `ref`")
+    ref <- branch
+  }
+
+  remotes <- lapply(url, git_remote, subdir = subdir, ref = ref,
     credentials = credentials, git = match.arg(git))
 
   install_remotes(remotes, credentials = credentials,
@@ -50,7 +57,7 @@ install_git <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
 }
 
 
-git_remote <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
+git_remote <- function(url, subdir = NULL, ref = NULL, credentials = NULL,
                        git = c("auto", "git2r", "external"), ...) {
 
   git <- match.arg(git)
@@ -62,25 +69,25 @@ git_remote <- function(url, subdir = NULL, branch = NULL, credentials = NULL,
     stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
   }
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, branch, credentials)
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
 }
 
 
-git_remote_git2r <- function(url, subdir = NULL, branch = NULL, credentials = NULL) {
+git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
   remote("git2r",
     url = url,
     subdir = subdir,
-    branch = branch,
+    ref = ref,
     credentials = credentials
   )
 }
 
 
-git_remote_xgit <- function(url, subdir = NULL, branch = NULL, credentials = NULL) {
+git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
   remote("xgit",
     url = url,
     subdir = subdir,
-    branch = branch
+    ref = ref
   )
 }
 
@@ -93,9 +100,9 @@ remote_download.git2r_remote <- function(x, quiet = FALSE) {
   bundle <- tempfile()
   git2r::clone(x$url, bundle, credentials = x$credentials, progress = FALSE)
 
-  if (!is.null(x$branch)) {
+  if (!is.null(x$ref)) {
     r <- git2r::repository(bundle)
-    git2r::checkout(r, x$branch)
+    git2r::checkout(r, x$ref)
   }
 
   bundle
@@ -114,7 +121,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = 
     RemoteType = "git2r",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
-    RemoteBranch = x$branch,
+    RemoteRef = x$ref,
     RemoteSha = sha
   )
 }
@@ -131,7 +138,7 @@ remote_package_name.git2r_remote <- function(remote, ...) {
   res <- try(silent = TRUE,
     system_check(git_path(),
       args = c("archive", "-o", tmp, "--remote", remote$url,
-        if (is.null(remote$branch)) "HEAD" else remote$branch,
+        if (is.null(remote$ref)) "HEAD" else remote$ref,
         description_path),
       quiet = TRUE))
 
@@ -151,14 +158,14 @@ remote_sha.git2r_remote <- function(remote, ...) {
     # set suppressWarnings in git2r 0.23.0+
     res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
 
-    # This needs to be master, not HEAD because no branch is called HEAD
-    branch <- remote$branch %||% "master"
+    # This needs to be master, not HEAD because no ref is called HEAD
+    ref <- remote$ref %||% "master"
 
-    found <- grep(pattern = paste0("/", branch), x = names(res))
+    found <- grep(pattern = paste0("/", ref), x = names(res))
 
     # If none found, it is either a SHA, so return the pinned sha or NA
     if (length(found) == 0) {
-      return(remote$branch %||% NA_character_)
+      return(remote$ref %||% NA_character_)
     }
 
     unname(res[found[1]])
@@ -184,7 +191,7 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
   bundle <- tempfile()
 
   args <- c('clone', '--depth', '1', '--no-hardlinks')
-  if (!is.null(x$branch)) args <- c(args, "--branch", x$branch)
+  if (!is.null(x$ref)) args <- c(args, "--branch", x$ref)
   args <- c(args, x$args, x$url, bundle)
   git(paste0(args, collapse = " "), quiet = quiet)
 
@@ -201,7 +208,7 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = N
     RemoteType = "xgit",
     RemoteUrl = x$url,
     RemoteSubdir = x$subdir,
-    RemoteBranch = x$branch,
+    RemoteRef = x$ref,
     RemoteSha = sha,
     RemoteArgs = if (length(x$args) > 0) paste0(deparse(x$args), collapse = " ")
   )
@@ -215,9 +222,9 @@ remote_package_name.xgit_remote <- remote_package_name.git2r_remote
 #' @export
 remote_sha.xgit_remote <- function(remote, ...) {
   url <- remote$url
-  branch <- remote$branch
+  ref <- remote$ref
 
-  refs <- git(paste("ls-remote", url, branch))
+  refs <- git(paste("ls-remote", url, ref))
 
   refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
     header = FALSE)

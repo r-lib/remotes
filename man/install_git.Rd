@@ -4,10 +4,10 @@
 \alias{install_git}
 \title{Install a package from a git repository}
 \usage{
-install_git(url, subdir = NULL, branch = NULL, credentials = NULL,
-  git = c("auto", "git2r", "external"), dependencies = NA,
-  upgrade = TRUE, force = FALSE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
+install_git(url, subdir = NULL, ref = NULL, branch = NULL,
+  credentials = NULL, git = c("auto", "git2r", "external"),
+  dependencies = NA, upgrade = TRUE, force = FALSE, quiet = FALSE,
+  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
@@ -18,7 +18,9 @@ private repository.}
 \item{subdir}{A sub-directory within a git repository that may
 contain the package we are interested in installing.}
 
-\item{branch}{Name of branch, tag or SHA reference to use, if not HEAD.}
+\item{ref}{Name of branch, tag or SHA reference to use, if not HEAD.}
+
+\item{branch}{Deprecated, synonym for ref.}
 
 \item{credentials}{A git2r credentials object passed through to clone.
 Supplying this argument implies using \code{git2r} with \code{git}.}
@@ -62,6 +64,6 @@ or an external git client installed.
 \examples{
 \dontrun{
 install_git("git://github.com/hadley/stringr.git")
-install_git("git://github.com/hadley/stringr.git", branch = "stringr-0.2")
+install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 }
 }
