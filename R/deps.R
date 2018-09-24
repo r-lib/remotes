@@ -134,14 +134,13 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
-  deps <- rbind(cran_deps, remote_deps)
-
   # Only keep the remotes that are specified in the cran_deps
-  # Keep only the Non-CRAN remotes if there are duplicates as we want to install
-  # the development version rather than the CRAN version. The remotes will
-  # always be specified after the CRAN dependencies, so using fromLast will
-  # filter out the CRAN dependencies.
-  deps[!duplicated(deps$package, fromLast = TRUE), ]
+  remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
+
+  # If there are remote deps remove the equivalent CRAN deps
+  cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+
+  rbind(cran_deps, remote_deps)
 }
 
 ## -2 = not installed, but available on CRAN
