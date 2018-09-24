@@ -131,6 +131,10 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
 
+  if (!quiet) {
+    print(packages)
+  }
+
   update(
     packages,
     dependencies = dep_deps,
