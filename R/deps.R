@@ -429,7 +429,7 @@ update_packages <- function(packages = TRUE,
                             type = getOption("pkgType"),
                             ...) {
   if (isTRUE(packages)) {
-    packages <- installed.packages()[, "Package"]
+    packages <- utils::installed.packages()[, "Package"]
   }
 
   pkgs <- package_deps(packages, repos = repos, type = type)
