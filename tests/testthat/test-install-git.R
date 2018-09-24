@@ -27,12 +27,12 @@ test_that("install_git with git2r", {
   expect_s3_class(remote, "git2r_remote")
   expect_equal(format(remote), "Git")
   expect_equal(remote$url, url)
-  expect_equal(remote$branch, NULL)
+  expect_equal(remote$ref, NULL)
   expect_equal(remote_sha(remote), remote$sha)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
-test_that("install_git with git2r and branch", {
+test_that("install_git with git2r and ref", {
 
   skip_on_cran()
   skip_if_offline()
@@ -46,7 +46,7 @@ test_that("install_git with git2r and branch", {
   dir.create(lib)
 
   url <- "https://github.com/gaborcsardi/pkgconfig.git"
-  install_git(url, lib = lib, branch = "travis", git = "git2r", quiet = TRUE)
+  install_git(url, lib = lib, ref = "travis", git = "git2r", quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
   expect_equal(
@@ -59,7 +59,7 @@ test_that("install_git with git2r and branch", {
   expect_s3_class(remote, "git2r_remote")
   expect_equal(format(remote), "Git")
   expect_equal(remote$url, url)
-  expect_equal(remote$branch, "travis")
+  expect_equal(remote$ref, "travis")
   expect_equal(remote_sha(remote), remote$sha)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
@@ -88,21 +88,21 @@ test_that("install_git with command line git", {
   expect_s3_class(remote, "xgit_remote")
   expect_equal(format(remote), "Git")
   expect_equal(remote$url, url)
-  expect_equal(remote$branch, NULL)
+  expect_equal(remote$ref, NULL)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 test_that("remote_metadata.xgit_remote", {
 
   r <- remote_metadata.xgit_remote(
-    list(url = "foo", subdir = "foo2", branch = "foo3")
+    list(url = "foo", subdir = "foo2", ref = "foo3")
   )
 
   e <- list(
     RemoteType = "xgit",
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
-    RemoteBranch = "foo3",
+    RemoteRef = "foo3",
     RemoteSha = NULL,
     RemoteArgs = NULL
   )
@@ -113,14 +113,14 @@ test_that("remote_metadata.xgit_remote", {
 test_that("remote_metadata.git2r_remote", {
 
   r <- remote_metadata.git2r_remote(
-    list(url = "foo", subdir = "foo2", branch = "foo3")
+    list(url = "foo", subdir = "foo2", ref = "foo3")
   )
 
   e <- list(
     RemoteType = "git2r",
     RemoteUrl = "foo",
     RemoteSubdir = "foo2",
-    RemoteBranch = "foo3",
+    RemoteRef = "foo3",
     RemoteSha = NULL
   )
 
