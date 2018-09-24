@@ -58,6 +58,13 @@
 including checking if the SHA of the remote has changed since the last
 installation. (#135)
 
+* `github_pat()` and `gitlab_pat()` no longer print diagnostic messages by
+  default (r-lib/devtools#1752).
+
+* Fix skipping when installing from a full SHA (r-lib/devtools#1624)
+
+* `install_url()` can now install package binaries on windows (r-lib/devtools#1765)
+
 # 1.1.1
 
 * Accept HTTPS, SSH, or various browser URLs in GitHub repo specification,
