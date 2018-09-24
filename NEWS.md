@@ -6,6 +6,9 @@
 * `install_deps()`'s `threads` argument has been removed, use the `Ncpus`
   argument instead (#153, #154)
 
+* `install_git()`'s `branch` argument has been renamed to `ref` and `branch`
+  has been deprecated.
+
 # Development
 
 * `install_()*` functions now temporally put Rtools on the PATH when necessary,
