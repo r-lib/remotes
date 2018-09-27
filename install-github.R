@@ -3827,8 +3827,9 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    status <- try(utils::untar(tarfile, extras = "--force-local", ...),
-                  silent = TRUE)
+    status <- try(
+      suppressWarnings(utils::untar(tarfile, extras = "--force-local 2>&1", ...)),
+      silent = TRUE)
     if (inherits(status, "try-error") ||
         is_error_status(status) || is_error_status(attr(status, "status"))) {
       message("External tar failed with `--force-local`, trying without")

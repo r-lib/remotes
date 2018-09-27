@@ -126,7 +126,7 @@ test_that("windows untar, --force-local errors", {
     mockery::stub(untar, "os_type", "windows")
     mockery::stub(untar, "utils::untar", function(extras, ...) {
       calls <<- calls + 1L
-      if (extras == "--force-local") tar_result() else "ok"
+      if (grepl("force-local", extras)) tar_result() else "ok"
     })
 
     expect_equal(untar("foobar"), "ok")
