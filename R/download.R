@@ -2,7 +2,7 @@
 #' @importFrom utils compareVersion
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
-                     quiet = TRUE) {
+  quiet = TRUE, auth_phrase = "access_token=") {
 
   real_url <- url
 
@@ -13,7 +13,8 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
   if (!is.null(auth_token)) {
     sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
-    real_url <- paste0(url, sep, "access_token=", auth_token)
+    tkn <- if (grepl("=$", auth_phrase)) auth_phrase else paste0(auth_phrase, "=")
+    real_url <- paste0(url, sep, tkn, auth_token)
   }
 
   if (compareVersion(get_r_version(), "3.2.0") == -1) {
@@ -25,7 +26,7 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
   }
 
   path
- }
+}
 
 base_download <- function(url, path, quiet) {
 
@@ -45,20 +46,20 @@ base_download <- function(url, path, quiet) {
 }
 
 download_method <- function() {
-  
+
   # R versions newer than 3.3.0 have correct default methods
   if (compareVersion(get_r_version(), "3.3") == -1) {
-    
+
     if (os_type() == "windows") {
       "wininet"
-      
+
     } else if (isTRUE(unname(capabilities("libcurl")))) {
       "libcurl"
-      
+
     } else {
       "auto"
     }
-    
+
   } else {
     "auto"
   }
