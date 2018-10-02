@@ -166,9 +166,7 @@ untar <- function(tarfile, ...) {
       status <- try(
         suppressWarnings(utils::untar(tarfile, extras = "--force-local", ...)),
         silent = TRUE)
-      if (! inherits(status, "try-error") &&
-          ! is_error_status(status) &&
-          !is_error_status(attr(status, "status"))) {
+      if (! is_tar_error(status)) {
         return(status)
 
       } else {
@@ -178,6 +176,12 @@ untar <- function(tarfile, ...) {
   }
 
   utils::untar(tarfile, ...)
+}
+
+is_tar_error <- function(status) {
+  inherits(status, "try-error") ||
+    is_error_status(status) ||
+    is_error_status(attr(status, "status"))
 }
 
 is_error_status <- function(x) {
