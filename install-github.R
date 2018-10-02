@@ -3827,15 +3827,21 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    status <- try(
-      suppressWarnings(utils::untar(tarfile, extras = "--force-local 2>&1", ...)),
-      silent = TRUE)
-    if (inherits(status, "try-error") ||
-        is_error_status(status) || is_error_status(attr(status, "status"))) {
-      message("External tar failed with `--force-local`, trying without")
-      utils::untar(tarfile, ...)
+    tarhelp <- system2("tar", "--help", stdout = TRUE, stderr = TRUE)
+    forcelocal <- any(grepl("--force-local", tarhelp))
+    if (forcelocal)  {
+      status <- try(
+        suppressWarnings(utils::untar(tarfile, extras = "--force-local", ...)),
+        silent = TRUE)
+      if (inherits(status, "try-error") ||
+          is_error_status(status) || is_error_status(attr(status, "status"))) {
+        message("External tar failed with `--force-local`, trying without")
+        utils::untar(tarfile, ...)
+      } else {
+        status
+      }
     } else {
-      status
+      utils::untar(tarfile, ...)
     }
   } else {
     utils::untar(tarfile, ...)
