@@ -115,7 +115,8 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 
   bitbucket_DESCRIPTION(
     username = remote$username, repo = remote$repo,
-    host = remote$host, auth = basic_auth(remote))$Package
+    host = remote$host, auth = basic_auth(remote),
+    ref = remote$ref)$Package
 }
 
 #' @export
