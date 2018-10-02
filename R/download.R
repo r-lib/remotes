@@ -26,7 +26,7 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
   }
 
   path
-}
+  }
 
 base_download <- function(url, path, quiet) {
 
