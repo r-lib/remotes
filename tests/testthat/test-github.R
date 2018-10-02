@@ -2,7 +2,7 @@
 context("GitHub")
 
 test_that("github_pat", {
-  withr::local_envvar(GITHUB_PAT="badcafe")
+  withr::local_envvar(c(GITHUB_PAT="badcafe"))
 
   expect_equal(github_pat(), "badcafe")
   expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
