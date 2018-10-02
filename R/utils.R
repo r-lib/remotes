@@ -9,7 +9,7 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
-rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
+rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
   if (os_type() == "windows") {
     real_cmd <- file.path(path, "Rcmd.exe")
     args <- c(cmd, args)
@@ -18,19 +18,25 @@ rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
     args <- c("CMD", cmd, args)
   }
 
-  outfile <- tempfile()
-  status <- system2(real_cmd, args, stderr = NULL, stdout = outfile)
-  out <- readLines(outfile, warn = FALSE)
+  stdoutfile <- tempfile()
+  stderrfile <- tempfile()
+  on.exit(unlink(c(stdoutfile, stderrfile), recursive = TRUE), add = TRUE)
+  status <- system2(real_cmd, args, stderr = stderrfile, stdout = stdoutfile)
+  out <- tryCatch(readLines(stdoutfile, warn = FALSE), error = function(x) "")
+  err <- tryCatch(readLines(stderrfile, warn = FALSE), error = function(x) "")
 
-  if (status != 0) {
+  if (fail_on_status && status != 0) {
+    cat("STDOUT:\n")
     cat(out, sep = "\n")
+    cat("STDERR:\n")
+    cat(err, sep = "\n")
     stop(sprintf("Error running '%s' (status '%i')", cmd, status), call. = FALSE)
   }
   if (!quiet) {
     cat(out, sep = "\n")
   }
 
-  out
+  list(stdout = out, stderr = err, status = status)
 }
 
 is_bioconductor <- function(x) {

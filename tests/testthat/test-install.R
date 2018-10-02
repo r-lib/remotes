@@ -39,7 +39,7 @@ test_that("safe_build_package fails appropriately without pkgbuild", {
   capture.output(
     expect_error(fixed = TRUE,
     safe_build_package(test_path("invalidpkg"), build_opts = opts , out, quiet = TRUE, use_pkgbuild = FALSE),
-    "Error running 'build' (status '1')"
+    "Failed to `R CMD build` package"
   ))
 })
 
