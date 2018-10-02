@@ -120,9 +120,10 @@ test_that("base64_decode", {
 })
 
 test_that("windows untar, --force-local errors", {
-  do <- function(tar_result) {
+  do <- function(has, tar_result) {
     withr::local_envvar(c(TAR = ""))
     calls <- 0
+    mockery::stub(untar, "system2", if (has) "--force-local" else "nah")
     mockery::stub(untar, "os_type", "windows")
     mockery::stub(untar, "utils::untar", function(extras, ...) {
       calls <<- calls + 1L
@@ -130,10 +131,16 @@ test_that("windows untar, --force-local errors", {
     })
 
     expect_equal(untar("foobar"), "ok")
-    expect_equal(calls, 2)
+    expect_equal(calls, 1 + has)
   }
 
-  do(function() stop("failed"))
-  do(function() 1L)
-  do(function() structure("blah", status = 1L))
+  ## Has force-local but tar fails with it
+  do(TRUE, function() stop("failed"))
+  do(TRUE, function() 1L)
+  do(TRUE, function() structure("blah", status = 1L))
+
+  ## Does not have force-local
+  do(FALSE, function() stop("failed"))
+  do(FALSE, function() 1L)
+  do(FALSE, function() structure("blah", status = 1L))
 })
