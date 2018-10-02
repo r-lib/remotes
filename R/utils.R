@@ -163,15 +163,35 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    status <- try(utils::untar(tarfile, extras = "--force-local", ...))
-    if(inherits(status, "try-error") || status != 0){
-        utils::untar(tarfile, ...)
-    } else {
-        status
+
+    tarhelp <- tryCatch(
+      system2("tar", "--help", stdout = TRUE, stderr = TRUE),
+      error = function(x) "")
+
+    if (any(grepl("--force-local", tarhelp)))  {
+      status <- try(
+        suppressWarnings(utils::untar(tarfile, extras = "--force-local", ...)),
+        silent = TRUE)
+      if (! is_tar_error(status)) {
+        return(status)
+
+      } else {
+        message("External tar failed with `--force-local`, trying without")
+      }
     }
-  } else {
-    utils::untar(tarfile, ...)
   }
+
+  utils::untar(tarfile, ...)
+}
+
+is_tar_error <- function(status) {
+  inherits(status, "try-error") ||
+    is_error_status(status) ||
+    is_error_status(attr(status, "status"))
+}
+
+is_error_status <- function(x) {
+  is.numeric(x) && length(x) > 0 && !is.na(x) && x != 0
 }
 
 os_type <- function() {
