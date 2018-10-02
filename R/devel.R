@@ -52,7 +52,10 @@ missing_devel_warning <- function(pkgdir) {
     pkgname,
     " has compiled code, but no suitable ",
     "compiler(s) were found. Installation will likely fail.\n  ",
-    if (sys == "windows") "Install Rtools and make sure it is in the PATH.",
+    if (sys == "windows") {
+      c("Install Rtools (https://cran.r-project.org/bin/windows/Rtools/).",
+        "Then use the pkgbuild package, or make sure that Rtools in the PATH.")
+    },
     if (sys == "macos") "Install XCode and make sure it works.",
     if (sys == "linux") "Install compilers via your Linux package manager."
   )
