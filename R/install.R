@@ -91,13 +91,32 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 
     pkgdir <- normalizePath(pkgdir)
 
+    message("Running `R CMD build`...")
     in_dir(dest_path, {
       with_envvar(env, {
-        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet)
+        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet,
+                       fail_on_status = FALSE)
       })
     })
 
-    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output[length(output)]))
+    if (output$status != 0) {
+      cat("STDOUT:\n")
+      cat(output$stdout, sep = "\n")
+      cat("STDERR:\n")
+      cat(output$stderr, sep = "\n")
+      if (sys_type() == "windows" &&
+          any(grepl("over-long path length", output$stderr))) {
+        message(
+          "\nIt seems that this package contains files with very long paths.\n",
+          "This is not supported on most Windows versions. Please contant the\n",
+          "package authors and tell them about this. See this GitHub issue\n",
+          "for more details: https://github.com/r-lib/remotes/issues/84\n")
+      }
+      stop(sprintf("Failed to `R CMD build` package, try `build = FALSE`."),
+           call. = FALSE)
+    }
+
+    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output$stdout[length(output$stdout)]))
   }
 }
 
