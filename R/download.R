@@ -2,7 +2,11 @@
 #' @importFrom utils compareVersion
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
+<<<<<<< HEAD
   quiet = TRUE, auth_phrase = "access_token=") {
+=======
+                     quiet = TRUE, auth_phrase = "access_token=") {
+>>>>>>> 98bd6c67a51c09ca07245ed867888c4c600954e3
 
   real_url <- url
 
@@ -13,7 +17,11 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
   if (!is.null(auth_token)) {
     sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
+<<<<<<< HEAD
     tkn <- if (grepl("=$", auth_phrase)) auth_phrase else paste0(auth_phrase, "=")
+=======
+    tkn = if (grepl("=$",auth_phrase)) auth_phrase else paste0(auth_phrase,"=")
+>>>>>>> 98bd6c67a51c09ca07245ed867888c4c600954e3
     real_url <- paste0(url, sep, tkn, auth_token)
   }
 
