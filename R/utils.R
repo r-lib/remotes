@@ -157,7 +157,9 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    tarhelp <- system2("tar", "--help", stdout = TRUE, stderr = TRUE)
+    tarhelp <- tryCatch(
+      system2("tar", "--help", stdout = TRUE, stderr = TRUE),
+      error = function(x) "")
     forcelocal <- any(grepl("--force-local", tarhelp))
     if (forcelocal)  {
       status <- try(
