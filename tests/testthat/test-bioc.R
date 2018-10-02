@@ -81,7 +81,7 @@ test_that("installing bioc packages", {
     install_git("https://git.bioconductor.org/packages/Biobase",
       branch = bioc_branch,
       lib = lib,
-      quiet = TRUE)
+      quiet = FALSE)
   )
 
   expect_silent(packageDescription("Biobase", lib.loc = lib))
