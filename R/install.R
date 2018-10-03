@@ -115,13 +115,19 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 
 msg_for_long_paths <- function(output) {
   if (sys_type() == "windows" &&
-      any(grepl("over-long path length", output$stderr))) {
+      (r_error_matches("over-long path", output$stderr) ||
+       r_error_matches("over-long path length", output$stderr))) {
     message(
       "\nIt seems that this package contains files with very long paths.\n",
       "This is not supported on most Windows versions. Please contact the\n",
       "package authors and tell them about this. See this GitHub issue\n",
       "for more details: https://github.com/r-lib/remotes/issues/84\n")
   }
+}
+
+r_error_matches <- function(msg, str) {
+  any(grepl(msg, str)) ||
+    any(grepl(gettext(msg, domain = "R"), str))
 }
 
 #' Install package dependencies if needed.
