@@ -1,6 +1,8 @@
 install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
                     repos, type, ...) {
 
+  warn_for_potential_errors()
+
   if (file.exists(file.path(pkgdir, "src"))) {
     if (has_package("pkgbuild")) {
       pkgbuild::local_build_tools(required = TRUE)

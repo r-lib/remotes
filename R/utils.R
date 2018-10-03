@@ -388,3 +388,19 @@ format_str <- function(x, width = Inf, trim = TRUE, justify = "none", ...) {
   }
   x
 }
+
+warn_for_potential_errors <- function() {
+  if (sys_type() == "windows" && grepl(" ", R.home()) &&
+      getRversion() <= "3.4.2") {
+    warning(immediate. = TRUE,
+      "\n!!! Installation will probably fail!\n",
+      "This version of R has trouble with building and installing packages if\n",
+      "the R HOME directory (currently '", R.home(), "')\n",
+      "has space characters. Possible workarounds include:\n",
+      "- installing R to the C: drive,\n",
+      "- installing it into a path without a space, or\n",
+      "- creating a drive letter for R HOME via the `subst` windows command, and\n",
+      "  starting R from the new drive.\n",
+      "See also https://github.com/r-lib/remotes/issues/98\n")
+  }
+}
