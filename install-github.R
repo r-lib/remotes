@@ -839,7 +839,10 @@ missing_devel_warning <- function(pkgdir) {
     pkgname,
     " has compiled code, but no suitable ",
     "compiler(s) were found. Installation will likely fail.\n  ",
-    if (sys == "windows") "Install Rtools and make sure it is in the PATH.",
+    if (sys == "windows") {
+      c("Install Rtools (https://cran.r-project.org/bin/windows/Rtools/).",
+        "Then use the pkgbuild package, or make sure that Rtools in the PATH.")
+    },
     if (sys == "macos") "Install XCode and make sure it works.",
     if (sys == "linux") "Install compilers via your Linux package manager."
   )
@@ -861,7 +864,7 @@ R <- function(args, path = tempdir()) {
 #' @importFrom utils compareVersion
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
-                     quiet = TRUE) {
+                     quiet = TRUE, auth_phrase = "access_token=") {
 
   real_url <- url
 
@@ -872,7 +875,8 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
   if (!is.null(auth_token)) {
     sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
-    real_url <- paste0(url, sep, "access_token=", auth_token)
+    tkn <- if (grepl("=$", auth_phrase)) auth_phrase else paste0(auth_phrase, "=")
+    real_url <- paste0(url, sep, tkn, auth_token)
   }
 
   if (compareVersion(get_r_version(), "3.2.0") == -1) {
@@ -1586,7 +1590,9 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 
   bitbucket_DESCRIPTION(
     username = remote$username, repo = remote$repo,
-    host = remote$host, auth = basic_auth(remote))$Package
+    subdir = remote$subdir, ref = remote$ref,
+    host = remote$host, auth = basic_auth(remote)
+  )$Package
 }
 
 #' @export
@@ -2273,7 +2279,7 @@ remote_download.gitlab_remote <- function(x, quiet = FALSE) {
             "\nfrom URL ", src)
   }
 
-  download(dest, src, auth_token = x$auth_token)
+  download(dest, src, auth_token = x$auth_token, auth_phrase = "private_token=")
 }
 
 #' @export
@@ -2306,7 +2312,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
     remote$ref, remote$subdir, "DESCRIPTION")
 
   dest <- tempfile()
-  res <- download(dest, src, auth_token = remote$auth_token)
+  res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
 
   tryCatch(
     read_dcf(dest)$Package,
@@ -2330,7 +2336,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
   fromJSONFile(tmp)$id
 }
@@ -3144,13 +3150,36 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 
     pkgdir <- normalizePath(pkgdir)
 
+    message("Running `R CMD build`...")
     in_dir(dest_path, {
       with_envvar(env, {
-        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet)
+        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet,
+                       fail_on_status = FALSE)
       })
     })
 
-    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output[length(output)]))
+    if (output$status != 0) {
+      cat("STDOUT:\n")
+      cat(output$stdout, sep = "\n")
+      cat("STDERR:\n")
+      cat(output$stderr, sep = "\n")
+      msg_for_long_paths(output)
+      stop(sprintf("Failed to `R CMD build` package, try `build = FALSE`."),
+           call. = FALSE)
+    }
+
+    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output$stdout[length(output$stdout)]))
+  }
+}
+
+msg_for_long_paths <- function(output) {
+  if (sys_type() == "windows" &&
+      any(grepl("over-long path length", output$stderr))) {
+    message(
+      "\nIt seems that this package contains files with very long paths.\n",
+      "This is not supported on most Windows versions. Please contact the\n",
+      "package authors and tell them about this. See this GitHub issue\n",
+      "for more details: https://github.com/r-lib/remotes/issues/84\n")
   }
 }
 
@@ -3679,7 +3708,7 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
-rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
+rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
   if (os_type() == "windows") {
     real_cmd <- file.path(path, "Rcmd.exe")
     args <- c(cmd, args)
@@ -3688,19 +3717,25 @@ rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
     args <- c("CMD", cmd, args)
   }
 
-  outfile <- tempfile()
-  status <- system2(real_cmd, args, stderr = NULL, stdout = outfile)
-  out <- readLines(outfile, warn = FALSE)
+  stdoutfile <- tempfile()
+  stderrfile <- tempfile()
+  on.exit(unlink(c(stdoutfile, stderrfile), recursive = TRUE), add = TRUE)
+  status <- system2(real_cmd, args, stderr = stderrfile, stdout = stdoutfile)
+  out <- tryCatch(readLines(stdoutfile, warn = FALSE), error = function(x) "")
+  err <- tryCatch(readLines(stderrfile, warn = FALSE), error = function(x) "")
 
-  if (status != 0) {
+  if (fail_on_status && status != 0) {
+    cat("STDOUT:\n")
     cat(out, sep = "\n")
+    cat("STDERR:\n")
+    cat(err, sep = "\n")
     stop(sprintf("Error running '%s' (status '%i')", cmd, status), call. = FALSE)
   }
   if (!quiet) {
     cat(out, sep = "\n")
   }
 
-  out
+  list(stdout = out, stderr = err, status = status)
 }
 
 is_bioconductor <- function(x) {
@@ -3827,25 +3862,31 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    tarhelp <- system2("tar", "--help", stdout = TRUE, stderr = TRUE)
-    forcelocal <- any(grepl("--force-local", tarhelp))
-    if (forcelocal)  {
+
+    tarhelp <- tryCatch(
+      system2("tar", "--help", stdout = TRUE, stderr = TRUE),
+      error = function(x) "")
+
+    if (any(grepl("--force-local", tarhelp)))  {
       status <- try(
         suppressWarnings(utils::untar(tarfile, extras = "--force-local", ...)),
         silent = TRUE)
-      if (inherits(status, "try-error") ||
-          is_error_status(status) || is_error_status(attr(status, "status"))) {
-        message("External tar failed with `--force-local`, trying without")
-        utils::untar(tarfile, ...)
+      if (! is_tar_error(status)) {
+        return(status)
+
       } else {
-        status
+        message("External tar failed with `--force-local`, trying without")
       }
-    } else {
-      utils::untar(tarfile, ...)
     }
-  } else {
-    utils::untar(tarfile, ...)
   }
+
+  utils::untar(tarfile, ...)
+}
+
+is_tar_error <- function(status) {
+  inherits(status, "try-error") ||
+    is_error_status(status) ||
+    is_error_status(attr(status, "status"))
 }
 
 is_error_status <- function(x) {
