@@ -764,8 +764,8 @@ remote_deps <- function(pkg, ...) {
   dev_packages <- split_remotes(pkg[["remotes"]])
   remote <- lapply(dev_packages, parse_one_remote, ...)
 
-  package <- vapply(remote, remote_package_name, character(1), USE.NAMES = FALSE)
-  installed <- vapply(package, local_sha, character(1), USE.NAMES = FALSE)
+  package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
+  installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
   available <- vapply(remote, remote_sha, character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
@@ -3174,13 +3174,19 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 
 msg_for_long_paths <- function(output) {
   if (sys_type() == "windows" &&
-      any(grepl("over-long path length", output$stderr))) {
+      (r_error_matches("over-long path", output$stderr) ||
+       r_error_matches("over-long path length", output$stderr))) {
     message(
       "\nIt seems that this package contains files with very long paths.\n",
       "This is not supported on most Windows versions. Please contact the\n",
       "package authors and tell them about this. See this GitHub issue\n",
       "for more details: https://github.com/r-lib/remotes/issues/84\n")
   }
+}
+
+r_error_matches <- function(msg, str) {
+  any(grepl(msg, str)) ||
+    any(grepl(gettext(msg, domain = "R"), str))
 }
 
 #' Install package dependencies if needed.
