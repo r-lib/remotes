@@ -5,8 +5,8 @@
 \title{Attempts to install a package from CRAN.}
 \usage{
 install_cran(pkgs, repos = getOption("repos"),
-  type = getOption("pkgType"), dependencies = NA, upgrade = TRUE,
-  force = FALSE, quiet = FALSE, build = TRUE,
+  type = getOption("pkgType"), dependencies = NA, upgrade = c("ask",
+  "always", "never"), force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), ...)
 }
@@ -26,7 +26,10 @@ Can be a character vector (selecting from "Depends", "Imports",
 and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
 just check this package, not its dependencies).}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "ask", "always" or "never". "ask" prompts the user for
+which out of date packages to upgrade. For non-interactive sessions "ask" is
+equivalent to "always". \code{TRUE} and \code{FALSE} are also accepted and
+correspond to "always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}

@@ -17,7 +17,10 @@
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
 #' @param quiet If `TRUE`, suppress output.
-#' @param upgrade If `TRUE`, also upgrade any of out date dependencies.
+#' @param upgrade One of "ask", "always" or "never". "ask" prompts the user for
+#'   which out of date packages to upgrade. For non-interactive sessions "ask" is
+#'   equivalent to "always". `TRUE` and `FALSE` are also accepted and
+#'   correspond to "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
 #'
@@ -236,13 +239,16 @@ UNAVAILABLE <- 2L
 
 update.package_deps <- function(object,
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
+
+
+  object <- upgradable_packages(object, upgrade)
 
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
@@ -254,21 +260,16 @@ update.package_deps <- function(object,
   }
 
   if (any(unknown_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[unknown_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(unknown_remotes), " packages not available: ",
-        paste(object$package[unknown_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[unknown_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
   ahead_of_cran <- object$diff == AHEAD & object$is_cran
@@ -279,28 +280,19 @@ update.package_deps <- function(object,
 
   ahead_remotes <- object$diff == AHEAD & !object$is_cran
   if (any(ahead_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[ahead_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(ahead_remotes), " packages ahead of remote: ",
-        paste(object$package[ahead_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[ahead_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
-  if (upgrade) {
-    behind <- object$diff < CURRENT
-  } else {
-    behind <- is.na(object$installed)
-  }
+  behind <- is.na(object$installed) | object$diff < CURRENT
 
   if (any(object$is_cran & behind)) {
     install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
@@ -427,7 +419,7 @@ standardise_dep <- function(x) {
 
 update_packages <- function(packages = TRUE,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -534,4 +526,69 @@ remote_deps <- function(pkg, ...) {
   res$remote <- structure(remote, class = "remotes")
 
   res
+}
+
+
+# interactive is an argument to make testing easier.
+resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
+  if (isTRUE(upgrade)) {
+    upgrade <- "always"
+  } else if (identical(upgrade, FALSE)) {
+    upgrade <- "never"
+  }
+
+  upgrade <- match.arg(upgrade, c("ask", "always", "never"))
+
+  if (!is_interactive && identical(upgrade, "ask")) {
+    upgrade <- "always"
+  }
+
+  upgrade
+}
+
+upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
+
+  switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
+
+    always = return(x),
+
+    never = return(x[0, ]),
+
+    ask = {
+      behind <- x$diff < CURRENT
+
+      if (!any(behind)) {
+        return(x)
+      }
+
+      out <- x[behind, ]
+
+      remote_type <- lapply(out$remote, format)
+
+      # This call trims widths to 12 characters
+      out[] <- lapply(out, format_str, width = 12)
+
+      # This call aligns the columns
+      out[] <- lapply(out, format, trim = FALSE, justify = "left")
+
+      pkgs <- paste0(out$package, " (", out$installed, " -> ", out$available, ") ", "[", remote_type, "]")
+
+      choices <- pkgs
+      if (length(choices) > 1) {
+        choices <- c(choices, "None", "All")
+      }
+
+      res <- utils::select.list(choices, title = "Select package(s) to update", multiple = TRUE)
+
+      if ("None" %in% res || length(res) == 0) {
+        return(x[0, ])
+      }
+
+      if ("All" %in% res) {
+        return(x)
+      }
+
+      x[behind, ][pkgs %in% res, ]
+    }
+  )
 }
