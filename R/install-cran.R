@@ -15,7 +15,7 @@
 #' }
 install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
                          dependencies = NA,
-                         upgrade = FALSE,
+                         upgrade = TRUE,
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),

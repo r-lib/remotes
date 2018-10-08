@@ -146,7 +146,7 @@ r_error_matches <- function(msg, str) {
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         upgrade = FALSE,
+                         upgrade = TRUE,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
