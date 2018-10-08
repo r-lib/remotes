@@ -190,11 +190,17 @@ test_that("update.package_deps", {
     diff = c(CURRENT, UNAVAILABLE, CURRENT),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(update, "install_packages", NULL)
   expect_message(
-    update(object, quiet = FALSE),
+    update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? not available: falsy"
   )
 })
@@ -209,11 +215,16 @@ test_that("update.package_deps 2", {
     diff = c(CURRENT, AHEAD, CURRENT),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(update, "install_packages", NULL)
   expect_message(
-    update(object, quiet = FALSE),
+    update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? ahead of CRAN: falsy"
   )
 })
@@ -228,6 +239,12 @@ test_that("update.package_deps 3", {
     diff = c(CURRENT, BEHIND, UNINSTALLED),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(
@@ -332,4 +349,81 @@ test_that("type = 'both' works well", {
     package_deps("falsy", type = "binary")[-6]
   )
 
+})
+
+test_that("resolve_upgrade works", {
+  # returns ask by default when used interactively
+  expect_equal(resolve_upgrade(c("ask", "always", "never"), is_interactive = TRUE), "ask")
+
+  # returns always by default when used non-interactively
+  expect_equal(resolve_upgrade(c("ask", "always", "never"), is_interactive = FALSE), "always")
+
+  # returns always when given TRUE or always input
+  expect_equal(resolve_upgrade(TRUE, is_interactive = FALSE), "always")
+  expect_equal(resolve_upgrade("always", is_interactive = FALSE), "always")
+
+  # returns never when given FALSE or never input
+  expect_equal(resolve_upgrade(FALSE, is_interactive = FALSE), "never")
+  expect_equal(resolve_upgrade("never", is_interactive = FALSE), "never")
+
+  # errors on unexpected inputs
+  expect_error(resolve_upgrade("sometimes"), "'arg' should be one of")
+})
+
+test_that("upgradeable_packages works", {
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "magrittr"),
+    installed = c("1.0", "1.0", NA),
+    available = c("1.0", "1.1", "1.0"),
+    diff = c(CURRENT, BEHIND, UNINSTALLED),
+    is_cran = c(TRUE, TRUE, TRUE)
+  )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  # returns full object if "always"
+  expect_equal(upgradable_packages(object, "always"),
+               object)
+
+  # returns 0 row object if "never"
+  expect_equal(upgradable_packages(object, "never"),
+               object[0, ])
+
+  # returns full object if "ask" and not is_interactive
+  expect_equal(upgradable_packages(object, "ask", is_interactive = FALSE),
+               object)
+
+  # returns selected row to update if "ask" and is_interactive
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) "falsy    (1.0 -> 1.1) [CRAN]")
+  expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
+               object[object$package == "falsy", ])
+
+  # returns selected rows to update if "ask" and is_interactive
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) c("falsy    (1.0 -> 1.1) [CRAN]", "magrittr (NA  -> 1.0) [CRAN]"))
+  expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
+               object[object$package %in% c("falsy", "magrittr"), ])
+
+  # All should be the whole object
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) "All")
+  expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
+               object)
+
+  # None should be the 0 row object
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) "None")
+  expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
+               object[0, ])
+
+  # empty vector should be the 0 row object (you get this when canceling the selection)
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) character(0))
+  expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
+               object[0, ])
+
+  # If only given current or ahead packages (which dotenv is), just return that
+  expect_equal(upgradable_packages(object[object$package == "dotenv", ], "ask", is_interactive = TRUE),
+               object[object$package == "dotenv", ])
 })

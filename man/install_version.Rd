@@ -5,9 +5,9 @@
 \title{Install specified version of a CRAN package.}
 \usage{
 install_version(package, version = NULL, dependencies = NA,
-  upgrade = TRUE, force = FALSE, quiet = FALSE, build = FALSE,
-  build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), repos = getOption("repos"),
+  upgrade = c("ask", "always", "never"), force = FALSE,
+  quiet = FALSE, build = FALSE, build_opts = c("--no-resave-data",
+  "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
 \arguments{
@@ -42,7 +42,10 @@ archived source tarballs and tries to install an older version instead.}
     In all of these, \code{"LinkingTo"} is omitted for binary packages.
   }
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "ask", "always" or "never". "ask" prompts the user for
+which out of date packages to upgrade. For non-interactive sessions "ask" is
+equivalent to "always". \code{TRUE} and \code{FALSE} are also accepted and
+correspond to "always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
