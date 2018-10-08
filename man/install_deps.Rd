@@ -6,7 +6,7 @@
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"),
-  upgrade = FALSE, quiet = FALSE, build = TRUE,
+  upgrade = TRUE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), ...)
 }

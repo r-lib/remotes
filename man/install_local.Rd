@@ -5,7 +5,7 @@
 \title{Install a package from a local file}
 \usage{
 install_local(path = ".", subdir = NULL, dependencies = NA,
-  upgrade = FALSE, force = FALSE, quiet = FALSE,
+  upgrade = TRUE, force = FALSE, quiet = FALSE,
   build = !is_binary_pkg(path), build_opts = c("--no-resave-data",
   "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)

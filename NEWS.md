@@ -9,10 +9,6 @@
 * `install_git()`'s `branch` argument has been renamed to `ref` and `branch`
   has been deprecated.
 
-* `install_*()` functions now default to `upgrade = FALSE` rather than
-  `upgrade = TRUE`. After installation the easiest way to upgrade its
-  dependencies is `remotes::update_packages("pkgname", upgrade = TRUE)`.
-
 # Development
 
 * `install_()*` functions now temporally put Rtools on the PATH when necessary,
