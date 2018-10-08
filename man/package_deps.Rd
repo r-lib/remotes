@@ -16,9 +16,9 @@ dev_package_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"), ...)
 
 \method{update}{package_deps}(object, dependencies = NA,
-  upgrade = TRUE, force = FALSE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), repos = getOption("repos"),
+  upgrade = c("ask", "always", "never"), force = FALSE,
+  quiet = FALSE, build = TRUE, build_opts = c("--no-resave-data",
+  "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
 \arguments{
@@ -43,7 +43,10 @@ just check this package, not its dependencies).}
 
 \item{object}{A \code{package_deps} object.}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "ask", "always" or "never". "ask" prompts the user for
+which out of date packages to upgrade. For non-interactive sessions "ask" is
+equivalent to "always". \code{TRUE} and \code{FALSE} are also accepted and
+correspond to "always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}

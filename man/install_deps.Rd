@@ -6,7 +6,7 @@
 \usage{
 install_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"),
-  upgrade = TRUE, quiet = FALSE, build = TRUE,
+  upgrade = c("ask", "always", "never"), quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), ...)
 }
@@ -26,7 +26,10 @@ just check this package, not its dependencies).}
 
 \item{type}{Type of package to \code{update}.}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "ask", "always" or "never". "ask" prompts the user for
+which out of date packages to upgrade. For non-interactive sessions "ask" is
+equivalent to "always". \code{TRUE} and \code{FALSE} are also accepted and
+correspond to "always" and "never" respectively.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
 

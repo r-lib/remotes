@@ -21,7 +21,7 @@
 
 install_version <- function(package, version = NULL,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
