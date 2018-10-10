@@ -1,0 +1,26 @@
+reference:
+  - title: Package Installation
+    desc: Tools for installing packages from a variety of locations.
+    contents:
+    - install_bioc
+    - install_bitbucket
+    - install_cran
+    - install_dev
+    - install_git
+    - install_github
+    - install_gitlab
+    - install_local
+    - install_svn
+    - install_url
+    - install_version
+    - download_version
+    - update_packages
+  - title: Dependencies
+    desc: Tools for working with package dependencies.
+    contents:
+      - contains("deps")
+  - title: GitHub helpers
+    desc: Utilities for interacting with GitHub.
+    contents:
+    - starts_with("github")
+    - starts_with("parse_github")
