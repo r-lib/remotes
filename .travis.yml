@@ -12,6 +12,10 @@ matrix:
   include:
     - r: release
       after_success: Rscript -e 'covr::codecov()'
+      deploy:
+        provider: script
+        script: Rscript -e 'pkgdown::deploy_site_github(verbose = TRUE)'
+        skip-cleanup: true
     - r: release
       env: R_REMOTES_STANDALONE=true
 
