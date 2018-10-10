@@ -443,7 +443,7 @@ has_dev_remotes <- function(pkg) {
 #' @export
 print.package_deps <- function(x, show_ok = FALSE, ...) {
   class(x) <- "data.frame"
-  x$remote <- lapply(x$remote, format)
+  x$remote <-lapply(x$remote, format)
 
   ahead <- x$diff > 0L
   behind <- x$diff < 0L
@@ -486,7 +486,7 @@ UNAVAILABLE <- 2L
 
 update.package_deps <- function(object,
                            dependencies = NA,
-                           upgrade = FALSE,
+                           upgrade = TRUE,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -766,7 +766,7 @@ remote_deps <- function(pkg, ...) {
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
-  available <- vapply(remote, remote_sha, character(1), USE.NAMES = FALSE)
+  available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
 
@@ -1210,7 +1210,7 @@ github_error_message <- function(res) {
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
                          git = c("auto", "git2r", "external"),
                          dependencies = NA,
-                         upgrade = FALSE,
+                         upgrade = TRUE,
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1511,7 +1511,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
                               host = "api.bitbucket.org/2.0",
                               dependencies = NA,
-                              upgrade = FALSE,
+                              upgrade = TRUE,
                               force = FALSE,
                               quiet = FALSE,
                               build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1680,7 +1680,7 @@ bitbucket_user <- function(quiet = TRUE) {
 #' }
 install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
                          dependencies = NA,
-                         upgrade = FALSE,
+                         upgrade = TRUE,
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1754,7 +1754,7 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                         credentials = NULL,
                         git = c("auto", "git2r", "external"),
                         dependencies = NA,
-                        upgrade = FALSE,
+                        upgrade = TRUE,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2008,7 +2008,7 @@ install_github <- function(repo,
                            auth_token = github_pat(),
                            host = "api.github.com",
                            dependencies = NA,
-                           upgrade = FALSE,
+                           upgrade = TRUE,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2227,7 +2227,7 @@ install_gitlab <- function(repo,
                            auth_token = gitlab_pat(),
                            host = "gitlab.com",
                            dependencies = NA,
-                           upgrade = FALSE,
+                           upgrade = TRUE,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2379,7 +2379,7 @@ gitlab_pat <- function(quiet = TRUE) {
 
 install_local <- function(path = ".", subdir = NULL,
                            dependencies = NA,
-                           upgrade = FALSE,
+                           upgrade = TRUE,
                            force = FALSE,
                            quiet = FALSE,
                            build = !is_binary_pkg(path),
@@ -2700,7 +2700,7 @@ format.remotes <- function(x, ...) {
 install_svn <- function(url, subdir = NULL, args = character(0),
                         revision = NULL,
                         dependencies = NA,
-                        upgrade = FALSE,
+                        upgrade = TRUE,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2871,7 +2871,7 @@ format.svn_remote <- function(x, ...) {
 
 install_url <- function(url, subdir = NULL,
                         dependencies = NA,
-                        upgrade = FALSE,
+                        upgrade = TRUE,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2957,10 +2957,10 @@ format.url_remote <- function(x, ...) {
 
 install_version <- function(package, version = NULL,
                             dependencies = NA,
-                            upgrade = FALSE,
+                            upgrade = TRUE,
                             force = FALSE,
                             quiet = FALSE,
-                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
                             type = getOption("pkgType"),
                             ...) {
@@ -3059,6 +3059,8 @@ download_version_url <- function(package, version, repos, type) {
 }
 install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
                     repos, type, ...) {
+
+  warn_for_potential_errors()
 
   if (file.exists(file.path(pkgdir, "src"))) {
     if (has_package("pkgbuild")) {
@@ -3168,7 +3170,14 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
            call. = FALSE)
     }
 
-    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output$stdout[length(output$stdout)]))
+    building_regex <- paste0(
+      "^[*] building[^[:alnum:]]+",     # prefix, "* building '"
+      "([-[:alnum:]_.]+)",              # package file name, e.g. xy_1.0-2.tar.gz
+      "[^[:alnum:]]+$"                   # trailing quote
+    )
+
+    pkgfile <- sub(building_regex, "\\1", output$stdout[length(output$stdout)])
+    file.path(dest_path, pkgfile)
   }
 }
 
@@ -3203,7 +3212,7 @@ r_error_matches <- function(msg, str) {
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         upgrade = FALSE,
+                         upgrade = TRUE,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -4092,6 +4101,22 @@ format_str <- function(x, width = Inf, trim = TRUE, justify = "none", ...) {
     }
   }
   x
+}
+
+warn_for_potential_errors <- function() {
+  if (sys_type() == "windows" && grepl(" ", R.home()) &&
+      getRversion() <= "3.4.2") {
+    warning(immediate. = TRUE,
+      "\n!!! Installation will probably fail!\n",
+      "This version of R has trouble with building and installing packages if\n",
+      "the R HOME directory (currently '", R.home(), "')\n",
+      "has space characters. Possible workarounds include:\n",
+      "- installing R to the C: drive,\n",
+      "- installing it into a path without a space, or\n",
+      "- creating a drive letter for R HOME via the `subst` windows command, and\n",
+      "  starting R from the new drive.\n",
+      "See also https://github.com/r-lib/remotes/issues/98\n")
+  }
 }
 
 
