@@ -11,6 +11,9 @@
 
 # Development
 
+* `install_dev()` added to install the development version of a CRAN package,
+  based on the URL and BugReports fields in the DESCRIPTION file (#144)
+
 * `install_()*` functions now temporally put Rtools on the PATH when necessary,
   as long as the pkgbuild package is installed.
 
