@@ -48,7 +48,7 @@ test_that("error if not username, warning if given as argument", {
 
 test_that("remote_download.gitlab_remote messages", {
 
-  mockery::stub(remote_download.gitlab_remote, "download_gitlab", TRUE)
+  mockery::stub(remote_download.gitlab_remote, "download", TRUE)
   expect_message(
     remote_download.gitlab_remote(
       remote("gitlab",
