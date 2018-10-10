@@ -172,7 +172,8 @@ github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
   ## Just because libcurl might download the error page...
   if (methods::is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
-         params$repo, "#", x)
+         params$repo, "#", x, "\n",
+         response$message)
   }
 
   params$username <- response$head$user$login
@@ -191,7 +192,8 @@ github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL)
   )
 
   if (methods::is(response, "error") || !is.null(response$message)) {
-    stop("Cannot find repo ", params$username, "/", params$repo, ".")
+    stop("Cannot find repo ", params$username, "/", params$repo, ".", "\n",
+      response$message)
   }
 
   if (length(response) == 0L)
