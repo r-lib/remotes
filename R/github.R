@@ -14,8 +14,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     res <- curl::curl_fetch_memory(url, handle = h)
 
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
     fromJSON(rawToChar(res$content))
   } else {
@@ -49,8 +48,7 @@ github_commit <- function(username, repo, ref = "master",
       return(current_sha)
     }
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
 
     rawToChar(res$content)
@@ -102,8 +100,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
     rawToChar(res$content)
   } else {
@@ -117,7 +114,33 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
   }
 }
 
-github_error_message <- function(res) {
-  msg <- fromJSON(rawToChar(res$content))
-  msg$message
+github_error <- function(res) {
+  res_headers <- curl::parse_headers_list(res$headers)
+  ratelimit_remaining <- res_headers$`x-ratelimit-remaining`
+
+  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
+
+  error_details <- fromJSON(rawToChar(res$content))$message
+
+  msg <- sprintf(
+"HTTP error %s.
+  %s
+
+  Rate limit remaining: %s
+  Rate limit reset at: %s",
+
+    res$status_code,
+    error_details,
+    ratelimit_remaining,
+    format(ratelimit_reset, usetz = TRUE)
+  )
+
+  structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
+
+
+#> Error: HTTP error 404.
+#>   Not Found
+#> 
+#>   Rate limit remaining: 4999
+#>   Rate limit reset at: 2018-10-10 19:43:52 UTC
