@@ -29,3 +29,15 @@ expect_equal_named_lists <- function(object, expected, ...) {
   expected <- expected[order(names(expected))]
   expect_equal(!!object, !!expected)
 }
+
+skip_without_package <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    skip(paste("Need the", pkg, "package"))
+  }
+}
+
+skip_without_program <- function(program) {
+  if (Sys.which(program) == "") {
+    skip(paste("Need the", program, "program"))
+  }
+}
