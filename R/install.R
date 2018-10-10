@@ -111,7 +111,14 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
            call. = FALSE)
     }
 
-    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output$stdout[length(output$stdout)]))
+    building_regex <- paste0(
+      "^[*] building[^[:alnum:]]+",     # prefix, "* building '"
+      "([-[:alnum:]_.]+)",              # package file name, e.g. xy_1.0-2.tar.gz
+      "[^[:alnum:]]+$"                   # trailing quote
+    )
+
+    pkgfile <- sub(building_regex, "\\1", output$stdout[length(output$stdout)])
+    file.path(dest_path, pkgfile)
   }
 }
 

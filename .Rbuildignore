@@ -1,5 +1,6 @@
 ^docs$
 ^_pkgdown\.yml$
+^codecov\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
