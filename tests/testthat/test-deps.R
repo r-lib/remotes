@@ -83,6 +83,10 @@ test_that("printing package_deps", {
     available = c("1.0", NA, "1.0"),
     diff = c(0L, 2L, 0L)
   )
+  object$remote <- list(cran_remote("dotenv", NULL, NULL),
+                        cran_remote("falsy", NULL, NULL),
+                        cran_remote("magrittr", NULL, NULL))
+
   class(object) <- c("package_deps", "data.frame")
 
   expect_output(
@@ -111,6 +115,10 @@ test_that("printing package_deps", {
     available = c("1.0", "1.1", "1.0"),
     diff = c(0L, -1L, -2L)
   )
+  object$remote <- list(cran_remote("dotenv", NULL, NULL),
+                        cran_remote("falsy", NULL, NULL),
+                        cran_remote("magrittr", NULL, NULL))
+
   class(object) <- c("package_deps", "data.frame")
 
   expect_output(

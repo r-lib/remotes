@@ -1,6 +1,8 @@
 install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
                     repos, type, ...) {
 
+  warn_for_potential_errors()
+
   if (file.exists(file.path(pkgdir, "src"))) {
     if (has_package("pkgbuild")) {
       pkgbuild::local_build_tools(required = TRUE)
@@ -95,14 +97,50 @@ safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuil
 
     pkgdir <- normalizePath(pkgdir)
 
+    message("Running `R CMD build`...")
     in_dir(dest_path, {
       with_envvar(env, {
-        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet)
+        output <- rcmd("build", c(build_opts, shQuote(pkgdir)), quiet = quiet,
+                       fail_on_status = FALSE)
       })
     })
 
-    file.path(dest_path, sub("^[*] building[^[:alnum:]]+([[:alnum:]_.]+)[^[:alnum:]]+$", "\\1", output[length(output)]))
+    if (output$status != 0) {
+      cat("STDOUT:\n")
+      cat(output$stdout, sep = "\n")
+      cat("STDERR:\n")
+      cat(output$stderr, sep = "\n")
+      msg_for_long_paths(output)
+      stop(sprintf("Failed to `R CMD build` package, try `build = FALSE`."),
+           call. = FALSE)
+    }
+
+    building_regex <- paste0(
+      "^[*] building[^[:alnum:]]+",     # prefix, "* building '"
+      "([-[:alnum:]_.]+)",              # package file name, e.g. xy_1.0-2.tar.gz
+      "[^[:alnum:]]+$"                   # trailing quote
+    )
+
+    pkgfile <- sub(building_regex, "\\1", output$stdout[length(output$stdout)])
+    file.path(dest_path, pkgfile)
   }
+}
+
+msg_for_long_paths <- function(output) {
+  if (sys_type() == "windows" &&
+      (r_error_matches("over-long path", output$stderr) ||
+       r_error_matches("over-long path length", output$stderr))) {
+    message(
+      "\nIt seems that this package contains files with very long paths.\n",
+      "This is not supported on most Windows versions. Please contact the\n",
+      "package authors and tell them about this. See this GitHub issue\n",
+      "for more details: https://github.com/r-lib/remotes/issues/84\n")
+  }
+}
+
+r_error_matches <- function(msg, str) {
+  any(grepl(msg, str)) ||
+    any(grepl(gettext(msg, domain = "R"), str))
 }
 
 #' Install package dependencies if needed.
@@ -134,6 +172,10 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
+
+  if (!quiet) {
+    print(packages)
+  }
 
   update(
     packages,

@@ -134,14 +134,19 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
-  deps <- rbind(cran_deps, remote_deps)
+  # If there are no dependencies there will be no remote dependencies either,
+  # so just return them (and don't force the remote_deps promise)
+  if (nrow(cran_deps) == 0) {
+    return(cran_deps)
+  }
 
   # Only keep the remotes that are specified in the cran_deps
-  # Keep only the Non-CRAN remotes if there are duplicates as we want to install
-  # the development version rather than the CRAN version. The remotes will
-  # always be specified after the CRAN dependencies, so using fromLast will
-  # filter out the CRAN dependencies.
-  deps[!duplicated(deps$package, fromLast = TRUE), ]
+  remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
+
+  # If there are remote deps remove the equivalent CRAN deps
+  cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+
+  rbind(cran_deps, remote_deps)
 }
 
 ## -2 = not installed, but available on CRAN
@@ -188,13 +193,14 @@ has_dev_remotes <- function(pkg) {
 #' @export
 print.package_deps <- function(x, show_ok = FALSE, ...) {
   class(x) <- "data.frame"
+  x$remote <-lapply(x$remote, format)
 
   ahead <- x$diff > 0L
   behind <- x$diff < 0L
   same_ver <- x$diff == 0L
 
   x$diff <- NULL
-  x[] <- lapply(x, format)
+  x[] <- lapply(x, format_str, width = 12)
 
   if (any(behind)) {
     cat("Needs update -----------------------------\n")
@@ -429,7 +435,7 @@ update_packages <- function(packages = TRUE,
                             type = getOption("pkgType"),
                             ...) {
   if (isTRUE(packages)) {
-    packages <- installed.packages()[, "Package"]
+    packages <- utils::installed.packages()[, "Package"]
   }
 
   pkgs <- package_deps(packages, repos = repos, type = type)
@@ -478,6 +484,10 @@ parse_one_remote <- function(x, ...) {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
   tryCatch({
+    # We need to use `environment(sys.function())` instead of
+    # `asNamespace("remotes")` because when used as a script in
+    # install-github.R there is no remotes namespace.
+
     fun <- get(paste0(tolower(type), "_remote"),
       envir = environment(sys.function()), mode = "function", inherits = FALSE)
 

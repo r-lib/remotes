@@ -9,7 +9,7 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
-rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
+rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
   if (os_type() == "windows") {
     real_cmd <- file.path(path, "Rcmd.exe")
     args <- c(cmd, args)
@@ -18,19 +18,25 @@ rcmd <- function(cmd, args, path = R.home("bin"), quiet) {
     args <- c("CMD", cmd, args)
   }
 
-  outfile <- tempfile()
-  status <- system2(real_cmd, args, stderr = NULL, stdout = outfile)
-  out <- readLines(outfile, warn = FALSE)
+  stdoutfile <- tempfile()
+  stderrfile <- tempfile()
+  on.exit(unlink(c(stdoutfile, stderrfile), recursive = TRUE), add = TRUE)
+  status <- system2(real_cmd, args, stderr = stderrfile, stdout = stdoutfile)
+  out <- tryCatch(readLines(stdoutfile, warn = FALSE), error = function(x) "")
+  err <- tryCatch(readLines(stderrfile, warn = FALSE), error = function(x) "")
 
-  if (status != 0) {
+  if (fail_on_status && status != 0) {
+    cat("STDOUT:\n")
     cat(out, sep = "\n")
+    cat("STDERR:\n")
+    cat(err, sep = "\n")
     stop(sprintf("Error running '%s' (status '%i')", cmd, status), call. = FALSE)
   }
   if (!quiet) {
     cat(out, sep = "\n")
   }
 
-  out
+  list(stdout = out, stderr = err, status = status)
 }
 
 is_bioconductor <- function(x) {
@@ -157,14 +163,35 @@ with_rprofile_user <- function(new, code) {
 
 untar <- function(tarfile, ...) {
   if (os_type() == "windows") {
-    tryCatch(
-      utils::untar(tarfile, extras = "--force-local", ...),
-      error = function(e) utils::untar(tarfile, ...)
-    )
 
-  } else {
-    utils::untar(tarfile, ...)
+    tarhelp <- tryCatch(
+      system2("tar", "--help", stdout = TRUE, stderr = TRUE),
+      error = function(x) "")
+
+    if (any(grepl("--force-local", tarhelp)))  {
+      status <- try(
+        suppressWarnings(utils::untar(tarfile, extras = "--force-local", ...)),
+        silent = TRUE)
+      if (! is_tar_error(status)) {
+        return(status)
+
+      } else {
+        message("External tar failed with `--force-local`, trying without")
+      }
+    }
   }
+
+  utils::untar(tarfile, ...)
+}
+
+is_tar_error <- function(status) {
+  inherits(status, "try-error") ||
+    is_error_status(status) ||
+    is_error_status(attr(status, "status"))
+}
+
+is_error_status <- function(x) {
+  is.numeric(x) && length(x) > 0 && !is.na(x) && x != 0
 }
 
 os_type <- function() {
@@ -347,4 +374,33 @@ dir.exists <- function(paths) {
 
 is_binary_pkg <- function(x) {
   file_ext(x) %in% c("tgz", "zip")
+}
+
+format_str <- function(x, width = Inf, trim = TRUE, justify = "none", ...) {
+  x <- format(x, trim = trim, justify = justify, ...)
+
+  if (width < Inf) {
+    x_width <- nchar(x, "width")
+    too_wide <- x_width > width
+    if (any(too_wide)) {
+      x[too_wide] <- paste0(substr(x[too_wide], 1, width - 3), "...")
+    }
+  }
+  x
+}
+
+warn_for_potential_errors <- function() {
+  if (sys_type() == "windows" && grepl(" ", R.home()) &&
+      getRversion() <= "3.4.2") {
+    warning(immediate. = TRUE,
+      "\n!!! Installation will probably fail!\n",
+      "This version of R has trouble with building and installing packages if\n",
+      "the R HOME directory (currently '", R.home(), "')\n",
+      "has space characters. Possible workarounds include:\n",
+      "- installing R to the C: drive,\n",
+      "- installing it into a path without a space, or\n",
+      "- creating a drive letter for R HOME via the `subst` windows command, and\n",
+      "  starting R from the new drive.\n",
+      "See also https://github.com/r-lib/remotes/issues/98\n")
+  }
 }

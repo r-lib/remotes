@@ -73,7 +73,7 @@ remote_download.gitlab_remote <- function(x, quiet = FALSE) {
             "\nfrom URL ", src)
   }
 
-  download(dest, src, auth_token = x$auth_token)
+  download(dest, src, auth_token = x$auth_token, auth_phrase = "private_token=")
 }
 
 #' @export
@@ -106,7 +106,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
     remote$ref, remote$subdir, "DESCRIPTION")
 
   dest <- tempfile()
-  res <- download(dest, src, auth_token = remote$auth_token)
+  res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
 
   tryCatch(
     read_dcf(dest)$Package,
@@ -130,7 +130,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
 
   tmp <- tempfile()
-  download(tmp, url, auth_token = pat)
+  download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
   fromJSONFile(tmp)$id
 }
