@@ -20,6 +20,7 @@ test_that("install_bioc with git2r", {
 
   skip_without_package("git2r")
   skip_on_cran()
+  skip_if_offline()
 
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
@@ -48,6 +49,7 @@ test_that("install_bioc with xgit", {
 
   skip_without_program("git")
   skip_on_cran()
+  skip_if_offline()
 
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
