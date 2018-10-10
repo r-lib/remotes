@@ -9,7 +9,7 @@ skip_if_offline <- function(host = "httpbin.org", port = 80) {
   if (is.na(res)) skip("No internet connection")
 }
 
-skip_if_over_rate_limit <- function(by = 5) {
+skip_if_over_rate_limit <- function(by = 50) {
 
   tmp <- tempfile()
   download(
