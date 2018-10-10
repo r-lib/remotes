@@ -59,6 +59,7 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
 #' @param r_ver R version to use.
 #' @param bioc_ver corresponding to the R version to use.
 #' @export
+#' @keywords internal
 
 bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version()) {
   r_ver <- package_version(r_ver)
