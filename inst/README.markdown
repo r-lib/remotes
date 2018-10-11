@@ -14,7 +14,7 @@
 Download and install R packages stored in GitHub,
 BitBucket, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
-[`devtools`](https://github.com/hadley/devtools).
+[`devtools`](https://github.com/r-lib/devtools).
 Indeed most of the code was copied over from `devtools`.
 
 ## Features
@@ -28,7 +28,7 @@ Indeed most of the code was copied over from `devtools`.
 	* Install specific package versions from CRAN.
 * Supports [BioConductor](https://bioconductor.org/) packages.
 * Supports the `Remotes` field in `DESCRIPTION`. See more
-  [here](https://github.com/hadley/remotes/blob/master/vignettes/dependencies.Rmd).
+  [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
@@ -128,7 +128,7 @@ assumed. Other possible values: `gitlab::`,`bitbucket::`, `git::`, `local::`,
 `svn::`, `url::`, `version::`, `cran::`, `bioc::`.
 
 See more about the `Remotes` field in this
-[vignette](https://github.com/hadley/remotes/blob/master/vignettes/dependencies.Rmd).
+[vignette](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
 
 #### Additional repositories
 
