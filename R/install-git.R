@@ -18,6 +18,7 @@
 #'   otherwise an external git installation.
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{

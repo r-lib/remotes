@@ -71,3 +71,13 @@ install_git("git://github.com/hadley/stringr.git")
 install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 }
 }
+\seealso{
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_bitbucket}},
+  \code{\link{install_cran}}, \code{\link{install_dev}},
+  \code{\link{install_github}},
+  \code{\link{install_gitlab}},
+  \code{\link{install_local}}, \code{\link{install_svn}},
+  \code{\link{install_url}}, \code{\link{install_version}}
+}
+\concept{package installation}

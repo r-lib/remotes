@@ -25,6 +25,7 @@
 #' @details
 #' If the repository uses submodules a command-line git client is required to
 #' clone the submodules.
+#' @family package installation
 #' @export
 #' @seealso [github_pull()]
 #' @examples
