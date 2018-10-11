@@ -33,9 +33,9 @@ The `type` is an optional parameter.  If the type is missing the default is
 to install from GitHub. Additional remote dependencies should be separated by
 commas, just like normal dependencies elsewhere in the `DESCRIPTION` file.
 
-### Github
+### GitHub
 
-Because github is the most commonly used unofficial package distribution in R, it's the default:
+Because GitHub is the most commonly used unofficial package distribution in R, it's the default:
 
 ```yaml
 Remotes: r-lib/testthat
@@ -49,6 +49,12 @@ Remotes: r-lib/httr@v0.4,
   r-lib/testthat@c67018fa4970
 ```
 
+The special `@*release` syntax will install the latest release:
+
+```yaml
+Remotes: r-lib/testthat@*release
+```
+
 A type of 'github' can be specified, but is not required
 
 ```yaml
@@ -58,7 +64,7 @@ Remotes: github::tidyverse/ggplot2
 ### Other sources
 
 All of the currently supported install sources are available, see the 'See
-Also' section in `?install` for a complete list.
+Also' section in `?install_github` for a complete list.
 
 ```yaml
 # GitLab
@@ -81,9 +87,6 @@ Remotes: url::https://github.com/tidyverse/stringr/archive/master.zip
 
 # Local
 Remotes: local::/pkgs/testthat
-
-# Gitorious
-Remotes: gitorious::r-mpc-package/r-mpc-package
 ```
 
 ### CRAN submission
