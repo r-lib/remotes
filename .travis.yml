@@ -12,10 +12,12 @@ matrix:
   include:
     - r: release
       after_success: Rscript -e 'covr::codecov()'
-      deploy:
-        provider: script
-        script: Rscript -e 'pkgdown::deploy_site_github(verbose = TRUE)'
-        skip-cleanup: true
+      #deploy:
+        #provider: script
+        #script: Rscript -e 'remotes::install_github("r-lib/pkgdown")' -e 'pkgdown::deploy_site_github(verbose = TRUE)'
+        #skip-cleanup: true
+        #on:
+          #branch: pkgdown
     - r: release
       env: R_REMOTES_STANDALONE=true
 
