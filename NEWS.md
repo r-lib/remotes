@@ -1,5 +1,5 @@
 
-# remotes 1.1.9000
+# remotes 2.0.0
 
 ## Breaking changes
 
