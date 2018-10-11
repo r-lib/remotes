@@ -9,14 +9,14 @@
 #' }
 #' @noRd
 install_remote <- function(remote,
-                           dependencies = dependencies,
-                           upgrade = upgrade,
-                           force = force,
-                           quiet = quiet,
-                           build = build,
-                           build_opts = build_opts,
-                           repos = repos,
-                           type = type,
+                           dependencies,
+                           upgrade,
+                           force,
+                           quiet,
+                           build,
+                           build_opts,
+                           repos,
+                           type,
                            ...) {
 
   stopifnot(is.remote(remote))
