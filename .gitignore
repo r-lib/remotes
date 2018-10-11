@@ -1,6 +1,9 @@
+Meta
+doc
 .Rproj.user
 .Rhistory
 .RData
 /revdep
 /.env
 docs/
+/inst/doc
