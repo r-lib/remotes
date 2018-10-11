@@ -1,4 +1,6 @@
-# remotes 2.0.0.9000
+
+# remotes 1.1.9000
+
 ## Breaking changes
 
 * `install_github()`'s previously deprecated `username` argument has been
@@ -10,67 +12,100 @@
 * `install_git()`'s `branch` argument has been renamed to `ref` and `branch`
   has been deprecated.
 
-## Features and bugfixes
+## New features
 
-* `install_dev()` added to install the development version of a CRAN package,
-  based on the URL and BugReports fields in the DESCRIPTION file (#144)
+* remotes now builds packages by default before installing them. This step
+  uses the pkgbuild package, if avilable. If not, it calls `R CMD build`
+  directly.
+
+* New `install_dev()` to install the development version of a CRAN package,
+  based on the URL and BugReports fields in the DESCRIPTION file (#144).
 
 * `install_()*` functions now temporally put Rtools on the PATH when necessary,
   as long as the pkgbuild package is installed.
 
-* `standardise_dep()` exported, for use in devtools.
-
-* Remotes can be forced to use only its internal code by setting the
+* remotes can be forced to use only its internal code by setting the
   environment variable `R_REMOTES_STANDALONE` = "true". This is useful when
   installing optional dependencies of remotes on Windows, such as curl or git2r
   (#147)
 
-* When installing set warnings to be errors, to catch cases where packages are
-  only partially installed. This often happens on windows when the package dll
-  is opened in another R process (#113).
-  
+* When installing, remotes now errors on warnings, to catch cases
+  where packages are only partially installed. This often happens on
+  windows when the package dll is opened in another R process (#113).
+
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
 
-* `install_git()` now supports passing credentials, when it is used with `git =
-  "git2r"` (#106)
+* `install_()` functions allow the seclection of a subset of packages to
+  upgrade, in interactive mode, when `upgrade = "ask"`.
+
+* `install_git()` now supports passing credentials, when it is used with
+  `git = "git2r"` (#106)
 
 * `install_()` functions now return the name of the package(s) which were
   installed (#55).
 
-* Dependency parsing is now more robust to whitespace around the dependency
-  specifications (#73).
+* git submodules are now installed if they exist and a git client is
+  available (#138, #133, #103, #82).
+
+* New `install_gitlab()` and `install_bioc()` functions, to install
+  `gitlab` and  `bioc` remote types.
+
+* remotes now uses the same SHA updating logic for remotes as devtools,
+  including checking if the SHA of the remote has changed since the last
+  istallation. (#135)
+
+* `install_url()` can now install package binaries on windows
+  (r-lib/devtools#1765)
+
+## Minor improvements and fixes
+
+* `install_deps()` et al. now do not rewrite the `type` argument from `both`
+  to `binary` to allow falling back to `source`. This fixes various
+  installation failures.
+
+* remotes now looks up GitHub package names locally, if possible, and
+  uses the GitHub REST API (if the curl package is available, and not in
+  standalone mode). This makes the remote lookup about 10x faster when the
+  remote package has not changed since the last install.
+
+* Using a GITHUB_PAT no longer prints diagnostic messages by
+  default (r-lib/devtools#1752).
+
+* remotes now always uses https URLs for R versions that support them
+  (@ankane, #139)
+
+* Do not include the BioCextra repository in versions after it was deprecated
+  (R 3.5+, Bioc 3.6+).
 
 * `install_()` functions now download tarballs (.tar.gz) files rather than zip
   archives (.zip). This results in generally smaller files and avoids issues
   with script permissions being lost and strange behavior of some external
   unzip programs on Windows (#96).
 
-* Do not include the BioCextra repository in versions after it was deprecated
-  (R 3.5+, Bioc 3.6+).
+* Dependency parsing is now more robust to whitespace around the dependency
+  specifications (#73).
 
-* `remote_package_name.github_remote` and `remote_sha.github_remote` will
-  lookup package name locally if possible and use faster REST APIs if the curl
-  package is installed. This makes the remote lookup about 10x faster when the
-  remote package has not changed since the last install.
+* `standardise_dep()` exported, for use in devtools.
 
-* Submodules are now installed if they exist and a git client is available
-  (#138, #133, #103, #82).
-* remotes now always uses https URLs for R versions that support them (@ankane,
-  #139)
+* `install_local()` now defaults to the current directory.
 
-* `install_gitlab()` and `install_bioc()` remote types added (#135)
+* `install_bitbucket()` now correctly supports authentication, and the
+  `subdir` argument.
 
-* Code in remotes now uses the same SHA updating logic for remotes as devtools,
-including checking if the SHA of the remote has changed since the last
-installation. (#135)
+* `install_()` functions give a helpful warning when the package has long
+  path names, on Windows. In this case building the package usually fails.
+  (#84, #178).
 
-* `github_pat()` and `gitlab_pat()` no longer print diagnostic messages by
-  default (r-lib/devtools#1752).
+* `install_()` functions have now a more robust way of handling various
+  tar programs on Windows (#172).
 
-* Fix skipping when installing from a full SHA (r-lib/devtools#1624)
+* `install_()` functions now give a helpful warning on older R versions,
+  on Windows, if `R.home()` contains a space character. Installation
+  usually fails in this case.
 
-* `install_url()` can now install package binaries on windows (r-lib/devtools#1765)
+* GitHub API errors now give better error messages, including data about
+  the API rate limits.
 
 # remotes 1.1.1
 
