@@ -121,6 +121,7 @@
 <h2 class="hasAnchor">
 <a href="#features-and-bugfixes" class="anchor"></a>Features and bugfixes</h2>
 <ul>
+<li><p><code><a href="../reference/install_dev.html">install_dev()</a></code> added to install the development version of a CRAN package, based on the URL and BugReports fields in the DESCRIPTION file (<a href='https://github.com/r-lib/remotes/issues/144'>#144</a>)</p></li>
 <li><p><code>install_()*</code> functions now temporally put Rtools on the PATH when necessary, as long as the pkgbuild package is installed.</p></li>
 <li><p><code><a href="../reference/standardise_dep.html">standardise_dep()</a></code> exported, for use in devtools.</p></li>
 <li><p>Remotes can be forced to use only its internal code by setting the environment variable <code>R_REMOTES_STANDALONE</code> = “true”. This is useful when installing optional dependencies of remotes on Windows, such as curl or git2r (<a href='https://github.com/r-lib/remotes/issues/147'>#147</a>)</p></li>
@@ -190,7 +191,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Gábor Csárdi, <a href='http://hadley.nz'>Hadley Wickham</a>, Winston Chang, Jim Hester, Martin Morgan, Dan Tenenbaum.</p>
+  <p>Developed by Gábor Csárdi, <a href='http://hadley.nz'>Hadley Wickham</a>, Winston Chang, <a href='http://jimhester.com'>Jim Hester</a>, Martin Morgan, Dan Tenenbaum.</p>
 </div>
 
 <div class="pkgdown">

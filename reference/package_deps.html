@@ -130,9 +130,9 @@ between local and CRAN versions of each dependent package; an
 
 <span class='co'># S3 method for package_deps</span>
 <span class='fu'>update</span>(<span class='no'>object</span>, <span class='kw'>dependencies</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>build</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>,
-  <span class='st'>"--no-build-vignettes"</span>), <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"repos"</span>),
+  <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>), <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>build</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"--no-resave-data"</span>,
+  <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>), <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"repos"</span>),
   <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"pkgType"</span>), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -174,7 +174,10 @@ just check this package, not its dependencies).</p></td>
     </tr>
     <tr>
       <th>upgrade</th>
-      <td><p>If <code>TRUE</code>, also upgrade any of out date dependencies.</p></td>
+      <td><p>One of "ask", "always" or "never". "ask" prompts the user for
+which out of date packages to upgrade. For non-interactive sessions "ask" is
+equivalent to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and
+correspond to "always" and "never" respectively.</p></td>
     </tr>
     <tr>
       <th>force</th>
@@ -234,7 +237,7 @@ currently available on CRAN.</td></tr>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Gábor Csárdi, <a href='http://hadley.nz'>Hadley Wickham</a>, Winston Chang, Jim Hester, Martin Morgan, Dan Tenenbaum.</p>
+  <p>Developed by Gábor Csárdi, <a href='http://hadley.nz'>Hadley Wickham</a>, Winston Chang, <a href='http://jimhester.com'>Jim Hester</a>, Martin Morgan, Dan Tenenbaum.</p>
 </div>
 
 <div class="pkgdown">

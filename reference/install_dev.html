@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Attempts to install a package from CRAN. — install_cran • remotes</title>
+<title>Install the development version of a package — install_dev • remotes</title>
 
 <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
 
@@ -32,10 +32,12 @@
 
 
 
-<meta property="og:title" content="Attempts to install a package from CRAN. — install_cran" />
+<meta property="og:title" content="Install the development version of a package — install_dev" />
 
-<meta property="og:description" content="This function is vectorised on pkgs so you can install multiple
-packages in a single command." />
+<meta property="og:description" content="install_dev() retrieves the package DESCRIPTION from the CRAN mirror and
+looks in the 'URL' and 'BugReports' fields for GitHub, GitLab or Bitbucket
+URLs. It then calls the appropriate install_() function to install the
+development package." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,77 +106,38 @@ packages in a single command." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Attempts to install a package from CRAN.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-cran.R'><code>R/install-cran.R</code></a></small>
-    <div class="hidden name"><code>install_cran.Rd</code></div>
+    <h1>Install the development version of a package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-dev.R'><code>R/install-dev.R</code></a></small>
+    <div class="hidden name"><code>install_dev.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This function is vectorised on <code>pkgs</code> so you can install multiple
-packages in a single command.</p>
+    <p><code>install_dev()</code> retrieves the package DESCRIPTION from the CRAN mirror and
+looks in the 'URL' and 'BugReports' fields for GitHub, GitLab or Bitbucket
+URLs. It then calls the appropriate <code>install_()</code> function to install the
+development package.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>install_cran</span>(<span class='no'>pkgs</span>, <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"repos"</span>),
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"pkgType"</span>), <span class='kw'>dependencies</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"ask"</span>,
-  <span class='st'>"always"</span>, <span class='st'>"never"</span>), <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>build</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>,
-  <span class='st'>"--no-build-vignettes"</span>), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>install_dev</span>(<span class='no'>package</span>, <span class='kw'>cran_url</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"repos"</span>)<span class='kw'>[[</span><span class='st'>"CRAN"</span>]], <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pkgs</th>
-      <td><p>Character vector of packages to install.</p></td>
+      <th>package</th>
+      <td><p>The package name to install.</p></td>
     </tr>
     <tr>
-      <th>repos</th>
-      <td><p>A character vector giving repositories to use.</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>Type of package to <code>update</code>.</p></td>
-    </tr>
-    <tr>
-      <th>dependencies</th>
-      <td><p>Which dependencies do you want to check?
-Can be a character vector (selecting from "Depends", "Imports",
-"LinkingTo", "Suggests", or "Enhances"), or a logical vector.</p>
-<p><code>TRUE</code> is shorthand for "Depends", "Imports", "LinkingTo" and
-"Suggests". <code>NA</code> is shorthand for "Depends", "Imports" and "LinkingTo"
-and is the default. <code>FALSE</code> is shorthand for no dependencies (i.e.
-just check this package, not its dependencies).</p></td>
-    </tr>
-    <tr>
-      <th>upgrade</th>
-      <td><p>One of "ask", "always" or "never". "ask" prompts the user for
-which out of date packages to upgrade. For non-interactive sessions "ask" is
-equivalent to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and
-correspond to "always" and "never" respectively.</p></td>
-    </tr>
-    <tr>
-      <th>force</th>
-      <td><p>Force installation, even if the remote state has not changed
-since the previous install.</p></td>
-    </tr>
-    <tr>
-      <th>quiet</th>
-      <td><p>If <code>TRUE</code>, suppress output.</p></td>
-    </tr>
-    <tr>
-      <th>build</th>
-      <td><p>If <code>TRUE</code> build the package before installing.</p></td>
-    </tr>
-    <tr>
-      <th>build_opts</th>
-      <td><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code>
-is <code>TRUE</code>.</p></td>
+      <th>cran_url</th>
+      <td><p>The URL of the CRAN mirror to use, by default based on the
+'repos' option. If unset uses 'https://cloud.r-project.org'.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments passed on to <code><a href='http://www.rdocumentation.org/packages/utils/topics/install.packages'>utils::install.packages()</a></code>.</p></td>
+      <td><p>Additional arguments passed to <code><a href='install_github.html'>install_github()</a></code>,
+<code><a href='install_gitlab.html'>install_gitlab()</a></code>, or <code><a href='install_bitbucket.html'>install_bitbucket()</a></code> functions.</p></td>
     </tr>
     </table>
     
@@ -182,7 +145,7 @@ is <code>TRUE</code>.</p></td>
 
     <div class='dont-index'><p>Other package installation: <code><a href='install_bioc.html'>install_bioc</a></code>,
   <code><a href='install_bitbucket.html'>install_bitbucket</a></code>,
-  <code><a href='install_dev.html'>install_dev</a></code>, <code><a href='install_github.html'>install_github</a></code>,
+  <code><a href='install_cran.html'>install_cran</a></code>, <code><a href='install_github.html'>install_github</a></code>,
   <code><a href='install_gitlab.html'>install_gitlab</a></code>, <code><a href='install_git.html'>install_git</a></code>,
   <code><a href='install_local.html'>install_local</a></code>, <code><a href='install_svn.html'>install_svn</a></code>,
   <code><a href='install_url.html'>install_url</a></code>, <code><a href='install_version.html'>install_version</a></code></p></div>
@@ -190,8 +153,14 @@ is <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>install_cran</span>(<span class='st'>"ggplot2"</span>)
-<span class='fu'>install_cran</span>(<span class='fu'>c</span>(<span class='st'>"httpuv"</span>, <span class='st'>"shiny"</span>))
+<span class='co'># From GitHub</span>
+<span class='fu'>install_dev</span>(<span class='st'>"dplyr"</span>)
+
+<span class='co'># From GitLab</span>
+<span class='fu'>install_dev</span>(<span class='st'>"iemiscdata"</span>)
+
+<span class='co'># From Bitbucket</span>
+<span class='fu'>install_dev</span>(<span class='st'>"argparser"</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
