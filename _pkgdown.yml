@@ -1,3 +1,4 @@
+url: https://remotes.r-lib.org
 reference:
   - title: Package Installation
     desc: Tools for installing packages from a variety of locations.
@@ -24,3 +25,6 @@ reference:
     contents:
     - starts_with("github")
     - starts_with("parse_github")
+authors:
+  "Jim Hester":
+    href: http://jimhester.com
