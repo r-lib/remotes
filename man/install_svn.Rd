@@ -67,3 +67,13 @@ install_svn("https://github.com/hadley/stringr/trunk")
 install_svn("https://github.com/hadley/httr/branches/oauth")
 }
 }
+\seealso{
+Other package installation: \code{\link{install_bioc}},
+  \code{\link{install_bitbucket}},
+  \code{\link{install_cran}}, \code{\link{install_dev}},
+  \code{\link{install_github}},
+  \code{\link{install_gitlab}}, \code{\link{install_git}},
+  \code{\link{install_local}}, \code{\link{install_url}},
+  \code{\link{install_version}}
+}
+\concept{package installation}

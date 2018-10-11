@@ -15,6 +15,7 @@
 #' @param revision svn revision, if omitted updates to latest
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #'
 #' @examples
