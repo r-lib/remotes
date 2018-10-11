@@ -10,6 +10,7 @@
 #'   'repos' option. If unset uses 'https://cloud.r-project.org'.
 #' @param ... Additional arguments passed to [install_github()],
 #'   [install_gitlab()], or [install_bitbucket()] functions.
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{

@@ -26,6 +26,7 @@
 #' your repositories and pull requests. Then store your password in the
 #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{

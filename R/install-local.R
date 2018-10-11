@@ -9,6 +9,7 @@
 #' @inheritParams install_url
 #' @inheritParams install_github
 #' @export
+#' @family package installation
 #' @examples
 #' \dontrun{
 #' dir <- tempfile()

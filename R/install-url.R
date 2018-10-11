@@ -11,6 +11,7 @@
 #' @inheritParams install_github
 #' @export
 #'
+#' @family package installation
 #' @examples
 #' \dontrun{
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
