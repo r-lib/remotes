@@ -373,15 +373,16 @@ test_that("resolve_upgrade works", {
 test_that("upgradeable_packages works", {
   object <- data.frame(
     stringsAsFactors = FALSE,
-    package = c("dotenv", "falsy", "magrittr"),
-    installed = c("1.0", "1.0", NA),
-    available = c("1.0", "1.1", "1.0"),
-    diff = c(CURRENT, BEHIND, UNINSTALLED),
-    is_cran = c(TRUE, TRUE, TRUE)
+    package = c("dotenv", "falsy", "rlang", "magrittr"),
+    installed = c("1.0", "1.0", "abc123", NA),
+    available = c("1.0", "1.1", "zyx456", "1.0"),
+    diff = c(CURRENT, BEHIND, BEHIND, UNINSTALLED),
+    is_cran = c(TRUE, TRUE, FALSE, TRUE)
   )
   object$remote <- list(
     cran_remote("dotenv", getOption("repos"), getOption("type")),
     cran_remote("falsy", getOption("repos"), getOption("type")),
+    github_remote("rlib/rlang"),
     cran_remote("magrittr", getOption("repos"), getOption("type"))
   )
   class(object) <- c("package_deps", "data.frame")
@@ -399,14 +400,23 @@ test_that("upgradeable_packages works", {
                object)
 
   # returns selected row to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "falsy    (1.0 -> 1.1) [CRAN]")
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) "falsy (1.0    -> 1.1   ) [CRAN]")
   expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
-               object[object$package == "falsy", ])
+               object[c(
+                 which(object$package == "magrittr"),
+                 which(object$package == "falsy")
+               ), ]
+              )
 
   # returns selected rows to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) c("falsy    (1.0 -> 1.1) [CRAN]", "magrittr (NA  -> 1.0) [CRAN]"))
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"))
   expect_equal(upgradable_packages(object, "ask", is_interactive = TRUE),
-               object[object$package %in% c("falsy", "magrittr"), ])
+               object[c(
+                 which(object$package == "magrittr"),
+                 which(object$package == "falsy"),
+                 which(object$package == "rlang")
+               ), ]
+              )
 
   # All should be the whole object
   mockery::stub(upgradable_packages, "utils::select.list", function(...) "All")
