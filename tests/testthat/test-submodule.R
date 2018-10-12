@@ -94,16 +94,37 @@ test_that("Can install a repo with a submodule", {
       "commit", "-m", shQuote("Initial commit")))
   })
   module <- file.path("submodule", ".gitmodules")
-  writeLines(sprintf(
+  on.exit(unlink(module), add = TRUE)
+
+  writeLines(con = module,
+    sprintf(
 '[submodule "foo"]
 	path = R
 	url = file://%s
+	branch = master
+[submodule "bar"]
+	path = bar
+	url = file://%s
 	branch = master',
-  URLencode(dir)),module
+      URLencode(dir),
+      URLencode(dir)
+    )
   )
 
-  on.exit(unlink(module), add = TRUE)
+  # The bar submodule is in .Rbuildignore, so we will not fetch it
+  build_ignore <- file.path("submodule", ".Rbuildignore")
+  on.exit(unlink(build_ignore), add = TRUE)
 
+  writeLines("^bar$", build_ignore)
+
+  update_submodules("submodule", quiet = TRUE)
+  expect_true(dir.exists(file.path("submodule", "R")))
+  expect_false(dir.exists(file.path("submodule", "bar")))
+
+  # Now remove the R directory so we can try installing the full package
+  unlink(file.path("submodule", "R"), recursive = TRUE)
+
+  # Install the package to a temporary library and verify it works
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
