@@ -555,7 +555,7 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
     never = return(x[0, ]),
 
     ask = {
-      behind <- x$diff < CURRENT
+      behind <- x$diff == BEHIND
 
       if (!any(behind)) {
         return(x)
@@ -588,7 +588,12 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
         return(x)
       }
 
-      x[behind, ][pkgs %in% res, ]
+      uninstalled <- x$diff == UNINSTALLED
+
+      rbind(
+        x[uninstalled, ],
+        x[behind, ][pkgs %in% res, ]
+      )
     }
   )
 }
