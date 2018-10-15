@@ -81,7 +81,7 @@ test_that("Can install a repo with a submodule", {
 
   dir <- tempfile()
   dir.create(dir)
-  on.exit(unlink(dir, recursive = TRUE))
+  on.exit(unlink(dir, recursive = TRUE, force = TRUE))
   writeLines("foo <- 1", file.path(dir, "foo.R"))
 
   in_dir(dir, {
@@ -122,11 +122,11 @@ test_that("Can install a repo with a submodule", {
   expect_false(dir.exists(file.path("submodule", "bar")))
 
   # Now remove the R directory so we can try installing the full package
-  unlink(file.path("submodule", "R"), recursive = TRUE)
+  unlink(file.path("submodule", "R"), recursive = TRUE, force = TRUE)
 
   # Install the package to a temporary library and verify it works
   lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  on.exit(unlink(lib, recursive = TRUE, force = TRUE), add = TRUE)
   dir.create(lib)
 
   install_local("submodule", lib = lib, quiet = TRUE)
