@@ -550,7 +550,10 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
 
   switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
 
-    always = return(x),
+    always = {
+      message(format_upgrades(x[x$diff <= BEHIND, ]), sep = "\n")
+      return(x)
+    },
 
     never = return(x[0, ]),
 
@@ -561,17 +564,7 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
         return(x)
       }
 
-      out <- x[behind, ]
-
-      remote_type <- lapply(out$remote, format)
-
-      # This call trims widths to 12 characters
-      out[] <- lapply(out, format_str, width = 12)
-
-      # This call aligns the columns
-      out[] <- lapply(out, format, trim = FALSE, justify = "left")
-
-      pkgs <- paste0(out$package, " (", out$installed, " -> ", out$available, ") ", "[", remote_type, "]")
+      pkgs <- format_upgrades(x[behind, ])
 
       choices <- pkgs
       if (length(choices) > 1) {
@@ -590,10 +583,32 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
 
       uninstalled <- x$diff == UNINSTALLED
 
-      rbind(
+      res <- rbind(
         x[uninstalled, ],
         x[behind, ][pkgs %in% res, ]
       )
+
+      message(format_upgrades(res), sep = "\n")
+
+      res
     }
   )
+}
+
+format_upgrades <- function(x) {
+
+  if (nrow(x) == 0) {
+    return(character(0))
+  }
+
+  remote_type <- lapply(x$remote, format)
+
+  # This call trims widths to 12 characters
+  x[] <- lapply(x, format_str, width = 12)
+
+  # This call aligns the columns
+  x[] <- lapply(x, format, trim = FALSE, justify = "left")
+
+  pkgs <- paste0(x$package, " (", x$installed, " -> ", x$available, ") ", "[", remote_type, "]")
+  pkgs
 }
