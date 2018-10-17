@@ -1,12 +1,34 @@
+cache <- new.env(parent = emptyenv())
 
-available_packages <- local({
-  cache <- new.env(emptyenv())
-
-  function(repos, type) {
-    signature <- rawToChar(serialize(1:10, NULL, ascii = TRUE))
-    if (is.null(cache[[signature]])) {
-      cache[[signature]] <- suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
-    }
-    cache[[signature]]
+#' @rdname available_packages
+#' @export
+available_packages_set <- function(repos, type, db) {
+  signature <- rawToChar(serialize(list(repos, type), NULL, ascii = TRUE))
+  if (is.null(cache[[signature]])) {
+    cache[[signature]] <- db
   }
-})
+  cache[[signature]]
+}
+
+#' @rdname available_packages
+#' @export
+available_packages_reset <- function() {
+  rm(list = ls(envir = cache), envir = cache)
+}
+
+#' Simpler available.packages
+#'
+#' This is mostly equivalent to [utils::available.packages()] however it also
+#' caches the full result. Additionally the cache can be assigned explicitly with
+#' [available_packages_set()] and reset (cleared) with [available_packages_reset()].
+#'
+#' @inheritParams utils::available.packages
+#' @keywords internal
+#' @seealso [utils::available.packages()] for full documentation on the output format.
+#' @export
+available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
+  available_packages_set(
+    repos, type,
+    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+  )
+}
