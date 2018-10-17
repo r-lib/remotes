@@ -5,6 +5,9 @@
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS=false` (the default).
 * `update.package_deps()` no longer prompts to install uninstalled
   dependencies, they are always installed (#203).
+* `available_packages()`, `available_packages_set()` and
+  `available_packges_reset()` added to allow caching of the
+  `available.packages()` database.
 
 # remotes 2.0.0
 
