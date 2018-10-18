@@ -135,11 +135,6 @@ read_rprofile_user <- function() {
     return(readLines(f))
   }
 
-  f <- ".Rprofile"
-  if (file.exists(f)) {
-    return(readLines(f))
-  }
-
   f <- normalizePath("~/.Rprofile", mustWork = FALSE)
   if (file.exists(f)) {
     return(readLines(f))

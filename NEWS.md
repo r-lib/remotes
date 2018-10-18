@@ -1,6 +1,9 @@
 
 # devel
 
+* No longer include project specific .Rprofile code in the temporary .Rprofile when
+  `R_REMOTES_NO_ERRORS_FROM_WARNINGS=false` (the default).
+
 # remotes 2.0.0
 
 ## Breaking changes
