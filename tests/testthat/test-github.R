@@ -55,3 +55,41 @@ test_that("github_DESCRIPTION", {
     github_DESCRIPTION("r-lib", "remotes", ref = "1.0.0", use_curl = TRUE),
     desc)
 })
+
+test_that("github_error", {
+  mockery::stub(
+    github_error,
+    "curl::parse_headers_list",
+    list(`x-ratelimit-remaining` = 0, `x-ratelimit-reset` = "1539962178"))
+
+  # Test without the TRAVIS envvar set
+  withr::with_envvar(c(TRAVIS = NA), {
+    err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
+    expect_equal(conditionMessage(err),
+"HTTP error 304.
+  foobar
+
+  Rate limit remaining: 0
+  Rate limit reset at: 2018-10-19 15:16:18 UTC
+
+  To increase your GitHub API rate limit
+  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`.")
+  })
+
+  # Test with the TRAVIS envvar set
+  withr::with_envvar(c(TRAVIS = "true"), {
+    err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
+    expect_equal(conditionMessage(err),
+"HTTP error 304.
+  foobar
+
+  Rate limit remaining: 0
+  Rate limit reset at: 2018-10-19 15:16:18 UTC
+
+  To increase your GitHub API rate limit
+  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - Add `GITHUB_PAT` to your travis settings as an encrypted variable.")
+  })
+
+})
