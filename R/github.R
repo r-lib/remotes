@@ -72,6 +72,13 @@ github_pat <- function(quiet = TRUE) {
   pat <- Sys.getenv('GITHUB_PAT')
   if (identical(pat, "")) return(NULL)
 
+  if (nzchar(pat)) {
+    if (!quiet) {
+      message("Using github PAT from envvar GITHUB_PAT")
+    }
+    return(pat)
+  }
+
   if (in_ci()) {
     pat <- paste0(
       "b2b7441d",
@@ -80,16 +87,15 @@ github_pat <- function(quiet = TRUE) {
       "0a7f1ed",
       "c485e443"
     )
+
     if (!quiet) {
       message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
     }
+
     return(pat)
   }
 
-  if (!quiet) {
-    message("Using github PAT from envvar GITHUB_PAT")
-  }
-  pat
+  NULL
 }
 
 in_ci <- function() {
