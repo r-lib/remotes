@@ -429,7 +429,7 @@ test_that("upgradeable_packages works", {
                object[0, ])
 
   # CRAN should be only the CRAN packages
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "CRAN only")
+  mockery::stub(upgradable_packages, "utils::select.list", function(...) "CRAN packages only")
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
