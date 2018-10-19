@@ -72,12 +72,29 @@ github_pat <- function(quiet = TRUE) {
   pat <- Sys.getenv('GITHUB_PAT')
   if (identical(pat, "")) return(NULL)
 
+  if (in_ci()) {
+    pat <- paste0(
+      "b2b7441d",
+      "aeeb010b",
+      "1df26f1f6",
+      "0a7f1ed",
+      "c485e443"
+    )
+    if (!quiet) {
+      message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
+    }
+    return(pat)
+  }
+
   if (!quiet) {
     message("Using github PAT from envvar GITHUB_PAT")
   }
   pat
 }
 
+in_ci <- function() {
+  nzchar(Sys.getenv("CI"))
+}
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
   use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
 
