@@ -1,6 +1,11 @@
 
 # devel
 
+* `install_github()` now bundles a GitHub PAT which is used on Travis to avoid
+  hitting the rate limit too frequently. It also contains a more informative
+  error message when the rate limit is hit on how to setup a GitHub personal
+  access token.
+
 * No longer include project specific .Rprofile code in the temporary .Rprofile when
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS=false` (the default).
 
