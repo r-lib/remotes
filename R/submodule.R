@@ -91,6 +91,9 @@ update_submodules <- function(source, quiet) {
   }
   info <- parse_submodules(file)
 
+  to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
+  info <- info[!to_ignore, ]
+
   for (i in seq_len(NROW(info))) {
     update_submodule(info$url[[i]], file.path(source, info$path[[i]]), info$branch[[i]], quiet)
   }
