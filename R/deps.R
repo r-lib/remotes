@@ -567,10 +567,10 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
 
       choices <- pkgs
       if (length(choices) > 1) {
-        choices <- c(choices, "CRAN only", "All", "None")
+        choices <- c(choices, "CRAN packages only", "All", "None")
       }
 
-      res <- utils::select.list(choices, title = "Select package(s) to update", multiple = TRUE)
+      res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
 
       if ("None" %in% res || length(res) == 0) {
         return(x[0, ])
@@ -582,7 +582,7 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
         wch <- seq_len(NROW(x))
       } else {
 
-        if ("CRAN only" %in% res) {
+        if ("CRAN packages only" %in% res) {
           wch <- uninstalled | (behind & x$is_cran)
         } else {
           wch <- sort(c(which(uninstalled), which(behind)[pkgs %in% res]))
