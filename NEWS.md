@@ -5,6 +5,7 @@
   hitting the rate limit too frequently. It also contains a more informative
   error message when the rate limit is hit on how to setup a GitHub personal
   access token.
+
 * The dialog when `upgrade = "ask"` now has a 'CRAN only' option, to update
   only CRAN packages.
 
@@ -13,6 +14,7 @@
 
 * `update.package_deps()` no longer prompts to install uninstalled
   dependencies, they are always installed (#203).
+
 * `available_packages()`, `available_packages_set()` and
   `available_packges_reset()` added to allow caching of the
   `available.packages()` database.
