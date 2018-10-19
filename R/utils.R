@@ -9,6 +9,10 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
+vlapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, logical(1L), ..., USE.NAMES = USE.NAMES)
+}
+
 rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
   if (os_type() == "windows") {
     real_cmd <- file.path(path, "Rcmd.exe")
@@ -398,4 +402,35 @@ warn_for_potential_errors <- function() {
       "  starting R from the new drive.\n",
       "See also https://github.com/r-lib/remotes/issues/98\n")
   }
+}
+
+# Return all directories in the input paths
+directories <- function(paths) {
+  dirs <- unique(dirname(paths))
+  out <- dirs[dirs != "."]
+  while(length(dirs) > 0 && any(dirs != ".")) {
+    out <- unique(c(out, dirs[dirs != "."]))
+    dirs <- unique(dirname(dirs))
+  }
+  sort(out)
+}
+
+in_r_build_ignore <- function(paths, ignore_file) {
+  ignore <- ("tools" %:::% "get_exclude_patterns")()
+
+  if (file.exists(ignore_file)) {
+    ignore <- c(ignore, readLines(ignore_file, warn = FALSE))
+  }
+
+  matches_ignores <- function(x) {
+    any(vlapply(ignore, grepl, x, perl = TRUE, ignore.case = TRUE))
+  }
+
+  # We need to search for the paths as well as directories in the path, so
+  # `^foo$` matches `foo/bar`
+  should_ignore <- function(path) {
+    any(vlapply(c(path, directories(path)), matches_ignores))
+  }
+
+  vlapply(paths, should_ignore)
 }

@@ -144,3 +144,37 @@ test_that("windows untar, --force-local errors", {
   do(FALSE, function() 1L)
   do(FALSE, function() structure("blah", status = 1L))
 })
+
+test_that("directories works", {
+  expect_equal(directories("foo"), character())
+  expect_equal(directories("foo/bar"), "foo")
+  expect_equal(directories("foo/bar/baz"), c("foo", "foo/bar"))
+
+  expect_equal(directories(c("foo/bar", "foo/baz")), "foo")
+
+  expect_equal(directories(c("foo/bar/baz", "foo2/1", "foo3/bar/3")),
+               c("foo", "foo/bar", "foo2", "foo3", "foo3/bar"))
+})
+
+test_that("in_r_build_ignore works", {
+  tf <- tempfile()
+  on.exit(unlink(tf))
+  writeLines(
+    c("^foo$",
+      "^blah/xyz"
+    ), tf)
+
+  expect_equal(
+    unname(
+      in_r_build_ignore(c("foo/bar/baz", "R/test.R"), tf)
+    ),
+    c(TRUE, FALSE)
+  )
+
+  expect_equal(
+    unname(
+      in_r_build_ignore(c("foo", "blah", "blah/abc", "blah/xyz", "R/test.R"), tf)
+    ),
+    c(TRUE, FALSE, FALSE, TRUE, FALSE)
+  )
+})
