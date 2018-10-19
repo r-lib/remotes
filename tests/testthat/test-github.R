@@ -65,31 +65,13 @@ test_that("github_error", {
   # Test without the TRAVIS envvar set
   withr::with_envvar(c(TRAVIS = NA), {
     err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
-    expect_equal(conditionMessage(err),
-"HTTP error 304.
-  foobar
-
-  Rate limit remaining: 0
-  Rate limit reset at: 2018-10-19 15:16:18 UTC
-
-  To increase your GitHub API rate limit
-  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
-  - Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`.")
+    expect_known_output(conditionMessage(err), test_path("github-error-local.txt"), print = TRUE)
   })
 
   # Test with the TRAVIS envvar set
   withr::with_envvar(c(TRAVIS = "true"), {
     err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
-    expect_equal(conditionMessage(err),
-"HTTP error 304.
-  foobar
-
-  Rate limit remaining: 0
-  Rate limit reset at: 2018-10-19 15:16:18 UTC
-
-  To increase your GitHub API rate limit
-  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
-  - Add `GITHUB_PAT` to your travis settings as an encrypted variable.")
+    expect_known_output(conditionMessage(err), test_path("github-error-travis.txt"), print = TRUE)
   })
 
 })
