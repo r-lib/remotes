@@ -248,7 +248,7 @@ update.package_deps <- function(object,
                            ...) {
 
 
-  object <- upgradable_packages(object, upgrade)
+  object <- upgradable_packages(object, upgrade, quiet)
 
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
@@ -546,13 +546,12 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
   upgrade
 }
 
-upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
+upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive()) {
 
   switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
 
     always = {
-      message(format_upgrades(x[x$diff <= BEHIND, ]), sep = "\n")
-      return(x)
+      return(msg_upgrades(x, quiet))
     },
 
     never = return(x[0, ]),
@@ -568,7 +567,7 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
 
       choices <- pkgs
       if (length(choices) > 1) {
-        choices <- c(choices, "None", "All")
+        choices <- c(choices, "CRAN only", "All", "None")
       }
 
       res <- utils::select.list(choices, title = "Select package(s) to update", multiple = TRUE)
@@ -577,22 +576,33 @@ upgradable_packages <- function(x, upgrade, is_interactive = interactive()) {
         return(x[0, ])
       }
 
-      if ("All" %in% res) {
-        return(x)
-      }
-
       uninstalled <- x$diff == UNINSTALLED
 
-      res <- rbind(
-        x[uninstalled, ],
-        x[behind, ][pkgs %in% res, ]
-      )
+      if ("All" %in% res) {
+        wch <- seq_len(NROW(x))
+      } else {
 
-      message(format_upgrades(res), sep = "\n")
+        if ("CRAN only" %in% res) {
+          wch <- uninstalled | (behind & x$is_cran)
+        } else {
+          wch <- sort(c(which(uninstalled), which(behind)[pkgs %in% res]))
+        }
+      }
 
-      res
+      msg_upgrades(x[wch, ], quiet)
     }
   )
+}
+
+msg_upgrades <- function(x, quiet) {
+
+  if (isTRUE(quiet) || nrow(x) == 0) {
+    return(invisible(x))
+  }
+
+  cat(format_upgrades(x[x$diff <= BEHIND, ]), sep = "\n")
+
+  invisible(x)
 }
 
 format_upgrades <- function(x) {
