@@ -1,8 +1,8 @@
 
-# devel
+# remotes 2.0.1
 
 * `install_github()` now bundles a GitHub PAT which is used on Travis to avoid
-  hitting the rate limit too frequently. It also contains a more informative
+c hitting the rate limit too frequently. It also contains a more informative
   error message when the rate limit is hit on how to setup a GitHub personal
   access token.
 
