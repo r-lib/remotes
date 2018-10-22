@@ -40,7 +40,9 @@ install_remote <- function(remote,
   if (inherits(remote, "cran_remote")) {
     install_packages(
       package_name, repos = remote$repos, type = remote$pkg_type,
-      ..., quiet = quiet)
+      dependencies = dependencies,
+      quiet = quiet,
+      ...)
     return(invisible(package_name))
   }
 
