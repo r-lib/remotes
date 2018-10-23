@@ -12,7 +12,9 @@ test_that("github_pat", {
   })
   expect_equal(github_pat(), NULL)
 
-  withr::local_envvar(c(GITHUB_PAT=NA, CI="true"))
+  withr::with_envvar(c(GITHUB_PAT=NA, CI="true"), {
+    expect_true(nzchar(github_pat()))
+  })
   expect_true(nzchar(github_pat()))
 })
 
