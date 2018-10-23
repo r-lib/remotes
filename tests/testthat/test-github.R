@@ -6,6 +6,12 @@ test_that("github_pat", {
 
   expect_equal(github_pat(), "badcafe")
   expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
+
+  withr::local_envvar(c(GITHUB_PAT=NA, CI=NA))
+  expect_equal(github_pat(), NULL)
+
+  withr::local_envvar(c(GITHUB_PAT=NA, CI="true"))
+  expect_true(nzchar(github_pat()))
 })
 
 test_that("github_commit", {
