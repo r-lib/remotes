@@ -548,16 +548,19 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
 
 upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive()) {
 
+  uninstalled <- x$diff == UNINSTALLED
+
+  behind <- x$diff == BEHIND
+
   switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
 
     always = {
       return(msg_upgrades(x, quiet))
     },
 
-    never = return(x[0, ]),
+    never = return(x[uninstalled, ]),
 
     ask = {
-      behind <- x$diff == BEHIND
 
       if (!any(behind)) {
         return(x)
@@ -573,10 +576,8 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
       res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
 
       if ("None" %in% res || length(res) == 0) {
-        return(x[0, ])
+        return(x[uninstalled, ])
       }
-
-      uninstalled <- x$diff == UNINSTALLED
 
       if ("All" %in% res) {
         wch <- seq_len(NROW(x))

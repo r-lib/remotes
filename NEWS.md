@@ -1,9 +1,12 @@
 # remotes 2.0.1.9000 - Development
 
+* `install_deps()` now installs un-installed packages even when `upgrade =
+  "never"` (#218)
+
 # remotes 2.0.1
 
 * `install_github()` now bundles a GitHub PAT which is used on Travis to avoid
-c hitting the rate limit too frequently. It also contains a more informative
+  hitting the rate limit too frequently. It also contains a more informative
   error message when the rate limit is hit on how to setup a GitHub personal
   access token.
 
