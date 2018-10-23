@@ -145,7 +145,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
 
-  url <- build_url(host, "repositories", username, repo, "src", ref, paste0(subdir, "DESCRIPTION"))
+  url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
 
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)

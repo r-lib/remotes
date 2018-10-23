@@ -1,5 +1,8 @@
 # remotes 2.0.1.9000 - Development
 
+* `install_bitbucket()` now works properly with packages in subdirectories
+  (#220)
+
 * `install_deps()` now installs un-installed packages even when `upgrade =
   "never"` (#218)
 
