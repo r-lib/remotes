@@ -70,7 +70,6 @@ github_commit <- function(username, repo, ref = "master",
 #' @noRd
 github_pat <- function(quiet = TRUE) {
   pat <- Sys.getenv("GITHUB_PAT")
-  if (identical(pat, "")) return(NULL)
 
   if (nzchar(pat)) {
     if (!quiet) {
