@@ -59,7 +59,7 @@ safe_install_packages <- function(...) {
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
-    if (Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS") != "true") {
+    if (should_error_for_warnings()) {
       with_options(list(warn = 2),
         with_rprofile_user("options(warn = 2)",
           i.p(...)
@@ -182,4 +182,13 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     build_opts = build_opts,
     ...
   )
+}
+
+should_error_for_warnings <- function() {
+
+  force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
+
+  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !as.logical(force_suggests))
+
+  !as.logical(no_errors)
 }

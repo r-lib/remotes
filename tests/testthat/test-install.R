@@ -94,3 +94,26 @@ test_that("safe_build_package calls pkgbuild with appropriate arguments", {
       args = "--no-resave-data", quiet = TRUE)
   )
 })
+
+test_that("should_error_for_warnings works", {
+
+  # If both unset, should error -> TRUE
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = NA),
+    expect_true(should_error_for_warnings())
+  )
+
+  # If no errors true, should error -> FALSE
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = "true", "_R_CHECK_FORCE_SUGGESTS_" = NA),
+    expect_false(should_error_for_warnings())
+  )
+
+  # If no errors unset, and force_suggests false, should error -> FALSE
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "false"),
+    expect_false(should_error_for_warnings())
+  )
+
+  # If no errors unset, and force_suggests true, should error -> TRUE
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "true"),
+    expect_true(should_error_for_warnings())
+  )
+})

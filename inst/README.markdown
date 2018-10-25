@@ -197,7 +197,12 @@ will allow successful installation of these packages.
   installation for warning messages. Warnings usually mean installation
   errors, so by default remotes stops for a warning. However, sometimes
   other warnings might happen, that could be ignored by setting this
-  environment variable.
+  environment variable. 
+
+* Setting `_R_CHECK_FORCE_SUGGESTS_=false` while
+  `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset will also avoid stopping the
+  installation for error messages. This is done because a warning is generated
+  during installation when not all Suggested packages are not available.
 
 ## License
 
