@@ -75,6 +75,10 @@ test_that("intall_version and invalid version number", {
     "version '109.42' is invalid for package 'pkgconfig'"
   )
 
+  expect_error(
+    download_version("pkgconfig", "109.42", repos = repos),
+    "version '109.42' is invalid for package 'pkgconfig'"
+  )
 })
 
 
@@ -95,7 +99,7 @@ test_that("install_version and non-existing package", {
 })
 
 
-test_that("install_version for archives packages", {
+test_that("install_version for archived packages", {
 
   skip_on_cran()
   skip_if_offline()
@@ -107,6 +111,12 @@ test_that("install_version for archives packages", {
   mockery::stub(install_version, "install_url", function(url, ...) url)
   expect_match(fixed = TRUE,
     install_version("igraph0", type = "source", lib = lib, repos = repos),
+    "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
+  )
+
+  mockery::stub(download_version, "download", function(url, ...) url)
+  expect_match(fixed = TRUE,
+    download_version("igraph0", type = "source", lib = lib, repos = repos),
     "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
   )
 })

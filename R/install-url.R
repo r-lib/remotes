@@ -50,7 +50,7 @@ url_remote <- function(url, subdir = NULL, ...) {
 #' @export
 remote_download.url_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading package from url: ", x$url)
+    message("Downloading package from url: ", x$url) # nocov
   }
 
   ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
