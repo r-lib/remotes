@@ -129,3 +129,50 @@ test_that("JSON parser, errors", {
   )
 
 })
+
+test_that("get_json_sha", {
+
+  inp <- '
+{
+    "sha": "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp),
+    "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b")
+
+  inp2 <- '
+{
+    "sha":
+      "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp2),
+    "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b")
+
+  inp3 <- '
+{
+    "nosha":
+      "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp3),
+    NA_character_)
+})

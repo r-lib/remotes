@@ -1115,7 +1115,7 @@ github_commit <- function(username, repo, ref = "master",
     on.exit(unlink(tmp), add = TRUE)
 
     download(tmp, url, auth_token = pat)
-    get_json_field(readLines(tmp, warn = FALSE), "sha")
+    get_json_sha(readLines(tmp, warn = FALSE))
   }
 }
 
@@ -3378,19 +3378,6 @@ j2r <- function(token) {
 
 trimq <- function(x) {
   sub('^"(.*)"$', "\\1", x)
-}
-
-# Often we don't need to parse the whole json file, only extract a single
-# record, which is faster and less error prone.
-get_json_field <- function(text, field) {
-  m <- regexpr(paste0('"', field, '"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
-  if (all(m == -1)) {
-    return(NA_character_)
-  }
-
-  start <- attr(m, "capture.start")
-  end <- start + attr(m, "capture.length") - 1L
-  substring(text, start, end)
 }
 
 parse_deps <- function(string) {
