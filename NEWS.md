@@ -1,5 +1,8 @@
 # remotes 2.0.1.9000 - Development
 
+* `install_version()` now removes metadata added as a byproduct of using
+  `install_url()` internally() (#224)
+
 * `install()` now avoids converting warnings to errors if
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset and
   `_R_CHECK_FORCE_SUGGESTS_=false`. This avoids failures due to Suggested
