@@ -19,9 +19,11 @@ test_that("install_version", {
   install_version("pkgconfig", "1.0.0", lib = lib, repos = repos, quiet = TRUE)
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
-  expect_equal(
-    packageDescription("pkgconfig", lib.loc = lib)$Version,
-    "1.0.0")
+  desc <- packageDescription("pkgconfig", lib.loc = lib)
+  expect_equal(desc$Version, "1.0.0")
+  expect_null(desc$RemoteType)
+  expect_null(desc$RemoteSubdir)
+  expect_null(desc$RemoteUrl)
 })
 
 test_that("package_find_repo() works correctly with multiple repos", {
@@ -108,7 +110,11 @@ test_that("install_version for archived packages", {
   if (length(repos) == 0) repos <- character()
   repos[repos == "@CRAN@"] <- "http://cran.rstudio.com"
 
+  lib <- tempfile()
+
   mockery::stub(install_version, "install_url", function(url, ...) url)
+  mockery::stub(install_version, "add_metadata", NULL)
+
   expect_match(fixed = TRUE,
     install_version("igraph0", type = "source", lib = lib, repos = repos),
     "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
