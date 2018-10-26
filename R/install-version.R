@@ -30,7 +30,7 @@ install_version <- function(package, version = NULL,
                             ...) {
 
   url <- download_version_url(package, version, repos, type)
-  install_url(url,
+  res <- install_url(url,
               dependencies = dependencies,
               upgrade = upgrade,
               force = force,
@@ -40,6 +40,15 @@ install_version <- function(package, version = NULL,
               repos = repos,
               type = type,
               ...)
+
+  lib <- list(...)$lib
+
+  # Remove Metadata from installed package
+  add_metadata(
+    system.file(package = package, lib.loc = lib),
+    list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL))
+
+  invisible(res)
 }
 
 package_find_repo <- function(package, repos) {
