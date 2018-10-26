@@ -94,3 +94,35 @@ test_that("source_pkg", {
     "7.."
   )
 })
+
+test_that("getrootdir",  {
+  cases <- list(
+    list(c("foo/bar", "foo/"), "foo"),
+    list(c("/foo/bar/baz", "/foo/bar"), "/foo"),
+    list(c("this/foo/bar", "this/that"), "this"),
+    list(c("", "yes"), ".")
+  )
+
+  for (c in seq_along(cases)) {
+    expect_identical(getrootdir(cases[[c]][[1]]), cases[[c]][[2]], info = c)
+  }
+
+  expect_error(getrootdir(character()))
+})
+
+test_that("my_unzip respects options('unzip')", {
+  mockery::stub(my_unzip, "utils::unzip", function(...) int <<- TRUE)
+  mockery::stub(my_unzip, "system_check", function(...) int <<- FALSE)
+
+  int <- NULL
+  withr::with_options(c("unzip" = "internal"), my_unzip("blah", "tg"))
+  expect_true(int)
+
+  int <- NULL
+  withr::with_options(c("unzip" = ""), my_unzip("blah", "tg"))
+  expect_true(int)
+
+  int <- NULL
+  withr::with_options(c("unzip" = "somethingelse"), my_unzip("blah", "tg"))
+  expect_false(int)
+})
