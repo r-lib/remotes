@@ -511,6 +511,7 @@ remote_deps <- function(pkg, ...) {
   available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
+  diff[is.na(installed)] <- UNINSTALLED
 
   res <- structure(
     data.frame(
