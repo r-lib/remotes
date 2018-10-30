@@ -87,7 +87,7 @@ add_metadata <- function(pkg_path, meta) {
   if (file.exists(source_desc)) {
     desc <- read_dcf(source_desc)
 
-    desc <- modifyList(desc, meta)
+    desc <- utils::modifyList(desc, meta)
 
     write_dcf(source_desc, desc)
   }
@@ -95,7 +95,7 @@ add_metadata <- function(pkg_path, meta) {
   if (file.exists(binary_desc)) {
     pkg_desc <- base::readRDS(binary_desc)
     desc <- as.list(pkg_desc$DESCRIPTION)
-    desc <- modifyList(desc, meta)
+    desc <- utils::modifyList(desc, meta)
     pkg_desc$DESCRIPTION <- stats::setNames(as.character(desc), names(desc))
     base::saveRDS(pkg_desc, binary_desc)
   }
