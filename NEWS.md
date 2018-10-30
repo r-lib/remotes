@@ -1,6 +1,7 @@
 # remotes 2.0.1.9000 - Development
 
-* `install_deps()` now installs un-installed remotes packages even when `upgrade = "never"` (@ankane, #227)
+* `install_deps()` now installs un-installed remotes packages even when
+  `upgrade = "never"` (@ankane, #227)
 
 * `install_version()` now removes metadata added as a byproduct of using
   `install_url()` internally() (#224)
