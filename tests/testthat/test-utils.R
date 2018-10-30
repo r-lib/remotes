@@ -148,12 +148,13 @@ test_that("windows untar, --force-local errors", {
 test_that("directories works", {
   expect_equal(directories("foo"), character())
   expect_equal(directories("foo/bar"), "foo")
-  expect_equal(directories("foo/bar/baz"), c("foo", "foo/bar"))
+  expect_equal(sort(directories("foo/bar/baz")),
+               sort(c("foo", "foo/bar")))
 
   expect_equal(directories(c("foo/bar", "foo/baz")), "foo")
 
-  expect_equal(directories(c("foo/bar/baz", "foo2/1", "foo3/bar/3")),
-               c("foo", "foo/bar", "foo2", "foo3", "foo3/bar"))
+  expect_equal(sort(directories(c("foo/bar/baz", "foo2/1", "foo3/bar/3"))),
+               sort(c("foo", "foo/bar", "foo2", "foo3", "foo3/bar")))
 })
 
 test_that("in_r_build_ignore works", {
