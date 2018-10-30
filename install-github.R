@@ -64,6 +64,7 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
 #' @param r_ver R version to use.
 #' @param bioc_ver corresponding to the R version to use.
 #' @export
+#' @keywords internal
 
 bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version()) {
   r_ver <- package_version(r_ver)
@@ -144,18 +145,40 @@ check_for_circular_dependencies <- function(pkgdir, quiet) {
     FALSE
   }
 }
+cache <- new.env(parent = emptyenv())
 
-available_packages <- local({
-  cache <- new.env(emptyenv())
-
-  function(repos, type) {
-    signature <- rawToChar(serialize(1:10, NULL, ascii = TRUE))
-    if (is.null(cache[[signature]])) {
-      cache[[signature]] <- suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
-    }
-    cache[[signature]]
+#' @rdname available_packages
+#' @export
+available_packages_set <- function(repos, type, db) {
+  signature <- rawToChar(serialize(list(repos, type), NULL, ascii = TRUE))
+  if (is.null(cache[[signature]])) {
+    cache[[signature]] <- db
   }
-})
+  cache[[signature]]
+}
+
+#' @rdname available_packages
+#' @export
+available_packages_reset <- function() {
+  rm(list = ls(envir = cache), envir = cache)
+}
+
+#' Simpler available.packages
+#'
+#' This is mostly equivalent to [utils::available.packages()] however it also
+#' caches the full result. Additionally the cache can be assigned explicitly with
+#' [available_packages_set()] and reset (cleared) with [available_packages_reset()].
+#'
+#' @inheritParams utils::available.packages
+#' @keywords internal
+#' @seealso [utils::available.packages()] for full documentation on the output format.
+#' @export
+available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
+  available_packages_set(
+    repos, type,
+    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+  )
+}
 read_dcf <- function(path) {
   fields <- colnames(read.dcf(path))
   as.list(read.dcf(path, keep.white = fields)[1, ])
@@ -229,9 +252,12 @@ getdir <- function(path)  sub("/[^/]*$", "", path)
 
 # Given a list of files, returns the root (the topmost folder)
 # getrootdir(c("path/to/file", "path/to/other/thing")) returns "path/to"
+# It does not check that all paths have a common prefix. It fails for
+# empty input vector. It assumes that directories end with '/'.
 getrootdir <- function(file_list) {
+  stopifnot(length(file_list) > 0)
   slashes <- nchar(gsub("[^/]", "", file_list))
-  if (min(slashes) == 0) return("")
+  if (min(slashes) == 0) return(".")
 
   getdir(file_list[which.min(slashes)])
 }
@@ -267,7 +293,10 @@ my_unzip <- function(src, target, unzip = getOption("unzip", "internal")) {
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
 #' @param quiet If `TRUE`, suppress output.
-#' @param upgrade If `TRUE`, also upgrade any of out date dependencies.
+#' @param upgrade One of "ask", "always" or "never". "ask" prompts the user for
+#'   which out of date packages to upgrade. For non-interactive sessions "ask" is
+#'   equivalent to "always". `TRUE` and `FALSE` are also accepted and
+#'   correspond to "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
 #'
@@ -486,13 +515,16 @@ UNAVAILABLE <- 2L
 
 update.package_deps <- function(object,
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
+
+
+  object <- upgradable_packages(object, upgrade, quiet)
 
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
@@ -504,21 +536,16 @@ update.package_deps <- function(object,
   }
 
   if (any(unknown_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[unknown_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(unknown_remotes), " packages not available: ",
-        paste(object$package[unknown_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[unknown_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
   ahead_of_cran <- object$diff == AHEAD & object$is_cran
@@ -529,28 +556,19 @@ update.package_deps <- function(object,
 
   ahead_remotes <- object$diff == AHEAD & !object$is_cran
   if (any(ahead_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[ahead_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(ahead_remotes), " packages ahead of remote: ",
-        paste(object$package[ahead_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[ahead_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
-  if (upgrade) {
-    behind <- object$diff < CURRENT
-  } else {
-    behind <- is.na(object$installed)
-  }
+  behind <- is.na(object$installed) | object$diff < CURRENT
 
   if (any(object$is_cran & behind)) {
     install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
@@ -677,7 +695,7 @@ standardise_dep <- function(x) {
 
 update_packages <- function(packages = TRUE,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -769,6 +787,7 @@ remote_deps <- function(pkg, ...) {
   available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
+  diff[is.na(installed)] <- UNINSTALLED
 
   res <- structure(
     data.frame(
@@ -784,6 +803,102 @@ remote_deps <- function(pkg, ...) {
   res$remote <- structure(remote, class = "remotes")
 
   res
+}
+
+
+# interactive is an argument to make testing easier.
+resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
+  if (isTRUE(upgrade)) {
+    upgrade <- "always"
+  } else if (identical(upgrade, FALSE)) {
+    upgrade <- "never"
+  }
+
+  upgrade <- match.arg(upgrade, c("ask", "always", "never"))
+
+  if (!is_interactive && identical(upgrade, "ask")) {
+    upgrade <- "always"
+  }
+
+  upgrade
+}
+
+upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive()) {
+
+  uninstalled <- x$diff == UNINSTALLED
+
+  behind <- x$diff == BEHIND
+
+  switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
+
+    always = {
+      return(msg_upgrades(x, quiet))
+    },
+
+    never = return(x[uninstalled, ]),
+
+    ask = {
+
+      if (!any(behind)) {
+        return(x)
+      }
+
+      pkgs <- format_upgrades(x[behind, ])
+
+      choices <- pkgs
+      if (length(choices) > 1) {
+        choices <- c(choices, "CRAN packages only", "All", "None")
+      }
+
+      res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
+
+      if ("None" %in% res || length(res) == 0) {
+        return(x[uninstalled, ])
+      }
+
+      if ("All" %in% res) {
+        wch <- seq_len(NROW(x))
+      } else {
+
+        if ("CRAN packages only" %in% res) {
+          wch <- uninstalled | (behind & x$is_cran)
+        } else {
+          wch <- sort(c(which(uninstalled), which(behind)[pkgs %in% res]))
+        }
+      }
+
+      msg_upgrades(x[wch, ], quiet)
+    }
+  )
+}
+
+msg_upgrades <- function(x, quiet) {
+
+  if (isTRUE(quiet) || nrow(x) == 0) {
+    return(invisible(x))
+  }
+
+  cat(format_upgrades(x[x$diff <= BEHIND, ]), sep = "\n")
+
+  invisible(x)
+}
+
+format_upgrades <- function(x) {
+
+  if (nrow(x) == 0) {
+    return(character(0))
+  }
+
+  remote_type <- lapply(x$remote, format)
+
+  # This call trims widths to 12 characters
+  x[] <- lapply(x, format_str, width = 12)
+
+  # This call aligns the columns
+  x[] <- lapply(x, format, trim = FALSE, justify = "left")
+
+  pkgs <- paste0(x$package, " (", x$installed, " -> ", x$available, ") ", "[", remote_type, "]")
+  pkgs
 }
 
 ## The checking code looks for the objects in the package namespace, so defining
@@ -1070,8 +1185,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     res <- curl::curl_fetch_memory(url, handle = h)
 
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
     fromJSON(rawToChar(res$content))
   } else {
@@ -1105,8 +1219,7 @@ github_commit <- function(username, repo, ref = "master",
       return(current_sha)
     }
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
 
     rawToChar(res$content)
@@ -1127,13 +1240,40 @@ github_commit <- function(username, repo, ref = "master",
 #' @keywords internal
 #' @noRd
 github_pat <- function(quiet = TRUE) {
-  pat <- Sys.getenv('GITHUB_PAT')
-  if (identical(pat, "")) return(NULL)
+  pat <- Sys.getenv("GITHUB_PAT")
 
-  if (!quiet) {
-    message("Using github PAT from envvar GITHUB_PAT")
+  if (nzchar(pat)) {
+    if (!quiet) {
+      message("Using github PAT from envvar GITHUB_PAT")
+    }
+    return(pat)
   }
-  pat
+
+  if (in_ci()) {
+    pat <- paste0(
+      "b2b7441d",
+      "aeeb010b",
+      "1df26f1f6",
+      "0a7f1ed",
+      "c485e443"
+    )
+
+    if (!quiet) {
+      message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
+    }
+
+    return(pat)
+  }
+
+  NULL
+}
+
+in_ci <- function() {
+  nzchar(Sys.getenv("CI"))
+}
+
+in_travis <- function() {
+  identical(Sys.getenv("TRAVIS", "false"), "true")
 }
 
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
@@ -1158,8 +1298,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
     rawToChar(res$content)
   } else {
@@ -1173,10 +1312,58 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
   }
 }
 
-github_error_message <- function(res) {
-  msg <- fromJSON(rawToChar(res$content))
-  msg$message
+github_error <- function(res) {
+  res_headers <- curl::parse_headers_list(res$headers)
+
+  ratelimit_limit <- res_headers$`x-ratelimit-limit`
+
+  ratelimit_remaining <- res_headers$`x-ratelimit-remaining`
+
+  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
+
+  error_details <- fromJSON(rawToChar(res$content))$message
+
+  pat_guidance <- ""
+  if (identical(as.integer(ratelimit_remaining), 0L)) {
+    pat_guidance <-
+      sprintf(
+"To increase your GitHub API rate limit
+  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - %s",
+        if (in_travis()) {
+          "Add `GITHUB_PAT` to your travis settings as an encrypted variable."
+        } else {
+          "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
+        }
+      )
+  }
+
+  msg <- sprintf(
+"HTTP error %s.
+  %s
+
+  Rate limit remaining: %s/%s
+  Rate limit reset at: %s
+
+  %s",
+
+    res$status_code,
+    error_details,
+    ratelimit_remaining,
+    ratelimit_limit,
+    format(ratelimit_reset, usetz = TRUE),
+    pat_guidance
+  )
+
+  structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
+
+
+#> Error: HTTP error 404.
+#>   Not Found
+#> 
+#>   Rate limit remaining: 4999
+#>   Rate limit reset at: 2018-10-10 19:43:52 UTC
 #' Install a package from a Bioconductor repository
 #'
 #' This function requires `git` to be installed on your system in order to
@@ -1210,7 +1397,7 @@ github_error_message <- function(res) {
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
                          git = c("auto", "git2r", "external"),
                          dependencies = NA,
-                         upgrade = TRUE,
+                         upgrade = c("ask", "always", "never"),
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1501,6 +1688,7 @@ git_repo_sha1 <- function(r) {
 #' your repositories and pull requests. Then store your password in the
 #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{
@@ -1511,7 +1699,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
                               host = "api.bitbucket.org/2.0",
                               dependencies = NA,
-                              upgrade = TRUE,
+                              upgrade = c("ask", "always", "never"),
                               force = FALSE,
                               quiet = FALSE,
                               build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1619,7 +1807,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
 
-  url <- build_url(host, "repositories", username, repo, "src", ref, paste0(subdir, "DESCRIPTION"))
+  url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
 
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
@@ -1680,7 +1868,7 @@ bitbucket_user <- function(quiet = TRUE) {
 #' }
 install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
                          dependencies = NA,
-                         upgrade = TRUE,
+                         upgrade = c("ask", "always", "never"),
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1724,6 +1912,83 @@ remote_sha.cran_remote <- function(remote, ...) {
 format.cran_remote <- function(x, ...) {
   "CRAN"
 }
+#' Install the development version of a package
+#'
+#' `install_dev()` retrieves the package DESCRIPTION from the CRAN mirror and
+#' looks in the 'URL' and 'BugReports' fields for GitHub, GitLab or Bitbucket
+#' URLs. It then calls the appropriate `install_()` function to install the
+#' development package.
+#'
+#' @param package The package name to install.
+#' @param cran_url The URL of the CRAN mirror to use, by default based on the
+#'   'repos' option. If unset uses 'https://cloud.r-project.org'.
+#' @param ... Additional arguments passed to [install_github()],
+#'   [install_gitlab()], or [install_bitbucket()] functions.
+#' @family package installation
+#' @export
+#' @examples
+#' \dontrun{
+#' # From GitHub
+#' install_dev("dplyr")
+#'
+#' # From GitLab
+#' install_dev("iemiscdata")
+#'
+#' # From Bitbucket
+#' install_dev("argparser")
+#' }
+install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
+  if (is.null(cran_url) || identical(cran_url, "@CRAN@")) {
+    cran_url <- "https://cloud.r-project.org"
+  }
+
+  url <- build_url(cran_url, "web", "packages", package, "DESCRIPTION")
+
+  f <- tempfile()
+  on.exit(unlink(f))
+
+  download(f, url)
+  desc <- read_dcf(f)
+
+  url_fields <- c(desc$URL, desc$BugReports)
+
+  if (length(url_fields) == 0) {
+    stop("Could not determine development repository", call. = FALSE)
+  }
+
+  pkg_urls <- unlist(strsplit(url_fields, "[[:space:]]*,[[:space:]]*"))
+
+  # Remove trailing "/issues" from the BugReports URL
+  pkg_urls <- sub("/issues$", "", pkg_urls)
+
+  valid_domains <- c("github[.]com", "gitlab[.]com", "bitbucket[.]org")
+
+  parts <-
+    re_match(pkg_urls,
+      sprintf("^https?://(?<domain>%s)/(?<username>%s)/(?<repo>%s)(?:/(?<subdir>%s))?",
+        domain = paste0(valid_domains, collapse = "|"),
+        username = "[^/]+",
+        repo = "[^/@#]+",
+        subdir = "[^/@$ ]+"
+      )
+    )[c("domain", "username", "repo", "subdir")]
+
+  # Remove cases which don't match and duplicates
+
+  parts <- unique(stats::na.omit(parts))
+
+  if (nrow(parts) != 1) {
+    stop("Could not determine development repository", call. = FALSE)
+  }
+
+  ref <- paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/")
+
+  switch(parts$domain,
+    github.com = install_github(ref, ...),
+    gitlab.com = install_gitlab(ref, ...),
+    bitbucket.org = install_bitbucket(ref, ...)
+  )
+}
 
 #' Install a package from a git repository
 #'
@@ -1744,6 +2009,7 @@ format.cran_remote <- function(x, ...) {
 #'   otherwise an external git installation.
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{
@@ -1754,7 +2020,7 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                         credentials = NULL,
                         git = c("auto", "git2r", "external"),
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -1985,6 +2251,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #' @details
 #' If the repository uses submodules a command-line git client is required to
 #' clone the submodules.
+#' @family package installation
 #' @export
 #' @seealso [github_pull()]
 #' @examples
@@ -2008,7 +2275,7 @@ install_github <- function(repo,
                            auth_token = github_pat(),
                            host = "api.github.com",
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2121,7 +2388,7 @@ github_resolve_ref.NULL <- function(x, params, ...) {
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
+github_resolve_ref.github_pull <- function(x, params, ..., auth_token = github_pat()) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
@@ -2132,7 +2399,8 @@ github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
   ## Just because libcurl might download the error page...
   if (methods::is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
-         params$repo, "#", x)
+         params$repo, "#", x, "\n",
+         response$message)
   }
 
   params$username <- response$head$user$login
@@ -2142,7 +2410,7 @@ github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL) {
+github_resolve_ref.github_release <- function(x, params, ..., auth_token = github_pat()) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
@@ -2151,7 +2419,8 @@ github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL)
   )
 
   if (methods::is(response, "error") || !is.null(response$message)) {
-    stop("Cannot find repo ", params$username, "/", params$repo, ".")
+    stop("Cannot find repo ", params$username, "/", params$repo, ".", "\n",
+      response$message)
   }
 
   if (length(response) == 0L)
@@ -2227,7 +2496,7 @@ install_gitlab <- function(repo,
                            auth_token = gitlab_pat(),
                            host = "gitlab.com",
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2369,6 +2638,7 @@ gitlab_pat <- function(quiet = TRUE) {
 #' @inheritParams install_url
 #' @inheritParams install_github
 #' @export
+#' @family package installation
 #' @examples
 #' \dontrun{
 #' dir <- tempfile()
@@ -2379,7 +2649,7 @@ gitlab_pat <- function(quiet = TRUE) {
 
 install_local <- function(path = ".", subdir = NULL,
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = !is_binary_pkg(path),
@@ -2465,14 +2735,14 @@ format.local_remote <- function(x, ...) {
 #' }
 #' @noRd
 install_remote <- function(remote,
-                           dependencies = dependencies,
-                           upgrade = upgrade,
-                           force = force,
-                           quiet = quiet,
-                           build = build,
-                           build_opts = build_opts,
-                           repos = repos,
-                           type = type,
+                           dependencies,
+                           upgrade,
+                           force,
+                           quiet,
+                           build,
+                           build_opts,
+                           repos,
+                           type,
                            ...) {
 
   stopifnot(is.remote(remote))
@@ -2496,7 +2766,9 @@ install_remote <- function(remote,
   if (inherits(remote, "cran_remote")) {
     install_packages(
       package_name, repos = remote$repos, type = remote$pkg_type,
-      ..., quiet = quiet)
+      dependencies = dependencies,
+      quiet = quiet,
+      ...)
     return(invisible(package_name))
   }
 
@@ -2531,12 +2803,28 @@ install_remotes <- function(remotes, ...) {
 
 # Add metadata
 add_metadata <- function(pkg_path, meta) {
-  path <- file.path(pkg_path, "DESCRIPTION")
-  desc <- read_dcf(path)
 
-  desc <- utils::modifyList(desc, meta)
+  # During installation, the DESCRIPTION file is read and an package.rds file
+  # created with most of the information from the DESCRIPTION file. Functions
+  # that read package metadata may use either the DESCRIPTION file or the
+  # package.rds file, therefore we attempt to modify both of them
+  source_desc <- file.path(pkg_path, "DESCRIPTION")
+  binary_desc <- file.path(pkg_path, "Meta", "package.rds")
+  if (file.exists(source_desc)) {
+    desc <- read_dcf(source_desc)
 
-  write_dcf(path, desc)
+    desc <- utils::modifyList(desc, meta)
+
+    write_dcf(source_desc, desc)
+  }
+
+  if (file.exists(binary_desc)) {
+    pkg_desc <- base::readRDS(binary_desc)
+    desc <- as.list(pkg_desc$DESCRIPTION)
+    desc <- utils::modifyList(desc, meta)
+    pkg_desc$DESCRIPTION <- stats::setNames(as.character(desc), names(desc))
+    base::saveRDS(pkg_desc, binary_desc)
+  }
 }
 
 # Modify the MD5 file - remove the line for DESCRIPTION
@@ -2611,14 +2899,16 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,
       ref = x$RemoteRef,
-      sha = x$RemoteSha),
+      sha = x$RemoteSha,
+      auth_token = github_pat()),
     gitlab = remote("gitlab",
       host = x$RemoteHost,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,
       ref = x$RemoteRef,
-      sha = x$RemoteSha),
+      sha = x$RemoteSha,
+      auth_token = gitlab_pat()),
     xgit = remote("xgit",
       url = trim_ws(x$RemoteUrl),
       ref = x$RemoteRef %||% x$RemoteBranch,
@@ -2636,7 +2926,9 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       username = x$RemoteUsername,
       ref = x$RemoteRef,
       sha = x$RemoteSha,
-      subdir = x$RemoteSubdir),
+      subdir = x$RemoteSubdir,
+      auth_user = bitbucket_user(),
+      password = bitbucket_password()),
     svn = remote("svn",
       url = trim_ws(x$RemoteUrl),
       svn_subdir = x$RemoteSubdir,
@@ -2690,6 +2982,7 @@ format.remotes <- function(x, ...) {
 #' @param revision svn revision, if omitted updates to latest
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #'
 #' @examples
@@ -2700,7 +2993,7 @@ format.remotes <- function(x, ...) {
 install_svn <- function(url, subdir = NULL, args = character(0),
                         revision = NULL,
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2864,6 +3157,7 @@ format.svn_remote <- function(x, ...) {
 #' @inheritParams install_github
 #' @export
 #'
+#' @family package installation
 #' @examples
 #' \dontrun{
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
@@ -2871,7 +3165,7 @@ format.svn_remote <- function(x, ...) {
 
 install_url <- function(url, subdir = NULL,
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2902,7 +3196,7 @@ url_remote <- function(url, subdir = NULL, ...) {
 #' @export
 remote_download.url_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading package from url: ", x$url)
+    message("Downloading package from url: ", x$url) # nocov
   }
 
   ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
@@ -2957,7 +3251,7 @@ format.url_remote <- function(x, ...) {
 
 install_version <- function(package, version = NULL,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -2966,7 +3260,7 @@ install_version <- function(package, version = NULL,
                             ...) {
 
   url <- download_version_url(package, version, repos, type)
-  install_url(url,
+  res <- install_url(url,
               dependencies = dependencies,
               upgrade = upgrade,
               force = force,
@@ -2976,6 +3270,15 @@ install_version <- function(package, version = NULL,
               repos = repos,
               type = type,
               ...)
+
+  lib <- list(...)$lib
+
+  # Remove Metadata from installed package
+  add_metadata(
+    system.file(package = package, lib.loc = lib),
+    list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL))
+
+  invisible(res)
 }
 
 package_find_repo <- function(package, repos) {
@@ -3078,7 +3381,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -3118,11 +3421,15 @@ safe_install_packages <- function(...) {
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
-    with_options(list(warn = 2),
-      with_rprofile_user("options(warn = 2)",
-        i.p(...)
+    if (should_error_for_warnings()) {
+      with_options(list(warn = 2),
+        with_rprofile_user("options(warn = 2)",
+          i.p(...)
+        )
       )
-    )
+    } else {
+      i.p(...)
+    }
   )
 }
 
@@ -3212,7 +3519,7 @@ r_error_matches <- function(msg, str) {
 install_deps <- function(pkgdir = ".", dependencies = NA,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
-                         upgrade = TRUE,
+                         upgrade = c("ask", "always", "never"),
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -3228,10 +3535,6 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
 
-  if (!quiet) {
-    print(packages)
-  }
-
   update(
     packages,
     dependencies = dep_deps,
@@ -3241,6 +3544,15 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     build_opts = build_opts,
     ...
   )
+}
+
+should_error_for_warnings <- function() {
+
+  force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
+
+  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !as.logical(force_suggests))
+
+  !as.logical(no_errors)
 }
 tokenize_json <- function(text) {
   text <- paste(text, collapse = "\n")
@@ -3378,6 +3690,17 @@ j2r <- function(token) {
 
 trimq <- function(x) {
   sub('^"(.*)"$', "\\1", x)
+}
+
+get_json_sha <- function(text) {
+  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
+  if (all(m == -1)) {
+    return(fromJSON(text)$sha %||% NA_character_)
+  }
+
+  start <- attr(m, "capture.start")
+  end <- start + attr(m, "capture.length") - 1L
+  substring(text, start, end)
 }
 
 parse_deps <- function(string) {
@@ -3646,6 +3969,9 @@ update_submodules <- function(source, quiet) {
   }
   info <- parse_submodules(file)
 
+  to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
+  info <- info[!to_ignore, ]
+
   for (i in seq_len(NROW(info))) {
     update_submodule(info$url[[i]], file.path(source, info$path[[i]]), info$branch[[i]], quiet)
   }
@@ -3708,6 +4034,10 @@ read_char <- function(path, ...) {
 
 viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
+}
+
+vlapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, logical(1L), ..., USE.NAMES = USE.NAMES)
 }
 
 rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
@@ -3832,11 +4162,6 @@ with_options <- with_something(set_options)
 # the workspace.
 read_rprofile_user <- function() {
   f <- normalizePath(Sys.getenv("R_PROFILE_USER", ""), mustWork = FALSE)
-  if (file.exists(f)) {
-    return(readLines(f))
-  }
-
-  f <- ".Rprofile"
   if (file.exists(f)) {
     return(readLines(f))
   }
@@ -4104,6 +4429,37 @@ warn_for_potential_errors <- function() {
       "  starting R from the new drive.\n",
       "See also https://github.com/r-lib/remotes/issues/98\n")
   }
+}
+
+# Return all directories in the input paths
+directories <- function(paths) {
+  dirs <- unique(dirname(paths))
+  out <- dirs[dirs != "."]
+  while(length(dirs) > 0 && any(dirs != ".")) {
+    out <- unique(c(out, dirs[dirs != "."]))
+    dirs <- unique(dirname(dirs))
+  }
+  sort(out)
+}
+
+in_r_build_ignore <- function(paths, ignore_file) {
+  ignore <- ("tools" %:::% "get_exclude_patterns")()
+
+  if (file.exists(ignore_file)) {
+    ignore <- c(ignore, readLines(ignore_file, warn = FALSE))
+  }
+
+  matches_ignores <- function(x) {
+    any(vlapply(ignore, grepl, x, perl = TRUE, ignore.case = TRUE))
+  }
+
+  # We need to search for the paths as well as directories in the path, so
+  # `^foo$` matches `foo/bar`
+  should_ignore <- function(path) {
+    any(vlapply(c(path, directories(path)), matches_ignores))
+  }
+
+  vlapply(paths, should_ignore)
 }
 
 
