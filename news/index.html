@@ -59,7 +59,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -114,6 +114,18 @@
       <small>Source: <a href='https://github.com/r-lib/remotes/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="remotes-2-0-1" class="section level1">
+<h1 class="page-header">
+<a href="#remotes-2-0-1" class="anchor"></a>remotes 2.0.1<small> 2018-10-19 </small>
+</h1>
+<ul>
+<li><p><code><a href="../reference/install_github.html">install_github()</a></code> now bundles a GitHub PAT which is used on Travis to avoid c hitting the rate limit too frequently. It also contains a more informative error message when the rate limit is hit on how to setup a GitHub personal access token.</p></li>
+<li><p>The dialog when <code>upgrade = "ask"</code> now has a ‘CRAN only’ option, to update only CRAN packages.</p></li>
+<li><p>No longer include project specific .Rprofile code in the temporary .Rprofile when <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS=false</code> (the default).</p></li>
+<li><p><code><a href="../reference/package_deps.html">update.package_deps()</a></code> no longer prompts to install uninstalled dependencies, they are always installed (<a href='https://github.com/r-lib/remotes/issues/203'>#203</a>).</p></li>
+<li><p><code><a href="../reference/available_packages.html">available_packages()</a></code>, <code><a href="../reference/available_packages.html">available_packages_set()</a></code> and <code>available_packges_reset()</code> added to allow caching of the <code>available.packages()</code> database.</p></li>
+</ul>
+</div>
     <div id="remotes-2-0-0" class="section level1">
 <h1 class="page-header">
 <a href="#remotes-2-0-0" class="anchor"></a>remotes 2.0.0<small> 2018-10-11 </small>
@@ -201,6 +213,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#remotes-2-0-1">2.0.1</a></li>
         <li><a href="#remotes-2-0-0">2.0.0</a></li>
         <li><a href="#remotes-1-1-1">1.1.1</a></li>
         <li><a href="#remotes-1-1-0">1.1.0</a></li>

@@ -4,6 +4,9 @@
     <loc>https://remotes.r-lib.org/index.html</loc>
   </url>
   <url>
+    <loc>https://remotes.r-lib.org/reference/available_packages.html</loc>
+  </url>
+  <url>
     <loc>https://remotes.r-lib.org/reference/bioc_install_repos.html</loc>
   </url>
   <url>

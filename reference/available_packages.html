@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GitHub references — github_pull • remotes</title>
+<title>Simpler available.packages — available_packages_set • remotes</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,10 +30,11 @@
 
 
 
-<meta property="og:title" content="GitHub references — github_pull" />
+<meta property="og:title" content="Simpler available.packages — available_packages_set" />
 
-<meta property="og:description" content="Use as ref parameter to install_github().
-Allows installing a specific pull request or the latest release." />
+<meta property="og:description" content="This is mostly equivalent to utils::available.packages() however it also
+caches the full result. Additionally the cache can be assigned explicitly with
+available_packages_set() and reset (cleared) with available_packages_reset()." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -114,34 +115,44 @@ Allows installing a specific pull request or the latest release." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>GitHub references</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-github.R'><code>R/install-github.R</code></a></small>
-    <div class="hidden name"><code>github_refs.Rd</code></div>
+    <h1>Simpler available.packages</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/cran.R'><code>R/cran.R</code></a></small>
+    <div class="hidden name"><code>available_packages.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Use as <code>ref</code> parameter to <code><a href='install_github.html'>install_github()</a></code>.
-Allows installing a specific pull request or the latest release.</p>
+    <p>This is mostly equivalent to <code><a href='http://www.rdocumentation.org/packages/utils/topics/available.packages'>utils::available.packages()</a></code> however it also
+caches the full result. Additionally the cache can be assigned explicitly with
+<code>available_packages_set()</code> and reset (cleared) with <code>available_packages_reset()</code>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>github_pull</span>(<span class='no'>pull</span>)
+    <pre class="usage"><span class='fu'>available_packages_set</span>(<span class='no'>repos</span>, <span class='no'>type</span>, <span class='no'>db</span>)
 
-<span class='fu'>github_release</span>()</pre>
+<span class='fu'>available_packages_reset</span>()
+
+<span class='fu'>available_packages</span>(<span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"repos"</span>),
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"pkgType"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pull</th>
-      <td><p>The pull request to install</p></td>
+      <th>repos</th>
+      <td><p>character vector, the base URL(s) of the repositories to use.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>character string, indicate which type of packages: see
+    <code>install.packages</code>.</p>  
+<p>If <code>type = "both"</code> this will use the source repository.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='install_github.html'>install_github()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='http://www.rdocumentation.org/packages/utils/topics/available.packages'>utils::available.packages()</a></code> for full documentation on the output format.</p></div>
     
 
   </div>
