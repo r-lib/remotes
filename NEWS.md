@@ -3,6 +3,8 @@
 
 # remotes 2.0.2
 
+* `install_local()` now omits updating git submodules (@tnagler, #237)
+
 * `install_deps()` now installs un-installed remotes packages even when
   `upgrade = "never"` (@ankane, #227)
 
