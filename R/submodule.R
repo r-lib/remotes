@@ -91,6 +91,10 @@ update_submodules <- function(source, quiet) {
   }
   info <- parse_submodules(file)
 
+  # Fixes #234
+  if (length(info) == 0) {
+    return()
+  }
   to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
   info <- info[!to_ignore, ]
 
