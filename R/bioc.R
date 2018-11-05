@@ -89,7 +89,7 @@ bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version())
     }
   }
   if (r_ver >= "3.5") {
-    repos <- bioc_repos("3.7")
+    repos <- bioc_repos("3.8")
 
   } else if (r_ver >= "3.4") {
     repos <- bioc_repos("3.6")

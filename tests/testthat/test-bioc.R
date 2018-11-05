@@ -31,7 +31,7 @@ test_that("bioc_install_repos", {
 
   expect_equal(
     bioc_install_repos("3.5"),
-    bioc_repos("3.7")
+    bioc_repos("3.8")
   )
 
   expect_error(
