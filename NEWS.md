@@ -1,6 +1,9 @@
 
 # remotes dev
 
+* `install_bioc()` repositories now updated for the Bioconductor 3.8 release.
+  (#239)
+
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
