@@ -135,24 +135,14 @@ test_that("Can install a repo with a submodule", {
   )
 })
 
-test_that("Can install a repo with an empty .gitmodules submodule", {
+test_that("Can update a submodule with an empty .gitmodules submodule", {
 
   if (is.null(git_path())) skip("git is not installed")
 
   dir <- tempfile()
   dir.create(dir)
   on.exit(unlink(dir, recursive = TRUE, force = TRUE))
-  writeLines("foo <- 1", file.path(dir, "foo.R"))
 
-  in_dir(dir, {
-    git("init")
-    git(paste("add", "-A", "."))
-    git(paste(
-      # We need to temporarily set the user name and user email,
-      # in case they are not set
-      "-c", "user.name=foobar", "-c", paste0("user.email=", shQuote("<>")),
-      "commit", "-m", shQuote("Initial commit")))
-  })
   module <- file.path("submodule", ".gitmodules")
   on.exit(unlink(module), add = TRUE)
 
@@ -165,19 +155,5 @@ test_that("Can install a repo with an empty .gitmodules submodule", {
   writeLines("^bar$", build_ignore)
 
   update_submodules("submodule", quiet = TRUE)
-  expect_true(dir.exists(file.path("submodule", "R")))
-  expect_false(dir.exists(file.path("submodule", "bar")))
 
-  # Now remove the R directory so we can try installing the full package
-  unlink(file.path("submodule", "R"), recursive = TRUE, force = TRUE)
-
-  # Install the package to a temporary library and verify it works
-  lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE, force = TRUE), add = TRUE)
-  dir.create(lib)
-
-  install_local("submodule", lib = lib, quiet = TRUE)
-  withr::with_libpaths(lib,
-                       expect_equal(submodule::foo, 1)
-  )
 })
