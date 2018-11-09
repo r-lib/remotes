@@ -28,6 +28,7 @@
   If you rely on the proxy configuration of _wininet_, then you might
   want to set the `download.file.method` option, or use another way to
   set up proxies, see `?download.file`.
+* Remotes without package names are now unconditionally installed (#246).
 
 # remotes 2.0.2
 
