@@ -28,6 +28,7 @@
   If you rely on the proxy configuration of _wininet_, then you might
   want to set the `download.file.method` option, or use another way to
   set up proxies, see `?download.file`.
+* Remotes without package names are now unconditionally installed (#246).
 
 * `install_github()` now includes a more informative error message when the 
   status code is 404, asking the user to check that they have spelled the

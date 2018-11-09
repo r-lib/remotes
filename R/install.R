@@ -11,11 +11,13 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     }
   }
 
+  pkg_name <- load_pkg_description(pkgdir)$package
+
   ## Check for circular dependencies. We need to know about the root
   ## of the install process.
   if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
   if (check_for_circular_dependencies(pkgdir, quiet)) {
-    return(invisible(NA_character_))
+    return(invisible(pkg_name))
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
@@ -37,7 +39,6 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     ...
   )
 
-  pkg_name <- load_pkg_description(pkgdir)$package
   invisible(pkg_name)
 }
 
