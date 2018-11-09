@@ -231,7 +231,7 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
   }
 
   tmp <- tempfile()
-  writeLines(desc, tmp)
+  writeChar(desc, tmp)
   on.exit(unlink(tmp))
 
   read_dcf(tmp)$Package

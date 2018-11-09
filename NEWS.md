@@ -1,6 +1,8 @@
 
 # remotes dev
 
+* `remote_package_name.github_remote()` now works properly on Windows (#248)
+
 * `install_bioc()` repositories now updated for the Bioconductor 3.8 release.
   (#239)
 
