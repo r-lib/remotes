@@ -4,7 +4,7 @@
 \alias{install_url}
 \title{Install a package from a url}
 \usage{
-install_url(url, subdir = NULL, dependencies = NA, upgrade = c("ask",
+install_url(url, subdir = NULL, dependencies = NA, upgrade = c("default", "ask",
   "always", "never"), force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),

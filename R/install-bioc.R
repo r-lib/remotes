@@ -31,7 +31,7 @@
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
                          git = c("auto", "git2r", "external"),
                          dependencies = NA,
-                         upgrade = c("ask", "always", "never"),
+                         upgrade = c("default", "ask", "always", "never"),
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),

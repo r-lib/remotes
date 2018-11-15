@@ -5,7 +5,7 @@
 \title{Install a package from GitLab}
 \usage{
 install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com",
-  dependencies = NA, upgrade = c("ask", "always", "never"),
+  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),

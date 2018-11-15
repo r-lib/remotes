@@ -7,7 +7,7 @@
 install_bitbucket(repo, ref = "master", subdir = NULL,
   auth_user = bitbucket_user(), password = bitbucket_password(),
   host = "api.bitbucket.org/2.0", dependencies = NA,
-  upgrade = c("ask", "always", "never"), force = FALSE,
+  upgrade = c("default", "ask", "always", "never"), force = FALSE,
   quiet = FALSE, build = TRUE, build_opts = c("--no-resave-data",
   "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
