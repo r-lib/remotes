@@ -19,7 +19,7 @@
 
 install_url <- function(url, subdir = NULL,
                         dependencies = NA,
-                        upgrade = c("ask", "always", "never"),
+                        upgrade = c("default", "ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),

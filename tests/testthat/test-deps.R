@@ -353,10 +353,10 @@ test_that("type = 'both' works well", {
 
 test_that("resolve_upgrade works", {
   # returns ask by default when used interactively
-  expect_equal(resolve_upgrade(c("ask", "always", "never"), is_interactive = TRUE), "ask")
+  expect_equal(resolve_upgrade(c("default", "ask", "always", "never"), is_interactive = TRUE), "ask")
 
   # returns always by default when used non-interactively
-  expect_equal(resolve_upgrade(c("ask", "always", "never"), is_interactive = FALSE), "always")
+  expect_equal(resolve_upgrade(c("default", "ask", "always", "never"), is_interactive = FALSE), "always")
 
   # returns always when given TRUE or always input
   expect_equal(resolve_upgrade(TRUE, is_interactive = FALSE), "always")
