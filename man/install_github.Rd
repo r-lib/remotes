@@ -6,7 +6,7 @@
 \usage{
 install_github(repo, ref = "master", subdir = NULL,
   auth_token = github_pat(), host = "api.github.com",
-  dependencies = NA, upgrade = c("ask", "always", "never"),
+  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),

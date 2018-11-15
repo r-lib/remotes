@@ -17,10 +17,12 @@
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
 #' @param quiet If `TRUE`, suppress output.
-#' @param upgrade One of "ask", "always" or "never". "ask" prompts the user for
-#'   which out of date packages to upgrade. For non-interactive sessions "ask" is
-#'   equivalent to "always". `TRUE` and `FALSE` are also accepted and
-#'   correspond to "always" and "never" respectively.
+#' @param upgrade One of "default", "ask", "always", or "never". "default"
+#'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
+#'   and falls back to "ask" if unset. "ask" prompts the user for which out of
+#'   date packages to upgrade. For non-interactive sessions "ask" is equivalent
+#'   to "always". `TRUE` and `FALSE` are also accepted and correspond to
+#'   "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
 #'
@@ -239,7 +241,7 @@ UNAVAILABLE <- 2L
 
 update.package_deps <- function(object,
                            dependencies = NA,
-                           upgrade = c("ask", "always", "never"),
+                           upgrade = c("default", "ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -419,7 +421,7 @@ standardise_dep <- function(x) {
 
 update_packages <- function(packages = TRUE,
                             dependencies = NA,
-                            upgrade = c("ask", "always", "never"),
+                            upgrade = c("default", "ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
@@ -538,7 +540,10 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
     upgrade <- "never"
   }
 
-  upgrade <- match.arg(upgrade, c("ask", "always", "never"))
+  upgrade <- match.arg(upgrade, c("default", "ask", "always", "never"))
+
+  if (identical(upgrade, "default"))
+    upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
 
   if (!is_interactive && identical(upgrade, "ask")) {
     upgrade <- "always"
