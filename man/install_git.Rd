@@ -6,7 +6,7 @@
 \usage{
 install_git(url, subdir = NULL, ref = NULL, branch = NULL,
   credentials = NULL, git = c("auto", "git2r", "external"),
-  dependencies = NA, upgrade = c("ask", "always", "never"),
+  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
   force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),

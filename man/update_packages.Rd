@@ -5,7 +5,7 @@
 \title{Update packages that are missing or out-of-date.}
 \usage{
 update_packages(packages = TRUE, dependencies = NA,
-  upgrade = c("ask", "always", "never"), force = FALSE,
+  upgrade = c("default", "ask", "always", "never"), force = FALSE,
   quiet = FALSE, build = TRUE, build_opts = c("--no-resave-data",
   "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)

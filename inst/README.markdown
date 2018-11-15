@@ -189,6 +189,11 @@ will allow successful installation of these packages.
 
 ### Environment variables
 
+* The `R_REMOTES_UPGRADE` environment variable can be used to set a default
+  preferred value for the `upgrade =` argument accepted by the various
+  `install_*()` functions. For example, you can set `R_REMOTES_UPGRADE=always`
+  to upgrade dependent packages without asking the user.
+
 * Setting `R_REMOTES_STANDALONE=true` forces remotes to work in standalone
   mode and avoid loading its optional dependencies (curl, git2 and pkgbuild
   currently. See "Standalone mode" above.
@@ -197,7 +202,7 @@ will allow successful installation of these packages.
   installation for warning messages. Warnings usually mean installation
   errors, so by default remotes stops for a warning. However, sometimes
   other warnings might happen, that could be ignored by setting this
-  environment variable. 
+  environment variable.
 
 * Setting `_R_CHECK_FORCE_SUGGESTS_=false` while
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset will also avoid stopping the
