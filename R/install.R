@@ -44,7 +44,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
 
 safe_install_packages <- function(...) {
 
-  lib <- paste(.libPaths(), collapse = ":")
+  lib <- paste(.libPaths(), collapse = .Platform$path.sep)
 
   if (has_package("crancache") && has_package("callr")) {
     i.p <- "crancache" %::% "install_packages"
