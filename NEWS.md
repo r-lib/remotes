@@ -9,6 +9,10 @@
 * `install_*` functions now set the `R_LIBS*` environment variables for
   child processes correctly on Windows (@HenrikBengtsson, #253)
 
+* `install_*` functions now support the `R_REMOTES_UPGRADE` environment
+  variable, to set the default for the `upgrade` argument. See README for
+  details (@kevinushey, #240).
+
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
