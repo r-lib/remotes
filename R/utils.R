@@ -346,6 +346,63 @@ base64_decode <- function(x) {
   rawToChar(out)
 }
 
+basis64 <- charToRaw(paste(c(LETTERS, letters, 0:9, "+", "/"),
+                           collapse = ""))
+
+base64_encode <- function(x) {
+  if (is.character(x)) {
+    x <- charToRaw(x)
+  }
+
+  len <- length(x)
+  rlen <- floor((len + 2L) / 3L) * 4L
+  out <- raw(rlen)
+  ip <- op <- 1L
+  c <- integer(4)
+
+  while (len > 0L) {
+    c[[1]] <- as.integer(x[[ip]])
+    ip <- ip + 1L
+    if (len > 1L) {
+      c[[2]] <- as.integer(x[ip])
+      ip <- ip + 1L
+    } else {
+      c[[2]] <- 0L
+    }
+    out[op] <- basis64[1 + bitwShiftR(c[[1]], 2L)]
+    op <- op + 1L
+    out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[1]], 3L), 4L),
+                                  bitwShiftR(bitwAnd(c[[2]], 240L), 4L))]
+    op <- op + 1L
+
+    if (len > 2) {
+      c[[3]] <- as.integer(x[ip])
+      ip <- ip + 1L
+      out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[2]], 15L), 2L),
+                                    bitwShiftR(bitwAnd(c[[3]], 192L), 6L))]
+      op <- op + 1L
+      out[op] <- basis64[1 + bitwAnd(c[[3]], 63)]
+      op <- op + 1L
+
+    } else if (len == 2) {
+      out[op] <- basis64[1 + bitwShiftL(bitwAnd(c[[2]], 15L), 2L)]
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    } else { ## len == 1
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    }
+    len <- len - 3L
+  }
+
+  rawToChar(out)
+}
+
 build_url <- function(host, ...) {
   download_url(do.call(file.path, as.list(c(host, ...))))
 }
