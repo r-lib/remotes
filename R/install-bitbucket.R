@@ -179,13 +179,13 @@ bitbucket_download_url <- function(username, repo, ref = "master",
 bitbucket_password <- function(quiet = TRUE) {
   pass <- Sys.getenv("BITBUCKET_PASSWORD")
   if (identical(pass, "")) return(NULL)
-  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PASSWORD")
   pass
 }
 
 bitbucket_user <- function(quiet = TRUE) {
   user <- Sys.getenv("BITBUCKET_USER")
   if (identical(user, "")) return(NULL)
-  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_USER")
   user
 }
