@@ -41,7 +41,7 @@ base_download <- function(url, path, quiet, headers) {
     }, add = TRUE)
     ua <- orig(FALSE)
 
-    flathead <- paste0(names(headers), ": ", headers, "\r\n")
+    flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
     agent <- paste0(ua, "\r\n", flathead)
     assign(
       "makeUserAgent",
