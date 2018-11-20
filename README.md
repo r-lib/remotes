@@ -187,7 +187,33 @@ in R `Sys.setenv(R_REMOTES_STANDALONE="true")`) you can force remotes to
 operate in standalone mode and use only its internal R implementations. This
 will allow successful installation of these packages.
 
+### Options
+
+remotes uses the following stardard R options, see `?options` for their
+details:
+
+* `download.file.method` for the default download method. See
+  `?download.file`.
+
+* `pkgType` for the package type (source or binary, see manual) to install,
+  download or look up dependencies for.
+
+* `repos` for the locations of the user's standard CRAN(-like) repositoies.
+
+It also uses some remotes specific options:
+
+* `BioC_git` for the URL of the default BioConductor git mirror.
+
+* `unzip` for the path of the external `unzip` program.
+
 ### Environment variables
+
+* The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` enrironment variables
+  are used for the default BitBucket  user name and password, in
+  `install_bitbucket()`
+
+* The `GITHUB_PAT` environment variable is used as the default GitHub
+  personal access token for all GitHub API queries.
 
 * The `R_REMOTES_UPGRADE` environment variable can be used to set a default
   preferred value for the `upgrade =` argument accepted by the various
