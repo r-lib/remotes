@@ -70,22 +70,28 @@ base_download <- function(url, path, quiet, headers) {
   path
 }
 
+has_curl <- function() isTRUE(unname(capabilities("libcurl")))
+
 download_method <- function() {
 
-  # R versions newer than 3.3.0 have correct default methods
-  if (compareVersion(get_r_version(), "3.3") == -1) {
+  user_option <- getOption("download.file.method")
 
-    if (os_type() == "windows") {
-      "wininet"
+  if (!is.null(user_option)) {
+    ## The user wants what the user wants
+    user_option
 
-    } else if (isTRUE(unname(capabilities("libcurl")))) {
-      "libcurl"
+  } else if (has_curl()) {
+    ## If we have libcurl, it is usually the best option
+    "libcurl"
 
-    } else {
-      "auto"
-    }
+  } else if (compareVersion(get_r_version(), "3.3") == -1 &&
+             os_type() == "windows") {
+    ## Before 3.3 we select wininet on Windows
+    "wininet"
 
   } else {
+    ## Otherwise this is probably hopeless, but let R select, and
+    ##  try something
     "auto"
   }
 }

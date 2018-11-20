@@ -4,6 +4,7 @@ context("Download")
 test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.3.0")
+  mockery::stub(download_method, "has_curl", FALSE)
   expect_equal(download_method(), "auto")
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
@@ -12,12 +13,12 @@ test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "capabilities", c(libcurl = TRUE))
+  mockery::stub(download_method, "has_curl", TRUE)
   expect_equal(download_method(), "libcurl")
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "capabilities", c(libcurl = FALSE))
+  mockery::stub(download_method, "has_curl", FALSE)
   expect_equal(download_method(), "auto")
 })
 
@@ -114,7 +115,7 @@ test_that("curl download with basic auth", {
   skip_if_offline()
   mockery::stub(download, "get_r_version", "3.0.0")
 
-  url <- "http://httpbin.org/basic-auth/ruser/rpass"
+  url <- "https://httpbin.org/basic-auth/ruser/rpass"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   download(url, path = tmp, quiet = TRUE,
