@@ -75,7 +75,7 @@ test_that("download with curl, basic auth", {
 
 test_that("base download with custom headers", {
   skip_if_offline()
-  url <- "https://httpbin.org/anything"
+  url <- "http://httpbin.org/anything"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   head <- c("X-Custom" = "Foobar")
