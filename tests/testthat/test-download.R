@@ -4,6 +4,7 @@ context("Download")
 test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.3.0")
+  mockery::stub(download_method, "has_curl", FALSE)
   expect_equal(download_method(), "auto")
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
@@ -12,12 +13,12 @@ test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "capabilities", c(libcurl = TRUE))
+  mockery::stub(download_method, "has_curl", TRUE)
   expect_equal(download_method(), "libcurl")
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "capabilities", c(libcurl = FALSE))
+  mockery::stub(download_method, "has_curl", FALSE)
   expect_equal(download_method(), "auto")
 })
 
@@ -42,28 +43,6 @@ test_that("download", {
 test_that("os_type", {
 
   expect_equal(os_type(), .Platform$OS.type)
-})
-
-test_that("download basic auth", {
-
-  mockery::stub(
-    download,
-    "base_download",
-    function(url, ...) { print(url); 0 })
-
-  mockery::stub(
-    download,
-    "curl_download",
-    function(url, ...) { print(url); 0 })
-
-  expect_output(
-    download(
-      tempfile(),
-      "http://foo.bar.com",
-      basic_auth = list(user = "user", password = "password")
-    ),
-    "http://user:password@foo.bar.com"
-  )
 })
 
 test_that("download fallback to curl, https", {
@@ -93,4 +72,56 @@ test_that("download with curl, basic auth", {
     paste(readLines(tmp), collapse = "\n"),
     '"authenticated": true'
   )
+})
+
+test_that("base download with custom headers", {
+  skip_if_offline()
+  url <- "http://httpbin.org/anything"
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  head <- c("X-Custom" = "Foobar")
+  base_download(url, path = tmp, quiet = TRUE, headers = head)
+  expect_true(file.exists(tmp))
+  resp <- fromJSON(readLines(tmp))
+  expect_equal(resp$headers$`X-Custom`, "Foobar")
+})
+
+test_that("curl download with custom headers", {
+  skip_if_offline()
+  url <- "https://httpbin.org/anything"
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  head <- c("X-Custom" = "Foobar")
+  curl_download(url, path = tmp, quiet = TRUE, headers = head)
+  expect_true(file.exists(tmp))
+  resp <- fromJSON(readLines(tmp))
+  expect_equal(resp$headers$`X-Custom`, "Foobar")
+})
+
+test_that("base download with basic auth", {
+  skip_if_offline()
+  url <- "http://httpbin.org/basic-auth/ruser/rpass"
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  download(url, path = tmp, quiet = TRUE,
+           basic_auth = list(user = "ruser", password = "rpass"))
+  expect_true(file.exists(tmp))
+  resp <- fromJSON(readLines(tmp))
+  expect_true(resp$authenticated)
+  expect_equal(resp$user, "ruser")
+})
+
+test_that("curl download with basic auth", {
+  skip_if_offline()
+  mockery::stub(download, "get_r_version", "3.0.0")
+
+  url <- "https://httpbin.org/basic-auth/ruser/rpass"
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  download(url, path = tmp, quiet = TRUE,
+           basic_auth = list(user = "ruser", password = "rpass"))
+  expect_true(file.exists(tmp))
+  resp <- fromJSON(readLines(tmp))
+  expect_true(resp$authenticated)
+  expect_equal(resp$user, "ruser")
 })

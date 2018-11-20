@@ -13,6 +13,20 @@
   variable, to set the default for the `upgrade` argument. See README for
   details (@kevinushey, #240).
 
+* `install_*` functions perform basic HTTP authentication using HTTP
+  headers now. This fixes an issue with `install_bitbucket()` and private
+  repos (#255).
+
+* `install_*` functions now respect the `download.file.method` option,
+  if `download_file()` is used for HTTP.
+
+* `install_*` functions now use the _libcurl_ method, if the
+  `download.file.method` option is not set to a different one, and libcurl
+  is available. Before, the _wininet_ method was preferred on Windows.
+  If you rely on the proxy configuration of _wininet_, then you might
+  want to set the `download.file.method` option, or use another way to
+  set up proxies, see `?download.file`.
+
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
