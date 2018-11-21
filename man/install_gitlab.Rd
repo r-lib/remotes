@@ -19,7 +19,7 @@ install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com",
 token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and
 supply to this argument. This is safer than using a password because you
 can easily delete a PAT without affecting any others. Defaults to the
-GITHUB_LAB environment variable.}
+GITLAB_PAT environment variable.}
 
 \item{host}{GitLab API host to use. Override with your GitLab enterprise
 hostname, for example, \code{"gitlab.hostname.com"}.}
