@@ -6,9 +6,9 @@
 \usage{
 install_bioc(repo, mirror = getOption("BioC_git",
   download_url("git.bioconductor.org/packages")), git = c("auto",
-  "git2r", "external"), dependencies = NA, upgrade = c("default", "ask", "always",
-  "never"), force = FALSE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
+  "git2r", "external"), dependencies = NA, upgrade = c("default",
+  "ask", "always", "never"), force = FALSE, quiet = FALSE,
+  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
@@ -34,10 +34,12 @@ Can be a character vector (selecting from "Depends", "Imports",
 and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
 just check this package, not its dependencies).}
 
-\item{upgrade}{One of "ask", "always" or "never". "ask" prompts the user for
-which out of date packages to upgrade. For non-interactive sessions "ask" is
-equivalent to "always". \code{TRUE} and \code{FALSE} are also accepted and
-correspond to "always" and "never" respectively.}
+\item{upgrade}{One of "default", "ask", "always", or "never". "default"
+respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,
+and falls back to "ask" if unset. "ask" prompts the user for which out of
+date packages to upgrade. For non-interactive sessions "ask" is equivalent
+to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
+"always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
