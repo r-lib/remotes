@@ -81,6 +81,17 @@ the
 App Passwords documentation}. The App Password requires read-only access to
 your repositories and pull requests. Then store your password in the
 environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})
+
+Note that on Windows, authentication requires the "libcurl" download
+method. You can set the default download method via the
+\code{download.file.method} option:\preformatted{options(download.file.method = "libcurl")
+}
+
+In particular, if unset, RStudio sets the download method to "wininet".
+To override this, you might want to set it to "libcurl" in your
+R profile, see \link[base:Startup]{base::Startup}. The caveat of the "libcurl" method is
+that it does \emph{not} set the system proxies automatically, see
+"Setting Proxies" in \code{\link[utils:download.file]{utils::download.file()}}.
 }
 \examples{
 \dontrun{
