@@ -53,7 +53,8 @@
 
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
-                         type = getOption("pkgType")) {
+                         type = getOption("pkgType"), 
+                         ...) {
 
   repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
@@ -69,7 +70,7 @@ package_deps <- function(packages, dependencies = NA,
   remote <- structure(lapply(deps, package2remote, repos = repos, type = type), class = "remotes")
 
   inst_ver <- vapply(deps, local_sha, character(1))
-  cran_ver <- vapply(remote, function(x) remote_sha(x), character(1))
+  cran_ver <- vapply(remote, function(x) remote_sha(x, ...), character(1))
   is_cran_remote <- vapply(remote, inherits, logical(1), "cran_remote")
 
   diff <- compare_versions(inst_ver, cran_ver, is_cran_remote)
@@ -134,7 +135,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
   }
 
   combine_deps(
-    package_deps(deps, repos = repos, type = type),
+    package_deps(deps, repos = repos, type = type, ...),
     remote_deps(pkg, ...))
 }
 
@@ -510,7 +511,7 @@ remote_deps <- function(pkg, ...) {
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
-  available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
+  available <- vapply(remote, function(x) remote_sha(x, ...), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
   diff[is.na(installed)] <- UNINSTALLED
