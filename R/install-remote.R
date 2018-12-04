@@ -23,7 +23,7 @@ install_remote <- function(remote,
 
   package_name <- remote_package_name(remote)
   local_sha <- local_sha(package_name)
-  remote_sha <- remote_sha(remote, local_sha)
+  remote_sha <- remote_sha(remote, local_sha, ...)
 
   if (!isTRUE(force) &&
     !different_sha(remote_sha = remote_sha, local_sha = local_sha)) {
@@ -142,7 +142,7 @@ local_sha <- function(name) {
 # is added to the package when it is installed by remotes. If the package is
 # installed some other way, such as by `install.packages()` there will be no
 # meta-data, so there we construct a generic CRAN remote.
-package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), type = getOption("pkgType")) {
+package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), type = getOption("pkgType"), ...) {
 
   x <- tryCatch(utils::packageDescription(name, lib.loc = lib), error = function(e) NA, warning = function(e) NA)
 
