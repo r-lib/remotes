@@ -94,7 +94,7 @@ bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version())
     }
   }
   if (r_ver >= "3.5") {
-    repos <- bioc_repos("3.7")
+    repos <- bioc_repos("3.8")
 
   } else if (r_ver >= "3.4") {
     repos <- bioc_repos("3.6")
@@ -293,10 +293,12 @@ my_unzip <- function(src, target, unzip = getOption("unzip", "internal")) {
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
 #' @param quiet If `TRUE`, suppress output.
-#' @param upgrade One of "ask", "always" or "never". "ask" prompts the user for
-#'   which out of date packages to upgrade. For non-interactive sessions "ask" is
-#'   equivalent to "always". `TRUE` and `FALSE` are also accepted and
-#'   correspond to "always" and "never" respectively.
+#' @param upgrade One of "default", "ask", "always", or "never". "default"
+#'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
+#'   and falls back to "ask" if unset. "ask" prompts the user for which out of
+#'   date packages to upgrade. For non-interactive sessions "ask" is equivalent
+#'   to "always". `TRUE` and `FALSE` are also accepted and correspond to
+#'   "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
 #'
@@ -816,6 +818,9 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
 
   upgrade <- match.arg(upgrade, c("default", "ask", "always", "never"))
 
+  if (identical(upgrade, "default"))
+    upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
+
   if (!is_interactive && identical(upgrade, "ask")) {
     upgrade <- "always"
   }
@@ -979,13 +984,15 @@ R <- function(args, path = tempdir()) {
 #' @importFrom utils compareVersion
 
 download <- function(path, url, auth_token = NULL, basic_auth = NULL,
-                     quiet = TRUE, auth_phrase = "access_token=") {
+                     quiet = TRUE, auth_phrase = "access_token=",
+                     headers = NULL) {
 
   real_url <- url
 
   if (!is.null(basic_auth)) {
-    str <- paste0("://", basic_auth$user, ":", basic_auth$password, "@")
-    real_url <- sub("://", str, url)
+    userpass <- paste0(basic_auth$user, ":", basic_auth$password)
+    auth <- paste("Basic", base64_encode(charToRaw(userpass)))
+    headers <- c(headers, Authorization = auth)
   }
 
   if (!is.null(auth_token)) {
@@ -995,17 +1002,40 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
   }
 
   if (compareVersion(get_r_version(), "3.2.0") == -1) {
-    curl_download(real_url, path, quiet)
+    curl_download(real_url, path, quiet, headers)
 
   } else {
 
-    base_download(real_url, path, quiet)
+    base_download(real_url, path, quiet, headers)
   }
 
   path
  }
 
-base_download <- function(url, path, quiet) {
+base_download <- function(url, path, quiet, headers) {
+
+  if (!is.null(headers)) {
+    unlockBinding("makeUserAgent", asNamespace("utils"))
+    orig <- get("makeUserAgent", envir = asNamespace("utils"))
+    on.exit({
+      assign("makeUserAgent", orig, envir = asNamespace("utils"))
+      lockBinding("makeUserAgent", asNamespace("utils"))
+    }, add = TRUE)
+    ua <- orig(FALSE)
+
+    flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
+    agent <- paste0(ua, "\r\n", flathead)
+    assign(
+      "makeUserAgent",
+      envir = asNamespace("utils"),
+      function(format = TRUE) {
+        if (format) {
+          paste0("User-Agent: ", agent, "\r\n")
+        } else {
+          agent
+        }
+      })
+  }
 
   suppressWarnings(
     status <- utils::download.file(
@@ -1022,33 +1052,41 @@ base_download <- function(url, path, quiet) {
   path
 }
 
+has_curl <- function() isTRUE(unname(capabilities("libcurl")))
+
 download_method <- function() {
-  
-  # R versions newer than 3.3.0 have correct default methods
-  if (compareVersion(get_r_version(), "3.3") == -1) {
-    
-    if (os_type() == "windows") {
-      "wininet"
-      
-    } else if (isTRUE(unname(capabilities("libcurl")))) {
-      "libcurl"
-      
-    } else {
-      "auto"
-    }
-    
+
+  user_option <- getOption("download.file.method")
+
+  if (!is.null(user_option)) {
+    ## The user wants what the user wants
+    user_option
+
+  } else if (has_curl()) {
+    ## If we have libcurl, it is usually the best option
+    "libcurl"
+
+  } else if (compareVersion(get_r_version(), "3.3") == -1 &&
+             os_type() == "windows") {
+    ## Before 3.3 we select wininet on Windows
+    "wininet"
+
   } else {
+    ## Otherwise this is probably hopeless, but let R select, and
+    ##  try something
     "auto"
   }
 }
 
-curl_download <- function(url, path, quiet) {
+curl_download <- function(url, path, quiet, headers) {
 
   if (!pkg_installed("curl")) {
     stop("The 'curl' package is required if R is older than 3.2.0")
   }
 
-  curl::curl_download(url, path, quiet = quiet, mode = "wb")
+  handle <- curl::new_handle()
+  if (!is.null(headers)) curl::handle_setheaders(handle, .list = headers)
+  curl::curl_download(url, path, quiet = quiet, mode = "wb", handle = handle)
 }
 
 true_download_method <- function(x) {
@@ -1687,6 +1725,19 @@ git_repo_sha1 <- function(r) {
 #' App Passwords documentation}. The App Password requires read-only access to
 #' your repositories and pull requests. Then store your password in the
 #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
+#'
+#' Note that on Windows, authentication requires the "libcurl" download
+#' method. You can set the default download method via the
+#' `download.file.method` option:
+#' ```
+#' options(download.file.method = "libcurl")
+#' ```
+#' In particular, if unset, RStudio sets the download method to "wininet".
+#' To override this, you might want to set it to "libcurl" in your
+#' R profile, see [base::Startup]. The caveat of the "libcurl" method is
+#' that it does _not_ set the system proxies automatically, see
+#' "Setting Proxies" in [utils::download.file()].
+#'
 #' @inheritParams install_github
 #' @family package installation
 #' @export
@@ -1841,14 +1892,14 @@ bitbucket_download_url <- function(username, repo, ref = "master",
 bitbucket_password <- function(quiet = TRUE) {
   pass <- Sys.getenv("BITBUCKET_PASSWORD")
   if (identical(pass, "")) return(NULL)
-  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PASSWORD")
   pass
 }
 
 bitbucket_user <- function(quiet = TRUE) {
   user <- Sys.getenv("BITBUCKET_USER")
   if (identical(user, "")) return(NULL)
-  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_USER")
   user
 }
 
@@ -2457,7 +2508,7 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
   }
 
   tmp <- tempfile()
-  writeLines(desc, tmp)
+  writeChar(desc, tmp)
   on.exit(unlink(tmp))
 
   read_dcf(tmp)$Package
@@ -3406,7 +3457,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
 
 safe_install_packages <- function(...) {
 
-  lib <- paste(.libPaths(), collapse = ":")
+  lib <- paste(.libPaths(), collapse = .Platform$path.sep)
 
   if (has_package("crancache") && has_package("callr")) {
     i.p <- "crancache" %::% "install_packages"
@@ -4370,6 +4421,63 @@ base64_decode <- function(x) {
 
     out[[length(out) + 1]] <- as.raw(bitwOr(bitwShiftL(bitwAnd(c[[3]], 0x03), 6L), c[[4]]))
   }
+  rawToChar(out)
+}
+
+basis64 <- charToRaw(paste(c(LETTERS, letters, 0:9, "+", "/"),
+                           collapse = ""))
+
+base64_encode <- function(x) {
+  if (is.character(x)) {
+    x <- charToRaw(x)
+  }
+
+  len <- length(x)
+  rlen <- floor((len + 2L) / 3L) * 4L
+  out <- raw(rlen)
+  ip <- op <- 1L
+  c <- integer(4)
+
+  while (len > 0L) {
+    c[[1]] <- as.integer(x[[ip]])
+    ip <- ip + 1L
+    if (len > 1L) {
+      c[[2]] <- as.integer(x[ip])
+      ip <- ip + 1L
+    } else {
+      c[[2]] <- 0L
+    }
+    out[op] <- basis64[1 + bitwShiftR(c[[1]], 2L)]
+    op <- op + 1L
+    out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[1]], 3L), 4L),
+                                  bitwShiftR(bitwAnd(c[[2]], 240L), 4L))]
+    op <- op + 1L
+
+    if (len > 2) {
+      c[[3]] <- as.integer(x[ip])
+      ip <- ip + 1L
+      out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[2]], 15L), 2L),
+                                    bitwShiftR(bitwAnd(c[[3]], 192L), 6L))]
+      op <- op + 1L
+      out[op] <- basis64[1 + bitwAnd(c[[3]], 63)]
+      op <- op + 1L
+
+    } else if (len == 2) {
+      out[op] <- basis64[1 + bitwShiftL(bitwAnd(c[[2]], 15L), 2L)]
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    } else { ## len == 1
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    }
+    len <- len - 3L
+  }
+
   rawToChar(out)
 }
 
