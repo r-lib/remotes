@@ -43,8 +43,13 @@ test_that("install-github.R script does not load any package", {
       library(compiler)
       library(tools)
       orig <- loadedNamespaces()
+
       source(script)$value("cran/falsy", lib = lib)
+
       new <- loadedNamespaces()
+
+      ## Need to load curl on R < 3.2.0, for HTTPS, so we ignore this
+      if (getRversion() < "3.2.0") new <- setdiff(new, "curl")
       list(orig, new)
     },
     args = list(script = script, lib = lib),
