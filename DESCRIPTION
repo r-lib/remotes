@@ -22,6 +22,8 @@ Imports:
     methods,
     utils
 Suggests:
+    brew,
+    callr,
     curl,
     covr,
     git2r (>= 0.23.0),
@@ -30,7 +32,9 @@ Suggests:
     pkgbuild (>= 1.0.1),
     pingr,
     rmarkdown,
+    rprojroot,
     testthat,
+    tools,
     withr
 Depends:
     R (>= 3.0.0)
