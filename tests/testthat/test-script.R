@@ -28,3 +28,28 @@ test_that("use install-github.R script", {
     packageDescription("falsy", lib.loc = lib)$RemoteRepo,
     "falsy")
 })
+
+test_that("install-github.R script does not load any package", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  script <- system.file(package = .packageName, "install-github.R")
+  lib <- test_temp_dir()
+
+  pkgs <- callr::r(
+    function(script, lib) {
+      ## tools is ok to load
+      library(tools)
+      orig <- loadedNamespaces()
+      source(script)$value("cran/falsy", lib = lib)
+      new <- loadedNamespaces()
+      list(orig, new)
+    },
+    args = list(script = script, lib = lib),
+    cmdargs = c("--vanilla", "--slave", "--no-save", "--no-restore"),
+    timeout = 20
+  )
+
+  expect_equal(pkgs[[1]], pkgs[[2]])
+})
