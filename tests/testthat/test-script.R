@@ -39,7 +39,8 @@ test_that("install-github.R script does not load any package", {
 
   pkgs <- callr::r(
     function(script, lib) {
-      ## tools is ok to load
+      ## compiler and tools are ok to load
+      library(compiler)
       library(tools)
       orig <- loadedNamespaces()
       source(script)$value("cran/falsy", lib = lib)
