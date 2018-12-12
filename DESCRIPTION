@@ -20,6 +20,7 @@ URL: https://github.com/r-lib/remotes#readme
 BugReports: https://github.com/r-lib/remotes/issues
 Imports:
     methods,
+    tools,
     utils
 Suggests:
     brew,
@@ -34,7 +35,6 @@ Suggests:
     rmarkdown,
     rprojroot,
     testthat,
-    tools,
     withr
 Depends:
     R (>= 3.0.0)
