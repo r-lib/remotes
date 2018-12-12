@@ -1,4 +1,4 @@
 SRC := $(wildcard R/*R)
 
-install-github.R: install-github.Rin $(SRC)
+inst/install-github.R: inst/install-github.Rin $(SRC)
 	Rscript -e 'brew::brew("$<", "$@")'
