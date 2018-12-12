@@ -10,8 +10,8 @@ test_that("install-github.R script is up to date", {
     brew::brew(file.path(root, "install-github.Rin"), tmp))
 
   expect_equal(
-    tools::md5sum(tmp)[[1]],
-    tools::md5sum(file.path(root, "install-github.R"))[[1]])
+    readLines(tmp),
+    readLines(file.path(root, "install-github.R")))
 })
 
 test_that("use install-github.R script", {
