@@ -4572,6 +4572,15 @@ in_r_build_ignore <- function(paths, ignore_file) {
 }
 
 
+  ## Standalone mode, make sure that we restore the env var on exit
+  old <- Sys.getenv("R_REMOTES_STANDALONE", NA_character_)
+  Sys.setenv("R_REMOTES_STANDALONE" = "true")
+  if (is.na(old)) {
+    on.exit(Sys.unsetenv("R_REMOTES_STANDALONE"), add = TRUE)
+  } else {
+    on.exit(Sys.setenv("R_REMOTES_STANDALONE" = old), add = TRUE)
+  }
+
   install_github(...)
 
 }
