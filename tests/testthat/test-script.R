@@ -2,7 +2,7 @@
 context("install-github.R script")
 
 test_that("install-github.R script is up to date", {
-  root <- system.file(package = .packageName)
+  root <- system.file(package = packageName())
   tmp <- test_temp_file(".R")
 
   withr::with_dir(
@@ -19,7 +19,7 @@ test_that("use install-github.R script", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
-  script <- system.file(package = .packageName, "install-github.R")
+  script <- system.file(package = packageName(), "install-github.R")
   lib <- test_temp_dir()
   expect_error(
     source(script)$value("cran/falsy", lib = lib, quiet = TRUE),
@@ -34,7 +34,7 @@ test_that("install-github.R script does not load any package", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
-  script <- system.file(package = .packageName, "install-github.R")
+  script <- system.file(package = packageName(), "install-github.R")
   lib <- test_temp_dir()
 
   pkgs <- callr::r(
