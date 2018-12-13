@@ -41,3 +41,18 @@ skip_without_program <- function(program) {
     skip(paste("Need the", program, "program"))
   }
 }
+
+test_temp_file <- function(fileext = "", pattern = "test-file-",
+                           envir = parent.frame()) {
+  tmp <- tempfile(pattern = pattern, fileext = fileext)
+  withr::defer(
+    try(unlink(tmp, recursive = TRUE, force = TRUE), silent = TRUE),
+    envir = envir)
+  tmp
+}
+
+test_temp_dir <- function(pattern = "test-dir-", envir = parent.frame()) {
+  tmp <- test_temp_file(pattern, envir = envir)
+  dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
+  tmp
+}
