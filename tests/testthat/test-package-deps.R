@@ -58,6 +58,61 @@ test_that("parse_deps", {
   )
 })
 
+test_that("version requirement comparisons", {
+  # Two different formats for requirement specs
+  required1 <- parse_deps("foo (< 2.1), foo (> 1.5)")
+  required2 <- as.data.frame(required1, strings.as.factors=FALSE)
+
+  for (required in list(required1, required2)) {
+    expect_true(satisfies('2.0', required))
+    expect_true(satisfies(NULL, required))
+    expect_false(satisfies('2.1', required))
+    expect_false(satisfies('1.5', required))
+
+    mockery::stub(have, "packageDescription", function(...) "2.0")
+    expect_true(have('foo', required))
+
+    mockery::stub(have, "packageDescription", function(...) "1.0")
+    expect_false(have('foo', required))
+  }
+
+  expect_equal(
+    version_criteria('1.5'),
+    data.frame(compare='==', version='1.5', stringsAsFactors=FALSE)
+  )
+
+  expect_equivalent(
+    version_criteria(NULL),
+    data.frame(compare=NA_character_, version=NA_character_, stringsAsFactors=FALSE)
+  )
+
+  expect_equivalent(
+    version_criteria(NA),
+    data.frame(compare=NA_character_, version=NA_character_, stringsAsFactors=FALSE)
+  )
+
+  expect_equal(
+    version_criteria(c('> 1.5', '< 2.0')),
+    data.frame(compare=c('>', '<'), version=c('1.5', '2.0'), stringsAsFactors=FALSE)
+  )
+
+  expect_equal(
+    version_from_tarball("ROI.plugin.glpk/ROI.plugin.glpk_0.0-1.tar.gz"),
+    "0.0-1"
+  )
+
+  expect_equal(
+    version_from_tarball("ROI.plugin.glpk_0.0-1.tar.gz"),
+    "0.0-1"
+  )
+
+  expect_equal(
+    version_from_tarball(c("ROI.plugin.glpk_0.0-1.tar.gz", "ROI.plugin.glpk_2.3-1.tar.gz")),
+    c("0.0-1", "2.3-1")
+  )
+})
+
+
 
 test_that("parse_deps errors", {
 

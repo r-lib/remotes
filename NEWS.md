@@ -1,5 +1,13 @@
 # remotes (development version)
 
+* `install_version()` now keeps searching subsequent repositories for the
+  requested version, rather than failing if the version it finds in an early
+  repository is unsuitable.
+
+* `install_version()` now understands specifications like '>= 1.0' or
+  '>= 1.12.0, < 1.14' to install the first version of the package it can
+  find that satisfies the criteria.
+
 * Bioc `remote_sha()` now always returns a character result (#379)
 
 * Fix API call for private repositories in `install_gitlab` 

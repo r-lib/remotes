@@ -26,7 +26,7 @@ test_that("install_version", {
   expect_null(desc$RemoteUrl)
 })
 
-test_that("package_find_repo() works correctly with multiple repos", {
+test_that("package_find_archives() works correctly", {
 
   skip_on_cran()
   skip_if_offline()
@@ -34,8 +34,11 @@ test_that("package_find_repo() works correctly with multiple repos", {
   repos <- c(CRANextras = "http://www.stats.ox.ac.uk/pub/RWin", CRAN = "http://cran.rstudio.com")
   # ROI.plugin.glpk is the smallest package in the CRAN archive
   package <- "ROI.plugin.glpk"
-  res <- package_find_repo(package, repos = repos)
 
+  res <- package_find_archives(package, repos[1])
+  expect_null(res)
+
+  res <- package_find_archives(package, repos[2])
   expect_true(NROW(res) >= 1)
   expect_equal(res$repo[1], "http://cran.rstudio.com")
   expect_match(rownames(res), package)
@@ -63,7 +66,7 @@ test_that("install_version for current version", {
 })
 
 
-test_that("intall_version and invalid version number", {
+test_that("install_version and invalid version number", {
 
   skip_on_cran()
   skip_if_offline()

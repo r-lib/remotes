@@ -9,6 +9,7 @@ Authors@R: c(
     person("RStudio", role = "cph"),
     person("Martin", "Morgan", role = "aut"),
     person("Dan", "Tenenbaum", role = "aut"),
+    person("Ken", "Williams", , "kenahoo@gmail.com", role = "ctb"),
     person("Mango Solutions", role = "cph")
     )
 Description: Download and install R packages stored in 'GitHub',
