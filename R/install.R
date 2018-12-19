@@ -15,7 +15,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   ## of the install process.
   if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
   if (check_for_circular_dependencies(pkgdir, quiet)) {
-    return(invisible(FALSE))
+    return(invisible(NA_character_))
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
