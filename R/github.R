@@ -152,9 +152,9 @@ github_error <- function(res) {
 
   error_details <- fromJSON(rawToChar(res$content))$message
 
-  pat_guidance <- ""
+  guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
-    pat_guidance <-
+    guidance <-
       sprintf(
 "To increase your GitHub API rate limit
   - Use `usethis::browse_github_pat()` to create a Personal Access Token.
@@ -166,14 +166,18 @@ github_error <- function(res) {
         }
       )
   } else if (identical(as.integer(res$status_code), 404L)) {
-    repo_information = re_match(res$url,"(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
-    pat_guidance <- sprintf(
-"Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+    repo_information <- re_match(res$url, "(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    if(!is.na(repo_information$owner) && !is.na(repo_information$repo)) {
+      guidance <- sprintf(
+        "Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
   - If spelling is correct, check that you have the required permissions to access the repo.",
         repo_information$owner,
         repo_information$repo
-    )
-
+      )
+    } else {
+      guidance <- "Did you spell the repo owner and repo name correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo."
+    }
   }
  if(identical(as.integer(res$status_code),404L)) {
    msg <- sprintf(
@@ -184,7 +188,7 @@ github_error <- function(res) {
 
      res$status_code,
      error_details,
-     pat_guidance
+     guidance
    )
  } else {
   msg <- sprintf(
@@ -201,7 +205,7 @@ github_error <- function(res) {
     ratelimit_remaining,
     ratelimit_limit,
     format(ratelimit_reset, usetz = TRUE),
-    pat_guidance
+    guidance
   )
  }
 
