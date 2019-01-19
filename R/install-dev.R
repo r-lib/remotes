@@ -28,6 +28,14 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     cran_url <- "https://cloud.r-project.org"
   }
 
+  # if @[ref] is included, save for repo install
+  if (contains_ref(package)) {
+    ref <- sub(".*(?=(@|#))", "", package, perl = TRUE)
+    package <- sub("(#|@).*", "", package)
+  } else {
+    ref <- ""
+  }
+
   url <- build_url(cran_url, "web", "packages", package, "DESCRIPTION")
 
   f <- tempfile()
@@ -67,7 +75,9 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     stop("Could not determine development repository", call. = FALSE)
   }
 
-  ref <- paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/")
+  ref <- paste0(
+    paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/"),
+    ref)
 
   switch(parts$domain,
     github.com = install_github(ref, ...),
