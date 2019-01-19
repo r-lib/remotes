@@ -29,6 +29,11 @@
   want to set the `download.file.method` option, or use another way to
   set up proxies, see `?download.file`.
 
+* `install_github()` now includes a more informative error message when the 
+  status code is 404, asking the user to check that they have spelled the
+  repo owner and repo correctly (included in the error message), and that 
+  they have the required permissions to access the repository.
+
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
