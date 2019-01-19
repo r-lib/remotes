@@ -179,3 +179,15 @@ test_that("in_r_build_ignore works", {
     c(TRUE, FALSE, FALSE, TRUE, FALSE)
   )
 })
+
+test_that("dev_split_ref works", {
+  expect_equal(dev_split_ref("DT")[["pkg"]], "DT")
+  expect_equal(dev_split_ref("remotes")[["ref"]], "")
+  expect_equal(dev_split_ref("with.dot")[["pkg"]], "with.dot")
+  expect_equal(dev_split_ref("with2")[["pkg"]], "with2")
+  expect_equal(dev_split_ref("with@v1.2.1")[["ref"]], "@v1.2.1")
+  expect_equal(dev_split_ref("with@v1.0.0.999")[["ref"]], "@v1.0.0.999")
+  expect_equal(dev_split_ref("with@v1.0.0.999")[["pkg"]], "with")
+  expect_equal(dev_split_ref("with#279")[["ref"]], "#279")
+  expect_equal(dev_split_ref("with#1")[["pkg"]], "with")
+})

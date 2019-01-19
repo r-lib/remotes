@@ -492,6 +492,4 @@ in_r_build_ignore <- function(paths, ignore_file) {
   vlapply(paths, should_ignore)
 }
 
-contains_ref <- function(x) {
-  grepl("^[^@#]+(\\@|\\#)[^@#]+$", x)
-}
+dev_split_ref <- function(x) re_match(x, "^(?<pkg>[^@#]+)(?<ref>[@#].*)?$")
