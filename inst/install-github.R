@@ -1366,9 +1366,9 @@ github_error <- function(res) {
 
   error_details <- fromJSON(rawToChar(res$content))$message
 
-  pat_guidance <- ""
+  guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
-    pat_guidance <-
+    guidance <-
       sprintf(
 "To increase your GitHub API rate limit
   - Use `usethis::browse_github_pat()` to create a Personal Access Token.
@@ -1379,8 +1379,32 @@ github_error <- function(res) {
           "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
         }
       )
+  } else if (identical(as.integer(res$status_code), 404L)) {
+    repo_information <- re_match(res$url, "(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    if(!is.na(repo_information$owner) && !is.na(repo_information$repo)) {
+      guidance <- sprintf(
+        "Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo.",
+        repo_information$owner,
+        repo_information$repo
+      )
+    } else {
+      guidance <- "Did you spell the repo owner and repo name correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo."
+    }
   }
+ if(identical(as.integer(res$status_code),404L)) {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s
 
+  %s",
+
+     res$status_code,
+     error_details,
+     guidance
+   )
+ } else {
   msg <- sprintf(
 "HTTP error %s.
   %s
@@ -1395,8 +1419,9 @@ github_error <- function(res) {
     ratelimit_remaining,
     ratelimit_limit,
     format(ratelimit_reset, usetz = TRUE),
-    pat_guidance
+    guidance
   )
+ }
 
   structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
@@ -1404,7 +1429,7 @@ github_error <- function(res) {
 
 #> Error: HTTP error 404.
 #>   Not Found
-#> 
+#>
 #>   Rate limit remaining: 4999
 #>   Rate limit reset at: 2018-10-10 19:43:52 UTC
 #' Install a package from a Bioconductor repository
