@@ -165,8 +165,28 @@ github_error <- function(res) {
           "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
         }
       )
-  }
+  } else if (identical(as.integer(res$status_code), 404L)) {
+    repo_information = re_match(res$url,"(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    pat_guidance <- sprintf(
+"Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo.",
+        repo_information$owner,
+        repo_information$repo
+    )
 
+  }
+ if(identical(as.integer(res$status_code),404L)) {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s
+
+  %s",
+
+     res$status_code,
+     error_details,
+     pat_guidance
+   )
+ } else {
   msg <- sprintf(
 "HTTP error %s.
   %s
@@ -183,6 +203,7 @@ github_error <- function(res) {
     format(ratelimit_reset, usetz = TRUE),
     pat_guidance
   )
+ }
 
   structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
@@ -190,6 +211,6 @@ github_error <- function(res) {
 
 #> Error: HTTP error 404.
 #>   Not Found
-#> 
+#>
 #>   Rate limit remaining: 4999
 #>   Rate limit reset at: 2018-10-10 19:43:52 UTC
