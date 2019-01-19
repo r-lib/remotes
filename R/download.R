@@ -136,8 +136,13 @@ download_method_secure <- function() {
     # known good methods
     TRUE
   } else if (identical(method, "internal")) {
-    # if internal then see if were using windows internal with inet2
-    identical(Sys.info()[["sysname"]], "Windows") && utils::setInternet2(NA)
+    # only done before R 3.3
+    if (utils::compareVersion(get_r_version(), "3.3") == -1) {
+      # if internal then see if were using windows internal with inet2
+      identical(Sys.info()[["sysname"]], "Windows") && utils::setInternet2(NA)
+    } else {
+      FALSE
+    }
   } else {
     # method with unknown properties (e.g. "lynx") or unresolved auto
     FALSE
