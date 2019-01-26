@@ -15,11 +15,11 @@ install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com",
 \item{repo}{Repository address in the format
 \code{username/repo[/subdir][@ref]}.}
 
-\item{auth_token}{To install from a private repo, generate a personal
-access token (PAT) in \url{https://github.com/settings/applications} and
-supply to this argument. This is safer than using a password because
-you can easily delete a PAT without affecting any others. Defaults to
-the \code{GITHUB_PAT} environment variable.}
+\item{auth_token}{To install from a private repo, generate a personal access
+token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and
+supply to this argument. This is safer than using a password because you
+can easily delete a PAT without affecting any others. Defaults to the
+GITLAB_PAT environment variable.}
 
 \item{host}{GitLab API host to use. Override with your GitLab enterprise
 hostname, for example, \code{"gitlab.hostname.com"}.}
