@@ -144,11 +144,11 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 github_error <- function(res) {
   res_headers <- curl::parse_headers_list(res$headers)
 
-  ratelimit_limit <- res_headers$`x-ratelimit-limit`
+  ratelimit_limit <- res_headers$`x-ratelimit-limit` %||% NA
 
-  ratelimit_remaining <- res_headers$`x-ratelimit-remaining`
+  ratelimit_remaining <- res_headers$`x-ratelimit-remaining` %||% NA
 
-  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
+  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset` %||% NA, tz = "UTC")
 
   error_details <- fromJSON(rawToChar(res$content))$message
 
