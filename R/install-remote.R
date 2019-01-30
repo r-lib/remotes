@@ -68,6 +68,7 @@ install_remote <- function(remote,
           build_opts = build_opts,
           repos = repos,
           type = type,
+          host = remote$host,
           ...)
 }
 
@@ -142,7 +143,8 @@ local_sha <- function(name) {
 # is added to the package when it is installed by remotes. If the package is
 # installed some other way, such as by `install.packages()` there will be no
 # meta-data, so there we construct a generic CRAN remote.
-package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), type = getOption("pkgType")) {
+package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), type = getOption("pkgType"),
+                           host = "api.github.com") {
 
   x <- tryCatch(utils::packageDescription(name, lib.loc = lib), error = function(e) NA, warning = function(e) NA)
 
@@ -167,7 +169,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
 
   switch(x$RemoteType,
     github = remote("github",
-      host = x$RemoteHost,
+      host = host %||% x$RemoteHost,
       package = x$RemotePackage,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,

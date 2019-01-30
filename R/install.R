@@ -1,5 +1,5 @@
 install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
-                    repos, type, ...) {
+                    repos, type, host, ...) {
 
   warn_for_potential_errors()
 
@@ -19,7 +19,8 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type,
+    host = host, ...)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -162,6 +163,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         host = "api.github.com",
                          ...) {
 
   packages <- dev_package_deps(
@@ -169,6 +171,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     repos = repos,
     dependencies = dependencies,
     type = type,
+    host = host,
     ...
   )
 
@@ -181,6 +184,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     upgrade = upgrade,
     build = build,
     build_opts = build_opts,
+    host = host,
     ...
   )
 }

@@ -60,7 +60,7 @@ install_github <- function(repo,
   remotes <- lapply(repo, github_remote, ref = ref,
     subdir = subdir, auth_token = auth_token, host = host)
 
-  install_remotes(remotes, auth_token = auth_token, host = host,
+  install_remotes(remotes, auth_token = auth_token,
     dependencies = dependencies,
     upgrade = upgrade,
     force = force,

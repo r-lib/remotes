@@ -53,7 +53,8 @@
 
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
-                         type = getOption("pkgType")) {
+                         type = getOption("pkgType"),
+                         host = "api.github.com") {
 
   repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
@@ -66,7 +67,7 @@ package_deps <- function(packages, dependencies = NA,
   deps <- setdiff(deps, base)
 
   # get remote types
-  remote <- structure(lapply(deps, package2remote, repos = repos, type = type), class = "remotes")
+  remote <- structure(lapply(deps, package2remote, repos = repos, type = type, host = host), class = "remotes")
 
   inst_ver <- vapply(deps, local_sha, character(1))
   cran_ver <- vapply(remote, function(x) remote_sha(x), character(1))
@@ -117,7 +118,8 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType"),
+                             host = "api.github.com", ...) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -134,8 +136,8 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
   }
 
   combine_deps(
-    package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg, ...))
+    package_deps(deps, repos = repos, type = type, host = host),
+    remote_deps(pkg, host = host, ...))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {

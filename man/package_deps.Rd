@@ -8,12 +8,13 @@
 \title{Find all dependencies of a CRAN or dev package.}
 \usage{
 package_deps(packages, dependencies = NA, repos = getOption("repos"),
-  type = getOption("pkgType"))
+  type = getOption("pkgType"), host = "api.github.com")
 
 local_package_deps(pkgdir = ".", dependencies = NA)
 
 dev_package_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"), ...)
+  repos = getOption("repos"), type = getOption("pkgType"),
+  host = "api.github.com", ...)
 
 \method{update}{package_deps}(object, dependencies = NA,
   upgrade = c("default", "ask", "always", "never"), force = FALSE,
@@ -36,6 +37,9 @@ just check this package, not its dependencies).}
 \item{repos}{A character vector giving repositories to use.}
 
 \item{type}{Type of package to \code{update}.}
+
+\item{host}{GitHub API host to use. Override with your GitHub enterprise
+hostname, for example, \code{"github.hostname.com/api/v3"}.}
 
 \item{pkgdir}{path to a package directory, or to a package tarball.}
 
