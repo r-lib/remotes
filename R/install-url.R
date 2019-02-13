@@ -40,15 +40,26 @@ install_url <- function(url, subdir = NULL,
 }
 
 url_remote <- function(url, subdir = NULL, ...) {
-  remote("url",
+  x <- remote("url",
     url = url,
     subdir = subdir
   )
+
+  # download, set path to (temporary) download location
+  x$path <- remote_download(x)
+
+  x
 }
 
 #' @importFrom tools file_ext
 #' @export
 remote_download.url_remote <- function(x, quiet = FALSE) {
+
+  # if the path exists, no need to download again
+  if (!is.null(x$path)) {
+    return(x$path)
+  }
+
   if (!quiet) {
     message("Downloading package from url: ", x$url) # nocov
   }
@@ -57,6 +68,9 @@ remote_download.url_remote <- function(x, quiet = FALSE) {
 
   bundle <- tempfile(fileext = paste0(".", ext))
   download(bundle, x$url)
+
+  # decompress, returning path to "decompressed" directory
+  decompress(bundle, tempdir())
 }
 
 #' @export
@@ -70,12 +84,14 @@ remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL, sha = NU
 
 #' @export
 remote_package_name.url_remote <- function(remote, ...) {
-  NA_character_
+  description_path <- file.path(remote$path, "DESCRIPTION")
+
+  read_dcf(description_path)$Package
 }
 
 #' @export
 remote_sha.url_remote <- function(remote, ...) {
-  NA_character_
+  read_dcf(file.path(remote$path, "DESCRIPTION"))$Version
 }
 
 #' @export

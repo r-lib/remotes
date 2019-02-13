@@ -29,4 +29,8 @@ test_that("install_url", {
   expect_equal(format(remote), "URL")
   expect_equal(remote$url, url)
   expect_equal(remote$subdir, NULL)
+
+  remote_new <- url_remote(url)
+  expect_equal(remote_package_name(remote_new), "simplegraph")
+  expect_equal(remote_sha(remote_new), "1.0.1")
 })
