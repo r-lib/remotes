@@ -26,7 +26,7 @@ install_url <- function(url, subdir = NULL,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
-  remotes <- lapply(url, url_remote, subdir = subdir)
+  remotes <- lapply(url, url_remote, subdir = subdir, quiet = quiet)
   install_remotes(remotes,
                   dependencies = dependencies,
                   upgrade = upgrade,
@@ -39,38 +39,34 @@ install_url <- function(url, subdir = NULL,
                   ...)
 }
 
-url_remote <- function(url, subdir = NULL, ...) {
-  x <- remote("url",
+url_remote <- function(url, subdir = NULL, quiet = FALSE, ...) {
+
+  # mimic local_remote
+
+  # download and keep in "private" directory
+  if (!quiet) {
+    message("Downloading package from url: ", url) # nocov
+  }
+
+  ext <- if (grepl("\\.tar\\.gz$", url)) "tar.gz" else file_ext(url)
+
+  bundle <- tempfile(fileext = paste0(".", ext))
+  download(bundle, url)
+
+  # decompress, returning path to "decompressed" directory
+  path <- decompress(bundle, tempdir())
+
+  remote("url",
     url = url,
-    subdir = subdir
+    subdir = subdir,
+    path = path
   )
-
-  # download, set path to (temporary) download location
-  x$path <- remote_download(x)
-
-  x
 }
 
 #' @importFrom tools file_ext
 #' @export
 remote_download.url_remote <- function(x, quiet = FALSE) {
-
-  # if the path exists, no need to download again
-  if (!is.null(x$path)) {
-    return(x$path)
-  }
-
-  if (!quiet) {
-    message("Downloading package from url: ", x$url) # nocov
-  }
-
-  ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)
-
-  bundle <- tempfile(fileext = paste0(".", ext))
-  download(bundle, x$url)
-
-  # decompress, returning path to "decompressed" directory
-  decompress(bundle, tempdir())
+  remote_download.local_remote(x, quiet = quiet)
 }
 
 #' @export
@@ -84,14 +80,15 @@ remote_metadata.url_remote <- function(x, bundle = NULL, source = NULL, sha = NU
 
 #' @export
 remote_package_name.url_remote <- function(remote, ...) {
-  description_path <- file.path(remote$path, "DESCRIPTION")
-
-  read_dcf(description_path)$Package
+  remote_package_name.local_remote(remote, ...)
 }
 
 #' @export
 remote_sha.url_remote <- function(remote, ...) {
-  read_dcf(file.path(remote$path, "DESCRIPTION"))$Version
+  if (is.null(remote$path)) {
+    return(NA_character_)
+  }
+  remote_sha.local_remote(remote, ...)
 }
 
 #' @export
