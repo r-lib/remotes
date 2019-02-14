@@ -1,6 +1,8 @@
 
 # remotes dev
 
+* Make `install_url()` more-robust. (@ijlyttle, #288)
+
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 
 * `remote_package_name.github_remote()` now works properly on Windows (#248)
