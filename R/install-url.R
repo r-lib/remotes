@@ -43,7 +43,7 @@ url_remote <- function(url, subdir = NULL, quiet = FALSE, ...) {
 
   # mimic local_remote
 
-  # download and keep in "private" directory
+  # download and keep in "private" temp directory
   if (!quiet) {
     message("Downloading package from url: ", url) # nocov
   }
@@ -55,6 +55,10 @@ url_remote <- function(url, subdir = NULL, quiet = FALSE, ...) {
 
   # decompress, returning path to "decompressed" directory
   path <- decompress(bundle, tempdir())
+
+  # clean up - cannot do this with `path` because it has to persist
+  # after the function returns
+  on.exit(unlink(bundle))
 
   remote("url",
     url = url,
