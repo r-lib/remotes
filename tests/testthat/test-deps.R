@@ -178,6 +178,17 @@ test_that("Additional_repositories field", {
     parse_additional_repositories(pkg),
     c("http://packages.ropensci.org", "http://foo.bar.com")
   )
+
+  pkg <- list(
+    additional_repositories = 
+      "\n  http://packages.ropensci.org, \nhttp://foo.bar.com"
+  )
+
+  expect_equal(
+    parse_additional_repositories(pkg),
+    c("http://packages.ropensci.org", "http://foo.bar.com")
+  )
+
 })
 
 test_that("update.package_deps", {
