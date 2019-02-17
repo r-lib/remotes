@@ -451,7 +451,7 @@ has_additional_repositories <- function(pkg) {
 
 parse_additional_repositories <- function(pkg) {
   if (has_additional_repositories(pkg)) {
-    strsplit(gsub("^[\n[:space:]]+", "", pkg[["additional_repositories"]]), "[,[:space:]]+")[[1]]
+    strsplit(gsub("^[[:space:]]*", "", pkg[["additional_repositories"]]), "[,[:space:]]+")[[1]]
   }
 }
 
