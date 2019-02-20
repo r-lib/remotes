@@ -2,7 +2,6 @@
 context("install-github.R script")
 
 test_that("install-github.R script is up to date", {
-  skip("test has a path problem")
   root <- system.file(package = packageName())
   tmp <- test_temp_file(".R")
 
