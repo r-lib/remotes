@@ -150,8 +150,7 @@ combine_deps <- function(cran_deps, remote_deps) {
 
   # If there are remote deps remove the equivalent CRAN deps
   cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
-
-  rbind(remote_deps, cran_deps)
+  rbind(cran_deps, remote_deps)
 }
 
 ## -2 = not installed, but available on CRAN
