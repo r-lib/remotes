@@ -108,6 +108,9 @@ have <- function(pkg, criteria) {
 #' @param criteria character vector expressing criteria for some version to satisfy
 #' @return `data.frame` with columns `compare` and `version` expressing the criteria
 version_criteria <- function(criteria) {
+  if (is.character(criteria) && length(criteria) == 1)
+    criteria <- strsplit(criteria, ',')[[1]]
+
   numeric_ver <- .standard_regexps()$valid_numeric_version
 
   package <- "p"  # dummy package name, required by parse_deps()

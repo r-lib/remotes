@@ -60,11 +60,11 @@ test_that("parse_deps", {
 
 test_that("version requirement comparisons", {
   # Two different formats for requirement specs
-  required1 <- parse_deps("foo (< 2.1), foo (> 1.5)")
-  required2 <- as.data.frame(required1, strings.as.factors=FALSE)
+  required1 <- c("< 2.1", "> 1.5")
+  required2 <- "< 2.1, > 1.5"
 
   for (required in list(required1, required2)) {
-    expect_true(satisfies('2.0', required))
+    expect_true(satisfies('2.0', required), label = required)
     expect_true(satisfies(NULL, required))
     expect_false(satisfies('2.1', required))
     expect_false(satisfies('1.5', required))
@@ -89,6 +89,11 @@ test_that("version requirement comparisons", {
   expect_equivalent(
     version_criteria(NA),
     data.frame(compare=NA_character_, version=NA_character_, stringsAsFactors=FALSE)
+  )
+
+  expect_equal(
+    version_criteria(c('> 1.5, < 2.0')),
+    data.frame(compare=c('>', '<'), version=c('1.5', '2.0'), stringsAsFactors=FALSE)
   )
 
   expect_equal(
