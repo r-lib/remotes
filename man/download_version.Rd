@@ -8,12 +8,12 @@ download_version(package, version = NULL, repos = getOption("repos"),
   type = getOption("pkgType"), ...)
 }
 \arguments{
-\item{package}{package name}
+\item{package}{Name of the package to install.}
 
-\item{version}{If the specified version is NULL or the same as the most
-recent version of the package, this function simply calls
-\code{\link[utils:install.packages]{utils::install.packages()}}. Otherwise, it looks at the list of
-archived source tarballs and tries to install an older version instead.}
+\item{version}{Version of the package to install.  Can either be a string giving the exact
+version required, or a specification in the same format as the parenthesized expressions used
+in package dependencies (see \code{\link{parse_deps}} and/or
+\url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies}).}
 
 \item{repos}{
     character vector, the base URL(s) of the repositories

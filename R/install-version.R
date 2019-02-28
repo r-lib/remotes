@@ -86,7 +86,7 @@ version_from_tarball <- function(tarball_name) {
 }
 
 #' @param to.check version as a string or `package_version` object
-#' @param criteria character vector specifying criteria for `to.check` to satisfy
+#' @inheritParams version_criteria
 #' @return TRUE if version 'to.check' satisfies all version criteria 'criteria'
 satisfies <- function(to.check, criteria) {
   to.check <- package_version(to.check)
@@ -98,14 +98,22 @@ satisfies <- function(to.check, criteria) {
 }
 
 #' @param pkg package name
-#' @param criteria character vector specifying criteria for `to.check` to satisfy
-#' @return TRUE if 'pkg' is already installed, and its version satisfies all criteria `criteria`
+#' @inheritParams version_criteria
+#' @return TRUE if `pkg` is already installed, and its version satisfies all criteria `criteria`
 have <- function(pkg, criteria) {
   v <- suppressWarnings(packageDescription(pkg, fields = "Version"))
   !is.na(v) && satisfies(v, criteria)
 }
 
-#' @param criteria character vector expressing criteria for some version to satisfy
+#' @param criteria character vector expressing criteria for some version to satisfy.  Options include:
+#' \begin{itemize}
+#'   \item `NULL` or `NA`, indicating that the package must be present, but need not satisfy any
+#'   particular version
+#'   \item An exact version required, as a string, e.g. `"0.1.13"`
+#'   \item A comparison operator and a version, e.g. `">= 0.1.12"`
+#'   \item Several criteria to satisfy, as a comma-separated string, e.g. `">= 1.12.0, < 1.14"`
+#'   \item Several criteria to satisfy, as elements of a character vector, e.g. `c(">= 1.12.0", "< 1.14")`
+#' \end{itemize}
 #' @return `data.frame` with columns `compare` and `version` expressing the criteria
 version_criteria <- function(criteria) {
   if (is.character(criteria) && length(criteria) == 1)
