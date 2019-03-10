@@ -49,7 +49,8 @@ install_remote <- function(remote,
   bundle <- remote_download(remote, quiet = quiet)
   on.exit(unlink(bundle), add = TRUE)
 
-  source <- source_pkg(bundle, subdir = remote$subdir)
+  if(inherits(remote, "gitlab_remote")) subdir <- NULL else subdir <- remote$subdir
+  source <- source_pkg(bundle, subdir = subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
 
   update_submodules(source, quiet)
