@@ -166,6 +166,11 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   }
 
   switch(x$RemoteType,
+    standard = remote("cran",
+      name = x$Package,
+      repos = x$RemoteRepos,
+      pkg_type = x$RemotePkgType,
+      sha = x$RemoteSha),
     github = remote("github",
       host = x$RemoteHost,
       package = x$RemotePackage,
@@ -231,7 +236,8 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       repo = x$RemoteRepo,
       release = x$RemoteRelease,
       sha = x$RemoteSha,
-      branch = x$RemoteBranch)
+      branch = x$RemoteBranch),
+    stop(sprintf("can't convert package with RemoteType '%s' to remote", x$RemoteType))
   )
 }
 
