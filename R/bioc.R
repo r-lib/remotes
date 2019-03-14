@@ -1,20 +1,104 @@
-## This is mostly from https://bioconductor.org/biocLite.R
+## This is mostly from https://github.com/Bioconductor/BiocManager/blob/ba18f67fb886048b991c0f04a87894cf8c35b076/R/version.R
 
-bioc_version <- function() {
-  bver <- get(
-    ".BioC_version_associated_with_R_version",
-    envir = asNamespace("tools"),
-    inherits = FALSE
-  )
+bioc_version <- function(r_ver) {
+  map <- bioc_version_map(r_ver)
 
-  if (is.function(bver)) {
-    bver()
-  } else {
-    bver
+   if (r_ver[, 1:2] < min(map$R)){
+      stop("Unsupported R version for Bioconductor", call. = FALSE)
+    } else {
+    map <- map[map$R == r_ver[, 1:2],]
+    if ("release" %in% map$BiocStatus)
+      idx <- map$BiocStatus == "release"
+    else if ("devel" %in% map$BiocStatus)
+      idx <- map$BiocStatus == "devel"
+    else if ("out-of-date" %in% map$BiocStatus)
+      idx <- map$BiocStatus == "out-of-date"
+    else
+      idx <- map$BiocStatus == "future"
+
+    return(tail(map$Bioc[idx], 1))
   }
+
 }
 
-bioc_repos <- function(bioc_ver = bioc_version()) {
+bioc_version_map <- function(r_ver){
+  # dput(BiocManager:::.version_map())
+  map <- structure(list(Bioc = structure(list(c(1L, 6L), c(1L, 7L), c(1L,
+                                                                      8L), c(1L, 9L), c(2L, 0L), c(2L, 1L), c(2L, 2L), 2:3, c(2L, 4L
+                                                                      ), c(2L, 5L), c(2L, 6L), c(2L, 7L), c(2L, 8L), c(2L, 9L), c(2L,
+                                                                                                                                  10L), c(2L, 11L), c(2L, 12L), c(2L, 13L), c(2L, 14L), c(3L, 0L
+                                                                                                                                  ), c(3L, 1L), c(3L, 2L), c(3L, 3L), 3:4, c(3L, 5L), c(3L, 6L),
+                                              c(3L, 7L), c(3L, 8L), c(3L, 9L), c(3L, 9L)), class = c("package_version",
+                                                                                                     "numeric_version")), R = structure(list(c(2L, 1L), c(2L, 2L),
+                                                                                                                                             2:3, c(2L, 4L), c(2L, 5L), c(2L, 6L), c(2L, 7L), c(2L, 8L
+                                                                                                                                             ), c(2L, 9L), c(2L, 10L), c(2L, 11L), c(2L, 12L), c(2L, 13L
+                                                                                                                                             ), c(2L, 14L), c(2L, 15L), c(2L, 15L), c(3L, 0L), c(3L, 0L
+                                                                                                                                             ), c(3L, 1L), c(3L, 1L), c(3L, 2L), c(3L, 2L), c(3L, 3L),
+                                                                                                                                             c(3L, 3L), 3:4, 3:4, c(3L, 5L), c(3L, 5L), c(3L, 6L), c(3L,
+                                                                                                                                                                                                     7L)), class = c("package_version", "numeric_version")), BiocStatus = structure(c(1L,
+                                                                                                                                                                                                                                                                                      1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L,
+                                                                                                                                                                                                                                                                                      1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 3L, 4L), .Label = c("out-of-date",
+                                                                                                                                                                                                                                                                                                                                                      "release", "devel", "future"), class = "factor")), .Names = c("Bioc",
+                                                                                                                                                                                                                                                                                                                                                                                                                    "R", "BiocStatus"), row.names = c(NA, -30L), class = "data.frame")
+
+
+     # if config got out-of-date
+  if (r_ver[, 1:2] > max(map$R)){
+    map <- get_online_bioc_version_map()
+  }
+
+  return(map)
+}
+
+get_online_bioc_version_map <- function(){
+  config <- "https://bioconductor.org/config.yaml"
+  txt <- tryCatch(readLines(config), error = identity)
+  if (inherits(txt, "error") && startsWith(config, "https://")) {
+    config <- sub("https", "http", config)
+    txt <- tryCatch(readLines(config), error = identity)
+  }
+  if (inherits(txt, "error"))
+    stop("Unable to read Bioconductor config", call. = FALSE)
+
+  grps <- grep("^[^[:blank:]]", txt)
+  start <- match(grep("r_ver_for_bioc_ver", txt), grps)
+  map <- txt[seq(grps[start] + 1, grps[start + 1] - 1)]
+  map <- trimws(gsub("\"", "", sub(" #.*", "", map)))
+
+  pattern <- "(.*): (.*)"
+  bioc <- package_version(sub(pattern, "\\1", map))
+  r <- package_version(sub(pattern, "\\2", map))
+
+  pattern <- "^release_version: \"(.*)\""
+  release <- package_version(
+    sub(pattern, "\\1", grep(pattern, txt, value=TRUE))
+  )
+  pattern <- "^devel_version: \"(.*)\""
+  devel <- package_version(
+    sub(pattern, "\\1", grep(pattern, txt, value=TRUE))
+  )
+  status <- rep("out-of-date", length(bioc))
+  status[bioc == release] <- "release"
+  status[bioc == devel] <- "devel"
+
+  ## append final version for 'devel' R
+  bioc <- c(
+    bioc, max(bioc)
+    ## package_version(paste(unlist(max(bioc)) + 0:1, collapse = "."))
+  )
+  r <- c(r, package_version(paste(unlist(max(r)) + 0:1, collapse = ".")))
+  status <- c(status, "future")
+
+  data.frame(
+    Bioc = bioc, R = r,
+    BiocStatus = factor(
+      status,
+      levels = c("out-of-date", "release", "devel", "future")
+    )
+  )
+}
+
+bioc_repos <- function(bioc_ver, r_ver) {
   bioc_ver <- as.package_version(bioc_ver)
 
   a <- NULL
@@ -42,7 +126,7 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
     repo_types
   )
 
-  default_bioc_version <- bioc_version()
+  default_bioc_version <- bioc_version(r_ver)
 
   if (!identical(default_bioc_version, bioc_ver)) {
     a[repos, "URL"] <- sub(as.character(default_bioc_version), bioc_ver, a[repos, "URL"], fixed = TRUE)
@@ -61,59 +145,10 @@ bioc_repos <- function(bioc_ver = bioc_version()) {
 #' @export
 #' @keywords internal
 
-bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version()) {
-  r_ver <- package_version(r_ver)
-  bioc_ver <- package_version(bioc_ver)
-
-  repos <- bioc_repos()
-
-  ## add a conditional for Bioc releases occuring WITHIN
-  ## a single R minor version. This is so that a user with a
-  ## version of R (whose etc/repositories file references the
-  ## no-longer-latest URL) and without BiocInstaller
-  ## will be pointed to the most recent repository suitable
-  ## for their version of R
-  if (r_ver >= "3.2.2" && r_ver < "3.3.0") {
-    ## transitioning to https support; check availability
-    con <- file(fl <- tempfile(), "w")
-    sink(con, type = "message")
-    tryCatch(
-      { xx <- close(file("https://bioconductor.org")) },
-      error = function(e) { message(conditionMessage(e)) }
-    )
-    sink(type = "message")
-    close(con)
-
-    if (!length(readLines(fl))) {
-      repos <- sub("^http:", "https:", repos)
-    }
-  }
-  if (r_ver >= "3.5") {
-    repos <- bioc_repos("3.8")
-
-  } else if (r_ver >= "3.4") {
-    repos <- bioc_repos("3.6")
-
-  } else if (r_ver >= "3.3") {
-    repos <- bioc_repos("3.4")
-
-  } else if (r_ver >= "3.2") {
-    repos <- bioc_repos("3.2")
-
-  } else if (r_ver > "3.1.1") {
-    repos <- bioc_repos("3.0")
-  } else if (r_ver == "3.1.1") {
-    ## R-3.1.1's etc/repositories file at the time of the release
-    ## of Bioc 3.0 pointed to the 2.14 repository, but we want
-    ## new installations to access the 3.0 repository
-    repos <- bioc_repos("3.0")
-
-  } else if (r_ver == "3.1.0") {
-    ## R-devel points to 2.14 repository
-    repos <- bioc_repos("2.14")
-  } else {
-    stop("Unsupported R version", call. = FALSE)
-  }
+bioc_install_repos <- function(r_ver = getRversion(),
+                               bioc_ver = Sys.getenv("BIOCONDUCTOR_VERSION",
+                                                     bioc_version(r_ver))) {
+  repos <- bioc_repos(bioc_ver, r_ver)
 
   repos
 }
