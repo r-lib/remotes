@@ -38,7 +38,7 @@ Indeed most of the code was copied over from `devtools`.
 
 ## Installation
 
-Install the relesed version of remotes from CRAN:
+Install the released version of remotes from CRAN:
 
 ```r
 install.packages("remotes")
