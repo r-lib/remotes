@@ -148,6 +148,17 @@ bioc_repos <- function(bioc_ver, r_ver) {
 bioc_install_repos <- function(r_ver = getRversion(),
                                bioc_ver = Sys.getenv("BIOCONDUCTOR_VERSION",
                                                      bioc_version(r_ver))) {
+
+  bioc_ver <- package_version(bioc_ver)
+  # check version compatibility
+  map <- bioc_version_map(r_ver)
+
+  if (!bioc_ver %in% map$Bioc[map$R == r_ver[, 1:2],]){
+    stop("Incompatible R and Bioconductor version, check BIOCONDUCTOR_VERSION",
+         call. = FALSE)
+  }
+
+  # get repos
   repos <- bioc_repos(bioc_ver, r_ver)
 
   repos
