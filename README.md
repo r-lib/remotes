@@ -128,7 +128,7 @@ assumed. Other possible values: `gitlab::`,`bitbucket::`, `git::`, `local::`,
 `svn::`, `url::`, `version::`, `cran::`, `bioc::`.
 
 See more about the `Remotes` field in this
-[vignette](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
+[vignette](https://remotes.r-lib.org/articles/dependencies.html).
 
 #### Additional repositories
 
