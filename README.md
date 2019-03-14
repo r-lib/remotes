@@ -189,7 +189,7 @@ will allow successful installation of these packages.
 
 ### Options
 
-remotes uses the following stardard R options, see `?options` for their
+remotes uses the following standard R options, see `?options` for their
 details:
 
 * `download.file.method` for the default download method. See
