@@ -1,6 +1,7 @@
 ## This is mostly from https://github.com/Bioconductor/BiocManager/blob/ba18f67fb886048b991c0f04a87894cf8c35b076/R/version.R
 
-bioc_version <- function(r_ver) {
+bioc_version <- function(r_ver = getRversion()) {
+  r_ver <- package_version(r_ver)
   map <- bioc_version_map(r_ver)
 
    if (r_ver[, 1:2] < min(map$R)){
@@ -21,7 +22,7 @@ bioc_version <- function(r_ver) {
 
 }
 
-bioc_version_map <- function(r_ver){
+bioc_version_map <- function(r_ver = getRversion()){
   # dput(BiocManager:::.version_map())
   map <- structure(list(Bioc = structure(list(c(1L, 6L), c(1L, 7L), c(1L,
                                                                       8L), c(1L, 9L), c(2L, 0L), c(2L, 1L), c(2L, 2L), 2:3, c(2L, 4L
@@ -99,6 +100,8 @@ get_online_bioc_version_map <- function(){
 }
 
 bioc_repos <- function(bioc_ver, r_ver) {
+
+  r_ver <- package_version(r_ver)
   bioc_ver <- as.package_version(bioc_ver)
 
   a <- NULL
@@ -149,6 +152,7 @@ bioc_install_repos <- function(r_ver = getRversion(),
                                bioc_ver = Sys.getenv("BIOCONDUCTOR_VERSION",
                                                      bioc_version(r_ver))) {
 
+  r_ver <- package_version(r_ver)
   bioc_ver <- package_version(bioc_ver)
   # check version compatibility
   map <- bioc_version_map(r_ver)
@@ -159,7 +163,7 @@ bioc_install_repos <- function(r_ver = getRversion(),
   }
 
   # get repos
-  repos <- bioc_repos(bioc_ver, r_ver)
+  repos <- bioc_repos(bioc_ver = bioc_ver, r_ver = r_ver)
 
   repos
 }
