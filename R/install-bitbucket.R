@@ -44,7 +44,7 @@
 #' @examples
 #' \dontrun{
 #' install_bitbucket("sulab/mygene.r@@default")
-#' install_bitbucket("dannavarro/lsr-package")
+#' install_bitbucket("djnavarro/lsr")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
