@@ -12,10 +12,10 @@
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/applications> and
+#'   access token (PAT) in <https://github.com/settings/tokens> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
-#'   the `GITHUB_PAT` environment variable.
+#'   the `GITHUB_PAT` environment variable in your `.Renviron` file.
 #' @param host GitHub API host to use. Override with your GitHub enterprise
 #'   hostname, for example, `"github.hostname.com/api/v3"`.
 #' @param force Force installation, even if the remote state has not changed
@@ -37,9 +37,9 @@
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
-#' # from https://github.com/settings/applications. You only need the
+#' # from https://github.com/settings/tokens. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
-#' # GITHUB_PAT.
+#' # GITHUB_PAT in your .Renviron file.
 #' install_github("hadley/private", auth_token = "abc")
 #'
 #' }
