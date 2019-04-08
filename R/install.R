@@ -57,7 +57,8 @@ safe_install_packages <- function(...) {
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
-      R_LIBS_SITE = lib),
+      R_LIBS_SITE = lib,
+      RGL_USE_NULL = "TRUE"),
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.

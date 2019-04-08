@@ -38,6 +38,10 @@
   repo owner and repo correctly (included in the error message), and that 
   they have the required permissions to access the repository.
 
+* `install_*` fuctions (via the underlying private `install` function) now set
+  `RGL_USE_NULL="TRUE"` in order to avoid errors when running headless
+  and installing any package using `rgl` (@jefferis, ##333)
+  
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
