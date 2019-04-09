@@ -15,3 +15,4 @@
 ^install-github.Rin$
 ^\.env$
 ^revdep$
+^cran-comments\.md$
