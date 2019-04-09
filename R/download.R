@@ -32,7 +32,7 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
 base_download <- function(url, path, quiet, headers) {
 
-  if (getRversion() < "3.7.0") {
+  if (getRversion() < "3.6.0") {
     if (!is.null(headers)) {
       get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
       orig <- get("makeUserAgent", envir = asNamespace("utils"))
