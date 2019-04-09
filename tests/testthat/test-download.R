@@ -75,7 +75,9 @@ test_that("download with curl, basic auth", {
 })
 
 test_that("base download with custom headers", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "http://httpbin.org/anything"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
@@ -87,7 +89,9 @@ test_that("base download with custom headers", {
 })
 
 test_that("curl download with custom headers", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "https://httpbin.org/anything"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
@@ -99,7 +103,9 @@ test_that("curl download with custom headers", {
 })
 
 test_that("base download with basic auth", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "http://httpbin.org/basic-auth/ruser/rpass"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
@@ -112,7 +118,9 @@ test_that("base download with basic auth", {
 })
 
 test_that("curl download with basic auth", {
+  skip_on_cran()
   skip_if_offline()
+
   mockery::stub(download, "get_r_version", "3.0.0")
 
   url <- "https://httpbin.org/basic-auth/ruser/rpass"
