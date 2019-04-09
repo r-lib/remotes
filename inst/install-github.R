@@ -2332,7 +2332,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/applications> and
+#'   access token (PAT) in <https://github.com/settings/tokens> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
@@ -2357,7 +2357,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
-#' # from https://github.com/settings/applications. You only need the
+#' # from https://github.com/settings/tokens. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
 #' install_github("hadley/private", auth_token = "abc")
@@ -4078,6 +4078,9 @@ update_submodules <- function(source, quiet) {
   info <- parse_submodules(file)
 
   to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
+  if (!(length(info) > 0)) {
+    return()
+  }
   info <- info[!to_ignore, ]
 
   for (i in seq_len(NROW(info))) {
