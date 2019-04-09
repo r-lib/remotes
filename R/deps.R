@@ -540,7 +540,7 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
     upgrade <- "never"
   }
 
-  upgrade <- match.arg(upgrade, c("default", "ask", "always", "never"))
+  upgrade <- match.arg(upgrade[[1]], c("default", "ask", "always", "never"))
 
   if (identical(upgrade, "default"))
     upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
