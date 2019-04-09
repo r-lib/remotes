@@ -16,3 +16,4 @@
 ^\.env$
 ^revdep$
 ^cran-comments\.md$
+^CRAN-RELEASE$
