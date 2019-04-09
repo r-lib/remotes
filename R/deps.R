@@ -576,7 +576,7 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
 
       choices <- pkgs
       if (length(choices) > 1) {
-        choices <- c(choices, "CRAN packages only", "All", "None")
+        choices <- c("All", "CRAN packages only", "None", choices)
       }
 
       res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
