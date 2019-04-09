@@ -1,6 +1,9 @@
 
 # remotes dev
 
+* The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
+  'CRAN only', 'none' first, so they always have the same numbers (#287).
+
 * `update_submodules()` now works with empty .gitmodules files (@jsilve24, #329).
 
 * remotes now understands the "standard" remote type, as produced by packages
