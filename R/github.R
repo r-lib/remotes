@@ -57,7 +57,7 @@ github_commit <- function(username, repo, ref = "master",
     on.exit(unlink(tmp), add = TRUE)
 
     download(tmp, url, auth_token = pat)
-    get_json_sha(readLines(tmp, warn = FALSE))
+    get_json_sha(paste0(readLines(tmp, warn = FALSE), collapse = "\n"))
   }
 }
 
