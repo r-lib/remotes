@@ -1,6 +1,8 @@
 
 # remotes dev
 
+* `update_submodules()` now works with empty .gitmodules files (@jsilve24, #329).
+
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
 
