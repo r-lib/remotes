@@ -1016,7 +1016,7 @@ base_download <- function(url, path, quiet, headers) {
 
   if (getRversion() < "3.7.0") {
     if (!is.null(headers)) {
-      unlockBinding("makeUserAgent", asNamespace("utils"))
+      get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
       orig <- get("makeUserAgent", envir = asNamespace("utils"))
       on.exit({
         assign("makeUserAgent", orig, envir = asNamespace("utils"))
