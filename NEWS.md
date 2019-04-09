@@ -1,5 +1,4 @@
-
-# remotes dev
+# remotes 2.0.3
 
 * The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
   'CRAN only', 'none' first, so they always have the same numbers (#287).
