@@ -26,7 +26,7 @@ Indeed most of the code was copied over from `devtools`.
 	* Install from local files or URLs.
 	* Install the dependencies of a local package tree.
 	* Install specific package versions from CRAN.
-* Supports [BioConductor](https://bioconductor.org/) packages.
+* Supports [Bioconductor](https://bioconductor.org/) packages.
 * Supports the `Remotes` field in `DESCRIPTION`. See more
   [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
@@ -38,7 +38,7 @@ Indeed most of the code was copied over from `devtools`.
 
 ## Installation
 
-Install the relesed version of remotes from CRAN:
+Install the released version of remotes from CRAN:
 
 ```r
 install.packages("remotes")
@@ -128,7 +128,7 @@ assumed. Other possible values: `gitlab::`,`bitbucket::`, `git::`, `local::`,
 `svn::`, `url::`, `version::`, `cran::`, `bioc::`.
 
 See more about the `Remotes` field in this
-[vignette](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
+[vignette](https://remotes.r-lib.org/articles/dependencies.html).
 
 #### Additional repositories
 
@@ -137,12 +137,10 @@ remotes supports the `Additional_repositories` field in
 package repositories. See the [Writing R extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies)
 manual for details.
 
-#### BioConductor packages
+#### Bioconductor packages
 
-BioConductor packages are automatically detected and their
-dependencies are installed from BioConductor. The BiocInstaller
-package, which is needed to install them, is also automatically
-installed temporarily.
+Bioconductor packages are automatically detected and their
+dependencies are installed from Bioconductor.
 
 #### Currently supported remote types
 
@@ -189,7 +187,7 @@ will allow successful installation of these packages.
 
 ### Options
 
-remotes uses the following stardard R options, see `?options` for their
+remotes uses the following standard R options, see `?options` for their
 details:
 
 * `download.file.method` for the default download method. See
@@ -202,7 +200,7 @@ details:
 
 It also uses some remotes specific options:
 
-* `BioC_git` for the URL of the default BioConductor git mirror.
+* `BioC_git` for the URL of the default Bioconductor git mirror.
 
 * `unzip` for the path of the external `unzip` program.
 
