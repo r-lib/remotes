@@ -83,9 +83,7 @@ package_deps <- function(packages, dependencies = NA,
       is_cran = is_cran_remote,
       stringsAsFactors = FALSE
     ),
-    class = c("package_deps", "data.frame"),
-    repos = repos,
-    type = type
+    class = c("package_deps", "data.frame")
   )
 
   res$remote <- remote
@@ -297,8 +295,10 @@ update.package_deps <- function(object,
   behind <- is.na(object$installed) | object$diff < CURRENT
 
   if (any(object$is_cran & !unavailable_on_cran & behind)) {
-    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
+    # get the first cran-like remote and use its repos and pkg_type
+    r <- object$remote[object$is_cran & behind][[1]]
+    install_packages(object$package[object$is_cran & behind], repos = r$repos,
+      type = r$pkg_type, dependencies = dependencies, quiet = quiet, ...)
   }
 
   install_remotes(object$remote[!object$is_cran & behind],
