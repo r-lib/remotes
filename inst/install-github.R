@@ -421,13 +421,13 @@ combine_deps <- function(cran_deps, remote_deps) {
     return(cran_deps)
   }
 
-  # Only keep the remotes that are specified in the cran_deps
-  remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
+  # Only keep the remotes that are specified in the cran_deps or are NA
+  remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
 
   # If there are remote deps remove the equivalent CRAN deps
   cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
 
-  rbind(cran_deps, remote_deps)
+  rbind(remote_deps, cran_deps)
 }
 
 ## -2 = not installed, but available on CRAN
@@ -530,7 +530,7 @@ update.package_deps <- function(object,
 
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
-  unknown_remotes <- object$diff == UNAVAILABLE & !object$is_cran
+  unknown_remotes <- (object$diff == UNAVAILABLE | object$diff == UNINSTALLED) & !object$is_cran
 
   if (any(unavailable_on_cran) && !quiet) {
     message("Skipping ", sum(unavailable_on_cran), " packages not available: ",
@@ -572,7 +572,7 @@ update.package_deps <- function(object,
 
   behind <- is.na(object$installed) | object$diff < CURRENT
 
-  if (any(object$is_cran & behind)) {
+  if (any(object$is_cran & !unavailable_on_cran & behind)) {
     install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
       type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
   }
@@ -1774,7 +1774,7 @@ git_repo_sha1 <- function(r) {
 #' @examples
 #' \dontrun{
 #' install_bitbucket("sulab/mygene.r@@default")
-#' install_bitbucket("dannavarro/lsr-package")
+#' install_bitbucket("djnavarro/lsr")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
@@ -2566,6 +2566,11 @@ format.github_remote <- function(x, ...) {
 #'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
+#' @param auth_token To install from a private repo, generate a personal access
+#'   token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and
+#'   supply to this argument. This is safer than using a password because you
+#'   can easily delete a PAT without affecting any others. Defaults to the
+#'   GITLAB_PAT environment variable.
 #' @inheritParams install_github
 #' @export
 #' @family package installation
@@ -2973,6 +2978,11 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   }
 
   switch(x$RemoteType,
+    standard = remote("cran",
+      name = x$Package,
+      repos = x$RemoteRepos,
+      pkg_type = x$RemotePkgType,
+      sha = x$RemoteSha),
     github = remote("github",
       host = x$RemoteHost,
       package = x$RemotePackage,
@@ -3038,7 +3048,8 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       repo = x$RemoteRepo,
       release = x$RemoteRelease,
       sha = x$RemoteSha,
-      branch = x$RemoteBranch)
+      branch = x$RemoteBranch),
+    stop(sprintf("can't convert package with RemoteType '%s' to remote", x$RemoteType))
   )
 }
 
@@ -3337,7 +3348,7 @@ install_version <- function(package, version = NULL,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
-                            type = getOption("pkgType"),
+                            type = "source",
                             ...) {
 
   url <- download_version_url(package, version, repos, type)
@@ -3454,11 +3465,13 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     }
   }
 
+  pkg_name <- load_pkg_description(pkgdir)$package
+
   ## Check for circular dependencies. We need to know about the root
   ## of the install process.
   if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
   if (check_for_circular_dependencies(pkgdir, quiet)) {
-    return(invisible(NA_character_))
+    return(invisible(pkg_name))
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
@@ -3480,7 +3493,6 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     ...
   )
 
-  pkg_name <- load_pkg_description(pkgdir)$package
   invisible(pkg_name)
 }
 
@@ -3499,7 +3511,8 @@ safe_install_packages <- function(...) {
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
-      R_LIBS_SITE = lib),
+      R_LIBS_SITE = lib,
+      RGL_USE_NULL = "TRUE"),
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
