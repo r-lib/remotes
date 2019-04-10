@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
+  `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
+
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
   rather than a global type attribute, fixing errors when this global attribute
   is lost (#291, #304).
