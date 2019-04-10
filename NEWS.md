@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* `update.package_dependencies()` now uses the pkg_type for the cran remote
+  rather than a global type attribute, fixing errors when this global attribute
+  is lost (#291, #304).
 * Credentials are no longer passed to dependencies, as this breaks dependencies
   which use different credentials or hosts. If you have relied on this behavior
   a more robust way to provide the credentials is using the appropriate
