@@ -40,8 +40,8 @@ test_that("bioc_install_repos", {
   )
 
   # This particular version needs to do a connection test for https support
-  skip_if_offline()
   skip_on_cran()
+  skip_if_offline()
   expect_equal(
     bioc_install_repos("3.2.2"),
     bioc_repos("3.2")

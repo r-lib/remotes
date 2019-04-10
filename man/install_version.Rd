@@ -8,7 +8,7 @@ install_version(package, version = NULL, dependencies = NA,
   upgrade = c("default", "ask", "always", "never"), force = FALSE,
   quiet = FALSE, build = FALSE, build_opts = c("--no-resave-data",
   "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+  type = "source", ...)
 }
 \arguments{
 \item{package}{package name}

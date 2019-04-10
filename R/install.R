@@ -21,7 +21,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -57,7 +57,8 @@ safe_install_packages <- function(...) {
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
-      R_LIBS_SITE = lib),
+      R_LIBS_SITE = lib,
+      RGL_USE_NULL = "TRUE"),
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
@@ -162,15 +163,12 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          upgrade = c("default", "ask", "always", "never"),
                          quiet = FALSE,
                          build = TRUE,
-                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
-                         ...) {
-
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type,
-    ...
+    type = type
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
@@ -181,8 +179,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     quiet = quiet,
     upgrade = upgrade,
     build = build,
-    build_opts = build_opts,
-    ...
+    build_opts = build_opts
   )
 }
 
