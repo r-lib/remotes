@@ -1,5 +1,9 @@
 # remotes (development version)
 
+* `update.package_dependencies()` now uses the pkg_type for the cran remote
+  rather than a global type attribute, fixing errors when this global attribute
+  is lost (#291, #304).
+
 # remotes 2.0.3
 
 * The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
