@@ -2,6 +2,8 @@
 context("install-github.R script")
 
 test_that("install-github.R script is up to date", {
+  skip_on_cran()
+
   root <- system.file(package = packageName())
   tmp <- test_temp_file(".R")
 

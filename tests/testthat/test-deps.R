@@ -178,6 +178,17 @@ test_that("Additional_repositories field", {
     parse_additional_repositories(pkg),
     c("http://packages.ropensci.org", "http://foo.bar.com")
   )
+
+  pkg <- list(
+    additional_repositories = 
+      "\n  http://packages.ropensci.org, \nhttp://foo.bar.com"
+  )
+
+  expect_equal(
+    parse_additional_repositories(pkg),
+    c("http://packages.ropensci.org", "http://foo.bar.com")
+  )
+
 })
 
 test_that("update.package_deps", {
@@ -492,4 +503,19 @@ test_that("format_upgrades works", {
       "magrittr (NA     -> 1.0   ) [CRAN]"
     )
   )
+})
+
+test_that("dev_package_deps works with package using remotes", {
+  skip_on_cran()
+  skip_if_offline()
+
+  res <- dev_package_deps(test_path("withremotes"), dependencies = TRUE)
+
+  is_falsy <- "falsy" == res$package
+  expect_true(any(is_falsy))
+  expect_is(res$remote[is_falsy][[1]], "github_remote")
+
+  is_testthat <- "testthat" == res$package
+  expect_true(any(is_testthat))
+  expect_is(res$remote[is_testthat][[1]], "cran_remote")
 })

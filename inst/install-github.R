@@ -359,9 +359,7 @@ package_deps <- function(packages, dependencies = NA,
       is_cran = is_cran_remote,
       stringsAsFactors = FALSE
     ),
-    class = c("package_deps", "data.frame"),
-    repos = repos,
-    type = type
+    class = c("package_deps", "data.frame")
   )
 
   res$remote <- remote
@@ -393,7 +391,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -411,7 +409,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   combine_deps(
     package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg, ...))
+    remote_deps(pkg))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
@@ -573,8 +571,10 @@ update.package_deps <- function(object,
   behind <- is.na(object$installed) | object$diff < CURRENT
 
   if (any(object$is_cran & !unavailable_on_cran & behind)) {
-    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
+    # get the first cran-like remote and use its repos and pkg_type
+    r <- object$remote[object$is_cran & behind][[1]]
+    install_packages(object$package[object$is_cran & behind], repos = r$repos,
+      type = r$pkg_type, dependencies = dependencies, quiet = quiet, ...)
   }
 
   install_remotes(object$remote[!object$is_cran & behind],
@@ -727,7 +727,8 @@ has_additional_repositories <- function(pkg) {
 
 parse_additional_repositories <- function(pkg) {
   if (has_additional_repositories(pkg)) {
-    strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
+
+    strsplit(trim_ws(pkg[["additional_repositories"]]), "[,[:space:]]+")[[1]]
   }
 }
 
@@ -776,13 +777,13 @@ split_remotes <- function(x) {
 }
 
 
-remote_deps <- function(pkg, ...) {
+remote_deps <- function(pkg) {
   if (!has_dev_remotes(pkg)) {
     return(NULL)
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote, ...)
+  remote <- lapply(dev_packages, parse_one_remote)
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
@@ -816,7 +817,7 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
     upgrade <- "never"
   }
 
-  upgrade <- match.arg(upgrade, c("default", "ask", "always", "never"))
+  upgrade <- match.arg(upgrade[[1]], c("default", "ask", "always", "never"))
 
   if (identical(upgrade, "default"))
     upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
@@ -852,7 +853,7 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
 
       choices <- pkgs
       if (length(choices) > 1) {
-        choices <- c(choices, "CRAN packages only", "All", "None")
+        choices <- c("All", "CRAN packages only", "None", choices)
       }
 
       res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
@@ -1014,9 +1015,9 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
 base_download <- function(url, path, quiet, headers) {
 
-  if (getRversion() < "3.7.0") {
+  if (getRversion() < "3.6.0") {
     if (!is.null(headers)) {
-      unlockBinding("makeUserAgent", asNamespace("utils"))
+      get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
       orig <- get("makeUserAgent", envir = asNamespace("utils"))
       on.exit({
         assign("makeUserAgent", orig, envir = asNamespace("utils"))
@@ -1818,7 +1819,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL, ...) {
+                              host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -1880,7 +1881,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export
@@ -2332,7 +2333,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/applications> and
+#'   access token (PAT) in <https://github.com/settings/tokens> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
@@ -2357,7 +2358,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
-#' # from https://github.com/settings/applications. You only need the
+#' # from https://github.com/settings/tokens. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
 #' install_github("hadley/private", auth_token = "abc")
@@ -3488,7 +3489,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -3630,15 +3631,12 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          upgrade = c("default", "ask", "always", "never"),
                          quiet = FALSE,
                          build = TRUE,
-                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
-                         ...) {
-
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type,
-    ...
+    type = type
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
@@ -3649,8 +3647,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     quiet = quiet,
     upgrade = upgrade,
     build = build,
-    build_opts = build_opts,
-    ...
+    build_opts = build_opts
   )
 }
 
@@ -4078,6 +4075,9 @@ update_submodules <- function(source, quiet) {
   info <- parse_submodules(file)
 
   to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
+  if (!(length(info) > 0)) {
+    return()
+  }
   info <- info[!to_ignore, ]
 
   for (i in seq_len(NROW(info))) {

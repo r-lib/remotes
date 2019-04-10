@@ -182,16 +182,16 @@ test_that("github_pull", {
   dir.create(lib)
 
   install_github(
-    "MangoTheCat/pkgsnap",
-    ref = github_pull(10),
+    "r-lib/desc",
+    ref = github_pull(64),
     lib = lib,
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("pkgsnap", lib.loc = lib))
+  expect_silent(packageDescription("desc", lib.loc = lib))
   expect_equal(
-    packageDescription("pkgsnap", lib.loc = lib)$RemoteRepo,
-    "pkgsnap")
+    packageDescription("desc", lib.loc = lib)$RemoteRepo,
+    "desc")
 })
 
 test_that("remote_sha.github_remote errors if remote doesn't exist", {

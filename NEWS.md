@@ -1,10 +1,29 @@
+# remotes (development version)
 
-# remotes dev
+* `update.package_dependencies()` now uses the pkg_type for the cran remote
+  rather than a global type attribute, fixing errors when this global attribute
+  is lost (#291, #304).
+
+* Credentials are no longer passed to dependencies, as this breaks dependencies
+  which use different credentials or hosts. If you have relied on this behavior
+  a more robust way to provide the credentials is using the appropriate
+  environment variables, e.g. `GITHUB_PAT`, `BITBUCKET_USER` etc.
+  (@antoine-sachet, #345).
+
+* The hash of bitbucket hosts is now correctly retrieved (@antoine-sachet, #344)
+
+# remotes 2.0.3
+
+* The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
+  'CRAN only', 'none' first, so they always have the same numbers (#287).
 
 * `update_submodules()` now works with empty .gitmodules files (@jsilve24, #329).
 
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
+
+* Fix parsing of Additional_Repositories which have a leading newline
+  (@tmelliott, #251).
 
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 
