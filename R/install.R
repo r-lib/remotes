@@ -164,7 +164,6 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
-  browser()
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
