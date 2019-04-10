@@ -24,6 +24,9 @@
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
 
+* Fix parsing of Additional_Repositories which have a leading newline
+  (@tmelliott, #251).
+
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 
 * `remote_package_name.github_remote()` now works properly on Windows (#248)
