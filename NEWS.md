@@ -5,6 +5,7 @@
   a more robust way to provide the credentials is using the appropriate
   environment variables, e.g. `GITHUB_PAT`, `BITBUCKET_USER` etc.
   (@antoine-sachet, #345).
+* The hash of bitbucket hosts is now correctly retrieved (@antoine-sachet, #344)
 
 # remotes 2.0.3
 
