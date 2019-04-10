@@ -137,7 +137,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export
