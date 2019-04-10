@@ -117,7 +117,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -135,7 +135,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   combine_deps(
     package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg, ...))
+    remote_deps(pkg))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
@@ -500,13 +500,13 @@ split_remotes <- function(x) {
 }
 
 
-remote_deps <- function(pkg, ...) {
+remote_deps <- function(pkg) {
   if (!has_dev_remotes(pkg)) {
     return(NULL)
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote, ...)
+  remote <- lapply(dev_packages, parse_one_remote)
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
