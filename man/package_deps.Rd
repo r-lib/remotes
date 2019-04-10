@@ -8,7 +8,7 @@
 \title{Find all dependencies of a CRAN or dev package.}
 \usage{
 package_deps(packages, dependencies = NA, repos = getOption("repos"),
-  type = getOption("pkgType"))
+  type = getOption("pkgType"), ...)
 
 local_package_deps(pkgdir = ".", dependencies = NA)
 
@@ -37,9 +37,9 @@ just check this package, not its dependencies).}
 
 \item{type}{Type of package to \code{update}.}
 
-\item{pkgdir}{path to a package directory, or to a package tarball.}
-
 \item{...}{Additional arguments passed to \code{install_packages}.}
+
+\item{pkgdir}{path to a package directory, or to a package tarball.}
 
 \item{object}{A \code{package_deps} object.}
 

@@ -120,6 +120,10 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
 
 #' @export
 remote_sha.gitlab_remote <- function(remote, ...) {
+  if (is.null(remote$auth_token)) {
+    auth_token <- list(...)
+    remote$auth_token <- auth_token$auth_token
+  }
   gitlab_commit(username = remote$username, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token)
 }
