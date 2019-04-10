@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* The hash of bitbucket hosts is now correctly retrieved (@antoine-sachet, #344)
+
 # remotes 2.0.3
 
 * The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
