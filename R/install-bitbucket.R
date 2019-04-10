@@ -75,7 +75,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL, ...) {
+                              host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -137,7 +137,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export

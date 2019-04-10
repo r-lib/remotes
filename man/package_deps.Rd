@@ -13,7 +13,7 @@ package_deps(packages, dependencies = NA, repos = getOption("repos"),
 local_package_deps(pkgdir = ".", dependencies = NA)
 
 dev_package_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"), ...)
+  repos = getOption("repos"), type = getOption("pkgType"))
 
 \method{update}{package_deps}(object, dependencies = NA,
   upgrade = c("default", "ask", "always", "never"), force = FALSE,
@@ -39,8 +39,6 @@ just check this package, not its dependencies).}
 
 \item{pkgdir}{path to a package directory, or to a package tarball.}
 
-\item{...}{Additional arguments passed to \code{install_packages}.}
-
 \item{object}{A \code{package_deps} object.}
 
 \item{upgrade}{One of "default", "ask", "always", or "never". "default"
@@ -59,6 +57,8 @@ since the previous install.}
 
 \item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
 is \code{TRUE}.}
+
+\item{...}{Additional arguments passed to \code{install_packages}.}
 }
 \value{
 A \code{data.frame} with columns:
