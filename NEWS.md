@@ -1,3 +1,5 @@
+# remotes 2.0.4
+
 # remotes (development version)
 
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
