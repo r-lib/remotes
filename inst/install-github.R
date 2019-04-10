@@ -3630,7 +3630,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          upgrade = c("default", "ask", "always", "never"),
                          quiet = FALSE,
                          build = TRUE,
-                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes")) {
+                         build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         ...) {
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
@@ -3646,7 +3647,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     quiet = quiet,
     upgrade = upgrade,
     build = build,
-    build_opts = build_opts
+    build_opts = build_opts,
+    ...
   )
 }
 
