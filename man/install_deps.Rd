@@ -8,7 +8,7 @@ install_deps(pkgdir = ".", dependencies = NA,
   repos = getOption("repos"), type = getOption("pkgType"),
   upgrade = c("default", "ask", "always", "never"), quiet = FALSE,
   build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"))
+  "--no-build-vignettes"), ...)
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}
