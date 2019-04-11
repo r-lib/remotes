@@ -1,3 +1,5 @@
+# remotes 2.0.4
+
 # remotes (development version)
 
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
@@ -11,6 +13,9 @@
   (@antoine-sachet, #345).
 
 * The hash of bitbucket hosts is now correctly retrieved (@antoine-sachet, #344)
+
+* Fix parsing of Additional_Repositories which have a leading newline
+  (@tmelliott, #251).
 
 # remotes 2.0.3
 
