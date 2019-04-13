@@ -35,7 +35,6 @@ parse_repo_spec("jimhester/covr#47")        ## pull request
 parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
 parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
 parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
-parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 parse_repo_spec("igraph=igraph/rigraph") ## Different package name from repo name
 
 parse_github_url("https://github.com/jeroen/curl.git")
