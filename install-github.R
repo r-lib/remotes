@@ -3081,7 +3081,7 @@ format.remotes <- function(x, ...) {
 #' a single command.
 #'
 #' @inheritParams install_git
-#' @param subdir A sub-directory withing a svn repository that contains the
+#' @param subdir A sub-directory within a svn repository that contains the
 #'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
