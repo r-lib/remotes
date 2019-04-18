@@ -70,12 +70,12 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, x$username, x$repo)
+  src_root <- build_url(x$host, x$username, x$repo, x$subdir)
   src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
-    message("Downloading GitLab repo ", x$username, "/", x$repo, "@", x$ref,
-            "\nfrom URL ", src)
+    message("Downloading GitLab repo ", gsub("/$", "", x$username, "/", x$repo, "/", x$subdir),
+            "@", x$ref, "\nfrom URL ", src)
   }
 
   download(dest, src, auth_token = x$auth_token, auth_phrase = "private_token=")
@@ -107,8 +107,8 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
 
   tmp <- tempfile()
   src <- build_url(
-    remote$host, remote$username, remote$repo, "raw",
-    remote$ref, remote$subdir, "DESCRIPTION")
+    remote$host, remote$username, remote$repo, remote$subdir,
+    "raw", remote$ref, "DESCRIPTION")
 
   dest <- tempfile()
   res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
@@ -120,7 +120,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
 
 #' @export
 remote_sha.gitlab_remote <- function(remote, ...) {
-  gitlab_commit(username = remote$username, repo = remote$repo,
+  gitlab_commit(username = remote$username, subdir = remote$subdir, repo = remote$repo,
     host = remote$host, ref = remote$ref, pat = remote$auth_token)
 }
 
@@ -129,10 +129,13 @@ format.gitlab_remote <- function(x, ...) {
   "GitLab"
 }
 
-gitlab_commit <- function(username, repo, ref = "master",
+gitlab_commit <- function(username, subdir, repo, ref = "master",
   host = "gitlab.com", pat = gitlab_pat()) {
 
-  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+  url <- build_url(
+    host, "api", "v4", "projects",
+    utils::URLencode(gsub("/$", "", paste(username, repo, subdir, sep = "/")), reserved = TRUE),
+    "repository", "commits", ref)
 
   tmp <- tempfile()
   download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
