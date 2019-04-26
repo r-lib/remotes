@@ -70,7 +70,7 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, x$username, x$repo)
+  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
   src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
