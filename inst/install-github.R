@@ -2640,8 +2640,8 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, x$username, x$repo)
-  src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
+  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+  src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
     message("Downloading GitLab repo ", x$username, "/", x$repo, "@", x$ref,
@@ -2676,16 +2676,27 @@ remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL, sha =
 remote_package_name.gitlab_remote <- function(remote, ...) {
 
   tmp <- tempfile()
-  src <- build_url(
-    remote$host, remote$username, remote$repo, "raw",
-    remote$ref, remote$subdir, "DESCRIPTION")
+
+  src_root <- build_url(
+    remote$host, "api", "v4", "projects",
+    utils::URLencode(paste0(remote$username, "/", remote$repo),
+                     reserved = TRUE),
+    "repository")
+
+  src <- paste0(
+    src_root, "/files/",
+    ifelse(
+      is.null(remote$subdir),
+      "DESCRIPTION",
+      utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
+    "/raw?ref=", remote$ref, "&private_token=", remote$auth_token)
 
   dest <- tempfile()
   res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
 
   tryCatch(
     read_dcf(dest)$Package,
-    error = function(e) NA_character_)
+    error = function(e) remote$repo)
 }
 
 #' @export
@@ -3884,7 +3895,6 @@ load_pkg_description <- function(path) {
 #' parse_repo_spec("jimhester/covr#47")        ## pull request
 #' parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
 #' parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
-#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 #' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 #' parse_repo_spec("igraph=igraph/rigraph") ## Different package name from repo name
 #'
