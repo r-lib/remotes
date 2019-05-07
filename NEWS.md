@@ -18,6 +18,9 @@
 
 * Fix parsing of Additional_Repositories which have a leading newline
   (@tmelliott, #251).
+  
+* Fix API call for private repositories in `install_gitlab` 
+  (@aornugent, [https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801](https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801))
 
 # remotes 2.0.3
 
