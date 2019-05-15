@@ -18,7 +18,7 @@ skip_if_over_rate_limit <- function(by = 50) {
     auth_token = github_pat()
   )
 
-  res <- fromJSONFile(tmp)$rate$remaining
+  res <- json$parse_file(tmp)$rate$remaining
   if (is.null(res) || res <= by) skip("Over the GitHub rate limit")
 }
 
