@@ -16,8 +16,8 @@ parse_deps <- function(string) {
   have_version <- grepl("\\(.*\\)", versions_str)
   versions_str[!have_version] <- NA
 
-  compare  <- trimws(sub(".*\\(\\s*(\\S+)\\s+.*\\s*\\)", "\\1", versions_str))
-  versions <- sub(".*\\(\\s*\\S+\\s+(\\S*)\\s*\\)", "\\1", versions_str)
+  compare  <- sub(".*\\(\\s*(\\S+)\\s+.*\\s*\\).*", "\\1", versions_str)
+  versions <- sub(".*\\(\\s*\\S+\\s+(\\S*)\\s*\\).*", "\\1", versions_str)
 
   # Check that non-NA comparison operators are valid
   compare_nna   <- compare[!is.na(compare)]
