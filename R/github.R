@@ -16,12 +16,12 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     if (res$status_code >= 300) {
       stop(github_error(res))
     }
-    fromJSON(rawToChar(res$content))
+    json$parse(rawToChar(res$content))
   } else {
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    fromJSONFile(tmp)
+    json$parse_file(tmp)
   }
 }
 
@@ -137,7 +137,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
 }
 
@@ -150,7 +150,7 @@ github_error <- function(res) {
 
   ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
 
-  error_details <- fromJSON(rawToChar(res$content))$message
+  error_details <- json$parse(rawToChar(res$content))$message
 
   guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
