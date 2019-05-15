@@ -1,6 +1,21 @@
 
 context("JSON parser")
 
+test_that("JSON is standalone", {
+  ## baseenv() makes sure that the remotes package env is not used
+  env <- new.env(parent = baseenv())
+  env$json <- json
+  stenv <- env$json$.internal
+  objs <- ls(stenv, all.names = TRUE)
+  funs <- Filter(function(x) is.function(stenv[[x]]), objs)
+  funobjs <- mget(funs, stenv)
+
+  expect_message(
+    mapply(codetools::checkUsage, funobjs, funs,
+           MoreArgs = list(report = message)),
+    NA)
+})
+
 test_that("JSON parser scalars", {
 
   expect_equal(json$parse('"foobar"'), "foobar" )
