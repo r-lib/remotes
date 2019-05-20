@@ -181,6 +181,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     upgrade = upgrade,
     build = build,
     build_opts = build_opts,
+    type = type,
     ...
   )
 }
