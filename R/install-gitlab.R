@@ -148,7 +148,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
-  fromJSONFile(tmp)$id
+  json$parse_file(tmp)$id
 }
 
 #' Retrieve GitLab personal access token.

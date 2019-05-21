@@ -1244,12 +1244,12 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     if (res$status_code >= 300) {
       stop(github_error(res))
     }
-    fromJSON(rawToChar(res$content))
+    json$parse(rawToChar(res$content))
   } else {
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    fromJSONFile(tmp)
+    json$parse_file(tmp)
   }
 }
 
@@ -1365,7 +1365,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
 }
 
@@ -1378,7 +1378,7 @@ github_error <- function(res) {
 
   ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
 
-  error_details <- fromJSON(rawToChar(res$content))$message
+  error_details <- json$parse(rawToChar(res$content))$message
 
   guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
@@ -1897,7 +1897,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  fromJSONFile(tmp)
+  json$parse_file(tmp)
 }
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
@@ -1930,7 +1930,7 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
+  paste0(build_url(json$parse_file(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {
@@ -2718,7 +2718,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
-  fromJSONFile(tmp)$id
+  json$parse_file(tmp)$id
 }
 
 #' Retrieve GitLab personal access token.
@@ -3672,154 +3672,181 @@ should_error_for_warnings <- function() {
 
   !as.logical(no_errors)
 }
-tokenize_json <- function(text) {
-  text <- paste(text, collapse = "\n")
 
-  ESCAPE <- '(\\\\[^u[:cntrl:]]|\\\\u[0-9a-fA-F]{4})'
-  CHAR <- '[^[:cntrl:]"\\\\]'
+# Standalone JSON parser
+#
+# The purpose of this file is to provide a standalone JSON parser.
+# It is quite slow and bare. If you need a proper parser please use the
+# jsonlite package.
+#
+# The canonical location of this file is in the remotes package:
+# https://github.com/r-lib/remotes/blob/master/R/json.R
+#
+# API:
+# parse(text)
+# parse_file(filename)
+#
+# NEWS:
+# - 2019/05/15 First standalone version
 
-  STRING <- paste0('"', CHAR, '*(', ESCAPE, CHAR, '*)*"')
-  NUMBER <- "-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?"
-  KEYWORD <- 'null|false|true'
-  SPACE <- '[[:space:]]+'
+json <- local({
 
-  match <- gregexpr(
-    pattern = paste0(
-      STRING, "|", NUMBER, "|", KEYWORD, "|", SPACE, "|", "."
-    ),
-    text = text,
-    perl = TRUE
-  )
+  tokenize_json <- function(text) {
+    text <- paste(text, collapse = "\n")
 
-  grep("^\\s+$", regmatches(text, match)[[1]], value = TRUE, invert = TRUE)
-}
+    ESCAPE <- '(\\\\[^u[:cntrl:]]|\\\\u[0-9a-fA-F]{4})'
+    CHAR <- '[^[:cntrl:]"\\\\]'
 
-throw <- function(...) {
-  stop("JSON: ", ..., call. = FALSE)
-}
+    STRING <- paste0('"', CHAR, '*(', ESCAPE, CHAR, '*)*"')
+    NUMBER <- "-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?"
+    KEYWORD <- 'null|false|true'
+    SPACE <- '[[:space:]]+'
 
-fromJSONFile <- function(filename) {
-  fromJSON(readLines(filename, warn = FALSE))
-}
+    match <- gregexpr(
+      pattern = paste0(
+        STRING, "|", NUMBER, "|", KEYWORD, "|", SPACE, "|", "."
+      ),
+      text = text,
+      perl = TRUE
+    )
 
-fromJSON <- function(text) {
-
-  tokens <- tokenize_json(text)
-  token <- NULL
-  ptr <- 1
-
-  read_token <- function() {
-    if (ptr <= length(tokens)) {
-      token <<- tokens[ptr]
-      ptr <<- ptr + 1
-    } else {
-      token <<- 'EOF'
-    }
+    grep("^\\s+$", regmatches(text, match)[[1]], value = TRUE, invert = TRUE)
   }
 
-  parse_value <- function(name = "") {
-    if (token == "{") {
-      parse_object()
-    } else if (token == "[") {
-      parse_array()
-    } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
-      throw("EXPECTED value GOT ", token)
-    } else {
-      j2r(token)
-    }
+  throw <- function(...) {
+    stop("JSON: ", ..., call. = FALSE)
   }
 
-  parse_object <- function() {
-    res <- structure(list(), names = character())
+  # Parse a JSON file
+  #
+  # @param filename Path to the JSON file.
+  # @return R objects corresponding to the JSON file.
 
-    read_token()
+  parse_file <- function(filename) {
+    parse(readLines(filename, warn = FALSE))
+  }
 
-    ## Invariant: we are at the beginning of an element
-    while (token != "}") {
+  # Parse a JSON string
+  #
+  # @param text JSON string.
+  # @return R object corresponding to the JSON string.
 
-      ## "key"
-      if (grepl('^".*"$', token)) {
-        key <- j2r(token)
+  parse <- function(text) {
+
+    tokens <- tokenize_json(text)
+    token <- NULL
+    ptr <- 1
+
+    read_token <- function() {
+      if (ptr <= length(tokens)) {
+        token <<- tokens[ptr]
+        ptr <<- ptr + 1
       } else {
-        throw("EXPECTED string GOT ", token)
+        token <<- 'EOF'
       }
-
-      ## :
-      read_token()
-      if (token != ":") { throw("EXPECTED : GOT ", token) }
-
-      ## value
-      read_token()
-      res[key] <- list(parse_value())
-
-      ## } or ,
-      read_token()
-      if (token == "}") {
-        break
-      } else if (token != ",") {
-        throw("EXPECTED , or } GOT ", token)
-      }
-      read_token()
     }
 
-    res
-  }
+    parse_value <- function(name = "") {
+      if (token == "{") {
+        parse_object()
+      } else if (token == "[") {
+        parse_array()
+      } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
+        throw("EXPECTED value GOT ", token)
+      } else {
+        j2r(token)
+      }
+    }
 
-  parse_array <- function() {
-    res <- list()
+    parse_object <- function() {
+      res <- structure(list(), names = character())
+
+      read_token()
+
+      ## Invariant: we are at the beginning of an element
+      while (token != "}") {
+
+        ## "key"
+        if (grepl('^".*"$', token)) {
+          key <- j2r(token)
+        } else {
+          throw("EXPECTED string GOT ", token)
+        }
+
+        ## :
+        read_token()
+        if (token != ":") { throw("EXPECTED : GOT ", token) }
+
+        ## value
+        read_token()
+        res[key] <- list(parse_value())
+
+        ## } or ,
+        read_token()
+        if (token == "}") {
+          break
+        } else if (token != ",") {
+          throw("EXPECTED , or } GOT ", token)
+        }
+        read_token()
+      }
+
+      res
+    }
+
+    parse_array <- function() {
+      res <- list()
+
+      read_token()
+
+      ## Invariant: we are at the beginning of an element
+      while (token != "]") {
+        ## value
+        res <- c(res, list(parse_value()))
+
+        ## ] or ,
+        read_token()
+        if (token == "]") {
+          break
+        } else if (token != ",") {
+          throw("EXPECTED , GOT ", token)
+        }
+        read_token()
+      }
+
+      res
+    }
 
     read_token()
+    parse_value(tokens)
+  }
 
-    ## Invariant: we are at the beginning of an element
-    while (token != "]") {
-      ## value
-      res <- c(res, list(parse_value()))
-
-      ## ] or ,
-      read_token()
-      if (token == "]") {
-        break
-      } else if (token != ",") {
-        throw("EXPECTED , GOT ", token)
-      }
-      read_token()
+  j2r <- function(token) {
+    if (token == "null") {
+      NULL
+    } else if (token == "true") {
+      TRUE
+    } else if (token == "false") {
+      FALSE
+    } else if (grepl('^".*"$', token)) {
+      trimq(token)
+    } else {
+      as.numeric(token)
     }
-
-    res
   }
 
-  read_token()
-  parse_value(tokens)
-}
-
-j2r <- function(token) {
-  if (token == "null") {
-    NULL
-  } else if (token == "true") {
-    TRUE
-  } else if (token == "false") {
-    FALSE
-  } else if (grepl('^".*"$', token)) {
-    trimq(token)
-  } else {
-    as.numeric(token)
-  }
-}
-
-trimq <- function(x) {
-  sub('^"(.*)"$', "\\1", x)
-}
-
-get_json_sha <- function(text) {
-  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
-  if (all(m == -1)) {
-    return(fromJSON(text)$sha %||% NA_character_)
+  trimq <- function(x) {
+    sub('^"(.*)"$', "\\1", x)
   }
 
-  start <- attr(m, "capture.start")
-  end <- start + attr(m, "capture.length") - 1L
-  substring(text, start, end)
-}
+  structure(
+    list(
+      .internal = environment(),
+      parse = parse,
+      parse_file = parse_file
+    ),
+    class = c("standalone_json", "standalone"))
+})
 
 parse_deps <- function(string) {
   if (is.null(string)) return()
@@ -4637,6 +4664,18 @@ in_r_build_ignore <- function(paths, ignore_file) {
   }
 
   vlapply(paths, should_ignore)
+}
+
+
+get_json_sha <- function(text) {
+  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
+  if (all(m == -1)) {
+    return(json$parse(text)$sha %||% NA_character_)
+  }
+
+  start <- attr(m, "capture.start")
+  end <- start + attr(m, "capture.length") - 1L
+  substring(text, start, end)
 }
 
 
