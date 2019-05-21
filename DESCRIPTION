@@ -26,6 +26,7 @@ Imports:
 Suggests:
     brew,
     callr,
+    codetools,
     curl,
     covr,
     git2r (>= 0.23.0),

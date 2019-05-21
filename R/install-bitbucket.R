@@ -153,7 +153,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  fromJSONFile(tmp)
+  json$parse_file(tmp)
 }
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
@@ -186,7 +186,7 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
+  paste0(build_url(json$parse_file(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {
