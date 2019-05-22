@@ -1,8 +1,6 @@
 
 # TODO:
-# - tests
 # - extract subset of files
-# - pax extensions
 # - GNU extensions
 # - do not read in big files into memory
 # - use seek, if stream is seeakable
@@ -97,26 +95,11 @@ s1_untar <- local({
     }
 
     decode_pax <- function(buf) {
-      result <- structure(list(), names = character())
-      buflen <- length(buf)
-      ptr <- 1L
-
-      while (ptr <= buflen) {
-        while (ptr <= buflen && buf[i] != 32) ptr <- ptr + 1L
-        len <- as.integer(rawToChar(buf[1:(ptr-1)]))
-        if (!len) return (result)
-
-        kw <- buf[(ptr + 1L) : (ptr + len)]
-        eq <- which(kw == EQUALS)[1]
-        if (is.na(eq)) return(result)
-        key <- rawToChar(kw[1:(eq-1)])
-        val <- rawToChar(kw[(eq+1):length(kw)])
-        result[[key]] <- val
-
-        ptr <- ptr + len
-      }
-
-      result
+      entries <- strsplit(rawToChar(buf), "\n", fixed = TRUE)[[1]]
+      recs <- strsplit(entries, "=", fixed = TRUE)
+      structure(
+        names = sub("^[^ ]+ ", "", map_str(recs, "[[", 1)),
+        lapply(recs, "[[", 2))
     }
 
     decode <- function(buf, filename_encoding = "") {
@@ -254,15 +237,47 @@ s1_untar <- local({
     dir.create(file.path(dir, path), showWarnings = FALSE, recursive = TRUE)
   }
 
-  process_next_entry <- function(self) {
-    self$buffer <- self$parse(self$con, 512L)
-    if (!length(self$buffer)) return(FALSE)
+  process_pax_global_header <- function(self, buffer) {
+    self$pax_global <- headers$decode_pax(buffer)
+  }
 
-    header <- headers$decode(self$buffer, self$opts$filename_encoding)
-    self$buffer <- NULL
+  process_pax_header <- function(self, buffer) {
+    pax <- headers$decode_pax(buffer)
+    self$pax <- modifyList(as.list(self$pax_global), pax)
+  }
+
+  process_next_entry <- function(self) {
+    buffer <- self$parse(self$con, 512L)
+    if (!length(buffer)) return(FALSE)
+
+    header <- headers$decode(buffer, self$opts$filename_encoding)
 
     ## Maybe a null header? Try again...
     if (is.null(header)) return(TRUE)
+
+    while (header$type %in% c("pax-header", "global-pax-header")) {
+      ## Pax global header
+      if (header$type == "pax-global-header") {
+        of <- overflow(header$size)
+        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
+        process_pax_global_header(self, buffer2)
+      }
+
+      ## Pax header
+      if (header$type == "pax-header") {
+        of <- overflow(header$size)
+        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
+        process_pax_header(self, buffer2)
+      }
+
+      buffer <- self$parse(self$con, 512L)
+      header <- headers$decode(buffer, self$opts$filename_encoding)
+    }
+
+    if (!is.null(self$pax)) {
+      header <- mixin_pax(header, self$pax)
+      self$pax <- NULL
+    }
 
     ## Either a directory or file, record it
     self$items[[length(self$items) + 1L]] <- header
@@ -313,7 +328,6 @@ s1_untar <- local({
     self$exdir <- exdir
     self$opts <- options
     self$parse <- make_parser()
-    self$buffer <- raw()
     self$items <- list()
 
     repeat {
@@ -337,7 +351,6 @@ s1_untar <- local({
     self$con <- con
     self$opts <- options
     self$parse <- make_parser()
-    self$buffer <- raw()
     self$items <- list()
 
     repeat {

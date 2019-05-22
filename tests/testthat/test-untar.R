@@ -77,3 +77,33 @@ test_that("multi-file", {
   expect_equal(readChar(file.path(tmp, "file-1.txt"), 100), "i am file-1\n")
   expect_equal(readChar(file.path(tmp, "file-2.txt"), 100), "i am file-2\n")
 })
+
+test_that("pax", {
+  ex <- data.frame(
+      stringsAsFactors = FALSE,
+      filename = "pax.txt",
+      size = 12L,
+      mtime = .POSIXct(1387580181),
+      permissions = I(as.octmode("644")),
+      dir = FALSE,
+      uid = 501L,
+      gid = 20L,
+      uname = "maf",
+      gname = "staff"
+    )
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "pax.tar")),
+    ex
+  )
+
+  tmp <- test_temp_dir()
+  expect_identical(
+    s1_untar$extract(test_path("fixtures", "untar", "pax.tar"), tmp),
+    ex
+  )
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "pax.txt")))
+  expect_equal(readChar(file.path(tmp, "pax.txt"), 100), "hello world\n")
+})
