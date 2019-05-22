@@ -1,6 +1,7 @@
 
 # TODO:
 # - extract subset of files
+# - hard links
 # - GNU extensions
 # - do not read in big files into memory
 # - use seek, if stream is seeakable
@@ -237,6 +238,16 @@ s1_untar <- local({
     dir.create(file.path(dir, path), showWarnings = FALSE, recursive = TRUE)
   }
 
+  safe_write_bin <- function(object, dir, path) {
+    ## TODO: check if path is not going back
+    writeBin(object, file.path(dir, path))
+  }
+
+  safe_symlink <- function(dir, path, linkname) {
+    ## TODO: check if path is not going back
+    file.symlink(linkname, file.path(dir, path))
+  }
+
   process_pax_global_header <- function(self, buffer) {
     self$pax_global <- headers$decode_pax(buffer)
   }
@@ -279,8 +290,18 @@ s1_untar <- local({
       self$pax <- NULL
     }
 
-    ## Either a directory or file, record it
     self$items[[length(self$items) + 1L]] <- header
+
+    if (header$type == "symlink") {
+      of <- overflow(header$size)
+      if (self$mode == "extract") {
+        safe_symlink(self$exdir, header$name, header$linkname)
+        self$parse(self$con, header$size + of)
+      } else {
+        self$parse(self$con, header$size + of, skip = TRUE)
+      }
+      return(TRUE)
+    }
 
     if (!header$size || header$type == "directory") {
       of <- overflow(header$size)
@@ -296,7 +317,7 @@ s1_untar <- local({
     of <- overflow(header$size)
     if (self$mode == "extract") {
       cnt <- self$parse(self$con, header$size + of)
-      writeBin(cnt, file.path(self$exdir, header$name))
+      safe_write_bin(cnt, self$exdir, header$name)
     } else {
       self$parse(self$con, header$size + of, skip = TRUE)
     }
@@ -311,7 +332,7 @@ s1_untar <- local({
       size = map_int(items, "[[", "size"),
       mtime = .POSIXct(vapply(items, "[[", .POSIXct(1), "mtime")),
       permissions = I(as.octmode(map_int(items, "[[", "mode"))),
-      dir = map_str(items, "[[", "type") == "directory",
+      type = map_str(items, "[[", "type"),
       uid = map_int(items, "[[", "uid"),
       gid = map_int(items, "[[", "gid"),
       uname = map_str(items, "[[", "uname"),

@@ -23,7 +23,7 @@ test_that("one-file", {
       size = 12L,
       mtime = .POSIXct(1387580181),
       permissions = I(as.octmode("644")),
-      dir = FALSE,
+      type = "file",
       uid = 501L,
       gid = 20L,
       uname = "maf",
@@ -53,7 +53,7 @@ test_that("multi-file", {
       size = c(12L, 12L),
       mtime = rep(.POSIXct(1387580181), 2),
       permissions = I(as.octmode(c("644", "644"))),
-      dir = c(FALSE, FALSE),
+      type = c("file", "file"),
       uid = c(501L, 501L),
       gid = c(20L, 20L),
       uname = c("maf", "maf"),
@@ -85,7 +85,7 @@ test_that("pax", {
       size = 12L,
       mtime = .POSIXct(1387580181),
       permissions = I(as.octmode("644")),
-      dir = FALSE,
+      type = "file",
       uid = 501L,
       gid = 20L,
       uname = "maf",
@@ -106,4 +106,36 @@ test_that("pax", {
   expect_true(file.exists(tmp))
   expect_true(file.exists(file.path(tmp, "pax.txt")))
   expect_equal(readChar(file.path(tmp, "pax.txt"), 100), "hello world\n")
+})
+
+test_that("types", {
+  ex <- data.frame(
+      stringsAsFactors = FALSE,
+      filename = c("directory", "directory-link"),
+      size = c(0L, 0L),
+      mtime = .POSIXct(c(1387580181, 1387580181)),
+      permissions = I(as.octmode(c("755", "755"))),
+      type = c("directory", "symlink"),
+      uid = c(501L, 501L),
+      gid = c(20L, 20L),
+      uname = c("maf", "maf"),
+      gname = c("staff", "staff")
+    )
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "types.tar")),
+    ex
+  )
+
+  tmp <- test_temp_dir()
+  expect_identical(
+    s1_untar$extract(test_path("fixtures", "untar", "types.tar"), tmp),
+    ex
+  )
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "directory")))
+  expect_true(file.exists(file.path(tmp, "directory-link")))
+  expect_true(file.info(file.path(tmp, "directory"))$isdir)
+  expect_equal(Sys.readlink(file.path(tmp, "directory-link")), "directory")
 })
