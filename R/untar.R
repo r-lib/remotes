@@ -360,7 +360,8 @@ s1_untar <- local({
       uid = map_int(items, "[[", "uid"),
       gid = map_int(items, "[[", "gid"),
       uname = map_str(items, "[[", "uname"),
-      gname = map_str(items, "[[", "gname")
+      gname = map_str(items, "[[", "gname"),
+      extra = I(lapply(items, function(x) as.list(x$pax)))
     )
   }
 
