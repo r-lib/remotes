@@ -233,14 +233,20 @@ s1_untar <- local({
     }
   }
 
+  mkdirp <- function(path) {
+    dir.create(path, showWarnings = FALSE, recursive = TRUE)
+  }
+
   safe_mkdirp <- function(dir, path) {
     ## TODO: check if path is not going back
-    dir.create(file.path(dir, path), showWarnings = FALSE, recursive = TRUE)
+    mkdirp(file.path(dir, path))
   }
 
   safe_write_bin <- function(object, dir, path) {
     ## TODO: check if path is not going back
-    writeBin(object, file.path(dir, path))
+    fpath <- file.path(dir, path)
+    mkdirp(dirname(fpath))
+    writeBin(object, fpath)
   }
 
   safe_symlink <- function(dir, path, linkname) {
@@ -257,6 +263,11 @@ s1_untar <- local({
     self$pax <- modifyList(as.list(self$pax_global), pax)
   }
 
+  process_gnu_long_path <- function(self, buffer) {
+    self$gnu_long_path <-
+      headers$decode_long_path(buffer, self$opts$filename_encoding)
+  }
+
   process_next_entry <- function(self) {
     buffer <- self$parse(self$con, 512L)
     if (!length(buffer)) return(FALSE)
@@ -266,7 +277,8 @@ s1_untar <- local({
     ## Maybe a null header? Try again...
     if (is.null(header)) return(TRUE)
 
-    while (header$type %in% c("pax-header", "global-pax-header")) {
+    memo_types <- c("pax-header", "global-pax-header", "gnu-long-path")
+    while (header$type %in% memo_types) {
       ## Pax global header
       if (header$type == "pax-global-header") {
         of <- overflow(header$size)
@@ -281,8 +293,20 @@ s1_untar <- local({
         process_pax_header(self, buffer2)
       }
 
+      ## GNU long path
+      if (header$type == "gnu-long-path") {
+        of <- overflow(header$size)
+        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
+        process_gnu_long_path(self, buffer2)
+      }
+
       buffer <- self$parse(self$con, 512L)
       header <- headers$decode(buffer, self$opts$filename_encoding)
+    }
+
+    if (!is.null(self$gnu_long_path)) {
+      header$name <- self$gnu_long_path
+      self$gnu_long_path <- NULL
     }
 
     if (!is.null(self$pax)) {

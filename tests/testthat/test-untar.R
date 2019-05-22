@@ -139,3 +139,48 @@ test_that("types", {
   expect_true(file.info(file.path(tmp, "directory"))$isdir)
   expect_equal(Sys.readlink(file.path(tmp, "directory-link")), "directory")
 })
+
+test_that("long-name", {
+  name <- paste0("my/file/is/longer/than/100/characters/and/should/use/",
+                 "the/prefix/header/foobarbaz/foobarbaz/foobarbaz/",
+                 "foobarbaz/foobarbaz/foobarbaz/filename.txt")
+  ex <- data.frame(
+      stringsAsFactors = FALSE,
+      filename = name,
+      size = 16L,
+      mtime = .POSIXct(1387580181),
+      permissions = I(as.octmode("644")),
+      type = "file",
+      uid = 501L,
+      gid = 20L,
+      uname = "maf",
+      gname = "staff"
+    )
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "long-name.tar")),
+    ex
+  )
+
+  tmp <- normalizePath(test_temp_dir(), winslash = "/")
+  expect_identical(
+    s1_untar$extract(test_path("fixtures", "untar", "long-name.tar"), tmp),
+    ex
+  )
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, name)))
+  expect_equal(readChar(file.path(tmp, name), 100), "hello long name\n")
+})
+
+test_that("gnu long path", {
+  name <- paste0("node-v0.11.14/deps/npm/node_modules/init-package-json/",
+                 "node_modules/promzard/example/npm-init/init-input.js")
+  tl <- s1_untar$list(test_path("fixtures", "untar", "gnu-long-path.tar"))
+  expect_identical(tl$filename, name)
+})
+
+test_that("name is 100", {
+  tl <- s1_untar$list(test_path("fixtures", "untar", "name-is-100.tar"))
+  expect_equal(nchar(tl$filename), 100L)
+})
