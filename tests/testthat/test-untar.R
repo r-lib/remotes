@@ -255,3 +255,10 @@ test_that("unicode", {
   expect_equal(readChar(file.path(tmp, "h\u00f8st\u00e5l.txt"), 100),
                "h\u00f8ll\u00f8\n")
 })
+
+test_that("invalid file", {
+  expect_error(
+    s1_untar$list(test_path("fixtures", "untar", "invalid.tgz")),
+    "Failed to decode tar header"
+  )
+})
