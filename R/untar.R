@@ -50,36 +50,24 @@ s1_untar <- local({
       } else if (buf[1] == 0xFF) {
         positive <- FALSE
       } else {
-        ## TODO: error?
-        return(NULL)
+        stop("Invalid tar file, maybe corrupted?")
       }
 
-      zero <- FALSE
-      tuple <- integer()
-      tx <- 1L
-      for (byte in rev(buf)) {
-        if (positive) {
-          tuple[tx] <- as.integer(byte)
-        } else if (zero && byte == 0L) {
-          ## zero, but it is already zero
-        } else if (zero) {
-          zero <- FALSE
-          tuple[tx] <- 0x100 - as.integer(byte)
-        } else {
-          tuple[tx] <- 0xFF - as.integer(byte)
-        }
-        tx <- tx + 1
+      buf <- buf[-1]
+      if (positive) {
+        num <- as.integer(buf[buf != 0])
+        as.integer(sum(rev(num) * 256^(1:length(num)-1L)))
+      } else {
+        num <- as.integer(buf)
+        if (num[1] >= 0x80) num[1] <- num[1] - 0x80
+        num <- 0xff - num
+        - as.integer(sum(rev(num) * 256^(1:length(num)-1L)))
       }
-
-      l <- length(tuple)
-      s <- sum(tuple * 256^(1:l))
-
-      positive ? sum : - sum
     }
 
     decode_oct <- function(val, offset, length) {
       val <- val[offset:(offset+length-1)]
-      if (val[1L] >= 0x80) return(parse256())
+      if (val[1L] >= 0x80) return(parse256(val))
 
       val <- val[val != 0 & val != 32]
       if (length(val)) strtoi(rawToChar(val), 8L) else 0L
