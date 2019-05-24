@@ -196,31 +196,23 @@ s1_untar <- local({
     cache <- raw()
     ptr <- 0L
 
-    function(con, size, skip = FALSE) {
+    function(con, size, skip = FALSE, header = FALSE) {
       if (size == 0) return(raw())
       if (size > chunk_size) chunk_size <- size
       ## Our of data? Read some
       if (size > length(cache) - ptr) {
-        cur <- if (ptr < length(cache)) {
+        out <- if (ptr < length(cache)) {
           cache[(ptr+1):length(cache)]
         } else {
           raw()
         }
-        out <- readBin(con, "raw", n = chunk_size)
-        ## Cannot read? Return what we have
         n <- length(out)
-        if (!n) {
-          cache <<- raw()
-          ptr <<- 0L
-          return(cur)
-        }
-
-        out <- c(cur, out)
+        new <- readBin(con, "raw", n = chunk_size - n)
+        out <- c(out, new)
         n <- length(out)
-        while (n < size) {
+        while (n < size && length(new)) {
           new <- readBin(con, "raw", n = chunk_size - n)
           nn <- length(new)
-          if (!nn) stop("Incomplete tar file?")
           out <- c(out, new)
           n <- n + nn
         }
@@ -228,7 +220,16 @@ s1_untar <- local({
         ptr <<- 0L
       }
 
-      ret <- if (!skip) cache[(ptr+1):(ptr+size)]
+      ## If we are looking for a header and get nothing,
+      ## that's just the normal end of file.
+      if (size > length(cache) - ptr) {
+        if (!header || (header && length(cache) != 0)) {
+          stop("Unexpected end of tar data, incomplete file?")
+        }
+        size <- 0L
+      }
+
+      ret <- if (size && !skip) cache[(ptr+1):(ptr+size)]
       ptr <<- ptr + size
       ret
     }
@@ -270,7 +271,7 @@ s1_untar <- local({
   }
 
   process_next_entry <- function(self) {
-    buffer <- self$parse(self$con, 512L)
+    buffer <- self$parse(self$con, 512L, header = TRUE)
     if (!length(buffer)) return(FALSE)
 
     header <- headers$decode(buffer, self$opts$filename_encoding)
@@ -301,7 +302,7 @@ s1_untar <- local({
         process_gnu_long_path(self, buffer2)
       }
 
-      buffer <- self$parse(self$con, 512L)
+      buffer <- self$parse(self$con, 512L, header = TRUE)
       header <- headers$decode(buffer, self$opts$filename_encoding)
     }
 
