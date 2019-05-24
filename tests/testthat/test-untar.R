@@ -262,3 +262,85 @@ test_that("invalid file", {
     "Failed to decode tar header"
   )
 })
+
+test_that("space prefixed", {
+  expect_error(
+    s1_untar$list(test_path("fixtures", "untar", "space.tar")),
+    NA
+  )
+})
+
+test_that("base 256 uid and gid", {
+  tl <- s1_untar$list(test_path("fixtures", "untar",
+                                "base-256-uid-gid.tar"))
+  expect_identical(tl$uid, 116435139L)
+  expect_identical(tl$gid, 1876110778L)
+})
+
+test_that("base 256 size", {
+  ex <- data.frame(
+    stringsAsFactors = FALSE,
+    filename = "test.txt",
+    size = 12L,
+    mtime = .POSIXct(1387580181),
+    permissions = I(as.octmode("644")),
+    type = "file",
+    uid = 501L,
+    gid = 20L,
+    uname = "maf",
+    gname = "staff",
+    extra = I(list(list()))
+  )
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "base-256-size.tar")),
+    ex)
+
+  tmp <- test_temp_dir()
+  expect_identical(
+    s1_untar$extract(test_path("fixtures", "untar", "base-256-size.tar"),
+                     tmp),
+    ex
+  )
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "test.txt")))
+  expect_equal(readChar(file.path(tmp, "test.txt"), 100), "hello world\n")
+})
+
+test_that("latin1", {
+  name <- "En fran\xe7ais, s'il vous pla\xeet?.txt"
+  Encoding(name) <- "latin1"
+  ex <- data.frame(
+    stringsAsFactors = FALSE,
+    filename = name,
+    size = 14L,
+    mtime = .POSIXct(1495941034),
+    permissions = I(as.octmode("644")),
+    type = "file",
+    uid = 0L,
+    gid = 0L,
+    uname = "root",
+    gname = "root",
+    extra = I(list(list()))
+  )
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "latin1.tar"),
+                  options = list(filename_encoding = "latin1")),
+    ex)
+})
+
+test_that("incomplete", {
+  expect_error(
+    s1_untar$list(test_path("fixtures", "untar", "incomplete.tar")),
+    "Unexpected end of tar data")
+
+  tmp <- test_temp_dir()
+  expect_error(
+    s1_untar$extract(test_path("fixtures", "untar", "incomplete.tar"), tmp),
+    "Unexpected end of tar data")
+
+  expect_true(file.exists(tmp))
+  expect_false(file.exists(file.path(tmp, "file-1.txt")))
+})
