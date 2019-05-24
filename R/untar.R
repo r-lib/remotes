@@ -432,7 +432,7 @@ s1_untar <- local({
     if (inherits(tarfile, "connection")) {
       list_connection(tarfile, options)
     } else {
-      con <- file(tarfile, open = "rb")
+      con <- gzcon(file(tarfile, open = "rb"))
       on.exit(close(con), add = TRUE)
       list_connection(con, options)
     }

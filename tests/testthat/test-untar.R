@@ -258,7 +258,7 @@ test_that("unicode", {
 
 test_that("invalid file", {
   expect_error(
-    s1_untar$list(test_path("fixtures", "untar", "invalid.tgz")),
+    s1_untar$list(test_path("fixtures", "untar", "invalid.zip")),
     "Failed to decode tar header"
   )
 })
@@ -349,6 +349,9 @@ test_that("compressed file", {
   on.exit(try(close(f)))
   f <- gzfile(test_path("fixtures", "untar", "invalid.tgz"), open = "rb")
   expect_error(s1_untar$list(f), NA)
+
+  expect_error(
+    s1_untar$list(test_path("fixtures", "untar", "invalid.tgz")), NA)
 })
 
 test_that("safe paths", {
