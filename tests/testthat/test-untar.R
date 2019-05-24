@@ -344,3 +344,9 @@ test_that("incomplete", {
   expect_true(file.exists(tmp))
   expect_false(file.exists(file.path(tmp, "file-1.txt")))
 })
+
+test_that("compressed file", {
+  on.exit(try(close(f)))
+  f <- gzfile(test_path("fixtures", "untar", "invalid.tgz"), open = "rb")
+  expect_error(s1_untar$list(f), NA)
+})

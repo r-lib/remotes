@@ -2,9 +2,9 @@
 # TODO:
 # - extract subset of files
 # - hard links
-# - GNU extensions
 # - do not read in big files into memory
 # - use seek, if stream is seeakable
+# - safe paths
 
 s1_untar <- local({
 
