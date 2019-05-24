@@ -4,7 +4,7 @@
 # - hard links
 # - do not read in big files into memory
 # - use seek, if stream is seeakable
-# - safe paths
+# - auto-detect compressed files
 
 s1_untar <- local({
 
@@ -239,20 +239,29 @@ s1_untar <- local({
     dir.create(path, showWarnings = FALSE, recursive = TRUE)
   }
 
+  check_safe_path <- function(path) {
+    if (.Platform$OS.type == "windows") {
+      path <- gsub("\\", "/", path, fixed = TRUE)
+    }
+    if (grepl("^\\.\\./|/\\.\\./|\\.\\.$", path)) {
+      stop("Invalid path in tar file, contains `..`")
+    }
+  }
+
   safe_mkdirp <- function(dir, path) {
-    ## TODO: check if path is not going back
+    check_safe_path(path)
     mkdirp(file.path(dir, path))
   }
 
   safe_write_bin <- function(object, dir, path) {
-    ## TODO: check if path is not going back
+    check_safe_path(path)
     fpath <- file.path(dir, path)
     mkdirp(dirname(fpath))
     writeBin(object, fpath)
   }
 
   safe_symlink <- function(dir, path, linkname) {
-    ## TODO: check if path is not going back
+    check_safe_path(path)
     file.symlink(linkname, file.path(dir, path))
   }
 

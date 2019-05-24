@@ -350,3 +350,12 @@ test_that("compressed file", {
   f <- gzfile(test_path("fixtures", "untar", "invalid.tgz"), open = "rb")
   expect_error(s1_untar$list(f), NA)
 })
+
+test_that("safe paths", {
+  fun <- s1_untar$.internal$check_safe_path
+  bad <- c("../foo/bar", "..", "foo/../bar", "foo/bar/..")
+  for (b in bad) expect_error(fun(b), "Invalid path", info = b)
+  good <- c(".xxx", "foo/.bar", "foo/./bar", "foo/ba.", "foo..bar",
+            "foo../bar", "foo/..bar")
+  for (g in good) expect_error(fun(g), NA, info = g)
+})
