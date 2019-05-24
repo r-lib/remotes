@@ -100,6 +100,10 @@ s1_untar <- local({
       )
     }
 
+    nchar_bytes <- function(x) {
+      nchar(x, type = "bytes")
+    }
+
     decode2 <- function(buf, filename_encoding) {
 
       type_flag <- if (buf[157] == 0) {
@@ -129,7 +133,7 @@ s1_untar <- local({
       }
 
       # to support old tar versions that use trailing / to indicate dirs
-      if (type_flag == 0 && substr(name, nchar(name), 1) == '/') {
+      if (type_flag == 0 && substr(name, nchar_bytes(name), 1) == '/') {
         type_flag <- 5L
       }
 
