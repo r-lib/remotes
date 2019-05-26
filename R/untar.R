@@ -361,7 +361,8 @@ s1_untar <- local({
       self$pax <- NULL
     }
 
-    self$items[[length(self$items) + 1L]] <- header
+    self$next_item <- self$next_item + 1L
+    self$items[[as.character(self$next_item)]] <- header
 
     if (header$type == "symlink") {
       of <- overflow(header$size)
@@ -401,7 +402,8 @@ s1_untar <- local({
     return(TRUE)
   }
 
-  make_result_df <- function(items) {
+  make_result_df <- function(items, num) {
+    items <- unname(mget(as.character(seq_len(num)), items))
     data.frame(
       stringsAsFactors = FALSE,
       filename = map_str(items, "[[", "name"),
@@ -438,13 +440,14 @@ s1_untar <- local({
     self$exdir <- exdir
     self$opts <- options
     self$parser <- buffer$buffer(tarfile)
-    self$items <- list()
+    self$items <- new.env(parent = emptyenv(), size = 5939)
+    self$next_item <- 0L
 
     repeat {
       if (!process_next_entry(self)) break;
     }
 
-    make_result_df(self$items)
+    make_result_df(self$items, self$next_item)
   }
 
   listx <- function(tarfile, options = list(filename_encoding = "")) {
@@ -458,13 +461,14 @@ s1_untar <- local({
     self$mode <- "list"
     self$opts <- options
     self$parser <- buffer$buffer(tarfile)
-    self$items <- list()
+    self$items <- new.env(parent = emptyenv(), size = 5939)
+    self$next_item <- 0L
 
     repeat {
       if (!process_next_entry(self)) break;
     }
 
-    make_result_df(self$items)
+    make_result_df(self$items, self$next_item)
   }
 
   # -- EXPORTED API -------------------------------------------------------
