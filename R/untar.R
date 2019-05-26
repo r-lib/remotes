@@ -425,9 +425,7 @@ s1_untar <- local({
     vapply(X, FUN, FUN.VALUE = integer(1), ...)
   }
 
-  extract <- function(tarfile, exdir = ".",
-                      options = list(filename_encoding = "")) {
-    self <- new.env(parent = emptyenv())
+  process_file <- function(self, tarfile, options) {
     filesize <- NA_integer_
 
     if (!inherits(tarfile, "connection")) {
@@ -438,8 +436,6 @@ s1_untar <- local({
 
     chunk_size <- min(filesize, 1024L * 1024L * 256L, na.rm = TRUE)
 
-    self$mode <- "extract"
-    self$exdir <- exdir
     self$opts <- options
     self$parser <- buffer$buffer(tarfile, chunk_size)
     self$items <- new.env(parent = emptyenv(), size = 5939)
@@ -452,29 +448,18 @@ s1_untar <- local({
     make_result_df(self$items, self$next_item)
   }
 
+  extract <- function(tarfile, exdir = ".",
+                      options = list(filename_encoding = "")) {
+    self <- new.env(parent = emptyenv())
+    self$mode <- "extract"
+    self$exdir <- exdir
+    process_file(self, tarfile, options)
+  }
+
   listx <- function(tarfile, options = list(filename_encoding = "")) {
     self <- new.env(parent = emptyenv())
-    filesize <- NA_integer_
-
-    if (!inherits(tarfile, "connection")) {
-      filesize <- file.size(tarfile)
-      tarfile <- gzfile(tarfile, open = "rb")
-      on.exit(close(tarfile), add = TRUE)
-    }
-
-    chunk_size <- min(filesize, 1024L * 1024L * 256L, na.rm = TRUE)
-
     self$mode <- "list"
-    self$opts <- options
-    self$parser <- buffer$buffer(tarfile, chunk_size)
-    self$items <- new.env(parent = emptyenv(), size = 5939)
-    self$next_item <- 0L
-
-    repeat {
-      if (!process_next_entry(self)) break;
-    }
-
-    make_result_df(self$items, self$next_item)
+    process_file(self, tarfile, options)
   }
 
   # -- EXPORTED API -------------------------------------------------------
