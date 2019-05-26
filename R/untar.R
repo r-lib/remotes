@@ -33,30 +33,17 @@ s1_untar <- local({
     buffer <- function(con, buffer_size = 512L * 1024L) {
       force(con)
       chunk_size <- buffer_size
-      cache <- raw()
-      cache_ptr <- 0L
-      cache_len <- 0L
+      cache_con <- rawConnection(raw(0))
 
       ## Read out the full cache
       read_cache <- function(num_bytes) {
-        if (cache_len <= num_bytes) {
-          ret <- if (cache_len) tail(cache, cache_len)
-          cache <<- raw()
-          cache_ptr <<- 0L
-          cache_len <<- 0L
-          as.raw(ret)
-        } else {
-          ret <- cache[(cache_ptr+1L):(cache_ptr+num_bytes)]
-          cache_ptr <<- cache_ptr + num_bytes
-          cache_len <<- cache_len - num_bytes
-          ret
-        }
+        ret <- readBin(cache_con, "raw", num_bytes)
+        if (length(ret) < num_bytes) close(cache_con)
+        ret
       }
 
-      pushback <- function(buf) {
-        cache <<- c(cache, buf)
-        cache_len <<- cache_len + length(buf)
-        NULL
+      set_cache <- function(buf) {
+        cache_con <<- rawConnection(buf)
       }
 
       err <- function(len, size, error) {
@@ -75,7 +62,7 @@ s1_untar <- local({
             if (!length(new)) break
             data <- c(data, new)
           }
-          if (length(data) > size) pushback(tail(data, -size))
+          if (length(data) > size) set_cache(tail(data, -size))
           ret <- head(data, size)
           err(length(ret), size, error)
           ret
@@ -90,7 +77,7 @@ s1_untar <- local({
             if (!length(data)) break
             skipped <- skipped + length(data)
           }
-          if (skipped > size) pushback(tail(data, skipped - size))
+          if (skipped > size) set_cache(tail(data, skipped - size))
           ret <- min(size, skipped)
           err(ret, size, error)
           ret
@@ -113,7 +100,7 @@ s1_untar <- local({
             writeBin(head(data, towrite), ocon)
             towrite <- towrite - min(towrite, length(data))
           }
-          if (length(data) > towrite) pushback(tail(data, -towrite))
+          if (length(data) > towrite) set_cache(tail(data, -towrite))
           err(size - towrite, size, error)
           towrite
         }
