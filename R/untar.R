@@ -16,19 +16,6 @@ s1_untar <- local({
 
   buffer <- local({
 
-    tail <- function(x, n) {
-      if (n == 0) return(x[FALSE])
-      l <- length(x)
-      if (n > 0) {
-        if (n >= l) return(x)
-        x[(l-n+1L):l]
-      } else {
-        n <- -n
-        if (n >= l) return(x[FALSE])
-        x[(n+1L):l]
-      }
-    }
-
     ## Buffered read from binary file
     buffer <- function(con, buffer_size = 512L * 1024L) {
       force(con)
@@ -62,7 +49,7 @@ s1_untar <- local({
             if (!length(new)) break
             data <- c(data, new)
           }
-          if (length(data) > size) set_cache(tail(data, -size))
+          if (length(data) > size) set_cache(data[(size+1):length(data)])
           ret <- head(data, size)
           err(length(ret), size, error)
           ret
@@ -77,7 +64,7 @@ s1_untar <- local({
             if (!length(data)) break
             skipped <- skipped + length(data)
           }
-          if (skipped > size) set_cache(tail(data, skipped - size))
+          if (skipped > size) set_cache(data[(length(data)-skipped+size+1L):length(data)])
           ret <- min(size, skipped)
           err(ret, size, error)
           ret
@@ -100,7 +87,7 @@ s1_untar <- local({
             writeBin(head(data, towrite), ocon)
             towrite <- towrite - min(towrite, length(data))
           }
-          if (length(data) > towrite) set_cache(tail(data, -towrite))
+          if (length(data) > towrite) set_cache(data[(towrite+1):length(data)])
           err(size - towrite, size, error)
           towrite
         }
