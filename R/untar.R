@@ -80,16 +80,17 @@ s1_untar <- local({
 
           data <- read_cache(size)
           writeBin(data, ocon)
-          towrite <- size - length(data)
-          while (towrite > 0) {
+          written <- length(data)
+          while (written < size) {
             data <- readBin(con, "raw", n = chunk_size)
             if (!length(data)) break
+            towrite <- min(size - written, length(data))
             writeBin(head(data, towrite), ocon)
-            towrite <- towrite - min(towrite, length(data))
+            if (towrite < length(data)) set_cache(data[(towrite+1):length(data)])
+            written <- written + towrite
           }
-          if (length(data) > towrite) set_cache(data[(towrite+1):length(data)])
-          err(size - towrite, size, error)
-          towrite
+          err(written, size, error)
+          written
         }
       )
     }
