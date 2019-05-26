@@ -199,20 +199,11 @@ s1_untar <- local({
         lapply(recs, "[[", 2))
     }
 
-    decode <- function(buf, filename_encoding = "") {
-      tryCatch(
-        decode2(buf, filename_encoding),
-        error = function(e) {
-          stop("Failed to decode tar header, broken or incomplete tar file?")
-        }
-      )
-    }
-
     nchar_bytes <- function(x) {
       nchar(x, type = "bytes")
     }
 
-    decode2 <- function(buf, filename_encoding) {
+    decode <- function(buf, filename_encoding) {
 
       type_flag <- if (buf[157] == 0) {
         0
