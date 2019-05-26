@@ -20,7 +20,7 @@ s1_untar <- local({
     buffer <- function(con, buffer_size = 512L * 1024L) {
       force(con)
       chunk_size <- buffer_size
-      cache_con <- rawConnection(raw(0))
+      cache_con <- rawConnection(readBin(con, "raw", buffer_size))
 
       ## Read out the full cache
       read_cache <- function(num_bytes) {
