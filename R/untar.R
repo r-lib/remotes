@@ -2,11 +2,132 @@
 # TODO:
 # - extract subset of files
 # - hard links
+# - device files
 # - do not read in big files into memory
 # - use seek, if stream is seeakable
-# - auto-detect compressed files
+# - restore mode
+# - restore mtime
+# - restore atime, ctime?
+# - devices?
 
 s1_untar <- local({
+
+  # -- BUFFERED CONNECTION
+
+  buffer <- local({
+
+    tail <- function(x, n) {
+      if (n == 0) return(x[FALSE])
+      l <- length(x)
+      if (n > 0) {
+        if (n >= l) return(x)
+        x[(l-n+1L):l]
+      } else {
+        n <- -n
+        if (n >= l) return(x[FALSE])
+        x[(n+1L):l]
+      }
+    }
+
+    ## Buffered read from binary file
+    buffer <- function(con, buffer_size = 512L * 1024L) {
+      force(con)
+      chunk_size <- buffer_size
+      cache <- raw()
+      cache_ptr <- 0L
+      cache_len <- 0L
+
+      ## Read out the full cache
+      read_cache <- function(num_bytes) {
+        if (cache_len <= num_bytes) {
+          ret <- if (cache_len) tail(cache, cache_len)
+          cache <<- raw()
+          cache_ptr <<- 0L
+          cache_len <<- 0L
+          as.raw(ret)
+        } else {
+          ret <- cache[(cache_ptr+1L):(cache_ptr+num_bytes)]
+          cache_ptr <<- cache_ptr + num_bytes
+          cache_len <<- cache_len - num_bytes
+          ret
+        }
+      }
+
+      pushback <- function(buf) {
+        cache <<- c(cache, buf)
+        cache_len <<- cache_len + length(buf)
+        NULL
+      }
+
+      err <- function(len, size, error) {
+        if ((len < size && isTRUE(error)) ||
+            (len < size && len != 0 &&
+             identical(error, "partial-nonempty"))) {
+          stop("Unexpected end of tar data")
+        }
+      }
+
+      list(
+        read = function(size, error = TRUE) {
+          data <- read_cache(size)
+          while (length(data) < size) {
+            new <- readBin(con, "raw", n = chunk_size)
+            if (!length(new)) break
+            data <- c(data, new)
+          }
+          if (length(data) > size) pushback(tail(data, -size))
+          ret <- head(data, size)
+          err(length(ret), size, error)
+          ret
+        },
+
+        skip = function(size, error = TRUE) {
+          if (size == 0) return(0)
+          data <- read_cache(size)
+          skipped <- length(data)
+          while (skipped < size) {
+            data <- readBin(con, "raw", n = chunk_size)
+            if (!length(data)) break
+            skipped <- skipped + length(data)
+          }
+          if (skipped > size) pushback(tail(data, skipped - size))
+          ret <- min(size, skipped)
+          err(ret, size, error)
+          ret
+        },
+
+        write_to = function(size, path, error = TRUE) {
+          if (inherits(path, "connection")) {
+            ocon <- path
+          } else {
+            ocon <- file(path, open = "wb")
+            on.exit(close(ocon), add = TRUE)
+          }
+
+          data <- read_cache(size)
+          writeBin(data, ocon)
+          towrite <- size - length(data)
+          while (towrite > 0) {
+            data <- readBin(con, "raw", n = chunk_size)
+            if (!length(data)) break
+            writeBin(head(data, towrite), ocon)
+            towrite <- towrite - min(towrite, length(data))
+          }
+          if (length(data) > towrite) pushback(tail(data, -towrite))
+          err(size - towrite, size, error)
+          towrite
+        }
+      )
+    }
+
+    structure(
+      list(
+        .internal = environment(),
+        buffer = buffer
+      ),
+      class = c("standalone_buffer", "standalone")
+    )
+  })
 
   # -- HEADER -------------------------------------------------------------
 
@@ -144,8 +265,7 @@ s1_untar <- local({
 
       # valid checksum
       if (c != decode_oct(buf, 149, 8)) {
-        stop("Invalid tar header. Maybe the tar is corrupted or it ",
-             "needs to be gunzipped?")
+        stop("Invalid tar header. Maybe the tar file is corrupted")
       }
 
       list(
@@ -190,51 +310,6 @@ s1_untar <- local({
     header
   }
 
-  ## Buffered read from binary file
-  make_parser <- function() {
-    chunk_size <- 512L * 1024L
-    cache <- raw()
-    ptr <- 0L
-
-    function(con, size, skip = FALSE, header = FALSE) {
-      if (size == 0) return(raw())
-      if (size > chunk_size) chunk_size <- size
-      ## Our of data? Read some
-      if (size > length(cache) - ptr) {
-        out <- if (ptr < length(cache)) {
-          cache[(ptr+1):length(cache)]
-        } else {
-          raw()
-        }
-        n <- length(out)
-        new <- readBin(con, "raw", n = chunk_size - n)
-        out <- c(out, new)
-        n <- length(out)
-        while (n < size && length(new)) {
-          new <- readBin(con, "raw", n = chunk_size - n)
-          nn <- length(new)
-          out <- c(out, new)
-          n <- n + nn
-        }
-        cache <<- out
-        ptr <<- 0L
-      }
-
-      ## If we are looking for a header and get nothing,
-      ## that's just the normal end of file.
-      if (size > length(cache) - ptr) {
-        if (!header || (header && length(cache) != 0)) {
-          stop("Unexpected end of tar data, incomplete file?")
-        }
-        size <- 0L
-      }
-
-      ret <- if (size && !skip) cache[(ptr+1):(ptr+size)]
-      ptr <<- ptr + size
-      ret
-    }
-  }
-
   mkdirp <- function(path) {
     dir.create(path, showWarnings = FALSE, recursive = TRUE)
   }
@@ -251,13 +326,6 @@ s1_untar <- local({
   safe_mkdirp <- function(dir, path) {
     check_safe_path(path)
     mkdirp(file.path(dir, path))
-  }
-
-  safe_write_bin <- function(object, dir, path) {
-    check_safe_path(path)
-    fpath <- file.path(dir, path)
-    mkdirp(dirname(fpath))
-    writeBin(object, fpath)
   }
 
   safe_symlink <- function(dir, path, linkname) {
@@ -280,8 +348,9 @@ s1_untar <- local({
   }
 
   process_next_entry <- function(self) {
-    buffer <- self$parse(self$con, 512L, header = TRUE)
+    buffer <- self$parser$read(512L, error = "partial-nonempty")
     if (!length(buffer)) return(FALSE)
+    if (length(buffer) < 512L) stop("Unexpected end of tar file")
 
     header <- headers$decode(buffer, self$opts$filename_encoding)
 
@@ -293,25 +362,26 @@ s1_untar <- local({
       ## Pax global header
       if (header$type == "pax-global-header") {
         of <- overflow(header$size)
-        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
-        process_pax_global_header(self, buffer2)
+        buffer2 <- self$parser$read(header$size + of)
+        process_pax_global_header(self, buffer2[1:header$size])
       }
 
       ## Pax header
       if (header$type == "pax-header") {
         of <- overflow(header$size)
-        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
+        buffer2 <- self$parser$read(header$size + of)[1:header$size]
         process_pax_header(self, buffer2)
       }
 
       ## GNU long path
       if (header$type == "gnu-long-path") {
         of <- overflow(header$size)
-        buffer2 <- self$parse(self$con, header$size + of)[1:header$size]
+        buffer2 <- self$parser$read(header$size + of)[1:header$size]
         process_gnu_long_path(self, buffer2)
       }
 
-      buffer <- self$parse(self$con, 512L, header = TRUE)
+      buffer <- self$parser$read(512L, error = "partial-nonempty")
+      if (!length(buffer)) return(FALSE)
       header <- headers$decode(buffer, self$opts$filename_encoding)
     }
 
@@ -331,9 +401,9 @@ s1_untar <- local({
       of <- overflow(header$size)
       if (self$mode == "extract") {
         safe_symlink(self$exdir, header$name, header$linkname)
-        self$parse(self$con, header$size + of)
+        self$parser$skip(header$size + of)
       } else {
-        self$parse(self$con, header$size + of, skip = TRUE)
+        self$parser$skip(header$size + of)
       }
       return(TRUE)
     }
@@ -342,19 +412,24 @@ s1_untar <- local({
       of <- overflow(header$size)
       if (self$mode == "extract") {
         safe_mkdirp(self$exdir, header$name)
-        self$parse(self$con, header$size + of)
+        self$parser$skip(header$size + of)
       } else {
-        self$parse(self$con, header$size + of, skip = TRUE)
+        self$parser$skip(header$size + of)
       }
       return(TRUE)
     }
 
     of <- overflow(header$size)
     if (self$mode == "extract") {
-      cnt <- self$parse(self$con, header$size + of)
-      safe_write_bin(cnt, self$exdir, header$name)
+      check_safe_path(header$name)
+      path <- file.path(self$exdir, header$name)
+      mkdirp(dirname(path))
+      withCallingHandlers({
+        self$parser$write_to(header$size, path)
+        self$parser$skip(of)
+      }, error = function(e) unlink(path))
     } else {
-      self$parse(self$con, header$size + of, skip = TRUE)
+      self$parser$skip(header$size + of)
     }
 
     return(TRUE)
@@ -376,24 +451,6 @@ s1_untar <- local({
     )
   }
 
-  extract_connection <- function(con, exdir, options) {
-
-    self <- new.env(parent = emptyenv())
-
-    self$mode <- "extract"
-    self$con <- con
-    self$exdir <- exdir
-    self$opts <- options
-    self$parse <- make_parser()
-    self$items <- list()
-
-    repeat {
-      if (!process_next_entry(self)) break;
-    }
-
-    make_result_df(self$items)
-  }
-
   map_str <- function (X, FUN, ...) {
     vapply(X, FUN, FUN.VALUE = character(1), ...)
   }
@@ -402,12 +459,19 @@ s1_untar <- local({
     vapply(X, FUN, FUN.VALUE = integer(1), ...)
   }
 
-  list_connection <- function(con, options) {
+  extract <- function(tarfile, exdir = ".",
+                      options = list(filename_encoding = "")) {
     self <- new.env(parent = emptyenv())
-    self$mode <- "list"
-    self$con <- con
+
+    if (!inherits(tarfile, "connection")) {
+      tarfile <- gzfile(tarfile, open = "rb")
+      on.exit(close(tarfile), add = TRUE)
+    }
+
+    self$mode <- "extract"
+    self$exdir <- exdir
     self$opts <- options
-    self$parse <- make_parser()
+    self$parser <- buffer$buffer(tarfile)
     self$items <- list()
 
     repeat {
@@ -417,25 +481,24 @@ s1_untar <- local({
     make_result_df(self$items)
   }
 
-  extract <- function(tarfile, exdir = ".",
-                      options = list(filename_encoding = "")) {
-    if (inherits(tarfile, "connection")) {
-      extract_connection(tarfile, exdir, options)
-    } else {
-      con <- file(tarfile, open = "rb")
-      on.exit(close(con), add = TRUE)
-      extract_connection(con, exdir, options)
-    }
-  }
-
   listx <- function(tarfile, options = list(filename_encoding = "")) {
-    if (inherits(tarfile, "connection")) {
-      list_connection(tarfile, options)
-    } else {
-      con <- gzcon(file(tarfile, open = "rb"))
-      on.exit(close(con), add = TRUE)
-      list_connection(con, options)
+    self <- new.env(parent = emptyenv())
+
+    if (!inherits(tarfile, "connection")) {
+      tarfile <- gzfile(tarfile, open = "rb")
+      on.exit(close(tarfile), add = TRUE)
     }
+
+    self$mode <- "list"
+    self$opts <- options
+    self$parser <- buffer$buffer(tarfile)
+    self$items <- list()
+
+    repeat {
+      if (!process_next_entry(self)) break;
+    }
+
+    make_result_df(self$items)
   }
 
   # -- EXPORTED API -------------------------------------------------------
