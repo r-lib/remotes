@@ -208,8 +208,8 @@ s1_untar <- local({
       linkname <- if (buf[158] != 0) {
         decode_str(buf, 158, 100, filename_encoding)
       }
-      uname <- decode_str(buf, 266, 32, "")
-      gname <- decode_str(buf, 298, 32, "")
+      uname <- decode_str(buf, 266, 32, filename_encoding)
+      gname <- decode_str(buf, 298, 32, filename_encoding)
       devmajor <- decode_oct(buf, 330, 8)
       devminor <- decode_oct(buf, 338, 8)
 
