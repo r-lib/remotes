@@ -3,10 +3,6 @@
 # - extract subset of files
 # - hard links
 # - device files
-# - do not read in big files into memory
-# - use seek, if stream is seeakable
-# - restore mode
-# - restore mtime
 # - restore atime, ctime?
 # - devices?
 
@@ -288,6 +284,11 @@ s1_untar <- local({
     header
   }
 
+  set_file_metadata <- function(path, header) {
+    Sys.chmod(path, header$mode, FALSE)
+    Sys.setFileTime(path, header$mtime)
+  }
+
   mkdirp <- function(path) {
     dir.create(path, showWarnings = FALSE, recursive = TRUE)
   }
@@ -301,14 +302,16 @@ s1_untar <- local({
     }
   }
 
-  safe_mkdirp <- function(dir, path) {
-    check_safe_path(path)
-    mkdirp(file.path(dir, path))
+  safe_mkdirp <- function(dir, header) {
+    check_safe_path(header$name)
+    mkdirp(path <- file.path(dir, header$name))
+    set_file_metadata(path, header)
   }
 
-  safe_symlink <- function(dir, path, linkname) {
-    check_safe_path(path)
-    file.symlink(linkname, file.path(dir, path))
+  safe_symlink <- function(dir, header) {
+    check_safe_path(header$name)
+    file.symlink(header$linkname, path <- file.path(dir, header$name))
+    set_file_metadata(path, header)
   }
 
   process_pax_global_header <- function(self, buffer) {
@@ -379,7 +382,7 @@ s1_untar <- local({
     if (header$type == "symlink") {
       of <- overflow(header$size)
       if (self$mode == "extract") {
-        safe_symlink(self$exdir, header$name, header$linkname)
+        safe_symlink(self$exdir, header)
         self$parser$skip(header$size + of)
       } else {
         self$parser$skip(header$size + of)
@@ -390,7 +393,7 @@ s1_untar <- local({
     if (!header$size || header$type == "directory") {
       of <- overflow(header$size)
       if (self$mode == "extract") {
-        safe_mkdirp(self$exdir, header$name)
+        safe_mkdirp(self$exdir, header)
         self$parser$skip(header$size + of)
       } else {
         self$parser$skip(header$size + of)
@@ -407,6 +410,7 @@ s1_untar <- local({
       self$parser$write_to(header$size, path)
       self$parser$skip(of)
       self$extracting <- NULL
+      set_file_metadata(path, header)
     } else {
       self$parser$skip(header$size + of)
     }

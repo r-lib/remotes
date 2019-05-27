@@ -362,3 +362,41 @@ test_that("safe paths", {
             "foo../bar", "foo/..bar")
   for (g in good) expect_error(fun(g), NA, info = g)
 })
+
+test_that("mtime is restored", {
+  ## Files
+  tmp <- test_temp_dir()
+  s1_untar$extract(test_path("fixtures", "untar", "one-file.tar"), tmp)
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "test.txt")))
+  expect_identical(file.info(file.path(tmp, "test.txt"))$mtime,
+                   .POSIXct(1387580181))
+
+  ## Directories and symlinks
+  tmp <- test_temp_dir()
+  s1_untar$extract(test_path("fixtures", "untar", "types.tar"), tmp)
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "directory")))
+  expect_true(file.exists(file.path(tmp, "directory-link")))
+  expect_identical(file.info(file.path(tmp, "directory"))$mtime,
+                   .POSIXct(1387580181))
+  expect_identical(file.info(file.path(tmp, "directory-link"))$mtime,
+                   .POSIXct(1387580181))
+})
+
+test_that("mode is restored", {
+  tmp <- test_temp_dir()
+  s1_untar$extract(test_path("fixtures", "untar", "permissions.tar"), tmp)
+
+  expect_true(file.exists(tmp))
+  expect_true(file.exists(file.path(tmp, "test")))
+  expect_true(file.exists(file.path(tmp, "test", "test-1.txt")))
+  expect_true(file.exists(file.path(tmp, "test", "test-2.txt")))
+  expect_identical(file.info(file.path(tmp, "test"))$mode, as.octmode("750"))
+  expect_identical(file.info(file.path(tmp, "test", "test-1.txt"))$mode,
+                   as.octmode("600"))
+  expect_identical(file.info(file.path(tmp, "test", "test-2.txt"))$mode,
+                   as.octmode("640"))
+})
