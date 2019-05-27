@@ -12,6 +12,14 @@
 
 s1_untar <- local({
 
+  incomplete_file_error <- function() {
+    structure(
+      list(message = "Unexpected end of tar data"),
+      class = c("incomplete_file_error", "simpleError", "error",
+                "condition")
+    )
+  }
+
   # -- BUFFERED CONNECTION
 
   buffer <- local({
@@ -37,7 +45,7 @@ s1_untar <- local({
         if ((len < size && isTRUE(error)) ||
             (len < size && len != 0 &&
              identical(error, "partial-nonempty"))) {
-          stop("Unexpected end of tar data")
+          stop(incomplete_file_error())
         }
       }
 
@@ -91,6 +99,10 @@ s1_untar <- local({
           }
           err(written, size, error)
           written
+        },
+
+        close = function() {
+          tryCatch(close(cache_con), error = function(e) NULL)
         }
       )
     }
@@ -316,7 +328,7 @@ s1_untar <- local({
   process_next_entry <- function(self) {
     buffer <- self$parser$read(512L, error = "partial-nonempty")
     if (!length(buffer)) return(FALSE)
-    if (length(buffer) < 512L) stop("Unexpected end of tar file")
+    if (length(buffer) < 512L) stop(incomplete_file_error())
 
     header <- headers$decode(buffer, self$opts$filename_encoding)
 
@@ -390,9 +402,11 @@ s1_untar <- local({
     if (self$mode == "extract") {
       check_safe_path(header$name)
       path <- file.path(self$exdir, header$name)
+      self$extracting <- path
       mkdirp(dirname(path))
       self$parser$write_to(header$size, path)
       self$parser$skip(of)
+      self$extracting <- NULL
     } else {
       self$parser$skip(header$size + of)
     }
@@ -441,9 +455,26 @@ s1_untar <- local({
     self$items <- new.env(parent = emptyenv(), size = 5939)
     self$next_item <- 0L
 
-    repeat {
-      if (!process_next_entry(self)) break;
-    }
+    tryCatch(
+      repeat {
+        if (!process_next_entry(self)) break
+      },
+      incomplete_file_error = function(e) {
+        e$processed <- TRUE
+        stop(e)
+      },
+      error = function(e) {
+        self$parser$close()
+        if (!is.null(self$extracting)) {
+          tryCatch(unlink(self$extracting), error = function(e) NULL)
+        }
+        if (isTRUE(e$processed)) stop(e)
+        msg <- "Failed to decode tar data, maybe file is corrupt?"
+        err <- structure(list(message = msg, parent = e),
+                         class = c("simpleError", "error", "condition"))
+        stop(err)
+      }
+    )
 
     make_result_df(self$items, self$next_item)
   }

@@ -259,7 +259,7 @@ test_that("unicode", {
 test_that("invalid file", {
   expect_error(
     s1_untar$list(test_path("fixtures", "untar", "invalid.zip")),
-    "Failed to decode tar header"
+    "Failed to decode tar"
   )
 })
 
