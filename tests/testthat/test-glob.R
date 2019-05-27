@@ -74,3 +74,24 @@ test_that("glob", {
   target_ext_str = "\\/$^+.()=!|,.*"
   glob_match(test_ext_str, target_ext_str)
 })
+
+test_that("test_any", {
+  expect_identical(
+    glob$test_any(c("*.tgz", "*.zip", "*.tar.gz"),
+                  c("foo.tgz", "bar.txt", "foobar.zip", "foobar.txt")),
+    c(TRUE, FALSE, TRUE, FALSE))
+
+  expect_identical(
+    glob$test_any(c("*.tgz", "*.zip", "*.tar.gz"),
+                  c("foo.tgza", "bar.txt", "foobar.zip", "foobar.txt")),
+    c(FALSE, FALSE, TRUE, FALSE))
+
+  expect_identical(
+    glob$test_any(c("*.tgz", "*.zip", "*.tar.gz"), character()), logical())
+
+  expect_identical(
+    glob$test_any(character(), c("foo", "bar")), c(FALSE, FALSE))
+
+  expect_identical(
+    glob$test_any(character(), character()), logical())
+})

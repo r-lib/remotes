@@ -55,11 +55,21 @@ glob <- local({
     grepl(re, paths)
   }
 
+  test_any <- function(globs, paths) {
+    if (!length(paths)) return(logical())
+    res <- vapply(globs, to_regex, character(1))
+    m <- matrix(
+      as.logical(unlist(lapply(res, grepl, x = paths))),
+      nrow = length(paths))
+    apply(m, 1, any)
+  }
+
   structure(
     list(
       .internal = environment(),
       to_regex = to_regex,
-      test = test
+      test = test,
+      test_any = test_any
     ),
     class = c("standalone_glob", "standalone")
   )
