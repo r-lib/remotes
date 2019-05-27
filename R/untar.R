@@ -1,11 +1,14 @@
 
-# ## Advantages to `utils::untar()`
+# ## Features
+#
+# TODO
+#
+# ## Advantages over `utils::untar()`
 #
 # TODO
 #
 # ## Roadmap
 #
-# - extract subset of files or --exclude and --include
 # - check extracting to symlinks to avoid overwriting files
 # - autodetect zip, bzip2 and xz compressed files
 # - autodetect compressed connections (hard)
@@ -27,7 +30,10 @@ s1_untar <- local({
 
   # -- HEADER -------------------------------------------------------------
 
+  # These are other standalone files. They happen to be before us in the
+  # collate order...
   buffer <- buffer
+  glob <- glob
 
   headers <- local({
 
@@ -106,7 +112,7 @@ s1_untar <- local({
       entries <- strsplit(rawToChar(buf), "\n", fixed = TRUE)[[1]]
       recs <- strsplit(entries, "=", fixed = TRUE)
       structure(
-        names = sub("^[^ ]+ ", "", map_str(recs, "[[", 1)),
+        names = sub("^[^ ]+ ", "", map_chr(recs, "[[", 1)),
         lapply(recs, "[[", 2))
     }
 
@@ -251,6 +257,19 @@ s1_untar <- local({
     )
   }
 
+  any_matches <- function(patterns, x) {
+    m <- matrix(
+      as.logical(unlist(lapply(patterns, grepl, x = x))),
+      nrow = length(x))
+    apply(m, 1, any)
+  }
+
+  all_dirnames <- function(path) {
+    pos <- gregexpr("/", path, fixed = TRUE)[[1L]] - 1L
+    px <- substring(path, 1, pos)
+    px[px != ""]
+  }
+
   process_next_entry <- function(self) {
     buffer <- self$parser$read(512L, error = "partial-nonempty")
     if (!length(buffer)) return(FALSE)
@@ -299,6 +318,15 @@ s1_untar <- local({
       self$pax <- NULL
     }
 
+    if (!is.null(self$patterns)) {
+      names <- c(all_dirnames(header$name), header$name)
+      if (!any(any_matches(self$patterns, names))) {
+        of <- overflow(header$size)
+        self$parser$skip(header$size + of)
+        return(TRUE)
+      }
+    }
+
     self$next_item <- self$next_item + 1L
     self$items[[as.character(self$next_item)]] <- header
 
@@ -345,20 +373,20 @@ s1_untar <- local({
     items <- unname(mget(as.character(seq_len(num)), items))
     data.frame(
       stringsAsFactors = FALSE,
-      filename = map_str(items, "[[", "name"),
+      filename = map_chr(items, "[[", "name"),
       size = map_int(items, "[[", "size"),
       mtime = .POSIXct(vapply(items, "[[", .POSIXct(1), "mtime")),
       permissions = I(as.octmode(map_int(items, "[[", "mode"))),
-      type = map_str(items, "[[", "type"),
+      type = map_chr(items, "[[", "type"),
       uid = map_int(items, "[[", "uid"),
       gid = map_int(items, "[[", "gid"),
-      uname = map_str(items, "[[", "uname"),
-      gname = map_str(items, "[[", "gname"),
+      uname = map_chr(items, "[[", "uname"),
+      gname = map_chr(items, "[[", "gname"),
       extra = I(lapply(items, function(x) as.list(x$pax)))
     )
   }
 
-  map_str <- function (X, FUN, ...) {
+  map_chr <- function (X, FUN, ...) {
     vapply(X, FUN, FUN.VALUE = character(1), ...)
   }
 
@@ -366,7 +394,7 @@ s1_untar <- local({
     vapply(X, FUN, FUN.VALUE = integer(1), ...)
   }
 
-  process_file <- function(self, tarfile, options) {
+  process_file <- function(self, tarfile, patterns, options) {
     filesize <- NA_integer_
 
     if (!inherits(tarfile, "connection")) {
@@ -377,6 +405,9 @@ s1_untar <- local({
 
     chunk_size <- min(filesize, 1024L * 1024L * 256L, na.rm = TRUE)
 
+    if (!is.null(patterns)) {
+      self$patterns <- map_chr(patterns, glob$to_regex)
+    }
     self$opts <- options
     self$parser <- buffer$buffer(tarfile, chunk_size)
     self$items <- new.env(parent = emptyenv(), size = 5939)
@@ -407,18 +438,19 @@ s1_untar <- local({
     make_result_df(self$items, self$next_item)
   }
 
-  extract <- function(tarfile, exdir = ".",
+  extract <- function(tarfile, exdir = ".", patterns = NULL,
                       options = list(filename_encoding = "")) {
     self <- new.env(parent = emptyenv())
     self$mode <- "extract"
     self$exdir <- exdir
-    process_file(self, tarfile, options)
+    process_file(self, tarfile, patterns, options)
   }
 
-  listx <- function(tarfile, options = list(filename_encoding = "")) {
+  listx <- function(tarfile, patterns = NULL,
+                    options = list(filename_encoding = "")) {
     self <- new.env(parent = emptyenv())
     self$mode <- "list"
-    process_file(self, tarfile, options)
+    process_file(self, tarfile, patterns, options)
   }
 
   # -- EXPORTED API -------------------------------------------------------

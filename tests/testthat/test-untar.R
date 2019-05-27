@@ -400,3 +400,38 @@ test_that("mode is restored", {
   expect_identical(file.info(file.path(tmp, "test", "test-2.txt"))$mode,
                    as.octmode("640"))
 })
+
+test_that("patterns", {
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "deep.tar"),
+                  pattern = "test/a/a1/f1")$filename,
+    "test/a/a1/f1")
+
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "deep.tar"),
+                  pattern = "test/a/a1")$filename,
+    c("test/a/a1/", "test/a/a1/f1", "test/a/a1/f2"))
+})
+
+test_that("multiple patterns", {
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "deep.tar"),
+                  pattern = c("test/a/a1", "test/b/b1/*"))$filename,
+    c("test/b/b1/", "test/b/b1/f5", "test/a/a1/", "test/a/a1/f1",
+      "test/a/a1/f2"))
+})
+
+test_that("patterns without match", {
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "deep.tar"),
+                  pattern = "test/x")$filename,
+    character())
+})
+
+test_that("pattern matching subdirectory", {
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "deep.tar"),
+                  pattern = "*/a1")$filename,
+    c("test/b/a1/", "test/b/a1/f7", "test/a/a1/", "test/a/a1/f1",
+      "test/a/a1/f2"))
+})
