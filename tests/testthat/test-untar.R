@@ -381,6 +381,17 @@ test_that("safe paths", {
   for (g in good) expect_error(fun(g), NA, info = g)
 })
 
+test_that("safe paths 2", {
+
+  l <- s1_untar$list(test_path("fixtures", "untar", "evil.tar"))
+  expect_identical(l$filename, c("sub/", "sub/foo", "../foobar"))
+
+  tmp <- test_temp_dir()
+  expect_error(
+    s1_untar$extract(test_path("fixtures", "untar", "evil.tar"), tmp),
+    "Invalid path")
+})
+
 test_that("mtime is restored", {
   ## Files
   tmp <- test_temp_dir()
