@@ -19,12 +19,11 @@ buffer <- local({
 
     ## Read out the full cache
     read_cache <- function(num_bytes) {
-      ret <- readBin(cache_con, "raw", num_bytes)
-      if (length(ret) < num_bytes) close(cache_con)
-      ret
+      readBin(cache_con, "raw", num_bytes)
     }
 
     set_cache <- function(buf) {
+      base::close(cache_con)
       cache_con <<- rawConnection(buf)
     }
 
@@ -70,7 +69,7 @@ buffer <- local({
           ocon <- path
         } else {
           ocon <- file(path, open = "wb")
-          on.exit(close(ocon), add = TRUE)
+          on.exit(base::close(ocon), add = TRUE)
         }
 
         data <- read_cache(size)
@@ -89,7 +88,8 @@ buffer <- local({
       },
 
       close = function() {
-        tryCatch(close(cache_con), error = function(e) NULL)
+        try(base::close(cache_con), silent = TRUE)
+        try(base::close(con), silent = TRUE)
       }
     )
   }

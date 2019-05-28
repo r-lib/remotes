@@ -364,7 +364,7 @@ test_that("incomplete", {
 })
 
 test_that("compressed file", {
-  on.exit(try(close(f)))
+  on.exit(try(close(f), silent = TRUE), add = TRUE)
   f <- gzfile(test_path("fixtures", "untar", "invalid.tgz"), open = "rb")
   expect_error(s1_untar$list(f), NA)
 

@@ -408,6 +408,7 @@ s1_untar <- local({
     }
     self$opts <- options
     self$parser <- buffer$buffer(tarfile, chunk_size)
+    on.exit(self$parser$close(), add = TRUE)
     self$items <- new.env(parent = emptyenv(), size = 5939)
     self$next_item <- 0L
 
@@ -421,7 +422,6 @@ s1_untar <- local({
         stop(e)
       },
       error = function(e) {
-        self$parser$close()
         if (!is.null(self$extracting)) {
           tryCatch(unlink(self$extracting), error = function(e) NULL)
         }
