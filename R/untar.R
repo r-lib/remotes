@@ -1,11 +1,29 @@
 
-# ## Features
-#
-# TODO
-#
 # ## Advantages over `utils::untar()`
 #
-# TODO
+# - Typically 2-3 times faster.
+# - `list()` and `extract()` both return a data frame with data about the
+#   contents, including all pax data.
+# - Errors if file would be extracted outside of the target directory.
+# - Creates junction points for symbolic links on Windows.
+# - It does not leave incomplete files around if interrupted or if the tar
+#   file is imcomplete.
+# - Defaults to UTF-8 encoding of filenames and pax metadata, but supports
+#   other encodings as well, is they are specified explicitly.
+# - Supports (extended) glob patterns instead of regular expressions, to
+#   specify files and directories to extract.
+# - Supports large files.
+# - Supports global pax headers.
+#
+# ## Disadvantages compared to `utils::untar()`
+#
+# - `utils::untar()` tries to create copies if links don't work on Windows.
+# - `utils::untar()` supports uncompression directly.
+# - `utils::untar()` has an option to avoid restoring mtime.
+#
+# ## NEWS
+#
+# ### 2019-05-28 First version
 #
 # ## Roadmap
 #
