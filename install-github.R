@@ -4902,12 +4902,12 @@ function(...) {
         decode_str(buf, 0, length(buf), encoding)
       }
   
-      decode_pax <- function(buf) {
+      decode_pax <- function(buf, encoding) {
         entries <- strsplit(rawToChar(buf), "\n", fixed = TRUE)[[1]]
         recs <- strsplit(entries, "=", fixed = TRUE)
         structure(
           names = sub("^[^ ]+ ", "", map_chr(recs, "[[", 1)),
-          lapply(recs, "[[", 2))
+          lapply(lapply(recs, "[[", 2), `Encoding<-`, encoding))
       }
   
       nchar_bytes <- function(x) {
@@ -5023,18 +5023,21 @@ function(...) {
       set_file_metadata(path, header)
     }
   
+    if (.Platform$OS.type != "windows") Sys.junction <- function(...) stop()
+  
     safe_symlink <- function(dir, header) {
       check_safe_path(header$name)
-      file.symlink(header$linkname, path <- file.path(dir, header$name))
+      link <- if (.Platform$OS.type == "windows") Sys.junction else file.symlink
+      link(file.path(dir, header$linkname), path <- file.path(dir, header$name))
       set_file_metadata(path, header)
     }
   
     process_pax_global_header <- function(self, buffer) {
-      self$pax_global <- headers$decode_pax(buffer)
+      self$pax_global <- headers$decode_pax(buffer, self$opts$filename_encoding)
     }
   
     process_pax_header <- function(self, buffer) {
-      pax <- headers$decode_pax(buffer)
+      pax <- headers$decode_pax(buffer, self$opts$filename_encoding)
       self$pax <- modifyList(as.list(self$pax_global), pax)
     }
   
@@ -5233,7 +5236,7 @@ function(...) {
     }
   
     extract <- function(tarfile, exdir = ".", patterns = NULL,
-                        options = list(filename_encoding = "")) {
+                        options = list(filename_encoding = "UTF-8")) {
       self <- new.env(parent = emptyenv())
       self$mode <- "extract"
       self$exdir <- exdir
@@ -5241,7 +5244,7 @@ function(...) {
     }
   
     listx <- function(tarfile, patterns = NULL,
-                      options = list(filename_encoding = "")) {
+                      options = list(filename_encoding = "UTF-8")) {
       self <- new.env(parent = emptyenv())
       self$mode <- "list"
       process_file(self, tarfile, patterns, options)
