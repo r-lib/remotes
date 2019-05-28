@@ -1,6 +1,16 @@
 
 context("untar")
 
+read_junction_point <- function(path) {
+  target <- tryCatch({
+    out <- processx::run("fsutil", c("reparsepoint", "query", path))$stdout
+    outlines <- strsplit(out, "\r?\n")[[1]]
+    name <- grep("^Substitute Name:", outlines, value = TRUE)[1]
+    sub("^Substitute Name:[ ]*", "", name)
+  }, error = function(e) NA_character_)
+  as.character(target)
+}
+
 test_that("untar is standalone", {
   ## baseenv() makes sure that the remotes package env is not used
   env <- new.env(parent = baseenv())
@@ -141,7 +151,13 @@ test_that("types", {
   expect_true(file.exists(file.path(tmp, "directory")))
   expect_true(file.exists(file.path(tmp, "directory-link")))
   expect_true(file.info(file.path(tmp, "directory"))$isdir)
-  expect_equal(Sys.readlink(file.path(tmp, "directory-link")), "directory")
+  if (.Platform$OS.type == "windows" && nzchar(Sys.which("fsutil"))) {
+    expect_equal(
+      basename(read_junction_point(file.path(tmp, "directory-link"))),
+      "directory")
+  } else {
+    expect_equal(Sys.readlink(file.path(tmp, "directory-link")), "directory")
+  }
 })
 
 test_that("long-name", {
@@ -252,8 +268,9 @@ test_that("unicode", {
 
   expect_true(file.exists(tmp))
   expect_true(file.exists(file.path(tmp, "h\u00f8st\u00e5l.txt")))
-  expect_equal(readChar(file.path(tmp, "h\u00f8st\u00e5l.txt"), 100),
-               "h\u00f8ll\u00f8\n")
+  cnt <- readChar(file.path(tmp, "h\u00f8st\u00e5l.txt"), 100, useBytes = TRUE)
+  Encoding(cnt) <- "UTF-8"
+  expect_equal(cnt, "h\u00f8ll\u00f8\n")
 })
 
 test_that("invalid file", {
@@ -387,6 +404,7 @@ test_that("mtime is restored", {
 })
 
 test_that("mode is restored", {
+  if (.Platform$OS.type == "windows") return(expect_true(TRUE))
   tmp <- test_temp_dir()
   s1_untar$extract(test_path("fixtures", "untar", "permissions.tar"), tmp)
 

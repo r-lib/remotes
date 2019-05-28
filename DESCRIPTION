@@ -34,6 +34,7 @@ Suggests:
     mockery,
     pkgbuild (>= 1.0.1),
     pingr,
+    processx,
     rmarkdown,
     rprojroot,
     testthat,
