@@ -231,7 +231,8 @@ s1_untar <- local({
 
   safe_symlink <- function(dir, header) {
     check_safe_path(header$name)
-    file.symlink(header$linkname, path <- file.path(dir, header$name))
+    link <- if (.Platform$OS.type == "windows") Sys.junction else file.symlink
+    link(file.path(dir, header$linkname), path <- file.path(dir, header$name))
     set_file_metadata(path, header)
   }
 
