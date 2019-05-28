@@ -379,12 +379,11 @@ function(...) {
   
       ## Read out the full cache
       read_cache <- function(num_bytes) {
-        ret <- readBin(cache_con, "raw", num_bytes)
-        if (length(ret) < num_bytes) close(cache_con)
-        ret
+        readBin(cache_con, "raw", num_bytes)
       }
   
       set_cache <- function(buf) {
+        base::close(cache_con)
         cache_con <<- rawConnection(buf)
       }
   
@@ -430,7 +429,7 @@ function(...) {
             ocon <- path
           } else {
             ocon <- file(path, open = "wb")
-            on.exit(close(ocon), add = TRUE)
+            on.exit(base::close(ocon), add = TRUE)
           }
   
           data <- read_cache(size)
@@ -449,7 +448,8 @@ function(...) {
         },
   
         close = function() {
-          tryCatch(close(cache_con), error = function(e) NULL)
+          try(base::close(cache_con), silent = TRUE)
+          try(base::close(con), silent = TRUE)
         }
       )
     }
@@ -5202,6 +5202,7 @@ function(...) {
       }
       self$opts <- options
       self$parser <- buffer$buffer(tarfile, chunk_size)
+      on.exit(self$parser$close(), add = TRUE)
       self$items <- new.env(parent = emptyenv(), size = 5939)
       self$next_item <- 0L
   
@@ -5215,12 +5216,12 @@ function(...) {
           stop(e)
         },
         error = function(e) {
-          self$parser$close()
           if (!is.null(self$extracting)) {
             tryCatch(unlink(self$extracting), error = function(e) NULL)
           }
           if (isTRUE(e$processed)) stop(e)
-          msg <- "Failed to decode tar data, maybe file is corrupt?"
+          msg <- paste("Failed to decode tar data, maybe file is corrupt?",
+                       conditionMessage(e))
           err <- structure(list(message = msg, parent = e),
                            class = c("simpleError", "error", "condition"))
           stop(err)
