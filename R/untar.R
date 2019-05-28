@@ -108,12 +108,12 @@ s1_untar <- local({
       decode_str(buf, 0, length(buf), encoding)
     }
 
-    decode_pax <- function(buf) {
+    decode_pax <- function(buf, encoding) {
       entries <- strsplit(rawToChar(buf), "\n", fixed = TRUE)[[1]]
       recs <- strsplit(entries, "=", fixed = TRUE)
       structure(
         names = sub("^[^ ]+ ", "", map_chr(recs, "[[", 1)),
-        lapply(recs, "[[", 2))
+        lapply(lapply(recs, "[[", 2), `Encoding<-`, encoding))
     }
 
     nchar_bytes <- function(x) {
@@ -236,11 +236,11 @@ s1_untar <- local({
   }
 
   process_pax_global_header <- function(self, buffer) {
-    self$pax_global <- headers$decode_pax(buffer)
+    self$pax_global <- headers$decode_pax(buffer, self$opts$filename_encoding)
   }
 
   process_pax_header <- function(self, buffer) {
-    pax <- headers$decode_pax(buffer)
+    pax <- headers$decode_pax(buffer, self$opts$filename_encoding)
     self$pax <- modifyList(as.list(self$pax_global), pax)
   }
 
