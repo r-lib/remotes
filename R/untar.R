@@ -426,7 +426,8 @@ s1_untar <- local({
           tryCatch(unlink(self$extracting), error = function(e) NULL)
         }
         if (isTRUE(e$processed)) stop(e)
-        msg <- "Failed to decode tar data, maybe file is corrupt?"
+        msg <- paste("Failed to decode tar data, maybe file is corrupt?",
+                     conditionMessage(e))
         err <- structure(list(message = msg, parent = e),
                          class = c("simpleError", "error", "condition"))
         stop(err)
