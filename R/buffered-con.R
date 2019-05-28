@@ -10,7 +10,7 @@ buffer <- local({
                 "condition")
     )
   }
-  
+
   ## Buffered read from binary file
   buffer <- function(con, buffer_size = 512L * 1024L * 16L) {
     force(con)

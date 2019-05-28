@@ -357,6 +357,111 @@ function(...) {
                                  bioc_ver = bioc_version(r_ver)) {
     bioconductor$get_repos(bioc_ver)
   }
+  # Contents of R/buffered-con.R
+  
+  # BUFFERED CONNECTION
+  
+  buffer <- local({
+  
+    incomplete_file_error <- function() {
+      structure(
+        list(message = "Unexpected end of file/connection"),
+        class = c("incomplete_file_error", "simpleError", "error",
+                  "condition")
+      )
+    }
+  
+    ## Buffered read from binary file
+    buffer <- function(con, buffer_size = 512L * 1024L * 16L) {
+      force(con)
+      chunk_size <- buffer_size
+      cache_con <- rawConnection(readBin(con, "raw", buffer_size))
+  
+      ## Read out the full cache
+      read_cache <- function(num_bytes) {
+        ret <- readBin(cache_con, "raw", num_bytes)
+        if (length(ret) < num_bytes) close(cache_con)
+        ret
+      }
+  
+      set_cache <- function(buf) {
+        cache_con <<- rawConnection(buf)
+      }
+  
+      err <- function(len, size, error) {
+        if ((len < size && isTRUE(error)) ||
+            (len < size && len != 0 &&
+             identical(error, "partial-nonempty"))) {
+          stop(incomplete_file_error())
+        }
+      }
+  
+      list(
+        read = function(size, error = TRUE) {
+          data <- read_cache(size)
+          while (length(data) < size) {
+            new <- readBin(con, "raw", n = chunk_size)
+            if (!length(new)) break
+            data <- c(data, new)
+          }
+          if (length(data) > size) set_cache(data[(size+1):length(data)])
+          ret <- head(data, size)
+          err(length(ret), size, error)
+          ret
+        },
+  
+        skip = function(size, error = TRUE) {
+          if (size == 0) return(0)
+          data <- read_cache(size)
+          skipped <- length(data)
+          while (skipped < size) {
+            data <- readBin(con, "raw", n = chunk_size)
+            if (!length(data)) break
+            skipped <- skipped + length(data)
+          }
+          if (skipped > size) set_cache(data[(length(data)-skipped+size+1L):length(data)])
+          ret <- min(size, skipped)
+          err(ret, size, error)
+          ret
+        },
+  
+        write_to = function(size, path, error = TRUE) {
+          if (inherits(path, "connection")) {
+            ocon <- path
+          } else {
+            ocon <- file(path, open = "wb")
+            on.exit(close(ocon), add = TRUE)
+          }
+  
+          data <- read_cache(size)
+          writeBin(data, ocon)
+          written <- length(data)
+          while (written < size) {
+            data <- readBin(con, "raw", n = chunk_size)
+            if (!length(data)) break
+            towrite <- min(size - written, length(data))
+            writeBin(head(data, towrite), ocon)
+            if (towrite < length(data)) set_cache(data[(towrite+1):length(data)])
+            written <- written + towrite
+          }
+          err(written, size, error)
+          written
+        },
+  
+        close = function() {
+          tryCatch(close(cache_con), error = function(e) NULL)
+        }
+      )
+    }
+  
+    structure(
+      list(
+        .internal = environment(),
+        buffer = buffer
+      ),
+      class = c("standalone_buffer", "standalone")
+    )
+  })
   # Contents of R/circular.R
   
   ## A environment to hold which packages are being installed so packages
@@ -1722,6 +1827,83 @@ function(...) {
   #>
   #>   Rate limit remaining: 4999
   #>   Rate limit reset at: 2018-10-10 19:43:52 UTC
+  # Contents of R/glob.R
+  
+  glob <- local({
+  
+    to_regex <- function(glob) {
+      restr <- new.env(parent = emptyenv(), size = 1003)
+      idx <- 0L
+      chr <- strsplit(glob, "", fixed = TRUE)[[1]]
+      in_group <- FALSE
+  
+      for (c in chr) {
+        if (c %in% c("/", "$", "^", "+", ".", "(", ")", "=", "!", "|")) {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- paste0("\\", c)
+  
+        } else if (c == "?") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- "."
+  
+        } else if (c == "[" || c == "]") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- c
+  
+        } else if (c == "{") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- "("
+          in_group <- TRUE
+  
+        } else if (c == "}") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- ")"
+          in_group <- FALSE
+  
+        } else if (c ==",") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- if (in_group) "|" else paste0("\\", c)
+  
+        } else if (c == "*") {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- ".*"
+  
+        } else {
+          idx <- idx + 1L
+          restr[[as.character(idx)]] <- c
+        }
+      }
+  
+      paste0(
+        "^",
+        paste(mget(as.character(seq_len(idx)), restr), collapse = ""),
+        "$")
+    }
+  
+    test <- function(glob, paths) {
+      re <- to_regex(glob)
+      grepl(re, paths)
+    }
+  
+    test_any <- function(globs, paths) {
+      if (!length(paths)) return(logical())
+      res <- vapply(globs, to_regex, character(1))
+      m <- matrix(
+        as.logical(unlist(lapply(res, grepl, x = paths))),
+        nrow = length(paths))
+      apply(m, 1, any)
+    }
+  
+    structure(
+      list(
+        .internal = environment(),
+        to_regex = to_regex,
+        test = test,
+        test_any = test_any
+      ),
+      class = c("standalone_glob", "standalone")
+    )
+  })
   # Contents of R/install-bioc.R
   #' Install a development package from the Bioconductor git repository
   #'
@@ -4611,120 +4793,41 @@ function(...) {
   }
   # Contents of R/untar.R
   
-  # TODO:
-  # - extract subset of files
+  # ## Features
+  #
+  # TODO
+  #
+  # ## Advantages over `utils::untar()`
+  #
+  # TODO
+  #
+  # ## Roadmap
+  #
+  # - check extracting to symlinks to avoid overwriting files
+  # - autodetect zip, bzip2 and xz compressed files
+  # - autodetect compressed connections (hard)
+  # - remap file names to appropriate encoding
+  # - extract into memory
+  # - handle resource forks on macOS
   # - hard links
+  # - better behavior of links on Windows
   # - device files
   # - restore atime, ctime?
-  # - devices?
+  # - -k, do not overwrite files
+  # - --keep-newer-files, do not overwrite files that are newer
+  # - -m do not extract modification time
+  # - -p preserve file permissions
+  # - -o use the user and group of the user running the program
+  # - --strip-components
   
   s1_untar <- local({
   
-    incomplete_file_error <- function() {
-      structure(
-        list(message = "Unexpected end of tar data"),
-        class = c("incomplete_file_error", "simpleError", "error",
-                  "condition")
-      )
-    }
-  
-    # -- BUFFERED CONNECTION
-  
-    buffer <- local({
-  
-      ## Buffered read from binary file
-      buffer <- function(con, buffer_size = 512L * 1024L * 16L) {
-        force(con)
-        chunk_size <- buffer_size
-        cache_con <- rawConnection(readBin(con, "raw", buffer_size))
-  
-        ## Read out the full cache
-        read_cache <- function(num_bytes) {
-          ret <- readBin(cache_con, "raw", num_bytes)
-          if (length(ret) < num_bytes) close(cache_con)
-          ret
-        }
-  
-        set_cache <- function(buf) {
-          cache_con <<- rawConnection(buf)
-        }
-  
-        err <- function(len, size, error) {
-          if ((len < size && isTRUE(error)) ||
-              (len < size && len != 0 &&
-               identical(error, "partial-nonempty"))) {
-            stop(incomplete_file_error())
-          }
-        }
-  
-        list(
-          read = function(size, error = TRUE) {
-            data <- read_cache(size)
-            while (length(data) < size) {
-              new <- readBin(con, "raw", n = chunk_size)
-              if (!length(new)) break
-              data <- c(data, new)
-            }
-            if (length(data) > size) set_cache(data[(size+1):length(data)])
-            ret <- head(data, size)
-            err(length(ret), size, error)
-            ret
-          },
-  
-          skip = function(size, error = TRUE) {
-            if (size == 0) return(0)
-            data <- read_cache(size)
-            skipped <- length(data)
-            while (skipped < size) {
-              data <- readBin(con, "raw", n = chunk_size)
-              if (!length(data)) break
-              skipped <- skipped + length(data)
-            }
-            if (skipped > size) set_cache(data[(length(data)-skipped+size+1L):length(data)])
-            ret <- min(size, skipped)
-            err(ret, size, error)
-            ret
-          },
-  
-          write_to = function(size, path, error = TRUE) {
-            if (inherits(path, "connection")) {
-              ocon <- path
-            } else {
-              ocon <- file(path, open = "wb")
-              on.exit(close(ocon), add = TRUE)
-            }
-  
-            data <- read_cache(size)
-            writeBin(data, ocon)
-            written <- length(data)
-            while (written < size) {
-              data <- readBin(con, "raw", n = chunk_size)
-              if (!length(data)) break
-              towrite <- min(size - written, length(data))
-              writeBin(head(data, towrite), ocon)
-              if (towrite < length(data)) set_cache(data[(towrite+1):length(data)])
-              written <- written + towrite
-            }
-            err(written, size, error)
-            written
-          },
-  
-          close = function() {
-            tryCatch(close(cache_con), error = function(e) NULL)
-          }
-        )
-      }
-  
-      structure(
-        list(
-          .internal = environment(),
-          buffer = buffer
-        ),
-        class = c("standalone_buffer", "standalone")
-      )
-    })
-  
     # -- HEADER -------------------------------------------------------------
+  
+    # These are other standalone files. They happen to be before us in the
+    # collate order...
+    buffer <- buffer
+    glob <- glob
   
     headers <- local({
   
@@ -4803,7 +4906,7 @@ function(...) {
         entries <- strsplit(rawToChar(buf), "\n", fixed = TRUE)[[1]]
         recs <- strsplit(entries, "=", fixed = TRUE)
         structure(
-          names = sub("^[^ ]+ ", "", map_str(recs, "[[", 1)),
+          names = sub("^[^ ]+ ", "", map_chr(recs, "[[", 1)),
           lapply(recs, "[[", 2))
       }
   
@@ -4940,6 +5043,27 @@ function(...) {
         headers$decode_long_path(buffer, self$opts$filename_encoding)
     }
   
+    incomplete_file_error <- function() {
+      structure(
+        list(message = "Unexpected end of file/connection"),
+        class = c("incomplete_file_error", "simpleError", "error",
+                  "condition")
+      )
+    }
+  
+    any_matches <- function(patterns, x) {
+      m <- matrix(
+        as.logical(unlist(lapply(patterns, grepl, x = x))),
+        nrow = length(x))
+      apply(m, 1, any)
+    }
+  
+    all_dirnames <- function(path) {
+      pos <- gregexpr("/", path, fixed = TRUE)[[1L]] - 1L
+      px <- substring(path, 1, pos)
+      px[px != ""]
+    }
+  
     process_next_entry <- function(self) {
       buffer <- self$parser$read(512L, error = "partial-nonempty")
       if (!length(buffer)) return(FALSE)
@@ -4988,6 +5112,15 @@ function(...) {
         self$pax <- NULL
       }
   
+      if (!is.null(self$patterns)) {
+        names <- c(all_dirnames(header$name), header$name)
+        if (!any(any_matches(self$patterns, names))) {
+          of <- overflow(header$size)
+          self$parser$skip(header$size + of)
+          return(TRUE)
+        }
+      }
+  
       self$next_item <- self$next_item + 1L
       self$items[[as.character(self$next_item)]] <- header
   
@@ -5034,20 +5167,20 @@ function(...) {
       items <- unname(mget(as.character(seq_len(num)), items))
       data.frame(
         stringsAsFactors = FALSE,
-        filename = map_str(items, "[[", "name"),
+        filename = map_chr(items, "[[", "name"),
         size = map_int(items, "[[", "size"),
         mtime = .POSIXct(vapply(items, "[[", .POSIXct(1), "mtime")),
         permissions = I(as.octmode(map_int(items, "[[", "mode"))),
-        type = map_str(items, "[[", "type"),
+        type = map_chr(items, "[[", "type"),
         uid = map_int(items, "[[", "uid"),
         gid = map_int(items, "[[", "gid"),
-        uname = map_str(items, "[[", "uname"),
-        gname = map_str(items, "[[", "gname"),
+        uname = map_chr(items, "[[", "uname"),
+        gname = map_chr(items, "[[", "gname"),
         extra = I(lapply(items, function(x) as.list(x$pax)))
       )
     }
   
-    map_str <- function (X, FUN, ...) {
+    map_chr <- function (X, FUN, ...) {
       vapply(X, FUN, FUN.VALUE = character(1), ...)
     }
   
@@ -5055,7 +5188,7 @@ function(...) {
       vapply(X, FUN, FUN.VALUE = integer(1), ...)
     }
   
-    process_file <- function(self, tarfile, options) {
+    process_file <- function(self, tarfile, patterns, options) {
       filesize <- NA_integer_
   
       if (!inherits(tarfile, "connection")) {
@@ -5066,6 +5199,9 @@ function(...) {
   
       chunk_size <- min(filesize, 1024L * 1024L * 256L, na.rm = TRUE)
   
+      if (!is.null(patterns)) {
+        self$patterns <- map_chr(patterns, glob$to_regex)
+      }
       self$opts <- options
       self$parser <- buffer$buffer(tarfile, chunk_size)
       self$items <- new.env(parent = emptyenv(), size = 5939)
@@ -5076,6 +5212,7 @@ function(...) {
           if (!process_next_entry(self)) break
         },
         incomplete_file_error = function(e) {
+          e$message <- "Unexpected end of tar data file/connection"
           e$processed <- TRUE
           stop(e)
         },
@@ -5095,18 +5232,19 @@ function(...) {
       make_result_df(self$items, self$next_item)
     }
   
-    extract <- function(tarfile, exdir = ".",
+    extract <- function(tarfile, exdir = ".", patterns = NULL,
                         options = list(filename_encoding = "")) {
       self <- new.env(parent = emptyenv())
       self$mode <- "extract"
       self$exdir <- exdir
-      process_file(self, tarfile, options)
+      process_file(self, tarfile, patterns, options)
     }
   
-    listx <- function(tarfile, options = list(filename_encoding = "")) {
+    listx <- function(tarfile, patterns = NULL,
+                      options = list(filename_encoding = "")) {
       self <- new.env(parent = emptyenv())
       self$mode <- "list"
-      process_file(self, tarfile, options)
+      process_file(self, tarfile, patterns, options)
     }
   
     # -- EXPORTED API -------------------------------------------------------
