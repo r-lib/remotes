@@ -156,7 +156,8 @@ test_that("types", {
       basename(read_junction_point(file.path(tmp, "directory-link"))),
       "directory")
   } else {
-    expect_equal(Sys.readlink(file.path(tmp, "directory-link")), "directory")
+    expect_equal(basename(Sys.readlink(file.path(tmp, "directory-link"))),
+                 "directory")
   }
 })
 
