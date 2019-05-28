@@ -4,6 +4,9 @@
 
 # remotes (development version)
 
+* Fix bug in internal `parse_deps()` where test of valid comparison operators
+failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
+
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
   rather than a global type attribute, fixing errors when this global attribute
   is lost (#291, #304).
