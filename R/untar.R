@@ -439,7 +439,7 @@ s1_untar <- local({
   }
 
   extract <- function(tarfile, exdir = ".", patterns = NULL,
-                      options = list(filename_encoding = "")) {
+                      options = list(filename_encoding = "UTF-8")) {
     self <- new.env(parent = emptyenv())
     self$mode <- "extract"
     self$exdir <- exdir
@@ -447,7 +447,7 @@ s1_untar <- local({
   }
 
   listx <- function(tarfile, patterns = NULL,
-                    options = list(filename_encoding = "")) {
+                    options = list(filename_encoding = "UTF-8")) {
     self <- new.env(parent = emptyenv())
     self$mode <- "list"
     process_file(self, tarfile, patterns, options)
