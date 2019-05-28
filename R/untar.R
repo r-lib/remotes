@@ -12,7 +12,6 @@
 # - check extracting to symlinks to avoid overwriting files
 # - autodetect zip, bzip2 and xz compressed files
 # - autodetect compressed connections (hard)
-# - remap file names to appropriate encoding
 # - extract into memory
 # - handle resource forks on macOS
 # - hard links
@@ -23,7 +22,6 @@
 # - --keep-newer-files, do not overwrite files that are newer
 # - -m do not extract modification time
 # - -p preserve file permissions
-# - -o use the user and group of the user running the program
 # - --strip-components
 
 s1_untar <- local({
@@ -37,10 +35,7 @@ s1_untar <- local({
 
   headers <- local({
 
-    ZEROS <- "0000000000000000000"
-    SEVENS <- "7777777777777777777"
     ZERO_OFFSET <- as.integer(charToRaw("0"))
-    EQUALS <- as.integer(charToRaw("="))
 
     to_type <- function(flag) {
       switch(
