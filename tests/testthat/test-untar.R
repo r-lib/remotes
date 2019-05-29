@@ -505,3 +505,21 @@ test_that("do not overwrite", {
                      option = list())$filename)
   expect_equal(readLines(file.path(tmp, "test.txt")), "second")
 })
+
+test_that("limit option", {
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "multi-file.tar"),
+                  options = list(limit = 0))$filename,
+    character())
+
+  expect_identical(
+    s1_untar$list(test_path("fixtures", "untar", "multi-file.tar"),
+                  options = list(limit = 1))$filename,
+    "file-1.txt")
+
+  tmp <- test_temp_dir()
+  expect_identical(
+    s1_untar$extract(test_path("fixtures", "untar", "multi-file.tar"),
+                     tmp, options = list(limit = 1))$filename,
+    "file-1.txt")
+})

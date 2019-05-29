@@ -15,6 +15,8 @@
 # - Supports large files.
 # - Supports global pax headers.
 # - Has `overwrite = FALSE` option.
+# - Has a `limit` option to look at or extarct the first couple of
+#   files (that match a glob pattern).
 #
 # ## Disadvantages compared to `utils::untar()`
 #
@@ -287,6 +289,8 @@ s1_untar <- local({
   }
 
   process_next_entry <- function(self) {
+    if (self$next_item == self$opts$limit) return(FALSE)
+
     buffer <- self$parser$read(512L, error = "partial-nonempty")
     if (!length(buffer)) return(FALSE)
     if (length(buffer) < 512L) stop(incomplete_file_error())
@@ -435,6 +439,7 @@ s1_untar <- local({
     self$opts <- utils::modifyList(default_options(), options)
     self$parser <- buffer$buffer(tarfile, chunk_size)
     on.exit(self$parser$close(), add = TRUE)
+
     self$items <- new.env(parent = emptyenv(), size = 5939)
     self$next_item <- 0L
 
@@ -480,7 +485,8 @@ s1_untar <- local({
   default_options <- function() {
     list(
       filename_encoding = "UTF-8",
-      overwrite = TRUE
+      overwrite = TRUE,
+      limit = Inf
     )
   }
 

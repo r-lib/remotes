@@ -4808,6 +4808,9 @@ function(...) {
   #   specify files and directories to extract.
   # - Supports large files.
   # - Supports global pax headers.
+  # - Has `overwrite = FALSE` option.
+  # - Has a `limit` option to look at or extarct the first couple of
+  #   files (that match a glob pattern).
   #
   # ## Disadvantages compared to `utils::untar()`
   #
@@ -4817,7 +4820,7 @@ function(...) {
   #
   # ## NEWS
   #
-  # ### 2019-05-28 First version
+  # ### 2019-05-29 First version
   #
   # ## Roadmap
   #
@@ -5030,18 +5033,17 @@ function(...) {
       }
     }
   
-    safe_mkdirp <- function(dir, header) {
-      check_safe_path(header$name)
-      mkdirp(path <- file.path(dir, header$name))
+    do_mkdirp <- function(path, header) {
+      mkdirp(path)
       set_file_metadata(path, header)
     }
   
     if (.Platform$OS.type != "windows") Sys.junction <- function(...) stop()
   
-    safe_symlink <- function(dir, header) {
-      check_safe_path(header$name)
+    do_symlink <- function(path, header, exdir) {
+      mkdirp(dirname(path))
       link <- if (.Platform$OS.type == "windows") Sys.junction else file.symlink
-      link(file.path(dir, header$linkname), path <- file.path(dir, header$name))
+      link(file.path(exdir, header$linkname), path)
       set_file_metadata(path, header)
     }
   
@@ -5081,6 +5083,8 @@ function(...) {
     }
   
     process_next_entry <- function(self) {
+      if (self$next_item == self$opts$limit) return(FALSE)
+  
       buffer <- self$parser$read(512L, error = "partial-nonempty")
       if (!length(buffer)) return(FALSE)
       if (length(buffer) < 512L) stop(incomplete_file_error())
@@ -5128,44 +5132,52 @@ function(...) {
         self$pax <- NULL
       }
   
+      skip_this <- FALSE
+      skip_list <- FALSE
       if (!is.null(self$patterns)) {
         names <- c(all_dirnames(header$name), header$name)
         if (!any(any_matches(self$patterns, names))) {
-          of <- overflow(header$size)
-          self$parser$skip(header$size + of)
-          return(TRUE)
+          skip_this <- skip_list <- TRUE
         }
       }
   
-      self$next_item <- self$next_item + 1L
-      self$items[[as.character(self$next_item)]] <- header
+      if (!skip_list) {
+        self$next_item <- self$next_item + 1L
+        self$items[[as.character(self$next_item)]] <- header
+      }
+  
+      if (self$mode != "extract") {
+        skip_this <- TRUE
+      } else {
+        path <- file.path(self$exdir, header$name)
+        if (file.exists(path) && !self$opts$overwrite) {
+          skip_this <- TRUE
+          message("*Not* overwriting path `", header$name, "`")
+        }
+      }
+  
+      of <- overflow(header$size)
+      if (skip_this) {
+        self$parser$skip(header$size + of)
+        return(TRUE)
+      }
+  
+      ## We only do this here, so the path can be included in the list
+      check_safe_path(header$name)
   
       if (header$type == "symlink") {
-        of <- overflow(header$size)
-        if (self$mode == "extract") {
-          safe_symlink(self$exdir, header)
-          self$parser$skip(header$size + of)
-        } else {
-          self$parser$skip(header$size + of)
-        }
+        if (self$mode == "extract") do_symlink(path, header, self$exdir)
+        self$parser$skip(header$size + of)
         return(TRUE)
       }
   
       if (!header$size || header$type == "directory") {
-        of <- overflow(header$size)
-        if (self$mode == "extract") {
-          safe_mkdirp(self$exdir, header)
-          self$parser$skip(header$size + of)
-        } else {
-          self$parser$skip(header$size + of)
-        }
+        if (self$mode == "extract") do_mkdirp(path, header)
+        self$parser$skip(header$size + of)
         return(TRUE)
       }
   
-      of <- overflow(header$size)
       if (self$mode == "extract") {
-        check_safe_path(header$name)
-        path <- file.path(self$exdir, header$name)
         self$extracting <- path
         mkdirp(dirname(path))
         self$parser$write_to(header$size, path)
@@ -5218,9 +5230,10 @@ function(...) {
       if (!is.null(patterns)) {
         self$patterns <- map_chr(patterns, glob$to_regex)
       }
-      self$opts <- options
+      self$opts <- utils::modifyList(default_options(), options)
       self$parser <- buffer$buffer(tarfile, chunk_size)
       on.exit(self$parser$close(), add = TRUE)
+  
       self$items <- new.env(parent = emptyenv(), size = 5939)
       self$next_item <- 0L
   
@@ -5250,18 +5263,25 @@ function(...) {
     }
   
     extract <- function(tarfile, exdir = ".", patterns = NULL,
-                        options = list(filename_encoding = "UTF-8")) {
+                        options = list()) {
       self <- new.env(parent = emptyenv())
       self$mode <- "extract"
       self$exdir <- exdir
       process_file(self, tarfile, patterns, options)
     }
   
-    listx <- function(tarfile, patterns = NULL,
-                      options = list(filename_encoding = "UTF-8")) {
+    listx <- function(tarfile, patterns = NULL, options = list()) {
       self <- new.env(parent = emptyenv())
       self$mode <- "list"
       process_file(self, tarfile, patterns, options)
+    }
+  
+    default_options <- function() {
+      list(
+        filename_encoding = "UTF-8",
+        overwrite = TRUE,
+        limit = Inf
+      )
     }
   
     # -- EXPORTED API -------------------------------------------------------
@@ -5270,7 +5290,8 @@ function(...) {
       list(
         .internal = environment(),
         list = listx,
-        extract = extract
+        extract = extract,
+        default_options = default_options
       ),
       class = c("standalone_tar", "standalone")
     )
