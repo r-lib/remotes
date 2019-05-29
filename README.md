@@ -202,6 +202,8 @@ It also uses some remotes specific options:
 
 * `BioC_git` for the URL of the default Bioconductor git mirror.
 
+* `BioC_mirror` for the URL of the Bioconductor mirror.
+
 * `unzip` for the path of the external `unzip` program.
 
 ### Environment variables
@@ -212,6 +214,13 @@ It also uses some remotes specific options:
 
 * The `GITHUB_PAT` environment variable is used as the default GitHub
   personal access token for all GitHub API queries.
+
+* The `R_BIOC_MIRROR` environment variable can be used to specify an
+  alternative Bioconductor mirror. (The `BioC_mirror` option takes
+  precedence over this.)
+
+* The `R_BIOC_VERSION` environment variable can be used to force a
+  Bioconductor version.
 
 * The `R_REMOTES_UPGRADE` environment variable can be used to set a default
   preferred value for the `upgrade =` argument accepted by the various
