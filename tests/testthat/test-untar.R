@@ -465,3 +465,43 @@ test_that("pattern matching subdirectory", {
     c("test/b/a1/", "test/b/a1/f7", "test/a/a1/", "test/a/a1/f1",
       "test/a/a1/f2"))
 })
+
+test_that("do not overwrite", {
+  tmp <- test_temp_dir()
+  cat("orig\n", file = file.path(tmp, "test.txt"))
+
+  opts <- list(overwrite = FALSE)
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "one-file.tar"),
+                  options = opts)$filename,
+    "test.txt")
+
+  expect_message(
+    s1_untar$extract(test_path("fixtures", "untar", "one-file.tar"), tmp,
+                     option = opts)$filename,
+    "*Not* overwriting path", fixed = TRUE)
+
+  expect_equal(readLines(file.path(tmp, "test.txt")), "orig")
+
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "overwrite.tar"),
+                  options = opts)$filename,
+    c("test.txt", "test.txt"))
+
+  expect_equal(
+    s1_untar$list(test_path("fixtures", "untar", "overwrite.tar"))$filename,
+    c("test.txt", "test.txt"))
+
+  tmp <- test_temp_dir()
+  expect_message(
+    s1_untar$extract(test_path("fixtures", "untar", "overwrite.tar"), tmp,
+                     option = opts)$filename,
+    "*Not* overwriting path `test.txt`", fixed = TRUE)
+  expect_equal(readLines(file.path(tmp, "test.txt")), "first")
+
+  tmp <- test_temp_dir()
+  expect_silent(
+    s1_untar$extract(test_path("fixtures", "untar", "overwrite.tar"), tmp,
+                     option = list())$filename)
+  expect_equal(readLines(file.path(tmp, "test.txt")), "second")
+})
