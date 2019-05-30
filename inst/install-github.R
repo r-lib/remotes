@@ -3,7 +3,40 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  bioconductor <- local({
+  #' Tools for Bioconductor versions and repositories
+#'
+#' \section{API:}
+#'
+#' ```
+#' get_yaml_config(forget = FALSE)
+#' set_yaml_config(text)
+#'
+#' get_release_version(forget = FALSE)
+#' get_devel_version(forget = FALSE)
+#'
+#' get_version_map(forget = FALSE)
+#' get_matching_bioc_version(r_version = getRversion(), forget = FALSE)
+#' get_bioc_version(r_version = getRversion(), forget = FALSE)
+#'
+#' get_repos(bioc_version = "auto", forget = FALSE)
+#' ```
+#'
+#' * `forget`: Whether to forget the cached version of the Bioconductor
+#'   config YAML file and download it again.
+#' * 
+#' 
+#' 
+#' \section{NEWS:}
+#' * 2019-05-30 First version in remotes.
+#'
+#' 
+#' @name bioconductor
+#' @keywords internal
+#' @noRd
+NULL
+
+
+bioconductor <- local({
 
   # -------------------------------------------------------------------
   # Configuration that does not change often
@@ -105,7 +138,6 @@ function(...) {
       # append final version for 'devel' R
       bioc <- c(
         bioc, max(bioc)
-        # package_version(paste(unlist(max(bioc)) + 0:1, collapse = "."))
       )
       r <- c(r, package_version(paste(unlist(max(r)) + 0:1, collapse = ".")))
       status <- c(status, "future")
@@ -127,7 +159,7 @@ function(...) {
   get_matching_bioc_version <- function(r_version = getRversion(),
                                         forget = FALSE) {
 
-    minor <- get_minor_r_version(r_version)
+    minor <- as.character(get_minor_r_version(r_version))
     if (minor %in% names(builtin_map)) return(builtin_map[[minor]])
 
     # If we are not in the map, then we need to look this up in
@@ -199,9 +231,7 @@ function(...) {
   )
 
   get_minor_r_version <- function (x) {
-    x <- package_version(x)
-    vapply(unclass(x), function(x) paste(x[1:2], collapse = "."),
-           character(1))
+    package_version(x)[,1:2]
   }
 
   # -------------------------------------------------------------------
