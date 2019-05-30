@@ -1,3 +1,36 @@
+#' Tools for Bioconductor versions and repositories
+#'
+#' \section{API:}
+#'
+#' ```
+#' get_yaml_config(forget = FALSE)
+#' set_yaml_config(text)
+#'
+#' get_release_version(forget = FALSE)
+#' get_devel_version(forget = FALSE)
+#'
+#' get_version_map(forget = FALSE)
+#' get_matching_bioc_version(r_version = getRversion(), forget = FALSE)
+#' get_bioc_version(r_version = getRversion(), forget = FALSE)
+#'
+#' get_repos(bioc_version = "auto", forget = FALSE)
+#' ```
+#'
+#' * `forget`: Whether to forget the cached version of the Bioconductor
+#'   config YAML file and download it again.
+#' * 
+#' 
+#' 
+#' \section{NEWS:}
+#' * 2019-05-30 First version in remotes.
+#'
+#' 
+#' @name bioconductor
+#' @keywords internal
+#' @noRd
+NULL
+
+
 bioconductor <- local({
 
   # -------------------------------------------------------------------
