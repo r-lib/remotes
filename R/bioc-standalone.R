@@ -100,7 +100,6 @@ bioconductor <- local({
       # append final version for 'devel' R
       bioc <- c(
         bioc, max(bioc)
-        # package_version(paste(unlist(max(bioc)) + 0:1, collapse = "."))
       )
       r <- c(r, package_version(paste(unlist(max(r)) + 0:1, collapse = ".")))
       status <- c(status, "future")
