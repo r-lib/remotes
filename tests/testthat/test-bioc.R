@@ -57,7 +57,7 @@ test_that("set of repos are correct", {
   if (!getRversion()[, 1:2] %in% required) skip("Needs newer R version")
 
   my_repos <- bioconductor$get_repos(dev_ver)
-  bm_repos <- BiocManager::repositories(version = dev_ver)
+  bm_repos <- asNamespace("BiocManager")$repositories(version = dev_ver)
   bm_repos <- bm_repos[names(bm_repos) != "CRAN"]
   expect_equal(sort(names(my_repos)), sort(names(bm_repos)))
   expect_equal(my_repos, bm_repos[names(my_repos)])
