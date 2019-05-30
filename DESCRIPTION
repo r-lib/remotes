@@ -24,7 +24,6 @@ Imports:
     tools,
     utils
 Suggests:
-    BiocManager,
     brew,
     callr,
     codetools,

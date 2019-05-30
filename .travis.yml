@@ -7,6 +7,7 @@ latex: false
 install:
   - R CMD INSTALL .
   - R -e 'remotes::install_deps(dependencies = TRUE)'
+  - R -e 'if (getRversion() >= "3.5.0") install.packages("BiocManager")'
 
 matrix:
   include:
