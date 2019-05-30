@@ -18,7 +18,16 @@
 #'
 #' * `forget`: Whether to forget the cached version of the Bioconductor
 #'   config YAML file and download it again.
-#' * 
+#' * `text`: character vector (linewise) or scalar, the contents of the
+#'   `config.yaml` file, if obtained externally, to be used as a cached
+#'   version in the future.
+#' * `r_version`: R version string, or `package_version` object.
+#' * `bioc_version`: Bioc version string or `package_version` object,
+#'   or the string `"auto"` to use the one matching the current R version.
+#'
+#' `get_yaml_config()` returns the raw contents of the `config.yaml` file,
+#' linewise.
+#'
 #' 
 #' 
 #' \section{NEWS:}
@@ -75,10 +84,10 @@ bioconductor <- local({
 
   get_yaml_config <- function(forget = FALSE) {
     if (forget || is.null(yaml_config)) {
-      new <- tryCatch(readLines(config_url), error = function(x) x)
+      new <- tryCatch(read_url(config_url), error = function(x) x)
       if (inherits(new, "error")) {
         http_url <- sub("^https", "http", config_url)
-        new <- tryCatch(readLines(http_url), error = function(x) x)
+        new <- tryCatch(read_url(http_url), error = function(x) x)
       }
       if (inherits(new, "error")) stop(new)
       yaml_config <<- new
@@ -209,6 +218,16 @@ bioconductor <- local({
 
   # -------------------------------------------------------------------
   # Internals
+
+  read_url <- function(url) {
+    tmp <- tempfile()
+    on.exit(unlink(tmp), add = TRUE)
+    suppressWarnings(download.file(url, tmp, quiet = TRUE))
+    if (!file.exists(tmp) || file.info(tmp)$size == 0) {
+      stop("Failed to download `", url, "`")
+    }
+    readLines(tmp, warn = FALSE)
+  }
 
   .VERSION_SENTINEL <- local({
     version <- package_version(list())
