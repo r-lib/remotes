@@ -122,7 +122,7 @@ bioconductor <- local({
   get_matching_bioc_version <- function(r_version = getRversion(),
                                         forget = FALSE) {
 
-    minor <- get_minor_r_version(r_version)
+    minor <- as.character(get_minor_r_version(r_version))
     if (minor %in% names(builtin_map)) return(builtin_map[[minor]])
 
     # If we are not in the map, then we need to look this up in
@@ -194,9 +194,7 @@ bioconductor <- local({
   )
 
   get_minor_r_version <- function (x) {
-    x <- package_version(x)
-    vapply(unclass(x), function(x) paste(x[1:2], collapse = "."),
-           character(1))
+    package_version(x)[,1:2]
   }
 
   # -------------------------------------------------------------------
