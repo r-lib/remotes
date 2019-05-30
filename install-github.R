@@ -31,14 +31,46 @@ function(...) {
 #'   or the string `"auto"` to use the one matching the current R version.
 #'
 #' `get_yaml_config()` returns the raw contents of the `config.yaml` file,
-#' linewise.
+#' linewise. It is typically not needed, except if one needs information
+#' that cannot be surfaces via the other API functions.
 #'
-#' 
-#' 
+#' `set_yaml_config()` can be used to _set_ the contents of the
+#' `config.yaml` file. This is useful, if one has already obtained it
+#' externally, but wants to use the obtained file with the rest of the
+#' bioc standalone code.
+#'
+#' `get_release_version()` returns the version of the current Bioconductor
+#' release.
+#'
+#' `get_devel_version()` returns the version of the current development
+#' version of Bioconductor.
+#'
+#' `get_version_map()` return the mapping between R versions and
+#' Bioconductor versions. Note that this is not a one to one mapping.
+#' E.g. currently R `3.6.x` maps to both Bioc `3.9` (Bioc release) and
+#' `3.10` (Bioc devel); and also Bioc `3.10` maps to both R `3.6.x` and
+#' R `3.7.x` (current R-devel). It returns a data frame with three columns:
+#' `bioc_version`, `r_version` and `bioc_status`. The first two columns
+#' contain `package_vesion` objects, the third is a factor with levels:
+#' `out-of-date`, `release`, `devel`, `future`.
+#'
+#' `get_matching_bioc_version()` returns the matching Bioc version for an
+#' R version. If the R version matches to both a released and a devel
+#' version, then the released version is chosen.
+#'
+#' `get_bioc_version()` returns the matching Bioc version for the
+#' specified R version. It does observe the `R_BIOC_VERSION` environment
+#' variable, which can be used to force a Bioconductor version. If this is
+#' not set, it just calls `get_matching_bioc_version()`.
+#'
+#' `get_repos()` returns the Bioc repositories of the specified Bioc
+#' version. It defaults to the Bioc version that matches the calling R
+#' version. It returns a named character vector.
+#'
 #' \section{NEWS:}
 #' * 2019-05-30 First version in remotes.
 #'
-#' 
+#'
 #' @name bioconductor
 #' @keywords internal
 #' @noRd
