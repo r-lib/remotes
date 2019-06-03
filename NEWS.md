@@ -1,8 +1,9 @@
 # remotes (development version)
 
-# remotes 2.0.4
+* Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
+  `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
-# remotes (development version)
+# remotes 2.0.4
 
 * Fix bug in internal `parse_deps()` where test of valid comparison operators
 failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
