@@ -144,7 +144,7 @@ combine_deps <- function(cran_deps, remote_deps) {
   }
 
   # Only keep the remotes that are specified in the cran_deps or are NA
-  remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
+  remote_deps <- remote_deps[is.null(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
 
   # If there are remote deps remove the equivalent CRAN deps
   cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
