@@ -45,6 +45,17 @@ test_that("parse_deps", {
     )
   )
 
+  expect_equal(
+    parse_deps("package (>= 1.0.1)  , package2 (< 0.0.1 )  "),
+    structure(
+      list(
+        name = c("package", "package2"),
+        compare = c(">=", "<"),
+        version = c("1.0.1", "0.0.1")),
+      row.names = 1:2,
+      class = "data.frame"
+    )
+  )
 })
 
 

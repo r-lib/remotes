@@ -3,6 +3,11 @@
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
+# remotes 2.0.4
+
+* Fix bug in internal `parse_deps()` where test of valid comparison operators
+failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
+
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
   rather than a global type attribute, fixing errors when this global attribute
   is lost (#291, #304).
@@ -15,6 +20,12 @@
 
 * The hash of bitbucket hosts is now correctly retrieved (@antoine-sachet, #344)
 
+* Fix parsing of Additional_Repositories which have a leading newline
+  (@tmelliott, #251).
+  
+* Fix API call for private repositories in `install_gitlab` 
+  (@aornugent, [https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801](https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801))
+
 # remotes 2.0.3
 
 * The order of choices for `upgrade = "ask"` now puts the stable ones 'All',
@@ -24,9 +35,6 @@
 
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
-
-* Fix parsing of Additional_Repositories which have a leading newline
-  (@tmelliott, #251).
 
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 

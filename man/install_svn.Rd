@@ -15,7 +15,7 @@ install_svn(url, subdir = NULL, args = character(0), revision = NULL,
 \item{url}{Location of package. The url should point to a public or
 private repository.}
 
-\item{subdir}{A sub-directory withing a svn repository that contains the
+\item{subdir}{A sub-directory within a svn repository that contains the
 package we are interested in installing.}
 
 \item{args}{A character vector providing extra options to pass on to
