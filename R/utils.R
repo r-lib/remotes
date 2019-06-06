@@ -491,3 +491,15 @@ in_r_build_ignore <- function(paths, ignore_file) {
 
   vlapply(paths, should_ignore)
 }
+
+
+get_json_sha <- function(text) {
+  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
+  if (all(m == -1)) {
+    return(json$parse(text)$sha %||% NA_character_)
+  }
+
+  start <- attr(m, "capture.start")
+  end <- start + attr(m, "capture.length") - 1L
+  substring(text, start, end)
+}
