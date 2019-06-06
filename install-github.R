@@ -2920,7 +2920,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
       is.null(remote$subdir),
       "DESCRIPTION",
       utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
-    "/raw?ref=", remote$ref, "&private_token=", remote$auth_token)
+    "/raw?ref=", remote$ref)
 
   dest <- tempfile()
   res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
