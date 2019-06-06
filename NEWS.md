@@ -1,12 +1,15 @@
 # remotes (development version)
 
+* `install_gitlab()` no longer adds the access token twice to the request
+  (@aornugent, #363).
+
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
-# remotes 2.0.4
-
 * Fix bug in internal `parse_deps()` where test of valid comparison operators
 failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
+
+# remotes 2.0.4
 
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
   rather than a global type attribute, fixing errors when this global attribute
