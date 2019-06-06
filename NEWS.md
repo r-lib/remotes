@@ -39,6 +39,9 @@ failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
 
+* `install_dev()` now supports ref/pull format, e.g.
+  `install_dev('shiny@v1.2-rc')` (@mkearney, #279).
+
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 
 * `remote_package_name.github_remote()` now works properly on Windows (#248)
