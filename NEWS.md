@@ -1,7 +1,7 @@
 # remotes (development version)
 
-* `install_gitlab()` no longer adds the access token twice to the request
-  (@aornugent, #363).
+* Fix API call for private repositories in `install_gitlab` 
+  (@aornugent, #359, #363)
 
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
@@ -25,9 +25,6 @@ failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
 
 * Fix parsing of Additional_Repositories which have a leading newline
   (@tmelliott, #251).
-  
-* Fix API call for private repositories in `install_gitlab` 
-  (@aornugent, [https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801](https://community.rstudio.com/t/how-to-install-gitlab-from-a-private-repository/26801))
 
 # remotes 2.0.3
 
