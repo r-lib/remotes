@@ -1008,9 +1008,22 @@ split_remotes <- function(x) {
 }
 
 
+package_deps_new <- function(package = character(), installed = character(),
+  available = character(), diff = logical(), is_cran = logical(),
+  remote = list()) {
+
+  res <- structure(
+    data.frame(package = package, installed = installed, available = available, diff = diff, is_cran = is_cran, stringsAsFactors = FALSE),
+    class = c("package_deps", "data.frame")
+  )
+
+  res$remote = structure(remote, class = "remotes")
+  res
+}
+
 remote_deps <- function(pkg) {
   if (!has_dev_remotes(pkg)) {
-    return(NULL)
+    return(package_deps_new())
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
@@ -1023,20 +1036,7 @@ remote_deps <- function(pkg) {
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
   diff[is.na(installed)] <- UNINSTALLED
 
-  res <- structure(
-    data.frame(
-      package = package,
-      installed = installed,
-      available = available,
-      diff = diff,
-      is_cran = FALSE,
-      stringsAsFactors = FALSE
-      ),
-    class = c("package_deps", "data.frame"))
-
-  res$remote <- structure(remote, class = "remotes")
-
-  res
+  package_deps_new(package, installed, available, diff, is_cran = FALSE, remote)
 }
 
 

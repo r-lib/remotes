@@ -270,13 +270,13 @@ test_that("update.package_deps 3", {
 
 context("Remotes")
 
-test_that("remote_deps returns if no remotes specified", {
+test_that("remote_deps returns an empty data frame if no remotes specified", {
 
   pkg <- list(
     package = "foo"
   )
 
-  expect_equal(remote_deps(pkg), NULL)
+  expect_equal(remote_deps(pkg), package_deps_new())
 })
 
 test_that("remote_deps works with implicit types", {
