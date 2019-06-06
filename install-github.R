@@ -3832,18 +3832,18 @@ safe_install_packages <- function(...) {
 
 normalize_build_opts <- function(build_opts, build_manual, build_vignettes) {
   if (!isTRUE(build_manual)) {
-    build_opts <- c(build_opts, "--no-manual")
+    build_opts <- union(build_opts, "--no-manual")
   } else {
     build_opts <- setdiff(build_opts, "--no-manual")
   }
 
   if (!isTRUE(build_vignettes)) {
-    build_opts <- c(build_opts, "--no-build-vignettes")
+    build_opts <- union(build_opts, "--no-build-vignettes")
   } else {
     build_opts <- setdiff(build_opts, "--no-build-vignettes")
   }
 
-  unique(build_opts)
+  build_opts
 }
 
 safe_build_package <- function(pkgdir, build_opts, build_manual, build_vignettes, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
@@ -3960,6 +3960,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     build_opts = build_opts,
     build_manual = build_manual,
     build_vignettes = build_vignettes,
+    type = type,
     ...
   )
 }
