@@ -1,5 +1,5 @@
-install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
-                    repos, type, ...) {
+install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual, build_vignettes,
+                    upgrade, repos, type, ...) {
 
   warn_for_potential_errors()
 
@@ -21,14 +21,16 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
+    build = build, build_opts = build_opts, build_manual = build_manual,
+    build_vignettes = build_vignettes, upgrade = upgrade, repos = repos,
+    type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
     dir.create(dir)
     on.exit(unlink(dir), add = TRUE)
 
-    pkgdir <- safe_build_package(pkgdir, build_opts, dir, quiet)
+    pkgdir <- safe_build_package(pkgdir, build_opts, build_manual, build_vignettes, dir, quiet)
   }
 
   safe_install_packages(
@@ -74,7 +76,25 @@ safe_install_packages <- function(...) {
   )
 }
 
-safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
+normalize_build_opts <- function(build_opts, build_manual, build_vignettes) {
+  if (!isTRUE(build_manual)) {
+    build_opts <- c(build_opts, "--no-manual")
+  } else {
+    build_opts <- setdiff(build_opts, "--no-manual")
+  }
+
+  if (!isTRUE(build_vignettes)) {
+    build_opts <- c(build_opts, "--no-build-vignettes")
+  } else {
+    build_opts <- setdiff(build_opts, "--no-build-vignettes")
+  }
+
+  unique(build_opts)
+}
+
+safe_build_package <- function(pkgdir, build_opts, build_manual, build_vignettes, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
+  build_opts <- normalize_build_opts(build_opts, build_manual, build_vignettes)
+
   if (use_pkgbuild) {
     vignettes <- TRUE
     manual <- FALSE
@@ -152,6 +172,8 @@ r_error_matches <- function(msg, str) {
 #' @param ... additional arguments passed to [utils::install.packages()].
 #' @param build If `TRUE` build the package before installing.
 #' @param build_opts Options to pass to `R CMD build`, only used when `build`
+#' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
+#' @param build_vignettes If `FALSE`, don't build package vignettes ('--no-build-vignettes').
 #' is `TRUE`.
 #' @export
 #' @examples
@@ -164,6 +186,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          ...) {
   packages <- dev_package_deps(
     pkgdir,
@@ -181,6 +204,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     upgrade = upgrade,
     build = build,
     build_opts = build_opts,
+    build_manual = build_manual,
+    build_vignettes = build_vignettes,
     type = type,
     ...
   )
