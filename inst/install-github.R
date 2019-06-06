@@ -750,6 +750,7 @@ update.package_deps <- function(object,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
@@ -774,6 +775,8 @@ update.package_deps <- function(object,
                     quiet = quiet,
                     build = build,
                     build_opts = build_opts,
+                    build_manual = build_manual,
+                    build_vignettes = build_vignettes,
                     repos = repos,
                     type = type,
                     ...)
@@ -794,6 +797,8 @@ update.package_deps <- function(object,
                     quiet = quiet,
                     build = build,
                     build_opts = build_opts,
+                    build_manual = build_manual,
+                    build_vignettes = build_vignettes,
                     repos = repos,
                     type = type,
                     ...)
@@ -815,6 +820,8 @@ update.package_deps <- function(object,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -932,6 +939,7 @@ update_packages <- function(packages = TRUE,
                             force = FALSE,
                             quiet = FALSE,
                             build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            build_manual = FALSE, build_vignettes = FALSE,
                             repos = getOption("repos"),
                             type = getOption("pkgType"),
                             ...) {
@@ -947,6 +955,8 @@ update_packages <- function(packages = TRUE,
          quiet = quiet,
          build = build,
          build_opts = build_opts,
+         build_manual = build_manual,
+         build_vignettes = build_vignettes,
          repos = repos,
          type = type,
          ...)
@@ -1714,6 +1724,7 @@ install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
                          ...) {
@@ -1727,6 +1738,8 @@ install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -2029,6 +2042,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               force = FALSE,
                               quiet = FALSE,
                               build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                              build_manual = FALSE, build_vignettes = FALSE,
                               repos = getOption("repos"),
                               type = getOption("pkgType"),
                               ...) {
@@ -2043,14 +2057,16 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
 }
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
-                              auth_user = NULL, password = NULL, sha = NULL,
-                              host = "api.bitbucket.org/2.0", ...) {
+                             auth_user = bitbucket_user(), password = bitbucket_password(),
+                             sha = NULL, host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -2198,6 +2214,7 @@ install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkg
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          ...) {
 
   remotes <- lapply(pkgs, cran_remote, repos = repos, type = type)
@@ -2209,6 +2226,8 @@ install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkg
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -2350,6 +2369,7 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -2369,6 +2389,8 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -2605,6 +2627,7 @@ install_github <- function(repo,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
@@ -2619,6 +2642,8 @@ install_github <- function(repo,
     quiet = quiet,
     build = build,
     build_opts = build_opts,
+    build_manual = build_manual,
+    build_vignettes = build_vignettes,
     repos = repos,
     type = type,
     ...)
@@ -2831,6 +2856,7 @@ install_gitlab <- function(repo,
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
@@ -2844,6 +2870,8 @@ install_gitlab <- function(repo,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -2996,6 +3024,7 @@ install_local <- function(path = ".", subdir = NULL,
                            quiet = FALSE,
                            build = !is_binary_pkg(path),
                            build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
@@ -3008,6 +3037,8 @@ install_local <- function(path = ".", subdir = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -3083,6 +3114,8 @@ install_remote <- function(remote,
                            quiet,
                            build,
                            build_opts,
+                           build_manual,
+                           build_vignettes,
                            repos,
                            type,
                            ...) {
@@ -3134,6 +3167,8 @@ install_remote <- function(remote,
           quiet = quiet,
           build = build,
           build_opts = build_opts,
+          build_manual = build_manual,
+          build_vignettes = build_vignettes,
           repos = repos,
           type = type,
           ...)
@@ -3345,6 +3380,7 @@ install_svn <- function(url, subdir = NULL, args = character(0),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -3359,6 +3395,8 @@ install_svn <- function(url, subdir = NULL, args = character(0),
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -3517,6 +3555,7 @@ install_url <- function(url, subdir = NULL,
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -3528,6 +3567,8 @@ install_url <- function(url, subdir = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -3603,6 +3644,7 @@ install_version <- function(package, version = NULL,
                             force = FALSE,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            build_manual = FALSE, build_vignettes = FALSE,
                             repos = getOption("repos"),
                             type = "source",
                             ...) {
@@ -3615,6 +3657,8 @@ install_version <- function(package, version = NULL,
               quiet = quiet,
               build = build,
               build_opts = build_opts,
+              build_manual = build_manual,
+              build_vignettes = build_vignettes,
               repos = repos,
               type = type,
               ...)
@@ -3708,8 +3752,8 @@ download_version_url <- function(package, version, repos, type) {
 
   paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
 }
-install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
-                    repos, type, ...) {
+install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual, build_vignettes,
+                    upgrade, repos, type, ...) {
 
   warn_for_potential_errors()
 
@@ -3731,14 +3775,16 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
+    build = build, build_opts = build_opts, build_manual = build_manual,
+    build_vignettes = build_vignettes, upgrade = upgrade, repos = repos,
+    type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
     dir.create(dir)
     on.exit(unlink(dir), add = TRUE)
 
-    pkgdir <- safe_build_package(pkgdir, build_opts, dir, quiet)
+    pkgdir <- safe_build_package(pkgdir, build_opts, build_manual, build_vignettes, dir, quiet)
   }
 
   safe_install_packages(
@@ -3784,7 +3830,25 @@ safe_install_packages <- function(...) {
   )
 }
 
-safe_build_package <- function(pkgdir, build_opts, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
+normalize_build_opts <- function(build_opts, build_manual, build_vignettes) {
+  if (!isTRUE(build_manual)) {
+    build_opts <- c(build_opts, "--no-manual")
+  } else {
+    build_opts <- setdiff(build_opts, "--no-manual")
+  }
+
+  if (!isTRUE(build_vignettes)) {
+    build_opts <- c(build_opts, "--no-build-vignettes")
+  } else {
+    build_opts <- setdiff(build_opts, "--no-build-vignettes")
+  }
+
+  unique(build_opts)
+}
+
+safe_build_package <- function(pkgdir, build_opts, build_manual, build_vignettes, dest_path, quiet, use_pkgbuild = !is_standalone() && pkg_installed("pkgbuild")) {
+  build_opts <- normalize_build_opts(build_opts, build_manual, build_vignettes)
+
   if (use_pkgbuild) {
     vignettes <- TRUE
     manual <- FALSE
@@ -3862,6 +3926,8 @@ r_error_matches <- function(msg, str) {
 #' @param ... additional arguments passed to [utils::install.packages()].
 #' @param build If `TRUE` build the package before installing.
 #' @param build_opts Options to pass to `R CMD build`, only used when `build`
+#' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
+#' @param build_vignettes If `FALSE`, don't build package vignettes ('--no-build-vignettes').
 #' is `TRUE`.
 #' @export
 #' @examples
@@ -3874,6 +3940,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          quiet = FALSE,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          ...) {
   packages <- dev_package_deps(
     pkgdir,
@@ -3891,6 +3958,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     upgrade = upgrade,
     build = build,
     build_opts = build_opts,
+    build_manual = build_manual,
+    build_vignettes = build_vignettes,
     ...
   )
 }

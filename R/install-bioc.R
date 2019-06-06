@@ -35,6 +35,7 @@ install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
                          ...) {
@@ -48,6 +49,8 @@ install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
