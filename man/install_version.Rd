@@ -8,7 +8,7 @@ install_version(package, version = NULL, dependencies = NA,
   upgrade = c("default", "ask", "always", "never"), force = FALSE,
   quiet = FALSE, build = FALSE, build_opts = c("--no-resave-data",
   "--no-manual", "--no-build-vignettes"), repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+  type = "source", ...)
 }
 \arguments{
 \item{package}{package name}
@@ -20,8 +20,9 @@ archived source tarballs and tries to install an older version instead.}
 
 \item{dependencies}{logical indicating whether to also install
     uninstalled packages which these packages depend on/link
-    to/import/suggest (and so on recursively).  Not used if \code{repos
-    = NULL}.  Can also be a character vector, a subset of
+    to/import/suggest (and so on recursively).
+    Not used if \code{repos = NULL}.
+    Can also be a character vector, a subset of
     \code{c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")}.
 
     Only supported if \code{lib} is of length one (or missing),

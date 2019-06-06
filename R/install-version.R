@@ -26,7 +26,7 @@ install_version <- function(package, version = NULL,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
-                            type = getOption("pkgType"),
+                            type = "source",
                             ...) {
 
   url <- download_version_url(package, version, repos, type)

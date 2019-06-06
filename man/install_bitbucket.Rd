@@ -96,7 +96,7 @@ that it does \emph{not} set the system proxies automatically, see
 \examples{
 \dontrun{
 install_bitbucket("sulab/mygene.r@default")
-install_bitbucket("dannavarro/lsr-package")
+install_bitbucket("djnavarro/lsr")
 }
 }
 \seealso{

@@ -11,15 +11,17 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     }
   }
 
+  pkg_name <- load_pkg_description(pkgdir)$package
+
   ## Check for circular dependencies. We need to know about the root
   ## of the install process.
   if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
   if (check_for_circular_dependencies(pkgdir, quiet)) {
-    return(invisible(NA_character_))
+    return(invisible(pkg_name))
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -37,7 +39,6 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     ...
   )
 
-  pkg_name <- load_pkg_description(pkgdir)$package
   invisible(pkg_name)
 }
 
@@ -56,7 +57,8 @@ safe_install_packages <- function(...) {
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
-      R_LIBS_SITE = lib),
+      R_LIBS_SITE = lib,
+      RGL_USE_NULL = "TRUE"),
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
@@ -163,13 +165,11 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                          ...) {
-
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type,
-    ...
+    type = type
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
@@ -181,6 +181,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     upgrade = upgrade,
     build = build,
     build_opts = build_opts,
+    type = type,
     ...
   )
 }

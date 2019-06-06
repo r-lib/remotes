@@ -10,6 +10,11 @@
 #'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
+#' @param auth_token To install from a private repo, generate a personal access
+#'   token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and
+#'   supply to this argument. This is safer than using a password because you
+#'   can easily delete a PAT without affecting any others. Defaults to the
+#'   GITLAB_PAT environment variable.
 #' @inheritParams install_github
 #' @export
 #' @family package installation
@@ -65,8 +70,8 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, x$username, x$repo)
-  src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
+  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+  src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
     message("Downloading GitLab repo ", x$username, "/", x$repo, "@", x$ref,
@@ -101,16 +106,27 @@ remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL, sha =
 remote_package_name.gitlab_remote <- function(remote, ...) {
 
   tmp <- tempfile()
-  src <- build_url(
-    remote$host, remote$username, remote$repo, "raw",
-    remote$ref, remote$subdir, "DESCRIPTION")
+
+  src_root <- build_url(
+    remote$host, "api", "v4", "projects",
+    utils::URLencode(paste0(remote$username, "/", remote$repo),
+                     reserved = TRUE),
+    "repository")
+
+  src <- paste0(
+    src_root, "/files/",
+    ifelse(
+      is.null(remote$subdir),
+      "DESCRIPTION",
+      utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
+    "/raw?ref=", remote$ref)
 
   dest <- tempfile()
   res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
 
   tryCatch(
     read_dcf(dest)$Package,
-    error = function(e) NA_character_)
+    error = function(e) remote$repo)
 }
 
 #' @export
@@ -132,7 +148,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
-  fromJSONFile(tmp)$id
+  json$parse_file(tmp)$id
 }
 
 #' Retrieve GitLab personal access token.

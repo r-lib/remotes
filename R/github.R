@@ -16,12 +16,12 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     if (res$status_code >= 300) {
       stop(github_error(res))
     }
-    fromJSON(rawToChar(res$content))
+    json$parse(rawToChar(res$content))
   } else {
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    fromJSONFile(tmp)
+    json$parse_file(tmp)
   }
 }
 
@@ -57,7 +57,7 @@ github_commit <- function(username, repo, ref = "master",
     on.exit(unlink(tmp), add = TRUE)
 
     download(tmp, url, auth_token = pat)
-    get_json_sha(readLines(tmp, warn = FALSE))
+    get_json_sha(paste0(readLines(tmp, warn = FALSE), collapse = "\n"))
   }
 }
 
@@ -137,7 +137,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
 }
 
@@ -150,11 +150,11 @@ github_error <- function(res) {
 
   ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
 
-  error_details <- fromJSON(rawToChar(res$content))$message
+  error_details <- json$parse(rawToChar(res$content))$message
 
-  pat_guidance <- ""
+  guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
-    pat_guidance <-
+    guidance <-
       sprintf(
 "To increase your GitHub API rate limit
   - Use `usethis::browse_github_pat()` to create a Personal Access Token.
@@ -165,8 +165,32 @@ github_error <- function(res) {
           "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
         }
       )
+  } else if (identical(as.integer(res$status_code), 404L)) {
+    repo_information <- re_match(res$url, "(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    if(!is.na(repo_information$owner) && !is.na(repo_information$repo)) {
+      guidance <- sprintf(
+        "Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo.",
+        repo_information$owner,
+        repo_information$repo
+      )
+    } else {
+      guidance <- "Did you spell the repo owner and repo name correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo."
+    }
   }
+ if(identical(as.integer(res$status_code),404L)) {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s
 
+  %s",
+
+     res$status_code,
+     error_details,
+     guidance
+   )
+ } else {
   msg <- sprintf(
 "HTTP error %s.
   %s
@@ -181,8 +205,9 @@ github_error <- function(res) {
     ratelimit_remaining,
     ratelimit_limit,
     format(ratelimit_reset, usetz = TRUE),
-    pat_guidance
+    guidance
   )
+ }
 
   structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
@@ -190,6 +215,6 @@ github_error <- function(res) {
 
 #> Error: HTTP error 404.
 #>   Not Found
-#> 
+#>
 #>   Rate limit remaining: 4999
 #>   Rate limit reset at: 2018-10-10 19:43:52 UTC

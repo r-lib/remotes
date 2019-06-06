@@ -3,124 +3,355 @@ function(...) {
 
   ## This is the code of the package, put in here by brew
 
-  ## This is mostly from https://bioconductor.org/biocLite.R
+  #' Tools for Bioconductor versions and repositories
+#'
+#' \section{API:}
+#'
+#' ```
+#' get_yaml_config(forget = FALSE)
+#' set_yaml_config(text)
+#'
+#' get_release_version(forget = FALSE)
+#' get_devel_version(forget = FALSE)
+#'
+#' get_version_map(forget = FALSE)
+#' get_matching_bioc_version(r_version = getRversion(), forget = FALSE)
+#' get_bioc_version(r_version = getRversion(), forget = FALSE)
+#'
+#' get_repos(bioc_version = "auto", forget = FALSE)
+#' ```
+#'
+#' * `forget`: Whether to forget the cached version of the Bioconductor
+#'   config YAML file and download it again.
+#' * `text`: character vector (linewise) or scalar, the contents of the
+#'   `config.yaml` file, if obtained externally, to be used as a cached
+#'   version in the future.
+#' * `r_version`: R version string, or `package_version` object.
+#' * `bioc_version`: Bioc version string or `package_version` object,
+#'   or the string `"auto"` to use the one matching the current R version.
+#'
+#' `get_yaml_config()` returns the raw contents of the `config.yaml` file,
+#' linewise. It is typically not needed, except if one needs information
+#' that cannot be surfaces via the other API functions.
+#'
+#' `set_yaml_config()` can be used to _set_ the contents of the
+#' `config.yaml` file. This is useful, if one has already obtained it
+#' externally, but wants to use the obtained file with the rest of the
+#' bioc standalone code.
+#'
+#' `get_release_version()` returns the version of the current Bioconductor
+#' release.
+#'
+#' `get_devel_version()` returns the version of the current development
+#' version of Bioconductor.
+#'
+#' `get_version_map()` return the mapping between R versions and
+#' Bioconductor versions. Note that this is not a one to one mapping.
+#' E.g. currently R `3.6.x` maps to both Bioc `3.9` (Bioc release) and
+#' `3.10` (Bioc devel); and also Bioc `3.10` maps to both R `3.6.x` and
+#' R `3.7.x` (current R-devel). It returns a data frame with three columns:
+#' `bioc_version`, `r_version` and `bioc_status`. The first two columns
+#' contain `package_vesion` objects, the third is a factor with levels:
+#' `out-of-date`, `release`, `devel`, `future`.
+#'
+#' `get_matching_bioc_version()` returns the matching Bioc version for an
+#' R version. If the R version matches to both a released and a devel
+#' version, then the released version is chosen.
+#'
+#' `get_bioc_version()` returns the matching Bioc version for the
+#' specified R version. It does observe the `R_BIOC_VERSION` environment
+#' variable, which can be used to force a Bioconductor version. If this is
+#' not set, it just calls `get_matching_bioc_version()`.
+#'
+#' `get_repos()` returns the Bioc repositories of the specified Bioc
+#' version. It defaults to the Bioc version that matches the calling R
+#' version. It returns a named character vector.
+#'
+#' \section{NEWS:}
+#' * 2019-05-30 First version in remotes.
+#'
+#'
+#' @name bioconductor
+#' @keywords internal
+#' @noRd
+NULL
 
-bioc_version <- function() {
-  bver <- get(
-    ".BioC_version_associated_with_R_version",
-    envir = asNamespace("tools"),
-    inherits = FALSE
+
+bioconductor <- local({
+
+  # -------------------------------------------------------------------
+  # Configuration that does not change often
+
+  config_url <- "https://bioconductor.org/config.yaml"
+
+  builtin_map <- list(
+    "2.1"  = package_version("1.6"),
+    "2.2"  = package_version("1.7"),
+    "2.3"  = package_version("1.8"),
+    "2.4"  = package_version("1.9"),
+    "2.5"  = package_version("2.0"),
+    "2.6"  = package_version("2.1"),
+    "2.7"  = package_version("2.2"),
+    "2.8"  = package_version("2.3"),
+    "2.9"  = package_version("2.4"),
+    "2.10" = package_version("2.5"),
+    "2.11" = package_version("2.6"),
+    "2.12" = package_version("2.7"),
+    "2.13" = package_version("2.8"),
+    "2.14" = package_version("2.9"),
+    "2.15" = package_version("2.11"),
+    "3.0"  = package_version("2.13"),
+    "3.1"  = package_version("3.0"),
+    "3.2"  = package_version("3.2"),
+    "3.3"  = package_version("3.4"),
+    "3.4"  = package_version("3.6"),
+    "3.5"  = package_version("3.8")
   )
 
-  if (is.function(bver)) {
-    bver()
-  } else {
-    bver
-  }
-}
+  # -------------------------------------------------------------------
+  # Cache
 
-bioc_repos <- function(bioc_ver = bioc_version()) {
-  bioc_ver <- as.package_version(bioc_ver)
+  devel_version <- NULL
+  release_version <- NULL
+  version_map <- NULL
+  yaml_config <- NULL
 
-  a <- NULL
+  # -------------------------------------------------------------------
+  # API
 
-  p <- file.path(Sys.getenv("HOME"), ".R", "repositories")
-  if (file.exists(p)) {
-    a <- ("tools" %:::% ".read_repositories")(p)
-    if (!"BioCsoft" %in% rownames(a)) a <- NULL
-  }
+  get_yaml_config <- function(forget = FALSE) {
+    if (forget || is.null(yaml_config)) {
+      new <- tryCatch(read_url(config_url), error = function(x) x)
+      if (inherits(new, "error")) {
+        http_url <- sub("^https", "http", config_url)
+        new <- tryCatch(read_url(http_url), error = function(x) x)
+      }
+      if (inherits(new, "error")) stop(new)
+      yaml_config <<- new
+    }
 
-  if (is.null(a)) {
-    p <- file.path(R.home("etc"), "repositories")
-    a <- ("tools" %:::% ".read_repositories")(p)
-  }
-
-  # BioCextra was removed in Bioc 3.6
-  if (bioc_ver < "3.6") {
-    repo_types <- c("BioCsoft", "BioCann", "BioCexp", "BioCextra")
-  } else {
-    repo_types <- c("BioCsoft", "BioCann", "BioCexp")
+    yaml_config
   }
 
-  repos <- intersect(
-    rownames(a),
-    repo_types
+  set_yaml_config <- function(text) {
+    if (length(text) == 1) text <- strsplit(text, "\n", fixed = TRUE)[[1]]
+    yaml_config <<- text
+  }
+
+  get_release_version <- function(forget = FALSE) {
+    if (forget || is.null(release_version)) {
+      yaml <- get_yaml_config(forget)
+      pattern <- "^release_version: \"(.*)\""
+      release_version <<- package_version(
+        sub(pattern, "\\1", grep(pattern, yaml, value=TRUE))
+      )
+    }
+    release_version
+  }
+
+  get_devel_version <- function(forget = FALSE) {
+    if (forget || is.null(devel_version)) {
+      yaml <- get_yaml_config(forget)
+      pattern <- "^devel_version: \"(.*)\""
+      devel_version <<- package_version(
+        sub(pattern, "\\1", grep(pattern, yaml, value=TRUE))
+      )
+    }
+    devel_version
+  }
+
+  get_version_map <- function(forget = FALSE) {
+    if (forget || is.null(version_map)) {
+      txt <- get_yaml_config(forget)
+      grps <- grep("^[^[:blank:]]", txt)
+      start <- match(grep("r_ver_for_bioc_ver", txt), grps)
+      map <- txt[seq(grps[start] + 1, grps[start + 1] - 1)]
+      map <- trimws(gsub("\"", "", sub(" #.*", "", map)))
+      pattern <- "(.*): (.*)"
+      bioc <- package_version(sub(pattern, "\\1", map))
+      r <- package_version(sub(pattern, "\\2", map))
+      status <- rep("out-of-date", length(bioc))
+      release <- get_release_version()
+      devel <- get_devel_version()
+      status[bioc == release] <- "release"
+      status[bioc == devel] <- "devel"
+
+      # append final version for 'devel' R
+      bioc <- c(
+        bioc, max(bioc)
+      )
+      r <- c(r, package_version(paste(unlist(max(r)) + 0:1, collapse = ".")))
+      status <- c(status, "future")
+
+      version_map <<- rbind(
+        .VERSION_MAP_SENTINEL,
+        data.frame(
+          bioc_version = bioc, r_version = r,
+          bioc_status = factor(
+            status,
+            levels = c("out-of-date", "release", "devel", "future")
+          )
+        )
+      )
+    }
+    version_map
+  }
+
+  get_matching_bioc_version <- function(r_version = getRversion(),
+                                        forget = FALSE) {
+
+    minor <- as.character(get_minor_r_version(r_version))
+    if (minor %in% names(builtin_map)) return(builtin_map[[minor]])
+
+    # If we are not in the map, then we need to look this up in
+    # YAML data.
+
+    map <- get_version_map(forget = forget)
+    mine <- match(package_version(minor), map$r_version)
+    if (!is.na(mine)) return(map$bioc_version[mine])
+
+    # If it is not even in the YAML, then it must be some very old
+    # or very new version. If old, we fail. If new, we assume bioc-devel.
+    if (package_version(minor) < "2.1") {
+      stop("R version too old, cannot run Bioconductor")
+    }
+
+    get_devel_version()
+  }
+
+  get_bioc_version <- function(r_version = getRversion(),
+                               forget = FALSE) {
+    if (nzchar(v <- Sys.getenv("R_BIOC_VERSION", ""))) {
+      return(package_version(v))
+    }
+    get_matching_bioc_version(r_version, forget = forget)
+  }
+
+  get_repos <- function(bioc_version = "auto", forget = FALSE) {
+    if (identical(bioc_version, "auto")) {
+      bioc_version <- get_bioc_version(getRversion(), forget)
+    } else {
+      bioc_version <- package_version(bioc_version)
+    }
+    mirror <- Sys.getenv("R_BIOC_MIRROR", "https://bioconductor.org")
+    mirror <- getOption("BioC_mirror", mirror)
+    repos <- c(
+      BioCsoft      = "{mirror}/packages/{bv}/bioc",
+      BioCann       = "{mirror}/packages/{bv}/data/annotation",
+      BioCexp       = "{mirror}/packages/{bv}/data/experiment",
+      BioCworkflows =
+        if (bioc_version >= "3.7") "{mirror}/packages/{bv}/workflows",
+      BioCextra     =
+        if (bioc_version <= "3.5") "{mirror}/packages/{bv}/extra"
+    )
+
+    ## It seems that if a repo is not available yet for bioc-devel,
+    ## they redirect to the bioc-release version, so we do not need to
+    ## parse devel_repos from the config.yaml file
+
+    sub("{mirror}", mirror, fixed = TRUE,
+        sub("{bv}", bioc_version, repos, fixed = TRUE))
+  }
+
+  # -------------------------------------------------------------------
+  # Internals
+
+  read_url <- function(url) {
+    tmp <- tempfile()
+    on.exit(unlink(tmp), add = TRUE)
+    suppressWarnings(download.file(url, tmp, quiet = TRUE))
+    if (!file.exists(tmp) || file.info(tmp)$size == 0) {
+      stop("Failed to download `", url, "`")
+    }
+    readLines(tmp, warn = FALSE)
+  }
+
+  .VERSION_SENTINEL <- local({
+    version <- package_version(list())
+    class(version) <- c("unknown_version", class(version))
+    version
+  })
+
+  .VERSION_MAP_SENTINEL <- data.frame(
+    bioc_version = .VERSION_SENTINEL,
+    r_version = .VERSION_SENTINEL,
+    bioc_status = factor(
+      factor(),
+      levels = c("out-of-date", "release", "devel", "future")
+    )
   )
 
-  default_bioc_version <- bioc_version()
-
-  if (!identical(default_bioc_version, bioc_ver)) {
-    a[repos, "URL"] <- sub(as.character(default_bioc_version), bioc_ver, a[repos, "URL"], fixed = TRUE)
+  get_minor_r_version <- function (x) {
+    package_version(x)[,1:2]
   }
-  structure(a[repos, "URL"], names = repos)
+
+  # -------------------------------------------------------------------
+
+  structure(
+    list(
+      .internal = environment(),
+      get_yaml_config = get_yaml_config,
+      set_yaml_config = set_yaml_config,
+      get_release_version = get_release_version,
+      get_devel_version = get_devel_version,
+      get_version_map = get_version_map,
+      get_matching_bioc_version = get_matching_bioc_version,
+      get_bioc_version = get_bioc_version,
+      get_repos = get_repos
+    ),
+    class = c("standalone_bioc", "standalone"))
+})
+
+
+#' @export
+#' @rdname bioc_install_repos
+#' @keywords internal
+#' @examples
+#' bioc_version()
+#' bioc_version("3.4")
+
+bioc_version <- function(r_ver = getRversion()) {
+  bioconductor$get_bioc_version(r_ver)
 }
 
-#' Deduce the URLs of the BioConductor repositories
+#' Tools for Bioconductor repositories
 #'
-#' @return A named character vector of the URLs of the
-#' BioConductor repositories, appropriate for the current
-#' R version.
+#' `bioc_version()` returns the Bioconductor version for the current or the
+#' specified R version.
 #'
-#' @param r_ver R version to use.
-#' @param bioc_ver corresponding to the R version to use.
+#' `bioc_install_repos()` deduces the URLs of the BioConductor repositories.
+#'
+#' @details
+#' Both functions observe the `R_BIOC_VERSION` environment variable, which
+#' can be set to force a Bioconductor version. If this is set, then the
+#' `r_ver` and `bioc_ver` arguments are ignored.
+#'
+#' `bioc_install_repos()` observes the `R_BIOC_MIRROR` enironment variable
+#' and also the `BioC_mirror` option, which can be set to the desired
+#' Bioconductor mirror. The option takes precedence if both are set. Its
+#' default value is `https://bioconductor.org`.
+#'
+#' @return
+#' `bioc_version()` returns a Bioconductor version, a `package_version`
+#' object.
+#'
+#' `bioc_install_repos()` returns a named character vector of the URLs of
+#' the BioConductor repositories, appropriate for the current or the
+#' specified R version.
+#'
+#' @param r_ver R version to use. For `bioc_install_repos()` it is
+#'   ignored if `bioc_ver` is specified.
+#' @param bioc_ver Bioconductor version to use. Defaults to the default one
+#'   corresposding to `r_ver`.
+#'
 #' @export
 #' @keywords internal
+#' @examples
+#' bioc_install_repos()
 
-bioc_install_repos <- function(r_ver = getRversion(), bioc_ver = bioc_version()) {
-  r_ver <- package_version(r_ver)
-  bioc_ver <- package_version(bioc_ver)
-
-  repos <- bioc_repos()
-
-  ## add a conditional for Bioc releases occuring WITHIN
-  ## a single R minor version. This is so that a user with a
-  ## version of R (whose etc/repositories file references the
-  ## no-longer-latest URL) and without BiocInstaller
-  ## will be pointed to the most recent repository suitable
-  ## for their version of R
-  if (r_ver >= "3.2.2" && r_ver < "3.3.0") {
-    ## transitioning to https support; check availability
-    con <- file(fl <- tempfile(), "w")
-    sink(con, type = "message")
-    tryCatch(
-      { xx <- close(file("https://bioconductor.org")) },
-      error = function(e) { message(conditionMessage(e)) }
-    )
-    sink(type = "message")
-    close(con)
-
-    if (!length(readLines(fl))) {
-      repos <- sub("^http:", "https:", repos)
-    }
-  }
-  if (r_ver >= "3.5") {
-    repos <- bioc_repos("3.8")
-
-  } else if (r_ver >= "3.4") {
-    repos <- bioc_repos("3.6")
-
-  } else if (r_ver >= "3.3") {
-    repos <- bioc_repos("3.4")
-
-  } else if (r_ver >= "3.2") {
-    repos <- bioc_repos("3.2")
-
-  } else if (r_ver > "3.1.1") {
-    repos <- bioc_repos("3.0")
-  } else if (r_ver == "3.1.1") {
-    ## R-3.1.1's etc/repositories file at the time of the release
-    ## of Bioc 3.0 pointed to the 2.14 repository, but we want
-    ## new installations to access the 3.0 repository
-    repos <- bioc_repos("3.0")
-
-  } else if (r_ver == "3.1.0") {
-    ## R-devel points to 2.14 repository
-    repos <- bioc_repos("2.14")
-  } else {
-    stop("Unsupported R version", call. = FALSE)
-  }
-
-  repos
+bioc_install_repos <- function(r_ver = getRversion(),
+                               bioc_ver = bioc_version(r_ver)) {
+  bioconductor$get_repos(bioc_ver)
 }
 
 ## A environment to hold which packages are being installed so packages
@@ -359,9 +590,7 @@ package_deps <- function(packages, dependencies = NA,
       is_cran = is_cran_remote,
       stringsAsFactors = FALSE
     ),
-    class = c("package_deps", "data.frame"),
-    repos = repos,
-    type = type
+    class = c("package_deps", "data.frame")
   )
 
   res$remote <- remote
@@ -393,7 +622,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -411,7 +640,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   combine_deps(
     package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg, ...))
+    remote_deps(pkg))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
@@ -421,13 +650,13 @@ combine_deps <- function(cran_deps, remote_deps) {
     return(cran_deps)
   }
 
-  # Only keep the remotes that are specified in the cran_deps
-  remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
+  # Only keep the remotes that are specified in the cran_deps or are NA
+  remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
 
   # If there are remote deps remove the equivalent CRAN deps
   cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
 
-  rbind(cran_deps, remote_deps)
+  rbind(remote_deps, cran_deps)
 }
 
 ## -2 = not installed, but available on CRAN
@@ -530,7 +759,7 @@ update.package_deps <- function(object,
 
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
-  unknown_remotes <- object$diff == UNAVAILABLE & !object$is_cran
+  unknown_remotes <- (object$diff == UNAVAILABLE | object$diff == UNINSTALLED) & !object$is_cran
 
   if (any(unavailable_on_cran) && !quiet) {
     message("Skipping ", sum(unavailable_on_cran), " packages not available: ",
@@ -572,9 +801,11 @@ update.package_deps <- function(object,
 
   behind <- is.na(object$installed) | object$diff < CURRENT
 
-  if (any(object$is_cran & behind)) {
-    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
+  if (any(object$is_cran & !unavailable_on_cran & behind)) {
+    # get the first cran-like remote and use its repos and pkg_type
+    r <- object$remote[object$is_cran & behind][[1]]
+    install_packages(object$package[object$is_cran & behind], repos = r$repos,
+      type = r$pkg_type, dependencies = dependencies, quiet = quiet, ...)
   }
 
   install_remotes(object$remote[!object$is_cran & behind],
@@ -727,7 +958,8 @@ has_additional_repositories <- function(pkg) {
 
 parse_additional_repositories <- function(pkg) {
   if (has_additional_repositories(pkg)) {
-    strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
+
+    strsplit(trim_ws(pkg[["additional_repositories"]]), "[,[:space:]]+")[[1]]
   }
 }
 
@@ -776,13 +1008,26 @@ split_remotes <- function(x) {
 }
 
 
-remote_deps <- function(pkg, ...) {
+package_deps_new <- function(package = character(), installed = character(),
+  available = character(), diff = logical(), is_cran = logical(),
+  remote = list()) {
+
+  res <- structure(
+    data.frame(package = package, installed = installed, available = available, diff = diff, is_cran = is_cran, stringsAsFactors = FALSE),
+    class = c("package_deps", "data.frame")
+  )
+
+  res$remote = structure(remote, class = "remotes")
+  res
+}
+
+remote_deps <- function(pkg) {
   if (!has_dev_remotes(pkg)) {
-    return(NULL)
+    return(package_deps_new())
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote, ...)
+  remote <- lapply(dev_packages, parse_one_remote)
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
@@ -791,20 +1036,7 @@ remote_deps <- function(pkg, ...) {
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
   diff[is.na(installed)] <- UNINSTALLED
 
-  res <- structure(
-    data.frame(
-      package = package,
-      installed = installed,
-      available = available,
-      diff = diff,
-      is_cran = FALSE,
-      stringsAsFactors = FALSE
-      ),
-    class = c("package_deps", "data.frame"))
-
-  res$remote <- structure(remote, class = "remotes")
-
-  res
+  package_deps_new(package, installed, available, diff, is_cran = FALSE, remote)
 }
 
 
@@ -816,7 +1048,7 @@ resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
     upgrade <- "never"
   }
 
-  upgrade <- match.arg(upgrade, c("default", "ask", "always", "never"))
+  upgrade <- match.arg(upgrade[[1]], c("default", "ask", "always", "never"))
 
   if (identical(upgrade, "default"))
     upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
@@ -852,7 +1084,7 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
 
       choices <- pkgs
       if (length(choices) > 1) {
-        choices <- c(choices, "CRAN packages only", "All", "None")
+        choices <- c("All", "CRAN packages only", "None", choices)
       }
 
       res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
@@ -1014,38 +1246,51 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
 base_download <- function(url, path, quiet, headers) {
 
-  if (!is.null(headers)) {
-    unlockBinding("makeUserAgent", asNamespace("utils"))
-    orig <- get("makeUserAgent", envir = asNamespace("utils"))
-    on.exit({
-      assign("makeUserAgent", orig, envir = asNamespace("utils"))
-      lockBinding("makeUserAgent", asNamespace("utils"))
-    }, add = TRUE)
-    ua <- orig(FALSE)
+  if (getRversion() < "3.6.0") {
+    if (!is.null(headers)) {
+      get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
+      orig <- get("makeUserAgent", envir = asNamespace("utils"))
+      on.exit({
+        assign("makeUserAgent", orig, envir = asNamespace("utils"))
+        lockBinding("makeUserAgent", asNamespace("utils"))
+      }, add = TRUE)
+      ua <- orig(FALSE)
 
-    flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
-    agent <- paste0(ua, "\r\n", flathead)
-    assign(
-      "makeUserAgent",
-      envir = asNamespace("utils"),
-      function(format = TRUE) {
-        if (format) {
-          paste0("User-Agent: ", agent, "\r\n")
-        } else {
-          agent
-        }
-      })
-  }
+      flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
+      agent <- paste0(ua, "\r\n", flathead)
+      assign(
+        "makeUserAgent",
+        envir = asNamespace("utils"),
+        function(format = TRUE) {
+          if (format) {
+            paste0("User-Agent: ", agent, "\r\n")
+          } else {
+            agent
+          }
+        })
+    }
 
-  suppressWarnings(
-    status <- utils::download.file(
-      url,
-      path,
-      method = download_method(),
-      quiet = quiet,
-      mode = "wb"
+    suppressWarnings(
+      status <- utils::download.file(
+        url,
+        path,
+        method = download_method(),
+        quiet = quiet,
+        mode = "wb"
+      )
     )
-  )
+  } else {
+    suppressWarnings(
+      status <- utils::download.file(
+        url,
+        path,
+        method = download_method(),
+        quiet = quiet,
+        mode = "wb",
+        headers = headers
+      )
+    )
+  }
 
   if (status != 0)  stop("Cannot download file from ", url, call. = FALSE)
 
@@ -1230,12 +1475,12 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     if (res$status_code >= 300) {
       stop(github_error(res))
     }
-    fromJSON(rawToChar(res$content))
+    json$parse(rawToChar(res$content))
   } else {
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    fromJSONFile(tmp)
+    json$parse_file(tmp)
   }
 }
 
@@ -1271,7 +1516,7 @@ github_commit <- function(username, repo, ref = "master",
     on.exit(unlink(tmp), add = TRUE)
 
     download(tmp, url, auth_token = pat)
-    get_json_sha(readLines(tmp, warn = FALSE))
+    get_json_sha(paste0(readLines(tmp, warn = FALSE), collapse = "\n"))
   }
 }
 
@@ -1351,7 +1596,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
 }
 
@@ -1364,11 +1609,11 @@ github_error <- function(res) {
 
   ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
 
-  error_details <- fromJSON(rawToChar(res$content))$message
+  error_details <- json$parse(rawToChar(res$content))$message
 
-  pat_guidance <- ""
+  guidance <- ""
   if (identical(as.integer(ratelimit_remaining), 0L)) {
-    pat_guidance <-
+    guidance <-
       sprintf(
 "To increase your GitHub API rate limit
   - Use `usethis::browse_github_pat()` to create a Personal Access Token.
@@ -1379,8 +1624,32 @@ github_error <- function(res) {
           "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
         }
       )
+  } else if (identical(as.integer(res$status_code), 404L)) {
+    repo_information <- re_match(res$url, "(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    if(!is.na(repo_information$owner) && !is.na(repo_information$repo)) {
+      guidance <- sprintf(
+        "Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo.",
+        repo_information$owner,
+        repo_information$repo
+      )
+    } else {
+      guidance <- "Did you spell the repo owner and repo name correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo."
+    }
   }
+ if(identical(as.integer(res$status_code),404L)) {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s
 
+  %s",
+
+     res$status_code,
+     error_details,
+     guidance
+   )
+ } else {
   msg <- sprintf(
 "HTTP error %s.
   %s
@@ -1395,8 +1664,9 @@ github_error <- function(res) {
     ratelimit_remaining,
     ratelimit_limit,
     format(ratelimit_reset, usetz = TRUE),
-    pat_guidance
+    guidance
   )
+ }
 
   structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
 }
@@ -1404,7 +1674,7 @@ github_error <- function(res) {
 
 #> Error: HTTP error 404.
 #>   Not Found
-#> 
+#>
 #>   Rate limit remaining: 4999
 #>   Rate limit reset at: 2018-10-10 19:43:52 UTC
 #' Install a package from a Bioconductor repository
@@ -1749,7 +2019,7 @@ git_repo_sha1 <- function(r) {
 #' @examples
 #' \dontrun{
 #' install_bitbucket("sulab/mygene.r@@default")
-#' install_bitbucket("dannavarro/lsr-package")
+#' install_bitbucket("djnavarro/lsr")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
@@ -1780,7 +2050,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
                               auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL, ...) {
+                              host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -1842,7 +2112,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export
@@ -1858,7 +2128,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  fromJSONFile(tmp)
+  json$parse_file(tmp)
 }
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
@@ -1891,7 +2161,7 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
+  paste0(build_url(json$parse_file(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {
@@ -2294,7 +2564,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/applications> and
+#'   access token (PAT) in <https://github.com/settings/tokens> and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
@@ -2319,7 +2589,7 @@ remote_sha.xgit_remote <- function(remote, ...) {
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
-#' # from https://github.com/settings/applications. You only need the
+#' # from https://github.com/settings/tokens. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
 #' install_github("hadley/private", auth_token = "abc")
@@ -2541,6 +2811,11 @@ format.github_remote <- function(x, ...) {
 #'   `username/repo[/subdir][@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
+#' @param auth_token To install from a private repo, generate a personal access
+#'   token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and
+#'   supply to this argument. This is safer than using a password because you
+#'   can easily delete a PAT without affecting any others. Defaults to the
+#'   GITLAB_PAT environment variable.
 #' @inheritParams install_github
 #' @export
 #' @family package installation
@@ -2596,8 +2871,8 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, x$username, x$repo)
-  src <- paste0(src_root, "/repository/archive.tar.gz?ref=", utils::URLencode(x$ref, reserved = TRUE))
+  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+  src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
     message("Downloading GitLab repo ", x$username, "/", x$repo, "@", x$ref,
@@ -2632,16 +2907,27 @@ remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL, sha =
 remote_package_name.gitlab_remote <- function(remote, ...) {
 
   tmp <- tempfile()
-  src <- build_url(
-    remote$host, remote$username, remote$repo, "raw",
-    remote$ref, remote$subdir, "DESCRIPTION")
+
+  src_root <- build_url(
+    remote$host, "api", "v4", "projects",
+    utils::URLencode(paste0(remote$username, "/", remote$repo),
+                     reserved = TRUE),
+    "repository")
+
+  src <- paste0(
+    src_root, "/files/",
+    ifelse(
+      is.null(remote$subdir),
+      "DESCRIPTION",
+      utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
+    "/raw?ref=", remote$ref)
 
   dest <- tempfile()
   res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
 
   tryCatch(
     read_dcf(dest)$Package,
-    error = function(e) NA_character_)
+    error = function(e) remote$repo)
 }
 
 #' @export
@@ -2663,7 +2949,7 @@ gitlab_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
 
-  fromJSONFile(tmp)$id
+  json$parse_file(tmp)$id
 }
 
 #' Retrieve GitLab personal access token.
@@ -2948,6 +3234,11 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   }
 
   switch(x$RemoteType,
+    standard = remote("cran",
+      name = x$Package,
+      repos = x$RemoteRepos,
+      pkg_type = x$RemotePkgType,
+      sha = x$RemoteSha),
     github = remote("github",
       host = x$RemoteHost,
       package = x$RemotePackage,
@@ -3013,7 +3304,8 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       repo = x$RemoteRepo,
       release = x$RemoteRelease,
       sha = x$RemoteSha,
-      branch = x$RemoteBranch)
+      branch = x$RemoteBranch),
+    stop(sprintf("can't convert package with RemoteType '%s' to remote", x$RemoteType))
   )
 }
 
@@ -3031,7 +3323,7 @@ format.remotes <- function(x, ...) {
 #' a single command.
 #'
 #' @inheritParams install_git
-#' @param subdir A sub-directory withing a svn repository that contains the
+#' @param subdir A sub-directory within a svn repository that contains the
 #'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
@@ -3312,7 +3604,7 @@ install_version <- function(package, version = NULL,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                             repos = getOption("repos"),
-                            type = getOption("pkgType"),
+                            type = "source",
                             ...) {
 
   url <- download_version_url(package, version, repos, type)
@@ -3429,15 +3721,17 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     }
   }
 
+  pkg_name <- load_pkg_description(pkgdir)$package
+
   ## Check for circular dependencies. We need to know about the root
   ## of the install process.
   if (is_root_install()) on.exit(exit_from_root_install(), add = TRUE)
   if (check_for_circular_dependencies(pkgdir, quiet)) {
-    return(invisible(NA_character_))
+    return(invisible(pkg_name))
   }
 
   install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
-    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type, ...)
+    build = build, build_opts = build_opts, upgrade = upgrade, repos = repos, type = type)
 
   if (isTRUE(build)) {
     dir <- tempfile()
@@ -3455,7 +3749,6 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, upgrade,
     ...
   )
 
-  pkg_name <- load_pkg_description(pkgdir)$package
   invisible(pkg_name)
 }
 
@@ -3474,7 +3767,8 @@ safe_install_packages <- function(...) {
   with_envvar(
     c(R_LIBS = lib,
       R_LIBS_USER = lib,
-      R_LIBS_SITE = lib),
+      R_LIBS_SITE = lib,
+      RGL_USE_NULL = "TRUE"),
 
     # Set options(warn = 2) for this process and child processes, so that
     # warnings from `install.packages()` are converted to errors.
@@ -3581,13 +3875,11 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                          ...) {
-
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type,
-    ...
+    type = type
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies
@@ -3611,154 +3903,181 @@ should_error_for_warnings <- function() {
 
   !as.logical(no_errors)
 }
-tokenize_json <- function(text) {
-  text <- paste(text, collapse = "\n")
 
-  ESCAPE <- '(\\\\[^u[:cntrl:]]|\\\\u[0-9a-fA-F]{4})'
-  CHAR <- '[^[:cntrl:]"\\\\]'
+# Standalone JSON parser
+#
+# The purpose of this file is to provide a standalone JSON parser.
+# It is quite slow and bare. If you need a proper parser please use the
+# jsonlite package.
+#
+# The canonical location of this file is in the remotes package:
+# https://github.com/r-lib/remotes/blob/master/R/json.R
+#
+# API:
+# parse(text)
+# parse_file(filename)
+#
+# NEWS:
+# - 2019/05/15 First standalone version
 
-  STRING <- paste0('"', CHAR, '*(', ESCAPE, CHAR, '*)*"')
-  NUMBER <- "-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?"
-  KEYWORD <- 'null|false|true'
-  SPACE <- '[[:space:]]+'
+json <- local({
 
-  match <- gregexpr(
-    pattern = paste0(
-      STRING, "|", NUMBER, "|", KEYWORD, "|", SPACE, "|", "."
-    ),
-    text = text,
-    perl = TRUE
-  )
+  tokenize_json <- function(text) {
+    text <- paste(text, collapse = "\n")
 
-  grep("^\\s+$", regmatches(text, match)[[1]], value = TRUE, invert = TRUE)
-}
+    ESCAPE <- '(\\\\[^u[:cntrl:]]|\\\\u[0-9a-fA-F]{4})'
+    CHAR <- '[^[:cntrl:]"\\\\]'
 
-throw <- function(...) {
-  stop("JSON: ", ..., call. = FALSE)
-}
+    STRING <- paste0('"', CHAR, '*(', ESCAPE, CHAR, '*)*"')
+    NUMBER <- "-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?"
+    KEYWORD <- 'null|false|true'
+    SPACE <- '[[:space:]]+'
 
-fromJSONFile <- function(filename) {
-  fromJSON(readLines(filename, warn = FALSE))
-}
+    match <- gregexpr(
+      pattern = paste0(
+        STRING, "|", NUMBER, "|", KEYWORD, "|", SPACE, "|", "."
+      ),
+      text = text,
+      perl = TRUE
+    )
 
-fromJSON <- function(text) {
-
-  tokens <- tokenize_json(text)
-  token <- NULL
-  ptr <- 1
-
-  read_token <- function() {
-    if (ptr <= length(tokens)) {
-      token <<- tokens[ptr]
-      ptr <<- ptr + 1
-    } else {
-      token <<- 'EOF'
-    }
+    grep("^\\s+$", regmatches(text, match)[[1]], value = TRUE, invert = TRUE)
   }
 
-  parse_value <- function(name = "") {
-    if (token == "{") {
-      parse_object()
-    } else if (token == "[") {
-      parse_array()
-    } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
-      throw("EXPECTED value GOT ", token)
-    } else {
-      j2r(token)
-    }
+  throw <- function(...) {
+    stop("JSON: ", ..., call. = FALSE)
   }
 
-  parse_object <- function() {
-    res <- structure(list(), names = character())
+  # Parse a JSON file
+  #
+  # @param filename Path to the JSON file.
+  # @return R objects corresponding to the JSON file.
 
-    read_token()
+  parse_file <- function(filename) {
+    parse(readLines(filename, warn = FALSE))
+  }
 
-    ## Invariant: we are at the beginning of an element
-    while (token != "}") {
+  # Parse a JSON string
+  #
+  # @param text JSON string.
+  # @return R object corresponding to the JSON string.
 
-      ## "key"
-      if (grepl('^".*"$', token)) {
-        key <- j2r(token)
+  parse <- function(text) {
+
+    tokens <- tokenize_json(text)
+    token <- NULL
+    ptr <- 1
+
+    read_token <- function() {
+      if (ptr <= length(tokens)) {
+        token <<- tokens[ptr]
+        ptr <<- ptr + 1
       } else {
-        throw("EXPECTED string GOT ", token)
+        token <<- 'EOF'
       }
-
-      ## :
-      read_token()
-      if (token != ":") { throw("EXPECTED : GOT ", token) }
-
-      ## value
-      read_token()
-      res[key] <- list(parse_value())
-
-      ## } or ,
-      read_token()
-      if (token == "}") {
-        break
-      } else if (token != ",") {
-        throw("EXPECTED , or } GOT ", token)
-      }
-      read_token()
     }
 
-    res
-  }
+    parse_value <- function(name = "") {
+      if (token == "{") {
+        parse_object()
+      } else if (token == "[") {
+        parse_array()
+      } else if (token == "EOF" || (nchar(token) == 1 && ! token %in% 0:9)) {
+        throw("EXPECTED value GOT ", token)
+      } else {
+        j2r(token)
+      }
+    }
 
-  parse_array <- function() {
-    res <- list()
+    parse_object <- function() {
+      res <- structure(list(), names = character())
+
+      read_token()
+
+      ## Invariant: we are at the beginning of an element
+      while (token != "}") {
+
+        ## "key"
+        if (grepl('^".*"$', token)) {
+          key <- j2r(token)
+        } else {
+          throw("EXPECTED string GOT ", token)
+        }
+
+        ## :
+        read_token()
+        if (token != ":") { throw("EXPECTED : GOT ", token) }
+
+        ## value
+        read_token()
+        res[key] <- list(parse_value())
+
+        ## } or ,
+        read_token()
+        if (token == "}") {
+          break
+        } else if (token != ",") {
+          throw("EXPECTED , or } GOT ", token)
+        }
+        read_token()
+      }
+
+      res
+    }
+
+    parse_array <- function() {
+      res <- list()
+
+      read_token()
+
+      ## Invariant: we are at the beginning of an element
+      while (token != "]") {
+        ## value
+        res <- c(res, list(parse_value()))
+
+        ## ] or ,
+        read_token()
+        if (token == "]") {
+          break
+        } else if (token != ",") {
+          throw("EXPECTED , GOT ", token)
+        }
+        read_token()
+      }
+
+      res
+    }
 
     read_token()
+    parse_value(tokens)
+  }
 
-    ## Invariant: we are at the beginning of an element
-    while (token != "]") {
-      ## value
-      res <- c(res, list(parse_value()))
-
-      ## ] or ,
-      read_token()
-      if (token == "]") {
-        break
-      } else if (token != ",") {
-        throw("EXPECTED , GOT ", token)
-      }
-      read_token()
+  j2r <- function(token) {
+    if (token == "null") {
+      NULL
+    } else if (token == "true") {
+      TRUE
+    } else if (token == "false") {
+      FALSE
+    } else if (grepl('^".*"$', token)) {
+      trimq(token)
+    } else {
+      as.numeric(token)
     }
-
-    res
   }
 
-  read_token()
-  parse_value(tokens)
-}
-
-j2r <- function(token) {
-  if (token == "null") {
-    NULL
-  } else if (token == "true") {
-    TRUE
-  } else if (token == "false") {
-    FALSE
-  } else if (grepl('^".*"$', token)) {
-    trimq(token)
-  } else {
-    as.numeric(token)
-  }
-}
-
-trimq <- function(x) {
-  sub('^"(.*)"$', "\\1", x)
-}
-
-get_json_sha <- function(text) {
-  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
-  if (all(m == -1)) {
-    return(fromJSON(text)$sha %||% NA_character_)
+  trimq <- function(x) {
+    sub('^"(.*)"$', "\\1", x)
   }
 
-  start <- attr(m, "capture.start")
-  end <- start + attr(m, "capture.length") - 1L
-  substring(text, start, end)
-}
+  structure(
+    list(
+      .internal = environment(),
+      parse = parse,
+      parse_file = parse_file
+    ),
+    class = c("standalone_json", "standalone"))
+})
 
 parse_deps <- function(string) {
   if (is.null(string)) return()
@@ -3777,8 +4096,8 @@ parse_deps <- function(string) {
   have_version <- grepl("\\(.*\\)", versions_str)
   versions_str[!have_version] <- NA
 
-  compare  <- sub(".*\\(\\s*(\\S+)\\s+.*\\s*\\)", "\\1", versions_str)
-  versions <- sub(".*\\(\\s*\\S+\\s+(\\S*)\\s*\\)", "\\1", versions_str)
+  compare  <- sub(".*\\(\\s*(\\S+)\\s+.*\\s*\\).*", "\\1", versions_str)
+  versions <- sub(".*\\(\\s*\\S+\\s+(\\S*)\\s*\\).*", "\\1", versions_str)
 
   # Check that non-NA comparison operators are valid
   compare_nna   <- compare[!is.na(compare)]
@@ -3834,7 +4153,6 @@ load_pkg_description <- function(path) {
 #' parse_repo_spec("jimhester/covr#47")        ## pull request
 #' parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
 #' parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
-#' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 #' parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 #' parse_repo_spec("igraph=igraph/rigraph") ## Different package name from repo name
 #'
@@ -4027,6 +4345,9 @@ update_submodules <- function(source, quiet) {
   info <- parse_submodules(file)
 
   to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
+  if (!(length(info) > 0)) {
+    return()
+  }
   info <- info[!to_ignore, ]
 
   for (i in seq_len(NROW(info))) {
@@ -4574,6 +4895,18 @@ in_r_build_ignore <- function(paths, ignore_file) {
   }
 
   vlapply(paths, should_ignore)
+}
+
+
+get_json_sha <- function(text) {
+  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
+  if (all(m == -1)) {
+    return(json$parse(text)$sha %||% NA_character_)
+  }
+
+  start <- attr(m, "capture.start")
+  end <- start + attr(m, "capture.length") - 1L
+  substring(text, start, end)
 }
 
 

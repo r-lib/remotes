@@ -32,38 +32,51 @@ download <- function(path, url, auth_token = NULL, basic_auth = NULL,
 
 base_download <- function(url, path, quiet, headers) {
 
-  if (!is.null(headers)) {
-    unlockBinding("makeUserAgent", asNamespace("utils"))
-    orig <- get("makeUserAgent", envir = asNamespace("utils"))
-    on.exit({
-      assign("makeUserAgent", orig, envir = asNamespace("utils"))
-      lockBinding("makeUserAgent", asNamespace("utils"))
-    }, add = TRUE)
-    ua <- orig(FALSE)
+  if (getRversion() < "3.6.0") {
+    if (!is.null(headers)) {
+      get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
+      orig <- get("makeUserAgent", envir = asNamespace("utils"))
+      on.exit({
+        assign("makeUserAgent", orig, envir = asNamespace("utils"))
+        lockBinding("makeUserAgent", asNamespace("utils"))
+      }, add = TRUE)
+      ua <- orig(FALSE)
 
-    flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
-    agent <- paste0(ua, "\r\n", flathead)
-    assign(
-      "makeUserAgent",
-      envir = asNamespace("utils"),
-      function(format = TRUE) {
-        if (format) {
-          paste0("User-Agent: ", agent, "\r\n")
-        } else {
-          agent
-        }
-      })
-  }
+      flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
+      agent <- paste0(ua, "\r\n", flathead)
+      assign(
+        "makeUserAgent",
+        envir = asNamespace("utils"),
+        function(format = TRUE) {
+          if (format) {
+            paste0("User-Agent: ", agent, "\r\n")
+          } else {
+            agent
+          }
+        })
+    }
 
-  suppressWarnings(
-    status <- utils::download.file(
-      url,
-      path,
-      method = download_method(),
-      quiet = quiet,
-      mode = "wb"
+    suppressWarnings(
+      status <- utils::download.file(
+        url,
+        path,
+        method = download_method(),
+        quiet = quiet,
+        mode = "wb"
+      )
     )
-  )
+  } else {
+    suppressWarnings(
+      status <- utils::download.file(
+        url,
+        path,
+        method = download_method(),
+        quiet = quiet,
+        mode = "wb",
+        headers = headers
+      )
+    )
+  }
 
   if (status != 0)  stop("Cannot download file from ", url, call. = FALSE)
 

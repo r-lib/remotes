@@ -31,11 +31,11 @@ test_that("download", {
   on.exit(unlink(tmp), add = TRUE)
 
   download(tmp, "http://httpbin.org/get", auth_token = NULL)
-  res <- fromJSONFile(tmp)
+  res <- json$parse_file(tmp)
   expect_true("args" %in% names(res))
 
   download(tmp, "http://httpbin.org/get", auth_token = "foobar")
-  res <- fromJSONFile(tmp)
+  res <- json$parse_file(tmp)
   expect_equal(res$args$access_token, "foobar")
 
 })
@@ -75,44 +75,52 @@ test_that("download with curl, basic auth", {
 })
 
 test_that("base download with custom headers", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "http://httpbin.org/anything"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   head <- c("X-Custom" = "Foobar")
   base_download(url, path = tmp, quiet = TRUE, headers = head)
   expect_true(file.exists(tmp))
-  resp <- fromJSON(readLines(tmp))
+  resp <- json$parse(readLines(tmp))
   expect_equal(resp$headers$`X-Custom`, "Foobar")
 })
 
 test_that("curl download with custom headers", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "https://httpbin.org/anything"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   head <- c("X-Custom" = "Foobar")
   curl_download(url, path = tmp, quiet = TRUE, headers = head)
   expect_true(file.exists(tmp))
-  resp <- fromJSON(readLines(tmp))
+  resp <- json$parse(readLines(tmp))
   expect_equal(resp$headers$`X-Custom`, "Foobar")
 })
 
 test_that("base download with basic auth", {
+  skip_on_cran()
   skip_if_offline()
+
   url <- "http://httpbin.org/basic-auth/ruser/rpass"
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   download(url, path = tmp, quiet = TRUE,
            basic_auth = list(user = "ruser", password = "rpass"))
   expect_true(file.exists(tmp))
-  resp <- fromJSON(readLines(tmp))
+  resp <- json$parse(readLines(tmp))
   expect_true(resp$authenticated)
   expect_equal(resp$user, "ruser")
 })
 
 test_that("curl download with basic auth", {
+  skip_on_cran()
   skip_if_offline()
+
   mockery::stub(download, "get_r_version", "3.0.0")
 
   url <- "https://httpbin.org/basic-auth/ruser/rpass"
@@ -121,7 +129,7 @@ test_that("curl download with basic auth", {
   download(url, path = tmp, quiet = TRUE,
            basic_auth = list(user = "ruser", password = "rpass"))
   expect_true(file.exists(tmp))
-  resp <- fromJSON(readLines(tmp))
+  resp <- json$parse(readLines(tmp))
   expect_true(resp$authenticated)
   expect_equal(resp$user, "ruser")
 })

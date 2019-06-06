@@ -44,7 +44,7 @@
 #' @examples
 #' \dontrun{
 #' install_bitbucket("sulab/mygene.r@@default")
-#' install_bitbucket("dannavarro/lsr-package")
+#' install_bitbucket("djnavarro/lsr")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
@@ -74,8 +74,8 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
 }
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
-                              auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL, ...) {
+                             auth_user = bitbucket_user(), password = bitbucket_password(),
+                             sha = NULL, host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -137,7 +137,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export
@@ -153,7 +153,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  fromJSONFile(tmp)
+  json$parse_file(tmp)
 }
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
@@ -186,7 +186,7 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
+  paste0(build_url(json$parse_file(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {
