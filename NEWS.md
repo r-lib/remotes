@@ -1,8 +1,9 @@
 # remotes (development version)
 
-# remotes 2.0.4
+* `install_gitlab()` no longer adds the access token twice to the request
+  (@aornugent, #363).
 
-# remotes (development version)
+# remotes 2.0.4
 
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
   rather than a global type attribute, fixing errors when this global attribute
