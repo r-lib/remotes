@@ -9,6 +9,9 @@
 * Fix bug in internal `parse_deps()` where test of valid comparison operators
 failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
 
+* `install_*()` functions gain `build_manual` and `build_vignette` arguments
+  that previously existed in devtools versions < 2.0 (#353).
+
 # remotes 2.0.4
 
 * `update.package_dependencies()` now uses the pkg_type for the cran remote
