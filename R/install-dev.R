@@ -28,7 +28,8 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     cran_url <- "https://cloud.r-project.org"
   }
 
-  url <- build_url(cran_url, "web", "packages", package, "DESCRIPTION")
+  refs <- dev_split_ref(package)
+  url <- build_url(cran_url, "web", "packages", refs[["pkg"]], "DESCRIPTION")
 
   f <- tempfile()
   on.exit(unlink(f))
@@ -67,11 +68,14 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     stop("Could not determine development repository", call. = FALSE)
   }
 
-  ref <- paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/")
+  full_ref <- paste0(
+    paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/"),
+    refs[["ref"]]
+  )
 
   switch(parts$domain,
-    github.com = install_github(ref, ...),
-    gitlab.com = install_gitlab(ref, ...),
-    bitbucket.org = install_bitbucket(ref, ...)
+    github.com = install_github(full_ref, ...),
+    gitlab.com = install_gitlab(full_ref, ...),
+    bitbucket.org = install_bitbucket(full_ref, ...)
   )
 }
