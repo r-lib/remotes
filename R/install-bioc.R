@@ -227,7 +227,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
     found <- grep(pattern = paste0("/", remote$branch), x = names(res))
 
     if (length(found) == 0) {
-      return(NA)
+      return(NA_character_)
     }
 
     unname(res[found[1]])
@@ -244,7 +244,7 @@ remote_sha.bioc_xgit_remote <- function(remote, ...) {
     header = FALSE)
   names(refs_df) <- c("sha", "ref")
 
-  refs_df$sha[[1]]
+  refs_df$sha[[1]] %||% NA_character_
 }
 
 bioconductor_branch <- function(release, sha) {
