@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Bioc `remote_sha()` now always returns a character result (#379)
+
 * Fix API call for private repositories in `install_gitlab` 
   (@aornugent, #359, #363)
 * git submodules now work if the submodule file is empty (@muschellij2, #234)
