@@ -2287,7 +2287,8 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     cran_url <- "https://cloud.r-project.org"
   }
 
-  url <- build_url(cran_url, "web", "packages", package, "DESCRIPTION")
+  refs <- dev_split_ref(package)
+  url <- build_url(cran_url, "web", "packages", refs[["pkg"]], "DESCRIPTION")
 
   f <- tempfile()
   on.exit(unlink(f))
@@ -2326,12 +2327,15 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
     stop("Could not determine development repository", call. = FALSE)
   }
 
-  ref <- paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/")
+  full_ref <- paste0(
+    paste0(c(parts$username, parts$repo, if (nzchar(parts$subdir)) parts$subdir), collapse = "/"),
+    refs[["ref"]]
+  )
 
   switch(parts$domain,
-    github.com = install_github(ref, ...),
-    gitlab.com = install_gitlab(ref, ...),
-    bitbucket.org = install_bitbucket(ref, ...)
+    github.com = install_github(full_ref, ...),
+    gitlab.com = install_gitlab(full_ref, ...),
+    bitbucket.org = install_bitbucket(full_ref, ...)
   )
 }
 
@@ -4414,6 +4418,10 @@ update_submodules <- function(source, quiet) {
   }
   info <- parse_submodules(file)
 
+  # Fixes #234
+  if (length(info) == 0) {
+    return()
+  }
   to_ignore <- in_r_build_ignore(info$path, file.path(source, ".Rbuildignore"))
   if (!(length(info) > 0)) {
     return()
@@ -4967,6 +4975,9 @@ in_r_build_ignore <- function(paths, ignore_file) {
   vlapply(paths, should_ignore)
 }
 
+dev_split_ref <- function(x) {
+  re_match(x, "^(?<pkg>[^@#]+)(?<ref>[@#].*)?$")
+}
 
 get_json_sha <- function(text) {
   m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
