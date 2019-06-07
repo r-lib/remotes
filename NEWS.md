@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* git submodules now work if the submodule file is empty (@muschellij2, #234)
+
 * `install_gitlab()` no longer adds the access token twice to the request
   (@aornugent, #363).
 
