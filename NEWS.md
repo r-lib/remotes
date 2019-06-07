@@ -2,6 +2,10 @@
 
 * Fix API call for private repositories in `install_gitlab` 
   (@aornugent, #359, #363)
+* git submodules now work if the submodule file is empty (@muschellij2, #234)
+
+* `install_gitlab()` no longer adds the access token twice to the request
+  (@aornugent, #363).
 
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
@@ -35,6 +39,9 @@ failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
 
 * remotes now understands the "standard" remote type, as produced by packages
   installed from CRAN using `pak` (#309)
+
+* `install_dev()` now supports ref/pull format, e.g.
+  `install_dev('shiny@v1.2-rc')` (@mkearney, #279).
 
 * Fix return type of `install_remote()` when there is a circular dependency (#225)
 

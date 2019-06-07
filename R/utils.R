@@ -492,6 +492,9 @@ in_r_build_ignore <- function(paths, ignore_file) {
   vlapply(paths, should_ignore)
 }
 
+dev_split_ref <- function(x) {
+  re_match(x, "^(?<pkg>[^@#]+)(?<ref>[@#].*)?$")
+}
 
 get_json_sha <- function(text) {
   m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)

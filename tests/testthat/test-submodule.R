@@ -134,3 +134,26 @@ test_that("Can install a repo with a submodule", {
     expect_equal(submodule::foo, 1)
   )
 })
+
+test_that("Can update a submodule with an empty .gitmodules submodule", {
+
+  if (is.null(git_path())) skip("git is not installed")
+
+  dir <- tempfile()
+  dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE, force = TRUE))
+
+  module <- file.path("submodule", ".gitmodules")
+  on.exit(unlink(module), add = TRUE)
+
+  writeLines(con = module,text = "")
+
+  # The bar submodule is in .Rbuildignore, so we will not fetch it
+  build_ignore <- file.path("submodule", ".Rbuildignore")
+  on.exit(unlink(build_ignore), add = TRUE)
+
+  writeLines("^bar$", build_ignore)
+
+  update_submodules("submodule", quiet = TRUE)
+
+})
