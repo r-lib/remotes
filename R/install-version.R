@@ -85,14 +85,14 @@ version_from_tarball <- function(tarball_name) {
   ifelse(grepl(package_ver_regex, tarball_name), sub(package_ver_regex, "\\1", tarball_name), NULL)
 }
 
-#' @param to.check version as a string or `package_version` object
+#' @param to_check version as a string or `package_version` object
 #' @inheritParams version_criteria
 #' @return TRUE if version 'to.check' satisfies all version criteria 'criteria'
-satisfies <- function(to.check, criteria) {
-  to.check <- package_version(to.check)
+satisfies <- function(to_check, criteria) {
+  to_check <- package_version(to_check)
   result <- apply(version_criteria(criteria), 1, function(r) {
     if(is.na(r['compare'])) TRUE
-    else get(r['compare'], mode='function')(to.check, r['version'])
+    else get(r['compare'], mode='function')(to_check, r['version'])
   })
   all(result)
 }
@@ -208,9 +208,9 @@ download_version_url <- function(package, version, repos, type) {
     package_exists <- TRUE
 
     for (i in rev(seq_len(nrow(info)))) {
-      package.path <- row.names(info)[i]
-      if (satisfies(version_from_tarball(package.path), version)) {
-        return(paste(info$repo[i], "/src/contrib/Archive/", package.path, sep = ""))
+      package_path <- row.names(info)[i]
+      if (satisfies(version_from_tarball(package_path), version)) {
+        return(paste(info$repo[i], "/src/contrib/Archive/", package_path, sep = ""))
       }
     }
   }
