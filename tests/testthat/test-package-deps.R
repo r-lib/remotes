@@ -64,16 +64,16 @@ test_that("version requirement comparisons", {
   required2 <- "< 2.1, > 1.5"
 
   for (required in list(required1, required2)) {
-    expect_true(satisfies('2.0', required), label = required)
-    expect_true(satisfies(NULL, required))
-    expect_false(satisfies('2.1', required))
-    expect_false(satisfies('1.5', required))
+    expect_true(version_satisfies_criteria('2.0', required), label = required)
+    expect_true(version_satisfies_criteria(NULL, required))
+    expect_false(version_satisfies_criteria('2.1', required))
+    expect_false(version_satisfies_criteria('1.5', required))
 
-    mockery::stub(have, "packageDescription", function(...) "2.0")
-    expect_true(have('foo', required))
+    mockery::stub(package_installed, "packageDescription", function(...) "2.0")
+    expect_true(package_installed('foo', required))
 
-    mockery::stub(have, "packageDescription", function(...) "1.0")
-    expect_false(have('foo', required))
+    mockery::stub(package_installed, "packageDescription", function(...) "1.0")
+    expect_false(package_installed('foo', required))
   }
 
   expect_equal(

@@ -88,7 +88,7 @@ version_from_tarball <- function(tarball_name) {
 #' @param to_check version as a string or `package_version` object
 #' @inheritParams version_criteria
 #' @return TRUE if version 'to.check' satisfies all version criteria 'criteria'
-satisfies <- function(to_check, criteria) {
+version_satisfies_criteria <- function(to_check, criteria) {
   to_check <- package_version(to_check)
   result <- apply(version_criteria(criteria), 1, function(r) {
     if(is.na(r['compare'])) TRUE
@@ -100,9 +100,9 @@ satisfies <- function(to_check, criteria) {
 #' @param pkg package name
 #' @inheritParams version_criteria
 #' @return TRUE if `pkg` is already installed, and its version satisfies all criteria `criteria`
-have <- function(pkg, criteria) {
+package_installed <- function(pkg, criteria) {
   v <- suppressWarnings(packageDescription(pkg, fields = "Version"))
-  !is.na(v) && satisfies(v, criteria)
+  !is.na(v) && version_satisfies_criteria(v, criteria)
 }
 
 #' @param criteria character vector expressing criteria for some version to satisfy.  Options include:
@@ -186,7 +186,7 @@ download_version_url <- function(package, version, repos, type) {
 
   if (package %in% row.names(available)) {
     current.version <- available[package, 'Version']
-    if (satisfies(current.version, version)) {
+    if (version_satisfies_criteria(current.version, version)) {
       row <- available[which(rownames(available) == package)[1], ]
       return(paste0(
         row[["Repository"]],
@@ -209,7 +209,7 @@ download_version_url <- function(package, version, repos, type) {
 
     for (i in rev(seq_len(nrow(info)))) {
       package_path <- row.names(info)[i]
-      if (satisfies(version_from_tarball(package_path), version)) {
+      if (version_satisfies_criteria(version_from_tarball(package_path), version)) {
         return(paste(info$repo[i], "/src/contrib/Archive/", package_path, sep = ""))
       }
     }
