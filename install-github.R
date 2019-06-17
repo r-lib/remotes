@@ -3870,7 +3870,7 @@ safe_build_package <- function(pkgdir, build_opts, build_manual, build_vignettes
   } else {
     # No pkgbuild, so we need to call R CMD build ourselves
 
-    lib <- paste(.libPaths(), collapse = ":")
+    lib <- paste(.libPaths(), collapse = .Platform$path.sep)
     env <- c(R_LIBS = lib,
       R_LIBS_USER = lib,
       R_LIBS_SITE = lib,
