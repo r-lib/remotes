@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* `install_version()` now errors with a more informative message when `type` is
+  not 'source' (#323)
+
 * The interactive menu has been modified to provide more clear instructions on
   the behavior (#207)
 

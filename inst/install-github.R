@@ -3703,6 +3703,10 @@ function(...) {
                               type = "source",
                               ...) {
   
+    if (!identical(type, "source")) {
+      stop("`type` must be 'source' for `install_version()`", call. = FALSE)
+    }
+  
     url <- download_version_url(package, version, repos, type)
     res <- install_url(url,
                 dependencies = dependencies,
