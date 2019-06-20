@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* The interactive menu has been modified to provide more clear instructions on
+  the behavior (#207)
+
 * Bioc `remote_sha()` now always returns a character result (#379)
 
 * Fix API call for private repositories in `install_gitlab` 

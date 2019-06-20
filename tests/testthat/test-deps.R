@@ -411,7 +411,7 @@ test_that("upgradeable_packages works", {
                object)
 
   # returns selected row to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "falsy (1.0    -> 1.1   ) [CRAN]", TRUE)
+  mockery::stub(upgradable_packages, "select_menu", function(...) "falsy (1.0    -> 1.1   ) [CRAN]", TRUE)
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -420,7 +420,7 @@ test_that("upgradeable_packages works", {
               )
 
   # returns selected rows to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"))
+  mockery::stub(upgradable_packages, "select_menu", function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"))
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -430,17 +430,17 @@ test_that("upgradeable_packages works", {
               )
 
   # All should be the whole object
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "All")
+  mockery::stub(upgradable_packages, "select_menu", function(...) "All")
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object)
 
   # None should be only un-installed packages
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "None")
+  mockery::stub(upgradable_packages, "select_menu", function(...) "None")
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[which(object$package == "magrittr"), ])
 
   # CRAN should be only the CRAN packages
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) "CRAN packages only")
+  mockery::stub(upgradable_packages, "select_menu", function(...) "CRAN packages only")
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -449,7 +449,7 @@ test_that("upgradeable_packages works", {
               )
 
   # empty vector should be the 0 row object (you get this when canceling the selection)
-  mockery::stub(upgradable_packages, "utils::select.list", function(...) character(0))
+  mockery::stub(upgradable_packages, "select_menu", function(...) character(0))
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[which(object$package == "magrittr"), ])
 
