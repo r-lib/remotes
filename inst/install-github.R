@@ -4030,9 +4030,9 @@ function(...) {
   
     force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
   
-    no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !as.logical(force_suggests))
+    no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !config_val_to_logical(force_suggests))
   
-    !as.logical(no_errors)
+    !config_val_to_logical(no_errors)
   }
   # Contents of R/json.R
   
@@ -4810,7 +4810,7 @@ function(...) {
   }
   
   is_standalone <- function() {
-    isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
+    isTRUE(config_val_to_logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
   }
   
   # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
@@ -5052,6 +5052,19 @@ function(...) {
     start <- attr(m, "capture.start")
     end <- start + attr(m, "capture.length") - 1L
     substring(text, start, end)
+  }
+  
+  
+  # from tools:::config_val_to_logical
+  config_val_to_logical <- function (val) {
+    v <- tolower(val)
+    if (v %in% c("1", "yes", "true"))
+      TRUE
+    else if (v %in% c("0", "no", "false"))
+      FALSE
+    else {
+      NA
+    }
   }
 
 

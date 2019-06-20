@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Environment variables now accept 0 and 1 as valid values (#238)
+
 * remotes now uses locking by default when installing binary packages, which avoids
   issues when installing binaries that are already open in other R processes
   (#368)

@@ -113,9 +113,15 @@ test_that("should_error_for_warnings works", {
   withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = "true", "_R_CHECK_FORCE_SUGGESTS_" = NA),
     expect_false(should_error_for_warnings())
   )
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = "1", "_R_CHECK_FORCE_SUGGESTS_" = NA),
+    expect_false(should_error_for_warnings())
+  )
 
   # If no errors unset, and force_suggests false, should error -> FALSE
   withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "false"),
+    expect_false(should_error_for_warnings())
+  )
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "0"),
     expect_false(should_error_for_warnings())
   )
 
@@ -123,6 +129,10 @@ test_that("should_error_for_warnings works", {
   withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "true"),
     expect_true(should_error_for_warnings())
   )
+  withr::with_envvar(c("R_REMOTES_NO_ERRORS_FROM_WARNINGS" = NA, "_R_CHECK_FORCE_SUGGESTS_" = "1"),
+    expect_true(should_error_for_warnings())
+  )
+
 })
 
 test_that("normalize_build_opts works", {
