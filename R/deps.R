@@ -586,11 +586,11 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
       pkgs <- format_upgrades(x[behind, ])
 
       choices <- pkgs
-      if (length(choices) > 1) {
+      if (length(choices) > 0) {
         choices <- c("All", "CRAN packages only", "None", choices)
       }
 
-      res <- utils::select.list(choices, title = "These packages have more recent versions available.\nWhich would you like to update?", multiple = TRUE)
+      res <- select_menu(choices, title = "These packages have more recent versions available.\nWhich would you like to update?")
 
       if ("None" %in% res || length(res) == 0) {
         return(x[uninstalled, ])
@@ -611,6 +611,31 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
     }
   )
 }
+
+select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates:", width = getOption("width")) {
+  if (!is.null(title)) {
+    cat(title, "\n", sep = "")
+  }
+
+  nc <- length(choices)
+  op <- paste0(format(seq_len(nc)), ": ", choices)
+  fop <- format(op)
+  nw <- nchar(fop[[1]], "w") + 2L
+  ncol <- width %/% nw
+  if (ncol > 1L) {
+    op <- paste0(fop, c(rep.int("  ", min(nc, ncol) - 1L), "\n"), collapse = "")
+  }
+  cat("", op, "", sep = "\n")
+  repeat {
+    cat(msg, "\n", sep = "")
+    answer <- readLines(n = 1)
+    answer <- strsplit(answer, "[ ,]+")[[1]]
+    if (all(answer %in% seq_along(choices))) {
+      return(choices[as.integer(answer)])
+    }
+  }
+}
+
 
 msg_upgrades <- function(x, quiet) {
 
