@@ -10,7 +10,8 @@ test_that("github_resolve_ref.github_release", {
   expect_error(
     github_resolve_ref.github_release(
       NA,
-      list(username = "hadley", repo = "devtools")
+      list(username = "hadley", repo = "devtools"),
+      host = "api.github.com"
     ),
     NA
   )
