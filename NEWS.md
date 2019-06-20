@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `github_resolve_ref()` now takes a `host` parameter (#284)
+
 * Environment variables now accept 0 and 1 as valid values (#238)
 
 * remotes now uses locking by default when installing binary packages, which avoids
