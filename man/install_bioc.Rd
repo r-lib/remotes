@@ -2,7 +2,7 @@
 % Please edit documentation in R/install-bioc.R
 \name{install_bioc}
 \alias{install_bioc}
-\title{Install a package from a Bioconductor repository}
+\title{Install a development package from the Bioconductor git repository}
 \usage{
 install_bioc(repo, mirror = getOption("BioC_git",
   download_url("git.bioconductor.org/packages")), git = c("auto",
@@ -70,7 +70,9 @@ be used.
 It is vectorised so you can install multiple packages with
 a single command.
 
-'
+This is intended as an aid for Bioconductor developers. If you want to
+install the release version of a Bioconductor package one can use the
+\code{BiocManager} package.
 }
 \examples{
 \dontrun{

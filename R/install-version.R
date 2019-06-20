@@ -48,7 +48,7 @@ install_version <- function(package, version = NULL,
               type = type,
               ...)
 
-  lib <- list(...)$lib
+  lib <- list(...)$lib %||% .libPaths()
 
   # Remove Metadata from installed package
   add_metadata(
