@@ -217,7 +217,7 @@ should_error_for_warnings <- function() {
 
   force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
 
-  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !as.logical(force_suggests))
+  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !config_val_to_logical(force_suggests))
 
-  !as.logical(no_errors)
+  !config_val_to_logical(no_errors)
 }
