@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `update_deps()` no longer fails if a local package no longer exists (#289)
+
 * `install_version()` now errors with a more informative message when `type` is
   not 'source' (#323)
 
