@@ -56,24 +56,26 @@ safe_install_packages <- function(...) {
     i.p <- utils::install.packages
   }
 
-  with_envvar(
-    c(R_LIBS = lib,
-      R_LIBS_USER = lib,
-      R_LIBS_SITE = lib,
-      RGL_USE_NULL = "TRUE"),
+  with_options(list(install.lock = getOption("install.lock", TRUE)), {
+    with_envvar(
+      c(R_LIBS = lib,
+        R_LIBS_USER = lib,
+        R_LIBS_SITE = lib,
+        RGL_USE_NULL = "TRUE"),
 
-    # Set options(warn = 2) for this process and child processes, so that
-    # warnings from `install.packages()` are converted to errors.
-    if (should_error_for_warnings()) {
-      with_options(list(warn = 2),
-        with_rprofile_user("options(warn = 2)",
-          i.p(...)
+      # Set options(warn = 2) for this process and child processes, so that
+      # warnings from `install.packages()` are converted to errors.
+      if (should_error_for_warnings()) {
+        with_options(list(warn = 2),
+          with_rprofile_user("options(warn = 2)",
+            i.p(...)
+          )
         )
-      )
-    } else {
-      i.p(...)
-    }
-  )
+      } else {
+        i.p(...)
+      }
+    )
+  })
 }
 
 normalize_build_opts <- function(build_opts, build_manual, build_vignettes) {
