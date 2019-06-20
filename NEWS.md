@@ -1,5 +1,9 @@
 # remotes (development version)
 
+* remotes now uses locking by default when installing binary packages, which avoids
+  issues when installing binaries that are already open in other R processes
+  (#368)
+
 * `update_deps()` no longer fails if a local package no longer exists (#289)
 
 * `install_version()` now errors with a more informative message when `type` is
