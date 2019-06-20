@@ -3108,7 +3108,12 @@ function(...) {
     # Already downloaded - just need to copy to tempdir()
     bundle <- tempfile()
     dir.create(bundle)
-    file.copy(x$path, bundle, recursive = TRUE)
+    suppressWarnings(
+      res <- file.copy(x$path, bundle, recursive = TRUE)
+    )
+    if (!all(res)) {
+      stop("Could not copy `", x$path, "` to `", bundle, "`", call. = FALSE)
+    }
   
     # file.copy() creates directory inside of bundle
     dir(bundle, full.names = TRUE)[1]
@@ -3200,7 +3205,11 @@ function(...) {
       return(invisible(package_name))
     }
   
-    bundle <- remote_download(remote, quiet = quiet)
+    res <- try(bundle <- remote_download(remote, quiet = quiet), silent = TRUE)
+    if (inherits(res, "try-error")) {
+      return(NA_character_)
+    }
+  
     on.exit(unlink(bundle), add = TRUE)
   
     source <- source_pkg(bundle, subdir = remote$subdir)

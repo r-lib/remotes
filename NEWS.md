@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* Local remotes whose original location has been moved will no longer error
+  when updating (#370).
+
 * `update_deps()` no longer sorts the dependencies alphabetically (#296, #301)
 
 * `github_resolve_ref()` now takes a `host` parameter (#284)

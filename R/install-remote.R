@@ -48,7 +48,11 @@ install_remote <- function(remote,
     return(invisible(package_name))
   }
 
-  bundle <- remote_download(remote, quiet = quiet)
+  res <- try(bundle <- remote_download(remote, quiet = quiet), silent = TRUE)
+  if (inherits(res, "try-error")) {
+    return(NA_character_)
+  }
+
   on.exit(unlink(bundle), add = TRUE)
 
   source <- source_pkg(bundle, subdir = remote$subdir)
