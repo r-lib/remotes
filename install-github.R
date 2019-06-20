@@ -574,7 +574,7 @@ function(...) {
     repos <- fix_repositories(repos)
     cran <- available_packages(repos, type)
   
-    deps <- sort(find_deps(packages, available = cran, top_dep = dependencies))
+    deps <- find_deps(packages, available = cran, top_dep = dependencies)
   
     # Remove base packages
     inst <- utils::installed.packages()

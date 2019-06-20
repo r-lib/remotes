@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `update_deps()` no longer sorts the dependencies alphabetically (#296, #301)
+
 * `github_resolve_ref()` now takes a `host` parameter (#284)
 
 * Environment variables now accept 0 and 1 as valid values (#238)
