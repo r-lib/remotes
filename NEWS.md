@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* GitHub remotes that point to branches no longer fail when the branch is later
+  deleted (#274).
+
 * Local remotes whose original location has been moved will no longer error
   when updating (#370).
 

@@ -1716,7 +1716,9 @@ function(...) {
     )
    }
   
-    structure(list(message = msg, call = NULL), class = c("simpleError", "error", "condition"))
+   status_type <- (res$status_code %/% 100) * 100
+  
+   structure(list(message = msg, call = NULL), class = c(paste0("http_", unique(c(res$status_code, status_type, "error"))), "error", "condition"))
   }
   
   
@@ -2866,8 +2868,14 @@ function(...) {
   
   #' @export
   remote_sha.github_remote <- function(remote, ..., use_curl = !is_standalone() && pkg_installed("curl")) {
-    github_commit(username = remote$username, repo = remote$repo,
-      host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl)
+    tryCatch(
+      github_commit(username = remote$username, repo = remote$repo,
+        host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl),
+  
+      # 422 errors most often occur when a branch or PR has been deleted, so we
+      # ignore the error in this case
+      http_422 = function(e) NA_character_
+    )
   }
   
   #' @export
