@@ -438,7 +438,7 @@ function(...) {
   # Contents of R/decompress.R
   # Decompress pkg, if needed
   source_pkg <- function(path, subdir = NULL) {
-    if (!file.info(path)$isdir) {
+    if (!dir.exists(path)) {
       bundle <- path
       outdir <- tempfile(pattern = "remotes")
       dir.create(outdir)
