@@ -170,6 +170,25 @@ test_that("remote_sha.github_remote", {
   )
 })
 
+test_that("github_remote with deleted branch", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  expect_equal(
+    remote_sha.github_remote(
+      list(
+        username = "tidyverse",
+        repo = "purrr",
+        ref = "rc-0.3.1",
+        host = "api.github.com"
+      )
+    ),
+    NA_character_
+  )
+})
+
 test_that("github_pull", {
 
   skip_on_cran()
