@@ -209,7 +209,7 @@ github_error <- function(res) {
   )
  }
 
- status_type <- (res$status_code %/% 100) * 100
+ status_type <- (as.integer(res$status_code) %/% 100) * 100
 
  structure(list(message = msg, call = NULL), class = c(paste0("http_", unique(c(res$status_code, status_type, "error"))), "error", "condition"))
 }
