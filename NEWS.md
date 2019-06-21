@@ -1,4 +1,14 @@
-# remotes (development version)
+# remotes 2.1.0
+
+## New features
+
+* `install_*()` functions gain `build_manual` and `build_vignette` arguments
+  that previously existed in devtools versions < 2.0 (#353).
+
+* The interactive menu has been modified to provide more clear instructions on
+  the skipping behavior (#207)
+
+## Minor improvements and fixes
 
 * `update_packages()` now has a more informative error message when the update
   fails (#223, #232)
@@ -18,7 +28,7 @@
 
 * `github_resolve_ref()` now takes a `host` parameter (#284)
 
-* Environment variables now accept 0 and 1 as valid values (#238)
+* Remotes specific environment variables now accept 0 and 1 as valid values (#238)
 
 * remotes now uses locking by default when installing binary packages, which avoids
   issues when installing binaries that are already open in other R processes
@@ -29,13 +39,11 @@
 * `install_version()` now errors with a more informative message when `type` is
   not 'source' (#323)
 
-* The interactive menu has been modified to provide more clear instructions on
-  the behavior (#207)
-
 * Bioc `remote_sha()` now always returns a character result (#379)
 
 * Fix API call for private repositories in `install_gitlab` 
   (@aornugent, #359, #363)
+
 * git submodules now work if the submodule file is empty (@muschellij2, #234)
 
 * `install_gitlab()` no longer adds the access token twice to the request
@@ -44,11 +52,8 @@
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
-* Fix bug in internal `parse_deps()` where test of valid comparison operators
-failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
-
-* `install_*()` functions gain `build_manual` and `build_vignette` arguments
-  that previously existed in devtools versions < 2.0 (#353).
+* `parse_deps()` now ignores trailing whitespaces around comparison operators
+  in DESCRIPTION fields (@LiNk-NY, #366)
 
 # remotes 2.0.4
 
