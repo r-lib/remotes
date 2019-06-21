@@ -12,7 +12,7 @@ buffer <- local({
   }
 
   ## Buffered read from binary file
-  buffer <- function(con, buffer_size = 512L * 1024L * 16L) {
+  buffer <- function(con, buffer_size = 1024L * 1024L * 4L) {
     force(con)
     chunk_size <- buffer_size
     cache_con <- rawConnection(readBin(con, "raw", buffer_size))

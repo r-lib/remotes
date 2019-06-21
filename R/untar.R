@@ -352,9 +352,10 @@ s1_untar <- local({
       self$items[[as.character(self$next_item)]] <- header
     }
 
-    if (self$mode != "extract") {
+    if (self$mode == "list") {
       skip_this <- TRUE
     } else {
+      ## extract or iterate
       path <- file.path(self$exdir, header$name)
       if (file.exists(path) && !self$opts$overwrite) {
         skip_this <- TRUE
@@ -369,16 +370,28 @@ s1_untar <- local({
     }
 
     ## We only do this here, so the path can be included in the list
-    check_safe_path(header$name)
+    if (self$mode == "extract") check_safe_path(header$name)
+
+    if (!is.null(self$header_callback)) {
+      if (!self$header_callback(header)) return(FALSE)
+    }
 
     if (header$type == "symlink") {
-      if (self$mode == "extract") do_symlink(path, header, self$exdir)
+      if (self$mode == "extract") {
+        do_symlink(path, header, self$exdir)
+      } else if (!is.null(self$data_callback)) {
+        if (!self$data_callback(header, NULL)) return(FALSE)
+      }
       self$parser$skip(header$size + of)
       return(TRUE)
     }
 
     if (!header$size || header$type == "directory") {
-      if (self$mode == "extract") do_mkdirp(path, header)
+      if (self$mode == "extract") {
+        do_mkdirp(path, header)
+      } else if (!is.null(self$data_callback)) {
+        if (!self$data_callback(header, NULL)) return(FALSE)
+      }
       self$parser$skip(header$size + of)
       return(TRUE)
     }
@@ -390,6 +403,11 @@ s1_untar <- local({
       self$parser$skip(of)
       self$extracting <- NULL
       set_file_metadata(path, header)
+    } else if (!is.null(self$data_callback)) {
+      if (!self$data_callback(header, self$parser$read(header$size))) {
+        return(FALSE)
+      }
+      self$parser$skip(of)
     } else {
       self$parser$skip(header$size + of)
     }
@@ -422,6 +440,8 @@ s1_untar <- local({
     vapply(X, FUN, FUN.VALUE = integer(1), ...)
   }
 
+  `%||%` <- function(l, r) if (is.null(l)) r else l
+
   process_file <- function(self, tarfile, patterns, options) {
     filesize <- NA_integer_
 
@@ -431,7 +451,10 @@ s1_untar <- local({
       on.exit(close(tarfile), add = TRUE)
     }
 
-    chunk_size <- min(filesize, 1024L * 1024L * 256L, na.rm = TRUE)
+    chunk_size <- min(
+      options$chunk_size %||% (1024L * 1024L * 4L),
+      filesize,
+      na.rm = TRUE)
 
     if (!is.null(patterns)) {
       self$patterns <- map_chr(patterns, glob$to_regex)
@@ -482,11 +505,56 @@ s1_untar <- local({
     process_file(self, tarfile, patterns, options)
   }
 
+  iterate <- function(tarfile, header_callback = NULL, data_callback = NULL,
+                      patterns = NULL, options = list()) {
+    self <- new.env(parent = emptyenv())
+    self$mode <- "iterate"
+    self$header_callback <- header_callback
+    self$data_callback <- data_callback
+    process_file(self, tarfile, patterns, options)
+  }
+
+  get_root_dir <- function(tarfile, patterns = NULL, options = list()) {
+    header <- NULL
+    header_callback <- function(h) {
+      header <<- h
+      FALSE
+    }
+
+    iterate(tarfile, header_callback = header_callback, patterns = patterns,
+            options = list(chunk_size = 4096))
+
+    if (is.null(header)) stop("Cannot find any files (matching patterns)")
+    dir <- header$name
+    while ((d2 <- dirname(dir)) != ".") dir <- d2
+    sub("/$", "", dir)
+  }
+
+  get_description <- function(tarfile, options = list()) {
+    stopifnot(is.character(tarfile))
+    root <- get_root_dir(tarfile, options = options)
+    header <- NULL
+    data <- NULL
+    data_callback <- function(h, d) {
+      header <<- h
+      data <<- d
+      FALSE
+    }
+
+    description <- paste0(root, "/", "DESCRIPTION")
+    iterate(tarfile, data_callback = data_callback, patterns = description,
+            options = options)
+    if (is.null(header)) stop("No DESCRIPTION file found")
+    if (is.null(data)) stop("DESCRIPTION is not a regular file")
+    rawToChar(data)
+  }
+
   default_options <- function() {
     list(
       filename_encoding = "UTF-8",
       overwrite = TRUE,
-      limit = Inf
+      limit = Inf,
+      chunk_size = NULL
     )
   }
 
@@ -497,6 +565,9 @@ s1_untar <- local({
       .internal = environment(),
       list = listx,
       extract = extract,
+      iterate = iterate,
+      get_root_dir = get_root_dir,
+      get_description = get_description,
       default_options = default_options
     ),
     class = c("standalone_tar", "standalone")
