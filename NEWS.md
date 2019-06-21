@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* `update_packages()` now has a more informative error message when the update
+  fails (#223, #232)
+
 * `install_git()` now can take credentials from the global option
   `remotes.git_credentials` (#378).
 

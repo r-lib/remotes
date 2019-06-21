@@ -80,7 +80,35 @@ install_remote <- function(remote,
 }
 
 install_remotes <- function(remotes, ...) {
-  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = character(1)))
+  res <- character(length(remotes))
+  for (i in seq_along(remotes)) {
+    tryCatch(
+      res[[i]] <- install_remote(remotes[[i]], ...),
+      error = function(e) {
+        stop(remote_install_error(remotes[[i]], e))
+      })
+  }
+  invisible(res)
+}
+
+remote_install_error <- function(remote, error) {
+  msg <- sprintf(
+    "Failed to install '%s' from %s:\n  %s", remote_name_or_unknown(remote), format(remote), conditionMessage(error)
+  )
+
+ structure(list(message = msg, call = NULL, error = error, remote = remote), class = c("install_error", "error", "condition"))
+}
+
+remote_name_or_unknown <- function(remote) {
+  res <- tryCatch(
+    res <- remote_package_name(remote),
+    error = function(e) NA_character_)
+
+  if (is.na(res)) {
+    return("unknown package")
+  }
+
+  res
 }
 
 # Add metadata
