@@ -5,9 +5,9 @@
 \title{Install a package from a git repository}
 \usage{
 install_git(url, subdir = NULL, ref = NULL, branch = NULL,
-  credentials = NULL, git = c("auto", "git2r", "external"),
-  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
-  force = FALSE, quiet = FALSE, build = TRUE,
+  credentials = git_credentials(), git = c("auto", "git2r",
+  "external"), dependencies = NA, upgrade = c("default", "ask",
+  "always", "never"), force = FALSE, quiet = FALSE, build = TRUE,
   build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), build_manual = FALSE,
   build_vignettes = FALSE, repos = getOption("repos"),
@@ -71,6 +71,11 @@ is \code{TRUE}.}
 It is vectorised so you can install multiple packages with
 a single command. You do not need to have the \code{git2r} package,
 or an external git client installed.
+}
+\details{
+If you need to set git credentials for use in the \code{Remotes} field you can do
+so by placing the credentials in the \code{remotes.git_credentials} global
+option.
 }
 \examples{
 \dontrun{
