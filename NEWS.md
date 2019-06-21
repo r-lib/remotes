@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `install_git()` now works with SHA references and external git (#389).
+
 * GitHub remotes that point to branches no longer fail when the branch is later
   deleted (#274).
 

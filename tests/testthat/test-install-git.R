@@ -92,6 +92,76 @@ test_that("install_git with command line git", {
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
+test_that("install_git with command line git and tag ref", {
+
+  skip_on_cran()
+  skip_if_offline()
+  if (is.null(git_path())) skip("git is not installed")
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+
+  url <- "https://github.com/cran/falsy.git"
+  install_git(url, ref = "1.0", git = "external", lib = lib, quiet = TRUE)
+
+  expect_silent(packageDescription("falsy", lib.loc = lib))
+  expect_equal(packageDescription("falsy", lib.loc = lib)$RemoteUrl, url)
+
+  remote <- package2remote("falsy", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "xgit_remote")
+  expect_equal(format(remote), "Git")
+  expect_equal(remote$url, url)
+  expect_equal(remote$ref, "1.0")
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
+})
+
+test_that("install_git with command line git and full SHA ref", {
+
+  skip_on_cran()
+  skip_if_offline()
+  if (is.null(git_path())) skip("git is not installed")
+
+  Sys.unsetenv("R_TESTS")
+
+  lib <- tempfile()
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+  dir.create(lib)
+
+  url <- "https://github.com/cran/falsy.git"
+  install_git(url, ref = "0f39d9eb735bf16909831c0bb129063dda388375", git = "external", lib = lib, quiet = TRUE)
+
+  expect_silent(packageDescription("falsy", lib.loc = lib))
+  expect_equal(packageDescription("falsy", lib.loc = lib)$RemoteUrl, url)
+
+  remote <- package2remote("falsy", lib = lib)
+  expect_s3_class(remote, "remote")
+  expect_s3_class(remote, "xgit_remote")
+  expect_equal(format(remote), "Git")
+  expect_equal(remote$url, url)
+  expect_equal(remote$ref, "0f39d9eb735bf16909831c0bb129063dda388375")
+  expect_true(!is.na(remote$sha) && nzchar(remote$sha))
+})
+
+test_that("remote_sha.xgit remote returns the SHA if it exists", {
+  skip_on_cran()
+  skip_if_offline()
+  if (is.null(git_path())) skip("git is not installed")
+
+  url <- "https://github.com/cran/falsy.git"
+
+  # works with tags
+  remote <- git_remote(url, ref = "1.0", git = "external")
+  expect_equal(remote_sha(remote), "0f39d9eb735bf16909831c0bb129063dda388375")
+
+  # works with full SHAs
+  remote <- git_remote(url, ref = "26a36cf957a18569e311ef75b6f61f822de945ef", git = "external")
+  expect_equal(remote_sha(remote), "26a36cf957a18569e311ef75b6f61f822de945ef")
+})
+
 test_that("remote_metadata.xgit_remote", {
 
   r <- remote_metadata.xgit_remote(
