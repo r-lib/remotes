@@ -620,12 +620,7 @@ select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers,
   nc <- length(choices)
   op <- paste0(format(seq_len(nc)), ": ", choices)
   fop <- format(op)
-  nw <- nchar(fop[[1]], "w") + 2L
-  ncol <- width %/% nw
-  if (ncol > 1L) {
-    op <- paste0(fop, c(rep.int("  ", min(nc, ncol) - 1L), "\n"), collapse = "")
-  }
-  cat("", op, sep = "\n")
+  cat("", fop, "", sep = "\n")
   repeat {
     cat(msg, "\n", sep = "")
     answer <- readLines(n = 1)
