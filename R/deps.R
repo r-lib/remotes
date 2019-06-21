@@ -625,7 +625,7 @@ select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers,
   if (ncol > 1L) {
     op <- paste0(fop, c(rep.int("  ", min(nc, ncol) - 1L), "\n"), collapse = "")
   }
-  cat("", op, "", sep = "\n")
+  cat("", op, sep = "\n")
   repeat {
     cat(msg, "\n", sep = "")
     answer <- readLines(n = 1)
