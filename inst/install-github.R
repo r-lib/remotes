@@ -2582,9 +2582,13 @@ function(...) {
     bundle <- tempfile()
   
     args <- c('clone', '--depth', '1', '--no-hardlinks')
-    if (!is.null(x$ref)) args <- c(args, "--branch", x$ref)
     args <- c(args, x$args, x$url, bundle)
     git(paste0(args, collapse = " "), quiet = quiet)
+  
+    if (!is.null(x$ref)) {
+      git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
+      git(paste0(c("checkout", "FETCH_HEAD"), collapse = " "), quiet = quiet, path = bundle)
+    }
   
     bundle
   }
@@ -2616,6 +2620,11 @@ function(...) {
     ref <- remote$ref
   
     refs <- git(paste("ls-remote", url, ref))
+  
+    # If none found, it is either a SHA, so return the pinned SHA or NA
+    if (length(refs) == 0) {
+      return(remote$ref %||% NA_character_)
+    }
   
     refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
       header = FALSE)
