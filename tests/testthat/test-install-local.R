@@ -62,9 +62,8 @@ test_that("local remotes do not fail if the local install no longer exists", {
 
   unlink(dir, recursive = TRUE)
 
-  old <- .libPaths()
-  .libPaths(lib)
-  on.exit(.libPaths(old), add = TRUE)
+  old <- set_libpaths(lib)
+  on.exit(set_libpaths(old), add = TRUE)
 
   expect_error(update_packages(pkg[, 1], lib = lib, upgrade = TRUE, quiet = TRUE), NA)
 })
