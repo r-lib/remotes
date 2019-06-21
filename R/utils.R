@@ -111,14 +111,6 @@ get_r_version <- function() {
   paste(R.version$major, sep = ".", R.version$minor)
 }
 
-set_libpaths <- function(paths) {
-  old <- .libPaths()
-  .libPaths(paths)
-  invisible(old)
-}
-
-with_libpaths <- with_something(set_libpaths, .libPaths)
-
 set_options <- function(x) {
   do.call(options, as.list(x))
 }
