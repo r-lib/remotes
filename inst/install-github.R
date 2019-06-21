@@ -2392,6 +2392,10 @@ function(...) {
   #' a single command. You do not need to have the `git2r` package,
   #' or an external git client installed.
   #'
+  #' If you need to set git credentials for use in the `Remotes` field you can do
+  #' so by placing the credentials in the `remotes.git_credentials` global
+  #' option.
+  #'
   #' @param url Location of package. The url should point to a public or
   #'   private repository.
   #' @param ref Name of branch, tag or SHA reference to use, if not HEAD.
@@ -2413,7 +2417,7 @@ function(...) {
   #' install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
   #'}
   install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
-                          credentials = NULL,
+                          credentials = git_credentials(),
                           git = c("auto", "git2r", "external"),
                           dependencies = NA,
                           upgrade = c("default", "ask", "always", "never"),
@@ -2448,7 +2452,7 @@ function(...) {
   }
   
   
-  git_remote <- function(url, subdir = NULL, ref = NULL, credentials = NULL,
+  git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials(),
                          git = c("auto", "git2r", "external"), ...) {
   
     git <- match.arg(git)
@@ -2464,7 +2468,7 @@ function(...) {
   }
   
   
-  git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
+  git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
     remote("git2r",
       url = url,
       subdir = subdir,
@@ -2474,7 +2478,7 @@ function(...) {
   }
   
   
-  git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
+  git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
     remote("xgit",
       url = url,
       subdir = subdir,
@@ -2631,6 +2635,16 @@ function(...) {
     names(refs_df) <- c("sha", "ref")
   
     refs_df$sha[[1]]
+  }
+  
+  #' Specify git credentials to use
+  #'
+  #' The global option `remotes.git_credentials` is used to set the git
+  #' credentials.
+  #' @export
+  #' @keywords internal
+  git_credentials <- function() {
+    getOption("remotes.git_credentials", NULL)
   }
   # Contents of R/install-github.R
   #' Attempts to install a package directly from GitHub.
