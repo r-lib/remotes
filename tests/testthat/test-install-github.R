@@ -176,6 +176,10 @@ test_that("github_remote with deleted branch", {
   skip_if_offline()
   skip_if_over_rate_limit()
 
+  # skip this test unless we are using curl
+  skip_if(is_standalone() || !pkg_installed("curl"))
+
+
   expect_equal(
     remote_sha.github_remote(
       list(
