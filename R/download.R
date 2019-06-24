@@ -130,6 +130,16 @@ base_download_curl <- function(url, path, quiet, headers) {
 base_download_noheaders <- function(url, path, quiet, headers, method) {
 
   if (length(headers)) {
+
+    if (method == "wininet" && getRversion() < "3.6.0") {
+      warning(paste(
+        "R (< 3.6.0) cannot send HTTP headers with the `wininet` download method.",
+        "This download will likely fail. Please choose a different download",
+        "method, via the `download.file.method` option. The `libcurl` method is",
+        "best, if available, and the `wget` and `curl` methods work as well,",
+        "if the corresponding external tool is available. See `?download.file`"))
+    }
+
     get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
     orig <- get("makeUserAgent", envir = asNamespace("utils"))
     on.exit({

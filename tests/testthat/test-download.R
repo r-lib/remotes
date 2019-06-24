@@ -150,6 +150,7 @@ test_that("wininet method download with custom headers", {
   skip_on_cran()
   skip_if_offline()
   if (os_type() == "unix") return(expect_true(TRUE))
+  if (getRversion() < "3.6.0") return(expect_true(TRUE))
 
   url <- "http://httpbin.org/anything"
   tmp <- tempfile()
@@ -249,6 +250,7 @@ test_that("base wininet download with basic auth", {
   skip_on_cran()
   skip_if_offline()
   if (os_type() == "unix") return(expect_true(TRUE))
+  if (getRversion() < "3.6.0") return(expect_true(TRUE))
 
   url <- "http://httpbin.org/basic-auth/ruser/rpass"
   tmp <- tempfile()
