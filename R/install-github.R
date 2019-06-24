@@ -12,7 +12,7 @@
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/tokens> and
+#'   access token (PAT) in "https://github.com/settings/tokens" and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
