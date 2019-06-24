@@ -8,6 +8,9 @@
 * The interactive menu has been modified to provide more clear instructions on
   the skipping behavior (#207)
 
+* Credentials are now passed via HTTP headers, to reduce exposure when requests
+  fail (#391).
+
 ## Minor improvements and fixes
 
 * `update_packages()` now has a more informative error message when the update
