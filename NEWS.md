@@ -13,6 +13,9 @@
 
 ## Minor improvements and fixes
 
+* `download()` with the external curl download method now always uses `-L` to
+  follow redirects. (#350)
+
 * `update_packages()` now has a more informative error message when the update
   fails (#223, #232)
 
