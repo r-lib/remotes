@@ -1254,6 +1254,37 @@ function(...) {
   }
   # Contents of R/download.R
   
+  #' Download a file
+  #'
+  #' Uses either the curl package for R versions older than 3.2.0,
+  #' otherwise a wrapper around [download.file()].
+  #'
+  #' We respect the `download.file.method` setting of the user. If it is
+  #' not set, then see `download_method()` for choosing a method.
+  #'
+  #' Authentication can be supplied three ways:
+  #' * By setting `auth_token`. This will append an HTTP `Authorization`
+  #'   header: `Authorization: token {auth_token}`.
+  #' * By setting `basic_auth` to a list with elements `user` and `password`.
+  #'   This will append a proper `Authorization: Basic {encoded_password}`
+  #'   HTTP header.
+  #' * By specifying the proper `headers` directly.
+  #'
+  #' If both `auth_token` and `basic_auth` are specified, that's an error.
+  #' `auth_token` and `basic_auth` are _appended_ to `headers`, so they
+  #' take precedence over an `Authorization` header that is specified
+  #' directly in `headers`.
+  #'
+  #' @param path Path to download to. `dirname(path)` must exist.
+  #' @param url URL.
+  #' @param auth_token Token for token-based authentication or `NULL`.
+  #' @param basic_auth List with `user` and `password` for basic HTTP
+  #'   authentication, or `NULL`.
+  #' @param quiet Passed to [download.file()] or [curl::curl_download()].
+  #' @param headers Named character vector of HTTP headers to use.
+  #' @return `path`, if the download was successful.
+  #'
+  #' @keywords internal
   #' @importFrom utils compareVersion
   
   download <- function(path, url, auth_token = NULL, basic_auth = NULL,
@@ -1273,7 +1304,7 @@ function(...) {
       headers <- c(headers, Authorization = paste("token", auth_token))
     }
   
-    if (compareVersion(get_r_version(), "3.2.0") == -1) {
+    if (getRversion() < "3.2.0") {
       curl_download(url, path, quiet, headers)
   
     } else {
@@ -1286,55 +1317,118 @@ function(...) {
   
   base_download <- function(url, path, quiet, headers) {
   
-    if (getRversion() < "3.6.0") {
-      if (!is.null(headers)) {
-        get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
-        orig <- get("makeUserAgent", envir = asNamespace("utils"))
-        on.exit({
-          assign("makeUserAgent", orig, envir = asNamespace("utils"))
-          lockBinding("makeUserAgent", asNamespace("utils"))
-        }, add = TRUE)
-        ua <- orig(FALSE)
+    method <- download_method()
   
-        flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
-        agent <- paste0(ua, "\r\n", flathead)
-        assign(
-          "makeUserAgent",
-          envir = asNamespace("utils"),
-          function(format = TRUE) {
-            if (format) {
-              paste0("User-Agent: ", agent, "\r\n")
-            } else {
-              agent
-            }
-          })
-      }
-  
-      suppressWarnings(
-        status <- utils::download.file(
-          url,
-          path,
-          method = download_method(),
-          quiet = quiet,
-          mode = "wb"
-        )
-      )
+    status <- if (method == "wget") {
+      base_download_wget(url, path, quiet, headers)
+    } else if (method =="curl") {
+      base_download_curl(url, path, quiet, headers)
+    } else if (getRversion() < "3.6.0") {
+      base_download_noheaders(url, path, quiet, headers, method)
     } else {
-      suppressWarnings(
-        status <- utils::download.file(
-          url,
-          path,
-          method = download_method(),
-          quiet = quiet,
-          mode = "wb",
-          headers = headers
-        )
-      )
+      base_download_headers(url, path, quiet, headers, method)
     }
   
-    if (status != 0)  stop("Cannot download file from ", url, call. = FALSE)
+    if (status != 0) stop("Cannot download file from ", url, call. = FALSE)
   
     path
+  }
+  
+  base_download_wget <- function(url, path, quiet, headers) {
+  
+    extra <- getOption("download.file.extra")
+  
+    if (length(headers)) {
+      qh <- shQuote(paste0(names(headers), ": ", headers))
+      extra <- c(extra, paste0("--header=", qh))
+    }
+  
+    with_options(
+      list(download.file.extra = extra),
+      suppressWarnings(
+        utils::download.file(
+          url,
+          path,
+          method = "wget",
+          quiet = quiet,
+          mode = "wb",
+          extra = extra
+        )
+      )
+    )
+  }
+  
+  base_download_curl <- function(url, path, quiet, headers) {
+  
+    extra <- getOption("download.file.extra")
+  
+    if (length(headers)) {
+      qh <- shQuote(paste0(names(headers), ": ", headers))
+      extra <- c(extra, paste("-H", qh))
+    }
+  
+    with_options(
+      list(download.file.extra = extra),
+      suppressWarnings(
+        utils::download.file(
+          url,
+          path,
+          method = "curl",
+          quiet = quiet,
+          mode = "wb",
+          extra = extra
+        )
+      )
+    )
+  }
+  
+  base_download_noheaders <- function(url, path, quiet, headers, method) {
+  
+    if (length(headers)) {
+      get("unlockBinding", baseenv())("makeUserAgent", asNamespace("utils"))
+      orig <- get("makeUserAgent", envir = asNamespace("utils"))
+      on.exit({
+        assign("makeUserAgent", orig, envir = asNamespace("utils"))
+        lockBinding("makeUserAgent", asNamespace("utils"))
+      }, add = TRUE)
+      ua <- orig(FALSE)
+  
+      flathead <- paste0(names(headers), ": ", headers, collapse = "\r\n")
+      agent <- paste0(ua, "\r\n", flathead)
+      assign(
+        "makeUserAgent",
+        envir = asNamespace("utils"),
+        function(format = TRUE) {
+          if (format) {
+              paste0("User-Agent: ", agent, "\r\n")
+          } else {
+            agent
+          }
+        })
+    }
+  
+    suppressWarnings(
+      utils::download.file(
+        url,
+        path,
+        method = method,
+        quiet = quiet,
+        mode = "wb"
+      )
+    )
+  }
+  
+  base_download_headers <- function(url, path, quiet, headers, method) {
+    suppressWarnings(
+      utils::download.file(
+        url,
+        path,
+        method = method,
+        quiet = quiet,
+        mode = "wb",
+        headers = headers
+      )
+    )
   }
   
   has_curl <- function() isTRUE(unname(capabilities("libcurl")))
