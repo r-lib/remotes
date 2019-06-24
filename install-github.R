@@ -1257,10 +1257,11 @@ function(...) {
   #' @importFrom utils compareVersion
   
   download <- function(path, url, auth_token = NULL, basic_auth = NULL,
-                       quiet = TRUE, auth_phrase = "access_token=",
-                       headers = NULL) {
+                       quiet = TRUE, headers = NULL) {
   
-    real_url <- url
+    if (!is.null(basic_auth) && !is.null(auth_token)) {
+      stop("Cannot use both Basic and Token authentication at the same time")
+    }
   
     if (!is.null(basic_auth)) {
       userpass <- paste0(basic_auth$user, ":", basic_auth$password)
@@ -1269,17 +1270,15 @@ function(...) {
     }
   
     if (!is.null(auth_token)) {
-      sep <- if (grepl("?", url, fixed = TRUE)) "&" else "?"
-      tkn <- if (grepl("=$", auth_phrase)) auth_phrase else paste0(auth_phrase, "=")
-      real_url <- paste0(url, sep, tkn, auth_token)
+      headers <- c(headers, Authorization = paste("token", auth_token))
     }
   
     if (compareVersion(get_r_version(), "3.2.0") == -1) {
-      curl_download(real_url, path, quiet, headers)
+      curl_download(url, path, quiet, headers)
   
     } else {
   
-      base_download(real_url, path, quiet, headers)
+      base_download(url, path, quiet, headers)
     }
   
     path
@@ -2984,7 +2983,7 @@ function(...) {
               "\nfrom URL ", src)
     }
   
-    download(dest, src, auth_token = x$auth_token, auth_phrase = "private_token=")
+    download(dest, src, headers = c("Private-Token" = x$auth_token))
   }
   
   #' @export
@@ -3028,7 +3027,7 @@ function(...) {
       "/raw?ref=", remote$ref)
   
     dest <- tempfile()
-    res <- download(dest, src, auth_token = remote$auth_token, auth_phrase = "private_token=")
+    res <- download(dest, src, headers = c("Private-Token" = remote$auth_token))
   
     tryCatch(
       read_dcf(dest)$Package,
@@ -3052,7 +3051,7 @@ function(...) {
     url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
   
     tmp <- tempfile()
-    download(tmp, url, auth_token = pat, auth_phrase = "private_token=")
+    download(tmp, url, headers = c("Private-Token" = pat))
   
     json$parse_file(tmp)$id
   }
