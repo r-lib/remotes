@@ -36,6 +36,7 @@ test_that("internal map is current", {
   # This is to notify us that we need to update the package's
   # internal map.
   skip_on_cran()
+  skip_if_offline()
   expect_equal(
     bioconductor$get_release_version(),
     package_version("3.9"))
