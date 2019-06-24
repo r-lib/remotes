@@ -5,21 +5,25 @@ test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.3.0")
   mockery::stub(download_method, "has_curl", FALSE)
-  expect_equal(download_method(), "auto")
+  with_options(list(download.file.method = NULL),
+               expect_equal(download_method(), "auto"))
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "windows")
-  expect_equal(download_method(), "wininet")
+  with_options(list(download.file.method = NULL),
+               expect_equal(download_method(), "wininet"))
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
   mockery::stub(download_method, "has_curl", TRUE)
-  expect_equal(download_method(), "libcurl")
+  with_options(list(download.file.method = NULL),
+               expect_equal(download_method(), "libcurl"))
 
   mockery::stub(download_method, "get_r_version", "3.2.5")
   mockery::stub(download_method, "os_type", "unix")
   mockery::stub(download_method, "has_curl", FALSE)
-  expect_equal(download_method(), "auto")
+  with_options(list(download.file.method = NULL),
+               expect_equal(download_method(), "auto"))
 })
 
 test_that("download", {
