@@ -56,24 +56,26 @@ safe_install_packages <- function(...) {
     i.p <- utils::install.packages
   }
 
-  with_envvar(
-    c(R_LIBS = lib,
-      R_LIBS_USER = lib,
-      R_LIBS_SITE = lib,
-      RGL_USE_NULL = "TRUE"),
+  with_options(list(install.lock = getOption("install.lock", TRUE)), {
+    with_envvar(
+      c(R_LIBS = lib,
+        R_LIBS_USER = lib,
+        R_LIBS_SITE = lib,
+        RGL_USE_NULL = "TRUE"),
 
-    # Set options(warn = 2) for this process and child processes, so that
-    # warnings from `install.packages()` are converted to errors.
-    if (should_error_for_warnings()) {
-      with_options(list(warn = 2),
-        with_rprofile_user("options(warn = 2)",
-          i.p(...)
+      # Set options(warn = 2) for this process and child processes, so that
+      # warnings from `install.packages()` are converted to errors.
+      if (should_error_for_warnings()) {
+        with_options(list(warn = 2),
+          with_rprofile_user("options(warn = 2)",
+            i.p(...)
+          )
         )
-      )
-    } else {
-      i.p(...)
-    }
-  )
+      } else {
+        i.p(...)
+      }
+    )
+  })
 }
 
 normalize_build_opts <- function(build_opts, build_manual, build_vignettes) {
@@ -112,7 +114,7 @@ safe_build_package <- function(pkgdir, build_opts, build_manual, build_vignettes
   } else {
     # No pkgbuild, so we need to call R CMD build ourselves
 
-    lib <- paste(.libPaths(), collapse = ":")
+    lib <- paste(.libPaths(), collapse = .Platform$path.sep)
     env <- c(R_LIBS = lib,
       R_LIBS_USER = lib,
       R_LIBS_SITE = lib,
@@ -215,7 +217,7 @@ should_error_for_warnings <- function() {
 
   force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
 
-  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !as.logical(force_suggests))
+  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !config_val_to_logical(force_suggests))
 
-  !as.logical(no_errors)
+  !config_val_to_logical(no_errors)
 }

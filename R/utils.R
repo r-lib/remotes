@@ -111,14 +111,6 @@ get_r_version <- function() {
   paste(R.version$major, sep = ".", R.version$minor)
 }
 
-set_libpaths <- function(paths) {
-  old <- .libPaths()
-  .libPaths(paths)
-  invisible(old)
-}
-
-with_libpaths <- with_something(set_libpaths, .libPaths)
-
 set_options <- function(x) {
   do.call(options, as.list(x))
 }
@@ -263,7 +255,7 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
 }
 
 is_standalone <- function() {
-  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
+  isTRUE(config_val_to_logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
 }
 
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
@@ -505,4 +497,17 @@ get_json_sha <- function(text) {
   start <- attr(m, "capture.start")
   end <- start + attr(m, "capture.length") - 1L
   substring(text, start, end)
+}
+
+
+# from tools:::config_val_to_logical
+config_val_to_logical <- function (val) {
+  v <- tolower(val)
+  if (v %in% c("1", "yes", "true"))
+    TRUE
+  else if (v %in% c("0", "no", "false"))
+    FALSE
+  else {
+    NA
+  }
 }

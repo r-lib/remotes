@@ -57,7 +57,12 @@ remote_download.local_remote <- function(x, quiet = FALSE) {
   # Already downloaded - just need to copy to tempdir()
   bundle <- tempfile()
   dir.create(bundle)
-  file.copy(x$path, bundle, recursive = TRUE)
+  suppressWarnings(
+    res <- file.copy(x$path, bundle, recursive = TRUE)
+  )
+  if (!all(res)) {
+    stop("Could not copy `", x$path, "` to `", bundle, "`", call. = FALSE)
+  }
 
   # file.copy() creates directory inside of bundle
   dir(bundle, full.names = TRUE)[1]

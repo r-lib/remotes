@@ -80,7 +80,7 @@ github_remote <- function(repo, ref = "master", subdir = NULL,
                        host = "api.github.com", ...) {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta, auth_token)
+  meta <- github_resolve_ref(meta$ref %||% ref, meta, host = host, auth_token = auth_token)
 
   remote("github",
     host = host,
@@ -165,11 +165,11 @@ github_resolve_ref.NULL <- function(x, params, ...) {
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params, ..., auth_token = github_pat()) {
+github_resolve_ref.github_pull <- function(x, params, ..., host, auth_token = github_pat()) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
-    github_GET(path, pat = auth_token),
+    github_GET(path, host = host, pat = auth_token),
     error = function(e) e
   )
 
@@ -187,11 +187,11 @@ github_resolve_ref.github_pull <- function(x, params, ..., auth_token = github_p
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params, ..., auth_token = github_pat()) {
+github_resolve_ref.github_release <- function(x, params, ..., host, auth_token = github_pat()) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
-    github_GET(path, pat = auth_token),
+    github_GET(path, host = host, pat = auth_token),
     error = function(e) e
   )
 
@@ -242,8 +242,14 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
 
 #' @export
 remote_sha.github_remote <- function(remote, ..., use_curl = !is_standalone() && pkg_installed("curl")) {
-  github_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl)
+  tryCatch(
+    github_commit(username = remote$username, repo = remote$repo,
+      host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl),
+
+    # 422 errors most often occur when a branch or PR has been deleted, so we
+    # ignore the error in this case
+    http_422 = function(e) NA_character_
+  )
 }
 
 #' @export

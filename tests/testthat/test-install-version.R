@@ -129,3 +129,20 @@ test_that("install_version for archived packages", {
     "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
   )
 })
+
+test_that("install_version for other types fails", {
+  expect_error(
+    install_version("igraph0", type = "binary"),
+    "must be 'source'"
+  )
+
+  expect_error(
+    install_version("igraph0", type = "win.binary"),
+    "must be 'source'"
+  )
+
+  expect_error(
+    install_version("igraph0", type = "mac.binary"),
+    "must be 'source'"
+  )
+})

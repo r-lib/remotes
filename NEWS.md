@@ -1,4 +1,49 @@
-# remotes (development version)
+# remotes 2.1.0
+
+## New features
+
+* `install_*()` functions gain `build_manual` and `build_vignette` arguments
+  that previously existed in devtools versions < 2.0 (#353).
+
+* The interactive menu has been modified to provide more clear instructions on
+  the skipping behavior (#207)
+
+* Credentials are now passed via HTTP headers, to reduce exposure when requests
+  fail (#391).
+
+## Minor improvements and fixes
+
+* `download()` with the external curl download method now always uses `-L` to
+  follow redirects. (#350)
+
+* `update_packages()` now has a more informative error message when the update
+  fails (#223, #232)
+
+* `install_git()` now can take credentials from the global option
+  `remotes.git_credentials` (#378).
+
+* `install_git()` now works with SHA references and external git (#389).
+
+* GitHub remotes that point to branches no longer fail when the branch is later
+  deleted (#274).
+
+* Local remotes whose original location has been moved will no longer error
+  when updating (#370).
+
+* `update_deps()` no longer sorts the dependencies alphabetically (#296, #301)
+
+* `github_resolve_ref()` now takes a `host` parameter (#284)
+
+* Remotes specific environment variables now accept 0 and 1 as valid values (#238)
+
+* remotes now uses locking by default when installing binary packages, which avoids
+  issues when installing binaries that are already open in other R processes
+  (#368)
+
+* `update_deps()` no longer fails if a local package no longer exists (#289)
+
+* `install_version()` now errors with a more informative message when `type` is
+  not 'source' (#323)
 
 * `install_version()` now keeps searching subsequent repositories for the
   requested version, rather than failing if the version it finds in an early
@@ -12,6 +57,7 @@
 
 * Fix API call for private repositories in `install_gitlab` 
   (@aornugent, #359, #363)
+
 * git submodules now work if the submodule file is empty (@muschellij2, #234)
 
 * `install_gitlab()` no longer adds the access token twice to the request
@@ -20,11 +66,8 @@
 * Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
-* Fix bug in internal `parse_deps()` where test of valid comparison operators
-failed due to trailing whitespaces in DESCRIPTION fields (@LiNk-NY, #366)
-
-* `install_*()` functions gain `build_manual` and `build_vignette` arguments
-  that previously existed in devtools versions < 2.0 (#353).
+* `parse_deps()` now ignores trailing whitespaces around comparison operators
+  in DESCRIPTION fields (@LiNk-NY, #366)
 
 # remotes 2.0.4
 

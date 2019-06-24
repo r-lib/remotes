@@ -10,7 +10,8 @@ test_that("github_resolve_ref.github_release", {
   expect_error(
     github_resolve_ref.github_release(
       NA,
-      list(username = "hadley", repo = "devtools")
+      list(username = "hadley", repo = "devtools"),
+      host = "api.github.com"
     ),
     NA
   )
@@ -166,6 +167,29 @@ test_that("remote_sha.github_remote", {
       )
     ),
     "0f39d9eb735bf16909831c0bb129063dda388375"
+  )
+})
+
+test_that("github_remote with deleted branch", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  # skip this test unless we are using curl
+  skip_if(is_standalone() || !pkg_installed("curl"))
+
+
+  expect_equal(
+    remote_sha.github_remote(
+      list(
+        username = "tidyverse",
+        repo = "purrr",
+        ref = "rc-0.3.1",
+        host = "api.github.com"
+      )
+    ),
+    NA_character_
   )
 })
 

@@ -54,6 +54,10 @@ install_version <- function(package, version = NULL,
   if (length(package) > 1)
     stop("install_version() must be called with a single 'package' argument - multiple packages given")
 
+  if (!identical(type, "source")) {
+    stop("`type` must be 'source' for `install_version()`", call. = FALSE)
+  }
+
   url <- download_version_url(package, version, repos, type)
   res <- install_url(url,
               dependencies = dependencies,
@@ -68,7 +72,7 @@ install_version <- function(package, version = NULL,
               type = type,
               ...)
 
-  lib <- list(...)$lib
+  lib <- list(...)$lib %||% .libPaths()
 
   # Remove Metadata from installed package
   add_metadata(

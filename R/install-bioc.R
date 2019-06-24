@@ -1,4 +1,4 @@
-#' Install a package from a Bioconductor repository
+#' Install a development package from the Bioconductor git repository
 #'
 #' This function requires `git` to be installed on your system in order to
 #' be used.
@@ -6,7 +6,9 @@
 #' It is vectorised so you can install multiple packages with
 #' a single command.
 #'
-#' '
+#' This is intended as an aid for Bioconductor developers. If you want to
+#' install the release version of a Bioconductor package one can use the
+#' `BiocManager` package.
 #' @inheritParams install_git
 #' @param repo Repository address in the format
 #'   `[username:password@@][release/]repo[#commit]`. Valid values for
