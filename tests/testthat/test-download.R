@@ -281,3 +281,20 @@ test_that("curl download with basic auth", {
   expect_true(resp$authenticated)
   expect_equal(resp$user, "ruser")
 })
+
+test_that("base curl download redirects", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_without_program("curl")
+
+  url <- "http://httpbin.org/absolute-redirect/1"
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  with_options(
+    list(download.file.method = "curl"),
+         download(url, path = tmp, quiet = TRUE)
+  )
+  expect_true(file.exists(tmp))
+  resp <- json$parse(readLines(tmp))
+  expect_equal(resp$url, "https://httpbin.org/get")
+})
