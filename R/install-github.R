@@ -1,3 +1,5 @@
+"foobar"
+
 #' Attempts to install a package directly from GitHub.
 #'
 #' This function is vectorised on `repo` so you can install multiple
