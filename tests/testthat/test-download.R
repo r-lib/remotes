@@ -101,7 +101,7 @@ test_that("wget method download with custom headers", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   head <- c("X-Custom" = "Foobar")
-  extra <- "--header='X-Another: extra-header'"
+  extra <- "--header=\"X-Another: extra-header\""
   with_options(
     list(download.file.method = "wget", download.file.extra = extra),
     base_download(url, path = tmp, quiet = TRUE, headers = head))
@@ -120,7 +120,7 @@ test_that("curl method download with custom headers", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   head <- c("X-Custom" = "Foobar")
-  extra <- "-H 'X-Another: extra-header'"
+  extra <- "-H \"X-Another: extra-header\""
   with_options(
     list(download.file.method = "curl", download.file.extra = extra),
     base_download(url, path = tmp, quiet = TRUE, headers = head))
