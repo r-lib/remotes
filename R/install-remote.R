@@ -273,7 +273,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       release = x$RemoteRelease,
       sha = x$RemoteSha,
       branch = x$RemoteBranch),
-    stop(sprintf("can't convert package with RemoteType '%s' to remote", x$RemoteType))
+    stop(sprintf("can't convert package %s with RemoteType '%s' to remote", name, x$RemoteType))
   )
 }
 
