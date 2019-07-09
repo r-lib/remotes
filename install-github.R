@@ -3481,8 +3481,22 @@ function(...) {
           sha = NA_character_))
     }
   
-    if (is.null(x$RemoteType) || x$RemoteType == "cran") {
+    # BiocManager sets a few fields we can use. Does not work for AnnotationDBI packages like org.Hs.eg.db.
+    if (is.null(x$RemoteType) && !is.null(x$git_url) && requireNamespace("BiocManager", quietly = TRUE)) {
+      bioc_pkgs <- rownames(available.packages(repos = BiocManager::repositories()))
+      if (x$Package %in% bioc_pkgs) {
+        # Packages installed with BiocManager::install()
+        pos_slash <- regexec("/[^/]+$", x$git_url)[[1L]]
+        return(remote("bioc_xgit",
+          mirror = substring(x$git_url, 1, pos_slash - 1L),
+          repo = substring(x$git_url, pos_slash + 1L),
+          release = sub("RELEASE_(\\d)+_(\\d+)", "\\1.\\2", x$git_branch),
+          sha = x$git_last_commit,
+          branch = x$git_branch))
+      }
+    }
   
+    if (is.null(x$RemoteType) || x$RemoteType == "cran") {
       # Packages installed with install.packages() or locally without remotes
       return(remote("cran",
           name = x$Package,
