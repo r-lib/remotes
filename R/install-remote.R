@@ -191,8 +191,18 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
         sha = NA_character_))
   }
 
-  if (is.null(x$RemoteType) || x$RemoteType == "cran") {
+  if (is.null(x$RemoteType) && requireNamespace("BiocManager", quietly = TRUE) && BiocManager::avaliable(x$Package)) {
+    # Packages installed with BiocManager::install()
+    pos_slash <- regexec("/[^/]+$", x$git_url)[[1]]
+    remote("bioc_xgit",
+      mirror = substring(x$git_url, 1, pos_slash-1),
+      repo = substring(x$git_url, pos_slash+1),
+      release = sub("RELEASE_(\\d)+_(\\d+)", "\\1.\\2", x$git_branch),
+      sha = x$git_last_commit,
+      branch = x$git_branch)
+  }
 
+  if (is.null(x$RemoteType) || x$RemoteType == "cran") {
     # Packages installed with install.packages() or locally without remotes
     return(remote("cran",
         name = x$Package,
