@@ -208,7 +208,7 @@ It also uses some remotes specific options:
 
 ### Environment variables
 
-* The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` enrironment variables
+* The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` environment variables
   are used for the default BitBucket  user name and password, in
   `install_bitbucket()`
 
