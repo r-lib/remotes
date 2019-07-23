@@ -1,10 +1,6 @@
-The previous release had a major bug which effected a number of users, this release fixes that bug.
-
-This release also changes the maintainer from Gábor Csárdi to Jim Hester.
-
 ## Test environments
-* local OS X install, R 3.5.3
-* ubuntu 14.04 (on travis-ci), R 3.5.3
+* local OS X install, R 3.6.0
+* ubuntu 14.04 (on travis-ci), R 3.6.0
 * win-builder (devel and release)
 
 ## R CMD check results

@@ -26,7 +26,7 @@ name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{
 \item{subdir}{subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal
-access token (PAT) in \url{https://github.com/settings/tokens} and
+access token (PAT) in "https://github.com/settings/tokens" and
 supply to this argument. This is safer than using a password because
 you can easily delete a PAT without affecting any others. Defaults to
 the \code{GITHUB_PAT} environment variable.}
