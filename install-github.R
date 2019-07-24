@@ -3563,7 +3563,7 @@ function(...) {
         release = x$RemoteRelease,
         sha = x$RemoteSha,
         branch = x$RemoteBranch),
-      stop(sprintf("can't convert package with RemoteType '%s' to remote", x$RemoteType))
+      stop(sprintf("can't convert package '%s' with RemoteType '%s' to remote", x$Package, x$RemoteType))
     )
   }
   
