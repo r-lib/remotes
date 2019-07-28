@@ -3348,7 +3348,7 @@ function(...) {
     source <- source_pkg(bundle, subdir = remote$subdir)
     on.exit(unlink(source, recursive = TRUE), add = TRUE)
   
-    update_submodules(source, quiet)
+    update_submodules(source, remote$subdir, quiet)
   
     add_metadata(source, remote_metadata(remote, bundle, source, remote_sha))
   
@@ -4645,10 +4645,20 @@ function(...) {
     git(paste0(args, collapse = " "), quiet = quiet)
   }
   
-  update_submodules <- function(source, quiet) {
+  update_submodules <- function(source, subdir, quiet) {
     file <- file.path(source, ".gitmodules")
+  
     if (!file.exists(file)) {
-      return()
+  
+      if (!is.null(subdir)) {
+        nb_sub_folders <- lengths(strsplit(subdir, "/"))
+        source <- do.call(file.path, as.list(c(source, rep("..", nb_sub_folders))))
+      }
+  
+      file <- file.path(source, ".gitmodules")
+      if (!file.exists(file)) {
+        return()
+      }
     }
     info <- parse_submodules(file)
   

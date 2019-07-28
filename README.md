@@ -84,7 +84,8 @@ If the R package is inside a subdirectory of the root directory,
 then give this subdirectory as well:
 
 ```r
-remotes::install_github("dmlc/xgboost/R-package")
+# build = FALSE because of some specificities of XGBoost package
+install_github("dmlc/xgboost/R-package", build = FALSE)
 ```
 
 To install a certain branch or commit or tag, append it to the
