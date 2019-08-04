@@ -144,15 +144,11 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
 github_error <- function(res) {
   res_headers <- curl::parse_headers_list(res$headers)
 
-  ratelimit_limit <- res_headers$`x-ratelimit-limit`
+  ratelimit_limit <- res_headers$`x-ratelimit-limit` %||% NA_character_
 
-  ratelimit_remaining <- res_headers$`x-ratelimit-remaining`
+  ratelimit_remaining <- res_headers$`x-ratelimit-remaining` %||% NA_character_
 
-  ratelimit_reset <- res_headers$`x-ratelimit-reset`
-
-  if (!is.null(ratelimit_reset)) {
-    ratelimit_reset <- .POSIXct(ratelimit_reset, tz = "UTC")
-  }
+  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset` %||% NA_character_, tz = "UTC")
 
   error_details <- json$parse(rawToChar(res$content))$message
 
@@ -194,7 +190,7 @@ github_error <- function(res) {
      error_details,
      guidance
    )
- } else if (!is.null(ratelimit_limit)) {
+ } else if (!is.na(ratelimit_limit)) {
   msg <- sprintf(
 "HTTP error %s.
   %s
