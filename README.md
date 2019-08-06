@@ -27,8 +27,8 @@ Indeed most of the code was copied over from `devtools`.
   * Install the dependencies of a local package tree.
   * Install specific package versions from CRAN.
 * Supports [Bioconductor](https://bioconductor.org/) packages.
-* Supports the `Remotes` field in `DESCRIPTION`. See more
-  [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
+* Supports the `Remotes` field in `DESCRIPTION`. See more in the
+  [dependencies](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd) vignette.
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
