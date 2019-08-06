@@ -11,8 +11,8 @@ Authors@R: c(
     person("Dan", "Tenenbaum", role = "aut"),
     person("Mango Solutions", role = "cph")
     )
-Description: Download and install R packages stored in 'GitHub',
-    'BitBucket', or plain 'subversion' or 'git' repositories. This package
+Description: Download and install R packages stored in 'GitHub', 
+    'Bitbucket', or plain 'subversion' or 'git' repositories. This package
     provides the 'install_*' functions in 'devtools'.
     Indeed most of the code was copied over from 'devtools'.
 License: GPL (>= 2)

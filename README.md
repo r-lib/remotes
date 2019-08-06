@@ -1,7 +1,7 @@
 
 # remotes
 
-> Install R Packages from GitHub, BitBucket, or other local or remote
+> Install R Packages from GitHub, Bitbucket, or other local or remote
 > repositories
 
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
@@ -12,7 +12,7 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/master.svg)](https://codecov.io/github/r-lib/remotes?branch=master)
 
 Download and install R packages stored in GitHub,
-BitBucket, or plain subversion or git repositories. This package
+Bitbucket, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
 [`devtools`](https://github.com/r-lib/devtools).
 Indeed most of the code was copied over from `devtools`.
@@ -21,7 +21,7 @@ Indeed most of the code was copied over from `devtools`.
 
 * Installers:
     * Install packages with their dependencies.
-    * Install from GitHub, GitLab, BitBucket.
+    * Install from GitHub, GitLab, Bitbucket.
 	* Install from git and subversion repositories.
 	* Install from local files or URLs.
 	* Install the dependencies of a local package tree.
@@ -209,7 +209,7 @@ It also uses some remotes specific options:
 ### Environment variables
 
 * The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` environment variables
-  are used for the default BitBucket  user name and password, in
+  are used for the default Bitbucket  user name and password, in
   `install_bitbucket()`
 
 * The `GITHUB_PAT` environment variable is used as the default GitHub
