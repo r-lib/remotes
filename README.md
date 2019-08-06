@@ -196,7 +196,7 @@ details:
 * `pkgType` for the package type (source or binary, see manual) to install,
   download or look up dependencies for.
 
-* `repos` for the locations of the user's standard CRAN(-like) repositoies.
+* `repos` for the locations of the user's standard CRAN(-like) repositories.
 
 It also uses some remotes specific options:
 

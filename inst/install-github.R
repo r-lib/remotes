@@ -330,7 +330,7 @@ function(...) {
   #' can be set to force a Bioconductor version. If this is set, then the
   #' `r_ver` and `bioc_ver` arguments are ignored.
   #'
-  #' `bioc_install_repos()` observes the `R_BIOC_MIRROR` enironment variable
+  #' `bioc_install_repos()` observes the `R_BIOC_MIRROR` environment variable
   #' and also the `BioC_mirror` option, which can be set to the desired
   #' Bioconductor mirror. The option takes precedence if both are set. Its
   #' default value is `https://bioconductor.org`.
@@ -346,7 +346,7 @@ function(...) {
   #' @param r_ver R version to use. For `bioc_install_repos()` it is
   #'   ignored if `bioc_ver` is specified.
   #' @param bioc_ver Bioconductor version to use. Defaults to the default one
-  #'   corresposding to `r_ver`.
+  #'   corresponding to `r_ver`.
   #'
   #' @export
   #' @keywords internal

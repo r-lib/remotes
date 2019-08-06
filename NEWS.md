@@ -127,7 +127,7 @@
   repo owner and repo correctly (included in the error message), and that 
   they have the required permissions to access the repository.
 
-* `install_*` fuctions (via the underlying private `install` function) now set
+* `install_*` functions (via the underlying private `install` function) now set
   `RGL_USE_NULL="TRUE"` in order to avoid errors when running headless
   and installing any package using `rgl` (@jefferis, ##333)
   
@@ -186,7 +186,7 @@
 ## New features
 
 * remotes now builds packages by default before installing them. This step
-  uses the pkgbuild package, if avilable. If not, it calls `R CMD build`
+  uses the pkgbuild package, if available. If not, it calls `R CMD build`
   directly.
 
 * New `install_dev()` to install the development version of a CRAN package,
@@ -207,7 +207,7 @@
 * `install_()` functions now pass arguments, including authentication
   information and upgrade down to dependencies (#53, #86, #87).
 
-* `install_()` functions allow the seclection of a subset of packages to
+* `install_()` functions allow the selection of a subset of packages to
   upgrade, in interactive mode, when `upgrade = "ask"`.
 
 * `install_git()` now supports passing credentials, when it is used with
@@ -224,7 +224,7 @@
 
 * remotes now uses the same SHA updating logic for remotes as devtools,
   including checking if the SHA of the remote has changed since the last
-  istallation. (#135)
+  installation. (#135)
 
 * `install_url()` can now install package binaries on windows
   (r-lib/devtools#1765)
