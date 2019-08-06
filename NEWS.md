@@ -1,5 +1,10 @@
 # remotes (development version)
 
+## Minor improvements and fixes
+
+* `github_error()` now also works when a GitHub (Enterprise) server does not
+  return information about the rate limit (@dpprdan, #396, #413).
+
 # remotes 2.1.0
 
 ## New features
