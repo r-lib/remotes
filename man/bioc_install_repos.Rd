@@ -22,7 +22,7 @@ corresponding to \code{r_ver}.}
 object.
 
 \code{bioc_install_repos()} returns a named character vector of the URLs of
-the BioConductor repositories, appropriate for the current or the
+the Bioconductor repositories, appropriate for the current or the
 specified R version.
 }
 \description{
@@ -30,7 +30,7 @@ specified R version.
 specified R version.
 }
 \details{
-\code{bioc_install_repos()} deduces the URLs of the BioConductor repositories.
+\code{bioc_install_repos()} deduces the URLs of the Bioconductor repositories.
 
 Both functions observe the \code{R_BIOC_VERSION} environment variable, which
 can be set to force a Bioconductor version. If this is set, then the

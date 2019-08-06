@@ -323,7 +323,7 @@ function(...) {
   #' `bioc_version()` returns the Bioconductor version for the current or the
   #' specified R version.
   #'
-  #' `bioc_install_repos()` deduces the URLs of the BioConductor repositories.
+  #' `bioc_install_repos()` deduces the URLs of the Bioconductor repositories.
   #'
   #' @details
   #' Both functions observe the `R_BIOC_VERSION` environment variable, which
@@ -340,7 +340,7 @@ function(...) {
   #' object.
   #'
   #' `bioc_install_repos()` returns a named character vector of the URLs of
-  #' the BioConductor repositories, appropriate for the current or the
+  #' the Bioconductor repositories, appropriate for the current or the
   #' specified R version.
   #'
   #' @param r_ver R version to use. For `bioc_install_repos()` it is
@@ -1847,7 +1847,7 @@ function(...) {
   #'   the release are \sQuote{devel},
   #'   \sQuote{release} (the default if none specified), or numeric release
   #'   numbers (e.g. \sQuote{3.3}).
-  #' @param mirror The bioconductor git mirror to use
+  #' @param mirror The Bioconductor git mirror to use
   #' @param ... Other arguments passed on to [utils::install.packages()].
   #' @inheritParams install_github
   #' @export

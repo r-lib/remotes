@@ -16,7 +16,7 @@ bioc_version <- function(r_ver = getRversion()) {
 #' `bioc_version()` returns the Bioconductor version for the current or the
 #' specified R version.
 #'
-#' `bioc_install_repos()` deduces the URLs of the BioConductor repositories.
+#' `bioc_install_repos()` deduces the URLs of the Bioconductor repositories.
 #'
 #' @details
 #' Both functions observe the `R_BIOC_VERSION` environment variable, which
@@ -33,7 +33,7 @@ bioc_version <- function(r_ver = getRversion()) {
 #' object.
 #'
 #' `bioc_install_repos()` returns a named character vector of the URLs of
-#' the BioConductor repositories, appropriate for the current or the
+#' the Bioconductor repositories, appropriate for the current or the
 #' specified R version.
 #'
 #' @param r_ver R version to use. For `bioc_install_repos()` it is

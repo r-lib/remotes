@@ -300,7 +300,7 @@
 
 * Check for circular dependencies while installing, #31
 
-* Updated BioConductor repo URLs for newer BioC versions
+* Updated Bioconductor repo URLs for newer BioC versions
 
 # remotes 1.0.0
 
