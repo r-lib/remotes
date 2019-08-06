@@ -11,8 +11,8 @@
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/master.svg)](https://codecov.io/github/r-lib/remotes?branch=master)
 
-Download and install R packages stored in GitHub,
-Bitbucket, or plain subversion or git repositories. This package
+Download and install R packages stored in GitHub, GitLab, Bitbucket, 
+Bioconductor, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
 [`devtools`](https://github.com/r-lib/devtools).
 Indeed most of the code was copied over from `devtools`.
