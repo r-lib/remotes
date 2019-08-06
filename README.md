@@ -20,12 +20,12 @@ Indeed most of the code was copied over from `devtools`.
 ## Features
 
 * Installers:
-    * Install packages with their dependencies.
-    * Install from GitHub, GitLab, Bitbucket.
-	* Install from git and subversion repositories.
-	* Install from local files or URLs.
-	* Install the dependencies of a local package tree.
-	* Install specific package versions from CRAN.
+  * Install packages with their dependencies.
+  * Install from GitHub, GitLab, Bitbucket.
+  * Install from git and subversion repositories.
+  * Install from local files or URLs.
+  * Install the dependencies of a local package tree.
+  * Install specific package versions from CRAN.
 * Supports [Bioconductor](https://bioconductor.org/) packages.
 * Supports the `Remotes` field in `DESCRIPTION`. See more
   [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
