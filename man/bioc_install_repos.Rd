@@ -15,14 +15,14 @@ bioc_install_repos(r_ver = getRversion(),
 ignored if \code{bioc_ver} is specified.}
 
 \item{bioc_ver}{Bioconductor version to use. Defaults to the default one
-corresposding to \code{r_ver}.}
+corresponding to \code{r_ver}.}
 }
 \value{
 \code{bioc_version()} returns a Bioconductor version, a \code{package_version}
 object.
 
 \code{bioc_install_repos()} returns a named character vector of the URLs of
-the BioConductor repositories, appropriate for the current or the
+the Bioconductor repositories, appropriate for the current or the
 specified R version.
 }
 \description{
@@ -30,13 +30,13 @@ specified R version.
 specified R version.
 }
 \details{
-\code{bioc_install_repos()} deduces the URLs of the BioConductor repositories.
+\code{bioc_install_repos()} deduces the URLs of the Bioconductor repositories.
 
 Both functions observe the \code{R_BIOC_VERSION} environment variable, which
 can be set to force a Bioconductor version. If this is set, then the
 \code{r_ver} and \code{bioc_ver} arguments are ignored.
 
-\code{bioc_install_repos()} observes the \code{R_BIOC_MIRROR} enironment variable
+\code{bioc_install_repos()} observes the \code{R_BIOC_MIRROR} environment variable
 and also the \code{BioC_mirror} option, which can be set to the desired
 Bioconductor mirror. The option takes precedence if both are set. Its
 default value is \code{https://bioconductor.org}.
