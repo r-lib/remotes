@@ -1,5 +1,5 @@
 
-#' Install a package directly from bitbucket
+#' Install a package directly from Bitbucket
 #'
 #' This function is vectorised so you can install multiple packages in
 #' a single command.

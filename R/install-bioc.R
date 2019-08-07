@@ -15,7 +15,7 @@
 #'   the release are \sQuote{devel},
 #'   \sQuote{release} (the default if none specified), or numeric release
 #'   numbers (e.g. \sQuote{3.3}).
-#' @param mirror The bioconductor git mirror to use
+#' @param mirror The Bioconductor git mirror to use
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
 #' @export
