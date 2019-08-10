@@ -7,7 +7,7 @@
 #'
 #' @inheritParams install_github
 #' @param repo Repository address in the format
-#'   `username/repo[/subdir][@@ref]`.
+#'   `username/repo[@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
 #' @param auth_token To install from a private repo, generate a personal access
@@ -23,6 +23,7 @@
 #' install_gitlab("jimhester/covr")
 #' }
 install_gitlab <- function(repo,
+                           subdir = NULL,
                            auth_token = gitlab_pat(),
                            host = "gitlab.com",
                            dependencies = NA,
@@ -35,7 +36,7 @@ install_gitlab <- function(repo,
                            type = getOption("pkgType"),
                            ...) {
 
-  remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
+  remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host)
 
   install_remotes(remotes, auth_token = auth_token, host = host,
                   dependencies = dependencies,
@@ -51,7 +52,7 @@ install_gitlab <- function(repo,
                   ...)
 }
 
-gitlab_remote <- function(repo,
+gitlab_remote <- function(repo, subdir = NULL,
                        auth_token = gitlab_pat(), sha = NULL,
                        host = "gitlab.com", ...) {
 
@@ -60,8 +61,8 @@ gitlab_remote <- function(repo,
 
   remote("gitlab",
     host = host,
-    repo = meta$repo,
-    subdir = meta$subdir,
+    repo = paste(meta$repo, meta$subdir, sep = "/"),
+    subdir = subdir,
     username = meta$username,
     ref = meta$ref,
     sha = sha,
