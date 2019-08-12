@@ -4234,6 +4234,7 @@ function(...) {
       build_manual = build_manual,
       build_vignettes = build_vignettes,
       type = type,
+      repos = repos,
       ...
     )
   }
