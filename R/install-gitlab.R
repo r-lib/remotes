@@ -74,7 +74,9 @@ gitlab_remote <- function(repo, subdir = NULL,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+  project_id <- gitlab_project_id(x$username, x$repo, x$ref, x$host, x$auth_token)
+
+  src_root <- build_url(x$host, "api", "v4", "projects", project_id)
   src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
@@ -171,4 +173,15 @@ gitlab_pat <- function(quiet = TRUE) {
     return(pat)
   }
   return(NULL)
+}
+
+gitlab_project_id <- function(username, repo, ref = "master",
+  host = "gitlab.com", pat = gitlab_pat()) {
+
+  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+
+  tmp <- tempfile()
+  download(tmp, url, headers = c("Private-Token" = pat))
+
+  json$parse_file(tmp)$project_id
 }
