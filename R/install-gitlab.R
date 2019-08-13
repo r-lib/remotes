@@ -61,7 +61,7 @@ gitlab_remote <- function(repo, subdir = NULL,
 
   remote("gitlab",
     host = host,
-    repo = paste(meta$repo, meta$subdir, sep = "/"),
+    repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
     subdir = subdir,
     username = meta$username,
     ref = meta$ref,
