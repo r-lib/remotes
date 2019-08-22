@@ -192,17 +192,18 @@ download_version_url <- function(package, version, repos, type, available, verbo
 
   package_exists <- FALSE
 
-  if (package %in% row.names(available)) {
+  # available.packages() returns a matrix with entries in the same order as the repositories in
+  # `repos`, so the first packages we encounter should be preferred.
+  for (ix in which(available[, "Package"] == package)) {
     package_exists <- TRUE
-    current.version <- available[package, 'Version']
-    if (version_satisfies_criteria(current.version, version)) {
-      row <- available[which(rownames(available) == package)[1], ]
+    row <- available[ix, ]
+    if (version_satisfies_criteria(row["Version"], version)) {
       return(paste0(
-        row[["Repository"]],
+        row["Repository"],
         "/",
-        row[["Package"]],
+        row["Package"],
         "_",
-        row[["Version"]],
+        row["Version"],
         ".tar.gz"
       ))
     }
@@ -218,7 +219,7 @@ download_version_url <- function(package, version, repos, type, available, verbo
     for (i in rev(seq_len(nrow(info)))) {
       package_path <- row.names(info)[i]
       if (version_satisfies_criteria(version_from_tarball(package_path), version)) {
-        return(paste(info$repo[i], "/src/contrib/Archive/", package_path, sep = ""))
+        return(paste(repo, "src/contrib/Archive/", package_path, sep = ""))
       }
     }
   }
