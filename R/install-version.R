@@ -190,7 +190,10 @@ download_version_url <- function(package, version, repos, type, available, verbo
     available <- available.packages(contriburl)
   }
 
+  package_exists <- FALSE
+
   if (package %in% row.names(available)) {
+    package_exists <- TRUE
     current.version <- available[package, 'Version']
     if (version_satisfies_criteria(current.version, version)) {
       row <- available[which(rownames(available) == package)[1], ]
@@ -205,7 +208,6 @@ download_version_url <- function(package, version, repos, type, available, verbo
     }
   }
 
-  package_exists <- FALSE
   for (repo in repos) {
     info <- package_find_archives(package, repo, verbose=verbose)
     if (is.null(info))
