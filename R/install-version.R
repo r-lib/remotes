@@ -179,14 +179,16 @@ download_version <- function(package, version = NULL,
   download(path = tempfile(), url = url)
 }
 
-download_version_url <- function(package, version, repos, type) {
+download_version_url <- function(package, version, repos, type, available, verbose=length(repos) > 1) {
 
   ## TODO should we do for(r in repos) { for (t in c('published','archive')) {...}}, or
   ## for (t in c('published','archive')) { for(r in repos) {...}} ? Right now it's the latter.  It
   ## only matters if required version is satisfied by both an early repo in archive/ and a late repo
 
-  contriburl <- contrib.url(repos, type)
-  available <- available.packages(contriburl)
+  if (missing(available)) {
+    contriburl <- contrib.url(repos, type)
+    available <- available.packages(contriburl)
+  }
 
   if (package %in% row.names(available)) {
     current.version <- available[package, 'Version']
@@ -205,7 +207,7 @@ download_version_url <- function(package, version, repos, type) {
 
   package_exists <- FALSE
   for (repo in repos) {
-    info <- package_find_archives(package, repo, verbose=length(repos) > 1)
+    info <- package_find_archives(package, repo, verbose=verbose)
     if (is.null(info))
       next
 
