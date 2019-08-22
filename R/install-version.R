@@ -187,7 +187,7 @@ download_version_url <- function(package, version, repos, type, available, verbo
 
   if (missing(available)) {
     contriburl <- contrib.url(repos, type)
-    available <- available.packages(contriburl)
+    available <- available.packages(contriburl, filters = c("R_version", "OS_type", "subarch"))
   }
 
   package_exists <- FALSE
