@@ -1,8 +1,8 @@
 
 # remotes
 
-> Install R Packages from GitHub, BitBucket, or other local or remote
-> repositories
+> Install R Packages from remote or local repositories, 
+> including GitHub, GitLab, Bitbucket, and Bioconductor
 
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Linux Build Status](https://travis-ci.org/r-lib/remotes.svg?branch=master)](https://travis-ci.org/r-lib/remotes)
@@ -11,8 +11,8 @@
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/master.svg)](https://codecov.io/github/r-lib/remotes?branch=master)
 
-Download and install R packages stored in GitHub,
-BitBucket, or plain subversion or git repositories. This package
+Download and install R packages stored in GitHub, GitLab, Bitbucket, 
+Bioconductor, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
 [`devtools`](https://github.com/r-lib/devtools).
 Indeed most of the code was copied over from `devtools`.
@@ -20,15 +20,15 @@ Indeed most of the code was copied over from `devtools`.
 ## Features
 
 * Installers:
-    * Install packages with their dependencies.
-    * Install from GitHub, GitLab, BitBucket.
-	* Install from git and subversion repositories.
-	* Install from local files or URLs.
-	* Install the dependencies of a local package tree.
-	* Install specific package versions from CRAN.
+  * Install packages with their dependencies.
+  * Install from GitHub, GitLab, Bitbucket.
+  * Install from git and subversion repositories.
+  * Install from local files or URLs.
+  * Install the dependencies of a local package tree.
+  * Install specific package versions from CRAN.
 * Supports [Bioconductor](https://bioconductor.org/) packages.
-* Supports the `Remotes` field in `DESCRIPTION`. See more
-  [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
+* Supports the `Remotes` field in `DESCRIPTION`. See more in the
+  [dependencies](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd) vignette.
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
@@ -196,7 +196,7 @@ details:
 * `pkgType` for the package type (source or binary, see manual) to install,
   download or look up dependencies for.
 
-* `repos` for the locations of the user's standard CRAN(-like) repositoies.
+* `repos` for the locations of the user's standard CRAN(-like) repositories.
 
 It also uses some remotes specific options:
 
@@ -209,7 +209,7 @@ It also uses some remotes specific options:
 ### Environment variables
 
 * The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` environment variables
-  are used for the default BitBucket  user name and password, in
+  are used for the default Bitbucket  user name and password, in
   `install_bitbucket()`
 
 * The `GITHUB_PAT` environment variable is used as the default GitHub

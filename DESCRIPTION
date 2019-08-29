@@ -12,10 +12,10 @@ Authors@R: c(
     person("Ken", "Williams", , "kenahoo@gmail.com", role = "ctb"),
     person("Mango Solutions", role = "cph")
     )
-Description: Download and install R packages stored in 'GitHub',
-    'BitBucket', or plain 'subversion' or 'git' repositories. This package
-    provides the 'install_*' functions in 'devtools'.
-    Indeed most of the code was copied over from 'devtools'.
+Description: Download and install R packages stored in 'GitHub', 'GitLab', 
+    'Bitbucket', 'Bioconductor', or plain 'subversion' or 'git' repositories. 
+    This package provides the 'install_*' functions in 'devtools'. Indeed most 
+    of the code was copied over from 'devtools'.
 License: GPL (>= 2)
 URL: https://github.com/r-lib/remotes#readme
 BugReports: https://github.com/r-lib/remotes/issues

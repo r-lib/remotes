@@ -20,7 +20,7 @@ the release are \sQuote{devel},
 \sQuote{release} (the default if none specified), or numeric release
 numbers (e.g. \sQuote{3.3}).}
 
-\item{mirror}{The bioconductor git mirror to use}
+\item{mirror}{The Bioconductor git mirror to use}
 
 \item{git}{Whether to use the \code{git2r} package, or an external
 git client via system. Default is \code{git2r} if it is installed,
