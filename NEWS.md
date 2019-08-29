@@ -1,5 +1,9 @@
 # remotes (development version)
 
+* `install_gitlab()` now installs from repositories in subgroups and with dots 
+  in their name. `subdir` is now an explicit argument instead of implicit in 
+  `repo` (@robertdj, #259, #420).
+
 # remotes 2.1.0
 
 ## New features
