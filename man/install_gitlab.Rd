@@ -4,10 +4,10 @@
 \alias{install_gitlab}
 \title{Install a package from GitLab}
 \usage{
-install_gitlab(repo, auth_token = gitlab_pat(), host = "gitlab.com",
-  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
-  force = FALSE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
+install_gitlab(repo, auth_token = gitlab_pat(quiet),
+  host = "gitlab.com", dependencies = NA, upgrade = c("default",
+  "ask", "always", "never"), force = FALSE, quiet = FALSE,
+  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
   "--no-build-vignettes"), build_manual = FALSE,
   build_vignettes = FALSE, repos = getOption("repos"),
   type = getOption("pkgType"), ...)

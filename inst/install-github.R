@@ -2797,7 +2797,7 @@ function(...) {
   install_github <- function(repo,
                              ref = "master",
                              subdir = NULL,
-                             auth_token = github_pat(),
+                             auth_token = github_pat(quiet),
                              host = "api.github.com",
                              dependencies = NA,
                              upgrade = c("default", "ask", "always", "never"),
@@ -3033,7 +3033,7 @@ function(...) {
   #' install_gitlab("jimhester/covr")
   #' }
   install_gitlab <- function(repo,
-                             auth_token = gitlab_pat(),
+                             auth_token = gitlab_pat(quiet),
                              host = "gitlab.com",
                              dependencies = NA,
                              upgrade = c("default", "ask", "always", "never"),
