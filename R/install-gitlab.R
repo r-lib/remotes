@@ -23,7 +23,7 @@
 #' install_gitlab("jimhester/covr")
 #' }
 install_gitlab <- function(repo,
-                           auth_token = gitlab_pat(),
+                           auth_token = gitlab_pat(quiet),
                            host = "gitlab.com",
                            dependencies = NA,
                            upgrade = c("default", "ask", "always", "never"),
