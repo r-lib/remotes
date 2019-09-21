@@ -1,5 +1,9 @@
 # remotes (development version)
 
+## Minor improvements and fixes
+
+* `install_gitlab` passes the `quiet` argument on to `gitlab_pat` (@michaelchirico, #437)
+
 # remotes 2.1.0
 
 ## New features
@@ -49,7 +53,7 @@
 
 * Bioc `remote_sha()` now always returns a character result (#379)
 
-* Fix API call for private repositories in `install_gitlab` 
+* Fix API call for private repositories in `install_gitlab`
   (@aornugent, #359, #363)
 
 * git submodules now work if the submodule file is empty (@muschellij2, #234)
@@ -57,7 +61,7 @@
 * `install_gitlab()` no longer adds the access token twice to the request
   (@aornugent, #363).
 
-* Bitbucket dependencies now actually use the `BITBUCKET_USER` and 
+* Bitbucket dependencies now actually use the `BITBUCKET_USER` and
   `BITBUCKET_PASSWORD` environment variables (@antoine-sachet, #347).
 
 * `parse_deps()` now ignores trailing whitespaces around comparison operators
@@ -122,15 +126,15 @@
   set up proxies, see `?download.file`.
 * Remotes without package names are now unconditionally installed (#246).
 
-* `install_github()` now includes a more informative error message when the 
+* `install_github()` now includes a more informative error message when the
   status code is 404, asking the user to check that they have spelled the
-  repo owner and repo correctly (included in the error message), and that 
+  repo owner and repo correctly (included in the error message), and that
   they have the required permissions to access the repository.
 
 * `install_*` functions (via the underlying private `install` function) now set
   `RGL_USE_NULL="TRUE"` in order to avoid errors when running headless
   and installing any package using `rgl` (@jefferis, ##333)
-  
+
 # remotes 2.0.2
 
 * `install_deps()` now installs un-installed remotes packages even when
