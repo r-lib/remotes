@@ -129,9 +129,11 @@ download_version_url <- function(package, version, repos, type) {
   } else {
     package.filename <- paste(package, "_", version, ".tar.gz",
       sep = "")
-    idx <- endsWith(row.names(info), package.filename)
+    rn <- row.names(info)
+    idx <- substr(rn, nchar(rn) - nchar(package.filename) + 1,
+      nchar(rn)) == package.filename
     if(any(idx)) {
-      package.path <- row.names(info)[idx][1L]
+      package.path <- rn[idx][1L]
     } else {
       stop(sprintf("version '%s' is invalid for package '%s'", version,
         package))

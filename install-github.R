@@ -3973,9 +3973,14 @@ function(...) {
       # Grab the latest one: only happens if pulled from CRAN
       package.path <- row.names(info)[nrow(info)]
     } else {
-      package.path <- paste(package, "/", package, "_", version, ".tar.gz",
+      package.filename <- paste(package, "_", version, ".tar.gz",
         sep = "")
-      if (!(package.path %in% row.names(info))) {
+      rn <- row.names(info)
+      idx <- substr(rn, nchar(rn) - nchar(package.filename) + 1,
+        nchar(rn)) == package.filename
+      if(any(idx)) {
+        package.path <- rn[idx][1L]
+      } else {
         stop(sprintf("version '%s' is invalid for package '%s'", version,
           package))
       }
