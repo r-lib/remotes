@@ -127,9 +127,12 @@ download_version_url <- function(package, version, repos, type) {
     # Grab the latest one: only happens if pulled from CRAN
     package.path <- row.names(info)[nrow(info)]
   } else {
-    package.path <- paste(package, "/", package, "_", version, ".tar.gz",
+    package.filename <- paste(package, "_", version, ".tar.gz",
       sep = "")
-    if (!(package.path %in% row.names(info))) {
+    idx <- endsWith(row.names(info), package.filename)
+    if(any(idx)) {
+      package.path <- row.names(info)[idx][1L]
+    } else {
       stop(sprintf("version '%s' is invalid for package '%s'", version,
         package))
     }
