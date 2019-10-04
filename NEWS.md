@@ -3,6 +3,7 @@
 * `install_gitlab()` now installs from repositories in subgroups and with dots 
   in their name. `subdir` is now an explicit argument instead of implicit in 
   `repo` (@robertdj, #259, #420).
+* `install()` now passes the ellipsis `...` to `install_deps()` (@Neil-Schneider, #411)
 
 # remotes 2.1.0
 
