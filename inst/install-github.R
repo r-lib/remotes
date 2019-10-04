@@ -4023,7 +4023,7 @@ function(...) {
     install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
       build = build, build_opts = build_opts, build_manual = build_manual,
       build_vignettes = build_vignettes, upgrade = upgrade, repos = repos,
-      type = type)
+      type = type, ...)
   
     if (isTRUE(build)) {
       dir <- tempfile()
