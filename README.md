@@ -180,7 +180,7 @@ process. However if you are using remotes to install or update these packages
 (or their reverse dependencies) using them during installation may fail
 (particularly on Windows).
 
-If you set the environment variable `R_REMOTES_STANDALONE=true` (e.g.
+If you set the environment variable `R_REMOTES_STANDALONE="true"` (e.g.
 in R `Sys.setenv(R_REMOTES_STANDALONE="true")`) you can force remotes to
 operate in standalone mode and use only its internal R implementations. This
 will allow successful installation of these packages.
@@ -224,20 +224,20 @@ It also uses some remotes specific options:
 
 * The `R_REMOTES_UPGRADE` environment variable can be used to set a default
   preferred value for the `upgrade =` argument accepted by the various
-  `install_*()` functions. For example, you can set `R_REMOTES_UPGRADE=always`
+  `install_*()` functions. For example, you can set `R_REMOTES_UPGRADE="always"`
   to upgrade dependent packages without asking the user.
 
-* Setting `R_REMOTES_STANDALONE=true` forces remotes to work in standalone
+* Setting `R_REMOTES_STANDALONE="true"` forces remotes to work in standalone
   mode and avoid loading its optional dependencies (curl, git2 and pkgbuild
   currently. See "Standalone mode" above.
 
-* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS=true` avoids stopping the
+* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS="true"` avoids stopping the
   installation for warning messages. Warnings usually mean installation
   errors, so by default remotes stops for a warning. However, sometimes
   other warnings might happen, that could be ignored by setting this
   environment variable.
 
-* Setting `_R_CHECK_FORCE_SUGGESTS_=false` while
+* Setting `_R_CHECK_FORCE_SUGGESTS_="false"` while
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset will also avoid stopping the
   installation for error messages. This is done because a warning is generated
   during installation when not all Suggested packages are not available.
