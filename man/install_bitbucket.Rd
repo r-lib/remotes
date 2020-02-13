@@ -2,7 +2,7 @@
 % Please edit documentation in R/install-bitbucket.R
 \name{install_bitbucket}
 \alias{install_bitbucket}
-\title{Install a package directly from bitbucket}
+\title{Install a package directly from Bitbucket}
 \usage{
 install_bitbucket(repo, ref = "master", subdir = NULL,
   auth_user = bitbucket_user(), password = bitbucket_password(),

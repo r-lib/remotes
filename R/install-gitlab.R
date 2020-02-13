@@ -7,7 +7,7 @@
 #'
 #' @inheritParams install_github
 #' @param repo Repository address in the format
-#'   `username/repo[/subdir][@@ref]`.
+#'   `username/repo[@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"gitlab.hostname.com"`.
 #' @param auth_token To install from a private repo, generate a personal access
@@ -23,7 +23,8 @@
 #' install_gitlab("jimhester/covr")
 #' }
 install_gitlab <- function(repo,
-                           auth_token = gitlab_pat(),
+                           subdir = NULL,
+                           auth_token = gitlab_pat(quiet),
                            host = "gitlab.com",
                            dependencies = NA,
                            upgrade = c("default", "ask", "always", "never"),
@@ -35,7 +36,7 @@ install_gitlab <- function(repo,
                            type = getOption("pkgType"),
                            ...) {
 
-  remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
+  remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host)
 
   install_remotes(remotes, auth_token = auth_token, host = host,
                   dependencies = dependencies,
@@ -51,7 +52,7 @@ install_gitlab <- function(repo,
                   ...)
 }
 
-gitlab_remote <- function(repo,
+gitlab_remote <- function(repo, subdir = NULL,
                        auth_token = gitlab_pat(), sha = NULL,
                        host = "gitlab.com", ...) {
 
@@ -60,8 +61,8 @@ gitlab_remote <- function(repo,
 
   remote("gitlab",
     host = host,
-    repo = meta$repo,
-    subdir = meta$subdir,
+    repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
+    subdir = subdir,
     username = meta$username,
     ref = meta$ref,
     sha = sha,
@@ -73,7 +74,9 @@ gitlab_remote <- function(repo,
 remote_download.gitlab_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = paste0(".tar.gz"))
 
-  src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+  project_id <- gitlab_project_id(x$username, x$repo, x$ref, x$host, x$auth_token)
+
+  src_root <- build_url(x$host, "api", "v4", "projects", project_id)
   src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
 
   if (!quiet) {
@@ -170,4 +173,15 @@ gitlab_pat <- function(quiet = TRUE) {
     return(pat)
   }
   return(NULL)
+}
+
+gitlab_project_id <- function(username, repo, ref = "master",
+  host = "gitlab.com", pat = gitlab_pat()) {
+
+  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+
+  tmp <- tempfile()
+  download(tmp, url, headers = c("Private-Token" = pat))
+
+  json$parse_file(tmp)$project_id
 }

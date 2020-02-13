@@ -1,18 +1,21 @@
 
 # remotes
 
-> Install R Packages from GitHub, BitBucket, or other local or remote
-> repositories
+> Install R Packages from remote or local repositories, 
+> including GitHub, GitLab, Bitbucket, and Bioconductor
 
+
+<!-- badges: start -->
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Linux Build Status](https://travis-ci.org/r-lib/remotes.svg?branch=master)](https://travis-ci.org/r-lib/remotes)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-lib/remotes?svg=true)](https://ci.appveyor.com/project/gaborcsardi/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/master.svg)](https://codecov.io/github/r-lib/remotes?branch=master)
+<!-- badges: end -->
 
-Download and install R packages stored in GitHub,
-BitBucket, or plain subversion or git repositories. This package
+Download and install R packages stored in GitHub, GitLab, Bitbucket, 
+Bioconductor, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
 [`devtools`](https://github.com/r-lib/devtools).
 Indeed most of the code was copied over from `devtools`.
@@ -20,15 +23,15 @@ Indeed most of the code was copied over from `devtools`.
 ## Features
 
 * Installers:
-    * Install packages with their dependencies.
-    * Install from GitHub, GitLab, BitBucket.
-	* Install from git and subversion repositories.
-	* Install from local files or URLs.
-	* Install the dependencies of a local package tree.
-	* Install specific package versions from CRAN.
+  * Install packages with their dependencies.
+  * Install from GitHub, GitLab, Bitbucket.
+  * Install from git and subversion repositories.
+  * Install from local files or URLs.
+  * Install the dependencies of a local package tree.
+  * Install specific package versions from CRAN.
 * Supports [Bioconductor](https://bioconductor.org/) packages.
-* Supports the `Remotes` field in `DESCRIPTION`. See more
-  [here](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd).
+* Supports the `Remotes` field in `DESCRIPTION`. See more in the
+  [dependencies](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd) vignette.
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
@@ -180,7 +183,7 @@ process. However if you are using remotes to install or update these packages
 (or their reverse dependencies) using them during installation may fail
 (particularly on Windows).
 
-If you set the environment variable `R_REMOTES_STANDALONE=true` (e.g.
+If you set the environment variable `R_REMOTES_STANDALONE="true"` (e.g.
 in R `Sys.setenv(R_REMOTES_STANDALONE="true")`) you can force remotes to
 operate in standalone mode and use only its internal R implementations. This
 will allow successful installation of these packages.
@@ -196,7 +199,7 @@ details:
 * `pkgType` for the package type (source or binary, see manual) to install,
   download or look up dependencies for.
 
-* `repos` for the locations of the user's standard CRAN(-like) repositoies.
+* `repos` for the locations of the user's standard CRAN(-like) repositories.
 
 It also uses some remotes specific options:
 
@@ -209,7 +212,7 @@ It also uses some remotes specific options:
 ### Environment variables
 
 * The `BITBUCKET_USER` and `BITBUCKET_PASSWORD` environment variables
-  are used for the default BitBucket  user name and password, in
+  are used for the default Bitbucket  user name and password, in
   `install_bitbucket()`
 
 * The `GITHUB_PAT` environment variable is used as the default GitHub
@@ -224,20 +227,20 @@ It also uses some remotes specific options:
 
 * The `R_REMOTES_UPGRADE` environment variable can be used to set a default
   preferred value for the `upgrade =` argument accepted by the various
-  `install_*()` functions. For example, you can set `R_REMOTES_UPGRADE=always`
+  `install_*()` functions. For example, you can set `R_REMOTES_UPGRADE="always"`
   to upgrade dependent packages without asking the user.
 
-* Setting `R_REMOTES_STANDALONE=true` forces remotes to work in standalone
+* Setting `R_REMOTES_STANDALONE="true"` forces remotes to work in standalone
   mode and avoid loading its optional dependencies (curl, git2 and pkgbuild
   currently. See "Standalone mode" above.
 
-* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS=true` avoids stopping the
+* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS="true"` avoids stopping the
   installation for warning messages. Warnings usually mean installation
   errors, so by default remotes stops for a warning. However, sometimes
   other warnings might happen, that could be ignored by setting this
   environment variable.
 
-* Setting `_R_CHECK_FORCE_SUGGESTS_=false` while
+* Setting `_R_CHECK_FORCE_SUGGESTS_="false"` while
   `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset will also avoid stopping the
   installation for error messages. This is done because a warning is generated
   during installation when not all Suggested packages are not available.

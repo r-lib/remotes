@@ -108,7 +108,8 @@ function(...) {
       "3.2"  = package_version("3.2"),
       "3.3"  = package_version("3.4"),
       "3.4"  = package_version("3.6"),
-      "3.5"  = package_version("3.8")
+      "3.5"  = package_version("3.8"),
+      "3.6"  = package_version("3.10")
     )
   
     # -------------------------------------------------------------------
@@ -323,14 +324,14 @@ function(...) {
   #' `bioc_version()` returns the Bioconductor version for the current or the
   #' specified R version.
   #'
-  #' `bioc_install_repos()` deduces the URLs of the BioConductor repositories.
+  #' `bioc_install_repos()` deduces the URLs of the Bioconductor repositories.
   #'
   #' @details
   #' Both functions observe the `R_BIOC_VERSION` environment variable, which
   #' can be set to force a Bioconductor version. If this is set, then the
   #' `r_ver` and `bioc_ver` arguments are ignored.
   #'
-  #' `bioc_install_repos()` observes the `R_BIOC_MIRROR` enironment variable
+  #' `bioc_install_repos()` observes the `R_BIOC_MIRROR` environment variable
   #' and also the `BioC_mirror` option, which can be set to the desired
   #' Bioconductor mirror. The option takes precedence if both are set. Its
   #' default value is `https://bioconductor.org`.
@@ -340,13 +341,13 @@ function(...) {
   #' object.
   #'
   #' `bioc_install_repos()` returns a named character vector of the URLs of
-  #' the BioConductor repositories, appropriate for the current or the
+  #' the Bioconductor repositories, appropriate for the current or the
   #' specified R version.
   #'
   #' @param r_ver R version to use. For `bioc_install_repos()` it is
   #'   ignored if `bioc_ver` is specified.
   #' @param bioc_ver Bioconductor version to use. Defaults to the default one
-  #'   corresposding to `r_ver`.
+  #'   corresponding to `r_ver`.
   #'
   #' @export
   #' @keywords internal
@@ -895,7 +896,9 @@ function(...) {
       rec_flat <- character()
     }
   
-    unique(c(if (include_pkgs) packages, top_flat, rec_flat))
+    # We need to put the recursive dependencies _before_ the top dependencies, to
+    # ensure that any dependencies are installed before their parents are loaded.
+    unique(c(if (include_pkgs) packages, rec_flat, top_flat))
   }
   
   #' Standardise dependencies using the same logical as [install.packages]
@@ -1855,7 +1858,7 @@ function(...) {
   #'   the release are \sQuote{devel},
   #'   \sQuote{release} (the default if none specified), or numeric release
   #'   numbers (e.g. \sQuote{3.3}).
-  #' @param mirror The bioconductor git mirror to use
+  #' @param mirror The Bioconductor git mirror to use
   #' @param ... Other arguments passed on to [utils::install.packages()].
   #' @inheritParams install_github
   #' @export
@@ -2141,7 +2144,7 @@ function(...) {
   
   # Contents of R/install-bitbucket.R
   
-  #' Install a package directly from bitbucket
+  #' Install a package directly from Bitbucket
   #'
   #' This function is vectorised so you can install multiple packages in
   #' a single command.
@@ -2805,7 +2808,7 @@ function(...) {
   install_github <- function(repo,
                              ref = "master",
                              subdir = NULL,
-                             auth_token = github_pat(),
+                             auth_token = github_pat(quiet),
                              host = "api.github.com",
                              dependencies = NA,
                              upgrade = c("default", "ask", "always", "never"),
@@ -3025,7 +3028,7 @@ function(...) {
   #'
   #' @inheritParams install_github
   #' @param repo Repository address in the format
-  #'   `username/repo[/subdir][@@ref]`.
+  #'   `username/repo[@@ref]`.
   #' @param host GitLab API host to use. Override with your GitLab enterprise
   #'   hostname, for example, `"gitlab.hostname.com"`.
   #' @param auth_token To install from a private repo, generate a personal access
@@ -3041,7 +3044,8 @@ function(...) {
   #' install_gitlab("jimhester/covr")
   #' }
   install_gitlab <- function(repo,
-                             auth_token = gitlab_pat(),
+                             subdir = NULL,
+                             auth_token = gitlab_pat(quiet),
                              host = "gitlab.com",
                              dependencies = NA,
                              upgrade = c("default", "ask", "always", "never"),
@@ -3053,7 +3057,7 @@ function(...) {
                              type = getOption("pkgType"),
                              ...) {
   
-    remotes <- lapply(repo, gitlab_remote, auth_token = auth_token, host = host)
+    remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host)
   
     install_remotes(remotes, auth_token = auth_token, host = host,
                     dependencies = dependencies,
@@ -3069,7 +3073,7 @@ function(...) {
                     ...)
   }
   
-  gitlab_remote <- function(repo,
+  gitlab_remote <- function(repo, subdir = NULL,
                          auth_token = gitlab_pat(), sha = NULL,
                          host = "gitlab.com", ...) {
   
@@ -3078,8 +3082,8 @@ function(...) {
   
     remote("gitlab",
       host = host,
-      repo = meta$repo,
-      subdir = meta$subdir,
+      repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
+      subdir = subdir,
       username = meta$username,
       ref = meta$ref,
       sha = sha,
@@ -3091,7 +3095,9 @@ function(...) {
   remote_download.gitlab_remote <- function(x, quiet = FALSE) {
     dest <- tempfile(fileext = paste0(".tar.gz"))
   
-    src_root <- build_url(x$host, "api", "v4", "projects", utils::URLencode(paste0(x$username, "/", x$repo), reserved = TRUE))
+    project_id <- gitlab_project_id(x$username, x$repo, x$ref, x$host, x$auth_token)
+  
+    src_root <- build_url(x$host, "api", "v4", "projects", project_id)
     src <- paste0(src_root, "/repository/archive.tar.gz?sha=", utils::URLencode(x$ref, reserved = TRUE))
   
     if (!quiet) {
@@ -3188,6 +3194,17 @@ function(...) {
       return(pat)
     }
     return(NULL)
+  }
+  
+  gitlab_project_id <- function(username, repo, ref = "master",
+    host = "gitlab.com", pat = gitlab_pat()) {
+  
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+  
+    tmp <- tempfile()
+    download(tmp, url, headers = c("Private-Token" = pat))
+  
+    json$parse_file(tmp)$project_id
   }
   # Contents of R/install-local.R
   
@@ -3502,8 +3519,8 @@ function(...) {
     switch(x$RemoteType,
       standard = remote("cran",
         name = x$Package,
-        repos = x$RemoteRepos,
-        pkg_type = x$RemotePkgType,
+        repos = x$RemoteRepos %||% repos,
+        pkg_type = x$RemotePkgType %||% type,
         sha = x$RemoteSha),
       github = remote("github",
         host = x$RemoteHost,
@@ -3559,7 +3576,7 @@ function(...) {
         url = trim_ws(x$RemoteUrl),
         subdir = x$RemoteSubdir,
         config = x$RemoteConfig,
-        pkg_type = x$RemotePkgType),
+        pkg_type = x$RemotePkgType %||% type),
       bioc_git2r = remote("bioc_git2r",
         mirror = x$RemoteMirror,
         repo = x$RemoteRepo,
@@ -4017,7 +4034,7 @@ function(...) {
     install_deps(pkgdir, dependencies = dependencies, quiet = quiet,
       build = build, build_opts = build_opts, build_manual = build_manual,
       build_vignettes = build_vignettes, upgrade = upgrade, repos = repos,
-      type = type)
+      type = type, ...)
   
     if (isTRUE(build)) {
       dir <- tempfile()
