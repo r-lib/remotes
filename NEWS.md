@@ -1,4 +1,10 @@
-# remotes (development version)
+# remotes 2.1.1
+
+## Minor improvements and fixes
+
+* Installing mixed binary and source dependencies when the latest versions of
+  some packages do not have binaries yet should now install dependencies in the
+  correct order to prevent load failures (#296)
 
 * `github_error()` now also works when a GitHub (Enterprise) server does not
   return information about the rate limit (@dpprdan, #396, #413).
@@ -15,6 +21,8 @@
   `repo` (@robertdj, #259, #420).
 
 * `install()` now passes the ellipsis `...` to `install_deps()` (@Neil-Schneider, #411)
+
+* The tests have been updated to work with newer versions of callr and R 4.0
 
 # remotes 2.1.0
 
