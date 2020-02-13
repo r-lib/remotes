@@ -1,5 +1,8 @@
 # remotes (development version)
 
+* `github_error()` now also works when a GitHub (Enterprise) server does not
+  return information about the rate limit (@dpprdan, #396, #413).
+
 * `install_gitlab` passes the `quiet` argument on to `gitlab_pat` (@michaelchirico, #437)
 
 * `remotes` is now resilient against installed packages that declare
