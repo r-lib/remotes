@@ -108,7 +108,8 @@ function(...) {
       "3.2"  = package_version("3.2"),
       "3.3"  = package_version("3.4"),
       "3.4"  = package_version("3.6"),
-      "3.5"  = package_version("3.8")
+      "3.5"  = package_version("3.8"),
+      "3.6"  = package_version("3.10")
     )
   
     # -------------------------------------------------------------------
@@ -895,7 +896,9 @@ function(...) {
       rec_flat <- character()
     }
   
-    unique(c(if (include_pkgs) packages, top_flat, rec_flat))
+    # We need to put the recursive dependencies _before_ the top dependencies, to
+    # ensure that any dependencies are installed before their parents are loaded.
+    unique(c(if (include_pkgs) packages, rec_flat, top_flat))
   }
   
   #' Standardise dependencies using the same logical as [install.packages]
@@ -3508,8 +3511,8 @@ function(...) {
     switch(x$RemoteType,
       standard = remote("cran",
         name = x$Package,
-        repos = x$RemoteRepos,
-        pkg_type = x$RemotePkgType,
+        repos = x$RemoteRepos %||% repos,
+        pkg_type = x$RemotePkgType %||% type,
         sha = x$RemoteSha),
       github = remote("github",
         host = x$RemoteHost,
@@ -3565,7 +3568,7 @@ function(...) {
         url = trim_ws(x$RemoteUrl),
         subdir = x$RemoteSubdir,
         config = x$RemoteConfig,
-        pkg_type = x$RemotePkgType),
+        pkg_type = x$RemotePkgType %||% type),
       bioc_git2r = remote("bioc_git2r",
         mirror = x$RemoteMirror,
         repo = x$RemoteRepo,
