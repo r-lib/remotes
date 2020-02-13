@@ -154,6 +154,8 @@ test_that("Can update a submodule with an empty .gitmodules submodule", {
 
   writeLines("^bar$", build_ignore)
 
-  update_submodules("submodule", NULL, quiet = TRUE)
-
+  expect_error(
+    update_submodules("submodule", NULL, quiet = TRUE),
+    NA
+  )
 })

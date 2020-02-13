@@ -1109,7 +1109,7 @@ function(...) {
           choices <- c("All", "CRAN packages only", "None", choices)
         }
   
-        res <- select_menu(choices, title = "These packages have more recent versions available.\nWhich would you like to update?")
+        res <- select_menu(choices, title = "These packages have more recent versions available.\nIt is recommended to update all of them.\nWhich would you like to update?")
   
         if ("None" %in% res || length(res) == 0) {
           return(x[uninstalled, ])
