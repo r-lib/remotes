@@ -27,7 +27,7 @@ test_that("safe_build_package fails appropriately with pkgbuild", {
   opts <- c("--no-resave-data", "--no-manual", "--no-build-vignettes")
   expect_error(
     safe_build_package(test_path("invalidpkg"), build_opts = opts, build_manual = FALSE, build_vignettes = FALSE, out, quiet = TRUE, use_pkgbuild = TRUE),
-    "System command error",
+    "System command",
     class = "system_command_status_error"
   )
 })
