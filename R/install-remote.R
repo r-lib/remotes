@@ -58,7 +58,7 @@ install_remote <- function(remote,
   source <- source_pkg(bundle, subdir = remote$subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
 
-  update_submodules(source, quiet)
+  update_submodules(source, remote$subdir, quiet)
 
   add_metadata(source, remote_metadata(remote, bundle, source, remote_sha))
 

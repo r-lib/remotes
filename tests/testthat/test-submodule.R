@@ -117,7 +117,7 @@ test_that("Can install a repo with a submodule", {
 
   writeLines("^bar$", build_ignore)
 
-  update_submodules("submodule", quiet = TRUE)
+  update_submodules("submodule", NULL, quiet = TRUE)
   expect_true(dir.exists(file.path("submodule", "R")))
   expect_false(dir.exists(file.path("submodule", "bar")))
 
@@ -154,6 +154,6 @@ test_that("Can update a submodule with an empty .gitmodules submodule", {
 
   writeLines("^bar$", build_ignore)
 
-  update_submodules("submodule", quiet = TRUE)
+  update_submodules("submodule", NULL, quiet = TRUE)
 
 })
