@@ -1756,11 +1756,11 @@ function(...) {
   github_error <- function(res) {
     res_headers <- curl::parse_headers_list(res$headers)
   
-    ratelimit_limit <- res_headers$`x-ratelimit-limit`
+    ratelimit_limit <- res_headers$`x-ratelimit-limit` %||% NA_character_
   
-    ratelimit_remaining <- res_headers$`x-ratelimit-remaining`
+    ratelimit_remaining <- res_headers$`x-ratelimit-remaining` %||% NA_character_
   
-    ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset`, tz = "UTC")
+    ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset` %||% NA_character_, tz = "UTC")
   
     error_details <- json$parse(rawToChar(res$content))$message
   
@@ -1791,7 +1791,7 @@ function(...) {
     - If spelling is correct, check that you have the required permissions to access the repo."
       }
     }
-   if(identical(as.integer(res$status_code),404L)) {
+   if(identical(as.integer(res$status_code), 404L)) {
      msg <- sprintf(
        "HTTP error %s.
     %s
@@ -1802,7 +1802,7 @@ function(...) {
        error_details,
        guidance
      )
-   } else {
+   } else if (!is.na(ratelimit_limit)) {
     msg <- sprintf(
   "HTTP error %s.
     %s
@@ -1819,6 +1819,14 @@ function(...) {
       format(ratelimit_reset, usetz = TRUE),
       guidance
     )
+   } else {
+     msg <- sprintf(
+       "HTTP error %s.
+    %s",
+  
+       res$status_code,
+       error_details
+     )
    }
   
    status_type <- (as.integer(res$status_code) %/% 100) * 100
