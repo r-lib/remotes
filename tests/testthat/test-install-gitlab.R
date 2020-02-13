@@ -83,6 +83,8 @@ test_that("error if not username, warning if given as argument", {
 })
 
 test_that("remote_download.gitlab_remote messages", {
+  skip_on_cran()
+  skip_if_offline()
 
   mockery::stub(remote_download.gitlab_remote, "download", TRUE)
   expect_message(
