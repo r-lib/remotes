@@ -4,12 +4,19 @@
 \alias{install_deps}
 \title{Install package dependencies if needed.}
 \usage{
-install_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"),
-  upgrade = c("default", "ask", "always", "never"), quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, ...)
+install_deps(
+  pkgdir = ".",
+  dependencies = NA,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  upgrade = c("default", "ask", "always", "never"),
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}
@@ -38,7 +45,7 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 

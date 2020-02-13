@@ -4,18 +4,28 @@
 \alias{install_github}
 \title{Attempts to install a package directly from GitHub.}
 \usage{
-install_github(repo, ref = "master", subdir = NULL,
-  auth_token = github_pat(), host = "api.github.com",
-  dependencies = NA, upgrade = c("default", "ask", "always", "never"),
-  force = FALSE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_github(
+  repo,
+  ref = "master",
+  subdir = NULL,
+  auth_token = github_pat(quiet),
+  host = "api.github.com",
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
+\verb{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
 specify \code{subdir} and/or \code{ref} using the respective parameters
 (see below); if both is specified, the values in \code{repo} take
 precedence.}
@@ -57,7 +67,7 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
@@ -97,11 +107,16 @@ install_github("hadley/private", auth_token = "abc")
 \seealso{
 \code{\link[=github_pull]{github_pull()}}
 
-Other package installation: \code{\link{install_bioc}},
-  \code{\link{install_bitbucket}},
-  \code{\link{install_cran}}, \code{\link{install_dev}},
-  \code{\link{install_gitlab}}, \code{\link{install_git}},
-  \code{\link{install_local}}, \code{\link{install_svn}},
-  \code{\link{install_url}}, \code{\link{install_version}}
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
 \concept{package installation}

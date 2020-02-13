@@ -4,18 +4,29 @@
 \alias{install_bitbucket}
 \title{Install a package directly from Bitbucket}
 \usage{
-install_bitbucket(repo, ref = "master", subdir = NULL,
-  auth_user = bitbucket_user(), password = bitbucket_password(),
-  host = "api.bitbucket.org/2.0", dependencies = NA,
-  upgrade = c("default", "ask", "always", "never"), force = FALSE,
-  quiet = FALSE, build = TRUE, build_opts = c("--no-resave-data",
-  "--no-manual", "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_bitbucket(
+  repo,
+  ref = "master",
+  subdir = NULL,
+  auth_user = bitbucket_user(),
+  password = bitbucket_password(),
+  host = "api.bitbucket.org/2.0",
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
+\verb{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
 specify \code{subdir} and/or \code{ref} using the respective parameters
 (see below); if both is specified, the values in \code{repo} take
 precedence.}
@@ -60,7 +71,7 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
@@ -108,11 +119,16 @@ install_bitbucket("djnavarro/lsr")
 Bitbucket API docs:
 \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
 
-Other package installation: \code{\link{install_bioc}},
-  \code{\link{install_cran}}, \code{\link{install_dev}},
-  \code{\link{install_github}},
-  \code{\link{install_gitlab}}, \code{\link{install_git}},
-  \code{\link{install_local}}, \code{\link{install_svn}},
-  \code{\link{install_url}}, \code{\link{install_version}}
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
 \concept{package installation}

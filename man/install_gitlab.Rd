@@ -4,17 +4,27 @@
 \alias{install_gitlab}
 \title{Install a package from GitLab}
 \usage{
-install_gitlab(repo, subdir = NULL, auth_token = gitlab_pat(quiet),
-  host = "gitlab.com", dependencies = NA, upgrade = c("default",
-  "ask", "always", "never"), force = FALSE, quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_gitlab(
+  repo,
+  subdir = NULL,
+  auth_token = gitlab_pat(quiet),
+  host = "gitlab.com",
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{username/repo[@ref]}.}
+\verb{username/repo[@ref]}.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 
@@ -50,7 +60,7 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
@@ -75,11 +85,16 @@ install_gitlab("jimhester/covr")
 }
 }
 \seealso{
-Other package installation: \code{\link{install_bioc}},
-  \code{\link{install_bitbucket}},
-  \code{\link{install_cran}}, \code{\link{install_dev}},
-  \code{\link{install_github}}, \code{\link{install_git}},
-  \code{\link{install_local}}, \code{\link{install_svn}},
-  \code{\link{install_url}}, \code{\link{install_version}}
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
 \concept{package installation}

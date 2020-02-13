@@ -4,12 +4,20 @@
 \alias{install_cran}
 \title{Attempts to install a package from CRAN.}
 \usage{
-install_cran(pkgs, repos = getOption("repos"),
-  type = getOption("pkgType"), dependencies = NA,
-  upgrade = c("default", "ask", "always", "never"), force = FALSE,
-  quiet = FALSE, build = TRUE, build_opts = c("--no-resave-data",
-  "--no-manual", "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, ...)
+install_cran(
+  pkgs,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pkgs}{Character vector of packages to install.}
@@ -41,7 +49,7 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
@@ -61,11 +69,16 @@ install_cran(c("httpuv", "shiny"))
 }
 }
 \seealso{
-Other package installation: \code{\link{install_bioc}},
-  \code{\link{install_bitbucket}},
-  \code{\link{install_dev}}, \code{\link{install_github}},
-  \code{\link{install_gitlab}}, \code{\link{install_git}},
-  \code{\link{install_local}}, \code{\link{install_svn}},
-  \code{\link{install_url}}, \code{\link{install_version}}
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
 \concept{package installation}

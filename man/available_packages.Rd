@@ -10,8 +10,7 @@ available_packages_set(repos, type, db)
 
 available_packages_reset()
 
-available_packages(repos = getOption("repos"),
-  type = getOption("pkgType"))
+available_packages(repos = getOption("repos"), type = getOption("pkgType"))
 }
 \arguments{
 \item{repos}{
@@ -20,7 +19,7 @@ available_packages(repos = getOption("repos"),
 
 \item{type}{
     character string, indicate which type of packages: see
-    \code{\link{install.packages}}.
+    \code{\link[utils]{install.packages}}.
   
     If \code{type = "both"} this will use the source repository.
   }
