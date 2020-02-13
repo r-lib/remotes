@@ -7,8 +7,7 @@
 \usage{
 bioc_version(r_ver = getRversion())
 
-bioc_install_repos(r_ver = getRversion(),
-  bioc_ver = bioc_version(r_ver))
+bioc_install_repos(r_ver = getRversion(), bioc_ver = bioc_version(r_ver))
 }
 \arguments{
 \item{r_ver}{R version to use. For \code{bioc_install_repos()} it is
@@ -39,7 +38,7 @@ can be set to force a Bioconductor version. If this is set, then the
 \code{bioc_install_repos()} observes the \code{R_BIOC_MIRROR} environment variable
 and also the \code{BioC_mirror} option, which can be set to the desired
 Bioconductor mirror. The option takes precedence if both are set. Its
-default value is \code{https://bioconductor.org}.
+default value is \verb{https://bioconductor.org}.
 }
 \examples{
 bioc_version()

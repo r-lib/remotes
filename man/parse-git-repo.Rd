@@ -26,7 +26,7 @@ A remote repo can be specified in two ways:
 \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
 and various GitHub browser URLs}
 \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
-\code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+\verb{[username/]repo[/subdir][#pull|@ref|@*release]}}
 }
 }
 \examples{

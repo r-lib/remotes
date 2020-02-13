@@ -4,18 +4,26 @@
 \alias{install_bioc}
 \title{Install a development package from the Bioconductor git repository}
 \usage{
-install_bioc(repo, mirror = getOption("BioC_git",
-  download_url("git.bioconductor.org/packages")), git = c("auto",
-  "git2r", "external"), dependencies = NA, upgrade = c("default",
-  "ask", "always", "never"), force = FALSE, quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), build_manual = FALSE,
-  build_vignettes = FALSE, repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_bioc(
+  repo,
+  mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
+  git = c("auto", "git2r", "external"),
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{[username:password@][release/]repo[#commit]}. Valid values for
+\verb{[username:password@][release/]repo[#commit]}. Valid values for
 the release are \sQuote{devel},
 \sQuote{release} (the default if none specified), or numeric release
 numbers (e.g. \sQuote{3.3}).}
@@ -49,7 +57,7 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
@@ -86,11 +94,16 @@ install_bioc("user:password@SummarizedExperiment#abc123")
 }
 }
 \seealso{
-Other package installation: \code{\link{install_bitbucket}},
-  \code{\link{install_cran}}, \code{\link{install_dev}},
-  \code{\link{install_github}},
-  \code{\link{install_gitlab}}, \code{\link{install_git}},
-  \code{\link{install_local}}, \code{\link{install_svn}},
-  \code{\link{install_url}}, \code{\link{install_version}}
+Other package installation: 
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
 \concept{package installation}

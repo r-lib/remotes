@@ -4,8 +4,14 @@
 \alias{download}
 \title{Download a file}
 \usage{
-download(path, url, auth_token = NULL, basic_auth = NULL,
-  quiet = TRUE, headers = NULL)
+download(
+  path,
+  url,
+  auth_token = NULL,
+  basic_auth = NULL,
+  quiet = TRUE,
+  headers = NULL
+)
 }
 \arguments{
 \item{path}{Path to download to. \code{dirname(path)} must exist.}
@@ -35,9 +41,9 @@ not set, then see \code{download_method()} for choosing a method.
 Authentication can be supplied three ways:
 \itemize{
 \item By setting \code{auth_token}. This will append an HTTP \code{Authorization}
-header: \code{Authorization: token {auth_token}}.
+header: \verb{Authorization: token \{auth_token\}}.
 \item By setting \code{basic_auth} to a list with elements \code{user} and \code{password}.
-This will append a proper \code{Authorization: Basic {encoded_password}}
+This will append a proper \verb{Authorization: Basic \{encoded_password\}}
 HTTP header.
 \item By specifying the proper \code{headers} directly.
 }

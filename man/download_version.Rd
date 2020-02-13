@@ -4,8 +4,13 @@
 \alias{download_version}
 \title{Download a specified version of a CRAN package}
 \usage{
-download_version(package, version = NULL, repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+download_version(
+  package,
+  version = NULL,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{package}{package name}
