@@ -4,7 +4,7 @@
 \alias{install_gitlab}
 \title{Install a package from GitLab}
 \usage{
-install_gitlab(repo, auth_token = gitlab_pat(quiet),
+install_gitlab(repo, subdir = NULL, auth_token = gitlab_pat(quiet),
   host = "gitlab.com", dependencies = NA, upgrade = c("default",
   "ask", "always", "never"), force = FALSE, quiet = FALSE,
   build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
@@ -14,7 +14,9 @@ install_gitlab(repo, auth_token = gitlab_pat(quiet),
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{username/repo[/subdir][@ref]}.}
+\code{username/repo[@ref]}.}
+
+\item{subdir}{subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal access
 token (PAT) in \url{https://gitlab.com/profile/personal_access_tokens} and

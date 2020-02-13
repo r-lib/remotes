@@ -1,8 +1,17 @@
 # remotes (development version)
 
-## Minor improvements and fixes
-
 * `install_gitlab` passes the `quiet` argument on to `gitlab_pat` (@michaelchirico, #437)
+
+* `remotes` is now resilient against installed packages that declare
+  `RemoteType: standard` but do not include a `RemoteRepos` or `RemotePkgType`
+  field. In such a case, the values for `getOption("repos")` and
+  `getOption("pkgType")` will be used (respectively).
+
+* `install_gitlab()` now installs from repositories in subgroups and with dots 
+  in their name. `subdir` is now an explicit argument instead of implicit in 
+  `repo` (@robertdj, #259, #420).
+
+* `install()` now passes the ellipsis `...` to `install_deps()` (@Neil-Schneider, #411)
 
 # remotes 2.1.0
 
