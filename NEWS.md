@@ -70,6 +70,8 @@
 
 * git submodules now work if the submodule file is empty (@muschellij2, #234)
 
+* git submodules now work if the R package is stored in a subfolder (@pommedeterresautee, #233)
+
 * `install_gitlab()` no longer adds the access token twice to the request
   (@aornugent, #363).
 
