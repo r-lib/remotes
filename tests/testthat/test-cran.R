@@ -10,6 +10,5 @@ test_that("available_packages", {
     type = "source"
   )
 
-  expect_equal(class(pkgs), "matrix")
-  
+  expect_true(inherits(pkgs, "matrix"))
 })
