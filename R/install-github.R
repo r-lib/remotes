@@ -46,7 +46,7 @@
 install_github <- function(repo,
                            ref = "master",
                            subdir = NULL,
-                           auth_token = github_pat(),
+                           auth_token = github_pat(quiet),
                            host = "api.github.com",
                            dependencies = NA,
                            upgrade = c("default", "ask", "always", "never"),
