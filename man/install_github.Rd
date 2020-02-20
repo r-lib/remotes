@@ -25,13 +25,14 @@ install_github(
 }
 \arguments{
 \item{repo}{Repository address in the format
-\verb{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
+\verb{username/repo[/subdir][@ref|#pull|@*release]}. Alternatively, you can
 specify \code{subdir} and/or \code{ref} using the respective parameters
-(see below); if both is specified, the values in \code{repo} take
+(see below); if both are specified, the values in \code{repo} take
 precedence.}
 
 \item{ref}{Desired git reference. Could be a commit, tag, or branch
-name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{"master"}.}
+name, or a call to \code{\link[=github_pull]{github_pull()}} or \code{\link[=github_release]{github_release()}}. Defaults to
+\code{"master"}.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 
@@ -94,7 +95,7 @@ install_github("klutometis/roxygen")
 install_github("wch/ggplot2")
 install_github(c("rstudio/httpuv", "rstudio/shiny"))
 install_github(c("hadley/httr@v0.4", "klutometis/roxygen#142",
-  "mfrasca/r-logging/pkg"))
+  "r-lib/roxygen2@*release", "mfrasca/r-logging/pkg"))
 
 # To install from a private repo, use auth_token with a token
 # from https://github.com/settings/tokens. You only need the
