@@ -12,6 +12,11 @@
 #' @param password your password. Defaults to the `BITBUCKET_PASSWORD`
 #'   environment variable. See details for further information on setting
 #'   up a password.
+#' @param repo Repository address in the format
+#'   `username/repo[/subdir][@@ref]`. Alternatively, you can
+#'   specify `subdir` and/or `ref` using the respective parameters
+#'   (see below); if both are specified, the values in `repo` take
+#'   precedence.
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
 #'   Defaults to master.
 #' @seealso Bitbucket API docs:
