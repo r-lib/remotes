@@ -47,29 +47,6 @@ Install the released version of remotes from CRAN:
 install.packages("remotes")
 ```
 
-You can also install remotes from GitHub. If you already have a previous
-version of remotes installed, you can use that to install the
-development version:
-
-```r
-remotes::install_github("r-lib/remotes")
-```
-
-Alternatively, you can also call the supplied `install-github.R` file
-directly, from within R:
-
-```r
-source("https://raw.githubusercontent.com/r-lib/remotes/master/install-github.R")$value("r-lib/remotes")
-```
-
-The <https://install-github.me> service is also based on remotes.
-You can use it to install any R package from GitHub via sourcing a URL.
-E.g. to install remotes itself:
-
-```r
-source("https://install-github.me/r-lib/remotes")
-```
-
 ## Usage
 
 Note that most of the examples here use GitHub. See below for other
