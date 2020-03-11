@@ -11,6 +11,7 @@
 #' @inheritParams install_github
 #' @export
 #'
+#' @family package installation
 #' @examples
 #' \dontrun{
 #' install_url("https://github.com/hadley/stringr/archive/master.zip")
@@ -18,10 +19,11 @@
 
 install_url <- function(url, subdir = NULL,
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("default", "ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -33,6 +35,8 @@ install_url <- function(url, subdir = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -49,7 +53,7 @@ url_remote <- function(url, subdir = NULL, ...) {
 #' @export
 remote_download.url_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading package from url: ", x$url)
+    message("Downloading package from url: ", x$url) # nocov
   }
 
   ext <- if (grepl("\\.tar\\.gz$", x$url)) "tar.gz" else file_ext(x$url)

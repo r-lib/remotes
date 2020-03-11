@@ -1,0 +1,1 @@
+[1] "HTTP error 304.\n  foobar\n\n  Rate limit remaining: 0/5000\n  Rate limit reset at: 2018-10-19 15:16:18 UTC\n\n  To increase your GitHub API rate limit\n  - Use `usethis::browse_github_pat()` to create a Personal Access Token.\n  - Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."

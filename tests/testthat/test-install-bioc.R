@@ -18,6 +18,10 @@ test_that("bioc repo paths are parsed correctly", {
 
 test_that("install_bioc with git2r", {
 
+  skip_without_package("git2r")
+  skip_on_cran()
+  skip_if_offline()
+
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
@@ -42,6 +46,10 @@ test_that("install_bioc with git2r", {
 })
 
 test_that("install_bioc with xgit", {
+
+  skip_without_program("git")
+  skip_on_cran()
+  skip_if_offline()
 
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)

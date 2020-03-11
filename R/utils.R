@@ -9,6 +9,10 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   vapply(X, FUN, integer(1L), ..., USE.NAMES = USE.NAMES)
 }
 
+vlapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  vapply(X, FUN, logical(1L), ..., USE.NAMES = USE.NAMES)
+}
+
 rcmd <- function(cmd, args, path = R.home("bin"), quiet, fail_on_status = TRUE) {
   if (os_type() == "windows") {
     real_cmd <- file.path(path, "Rcmd.exe")
@@ -107,14 +111,6 @@ get_r_version <- function() {
   paste(R.version$major, sep = ".", R.version$minor)
 }
 
-set_libpaths <- function(paths) {
-  old <- .libPaths()
-  .libPaths(paths)
-  invisible(old)
-}
-
-with_libpaths <- with_something(set_libpaths, .libPaths)
-
 set_options <- function(x) {
   do.call(options, as.list(x))
 }
@@ -131,11 +127,6 @@ with_options <- with_something(set_options)
 # the workspace.
 read_rprofile_user <- function() {
   f <- normalizePath(Sys.getenv("R_PROFILE_USER", ""), mustWork = FALSE)
-  if (file.exists(f)) {
-    return(readLines(f))
-  }
-
-  f <- ".Rprofile"
   if (file.exists(f)) {
     return(readLines(f))
   }
@@ -264,7 +255,7 @@ re_match <- function(text, pattern, perl = TRUE, ...) {
 }
 
 is_standalone <- function() {
-  isTRUE(as.logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
+  isTRUE(config_val_to_logical(Sys.getenv("R_REMOTES_STANDALONE", "false")))
 }
 
 # This code is adapted from the perl MIME::Base64 module https://perldoc.perl.org/MIME/Base64.html
@@ -347,6 +338,63 @@ base64_decode <- function(x) {
   rawToChar(out)
 }
 
+basis64 <- charToRaw(paste(c(LETTERS, letters, 0:9, "+", "/"),
+                           collapse = ""))
+
+base64_encode <- function(x) {
+  if (is.character(x)) {
+    x <- charToRaw(x)
+  }
+
+  len <- length(x)
+  rlen <- floor((len + 2L) / 3L) * 4L
+  out <- raw(rlen)
+  ip <- op <- 1L
+  c <- integer(4)
+
+  while (len > 0L) {
+    c[[1]] <- as.integer(x[[ip]])
+    ip <- ip + 1L
+    if (len > 1L) {
+      c[[2]] <- as.integer(x[ip])
+      ip <- ip + 1L
+    } else {
+      c[[2]] <- 0L
+    }
+    out[op] <- basis64[1 + bitwShiftR(c[[1]], 2L)]
+    op <- op + 1L
+    out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[1]], 3L), 4L),
+                                  bitwShiftR(bitwAnd(c[[2]], 240L), 4L))]
+    op <- op + 1L
+
+    if (len > 2) {
+      c[[3]] <- as.integer(x[ip])
+      ip <- ip + 1L
+      out[op] <- basis64[1 + bitwOr(bitwShiftL(bitwAnd(c[[2]], 15L), 2L),
+                                    bitwShiftR(bitwAnd(c[[3]], 192L), 6L))]
+      op <- op + 1L
+      out[op] <- basis64[1 + bitwAnd(c[[3]], 63)]
+      op <- op + 1L
+
+    } else if (len == 2) {
+      out[op] <- basis64[1 + bitwShiftL(bitwAnd(c[[2]], 15L), 2L)]
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    } else { ## len == 1
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+      out[op] <- charToRaw("=")
+      op <- op + 1L
+
+    }
+    len <- len - 3L
+  }
+
+  rawToChar(out)
+}
+
 build_url <- function(host, ...) {
   download_url(do.call(file.path, as.list(c(host, ...))))
 }
@@ -402,5 +450,64 @@ warn_for_potential_errors <- function() {
       "- creating a drive letter for R HOME via the `subst` windows command, and\n",
       "  starting R from the new drive.\n",
       "See also https://github.com/r-lib/remotes/issues/98\n")
+  }
+}
+
+# Return all directories in the input paths
+directories <- function(paths) {
+  dirs <- unique(dirname(paths))
+  out <- dirs[dirs != "."]
+  while(length(dirs) > 0 && any(dirs != ".")) {
+    out <- unique(c(out, dirs[dirs != "."]))
+    dirs <- unique(dirname(dirs))
+  }
+  sort(out)
+}
+
+in_r_build_ignore <- function(paths, ignore_file) {
+  ignore <- ("tools" %:::% "get_exclude_patterns")()
+
+  if (file.exists(ignore_file)) {
+    ignore <- c(ignore, readLines(ignore_file, warn = FALSE))
+  }
+
+  matches_ignores <- function(x) {
+    any(vlapply(ignore, grepl, x, perl = TRUE, ignore.case = TRUE))
+  }
+
+  # We need to search for the paths as well as directories in the path, so
+  # `^foo$` matches `foo/bar`
+  should_ignore <- function(path) {
+    any(vlapply(c(path, directories(path)), matches_ignores))
+  }
+
+  vlapply(paths, should_ignore)
+}
+
+dev_split_ref <- function(x) {
+  re_match(x, "^(?<pkg>[^@#]+)(?<ref>[@#].*)?$")
+}
+
+get_json_sha <- function(text) {
+  m <- regexpr(paste0('"sha"\\s*:\\s*"(\\w+)"'), text, perl = TRUE)
+  if (all(m == -1)) {
+    return(json$parse(text)$sha %||% NA_character_)
+  }
+
+  start <- attr(m, "capture.start")
+  end <- start + attr(m, "capture.length") - 1L
+  substring(text, start, end)
+}
+
+
+# from tools:::config_val_to_logical
+config_val_to_logical <- function (val) {
+  v <- tolower(val)
+  if (v %in% c("1", "yes", "true"))
+    TRUE
+  else if (v %in% c("0", "no", "false"))
+    FALSE
+  else {
+    NA
   }
 }

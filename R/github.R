@@ -14,15 +14,14 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
     res <- curl::curl_fetch_memory(url, handle = h)
 
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
-    fromJSON(rawToChar(res$content))
+    json$parse(rawToChar(res$content))
   } else {
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    fromJSONFile(tmp)
+    json$parse_file(tmp)
   }
 }
 
@@ -49,8 +48,7 @@ github_commit <- function(username, repo, ref = "master",
       return(current_sha)
     }
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
 
     rawToChar(res$content)
@@ -59,7 +57,8 @@ github_commit <- function(username, repo, ref = "master",
     on.exit(unlink(tmp), add = TRUE)
 
     download(tmp, url, auth_token = pat)
-    fromJSON(readLines(tmp, warn = FALSE))$sha
+
+    json$parse(readLines(tmp, warn = FALSE))$sha
   }
 }
 
@@ -71,13 +70,40 @@ github_commit <- function(username, repo, ref = "master",
 #' @keywords internal
 #' @noRd
 github_pat <- function(quiet = TRUE) {
-  pat <- Sys.getenv('GITHUB_PAT')
-  if (identical(pat, "")) return(NULL)
+  pat <- Sys.getenv("GITHUB_PAT")
 
-  if (!quiet) {
-    message("Using github PAT from envvar GITHUB_PAT")
+  if (nzchar(pat)) {
+    if (!quiet) {
+      message("Using github PAT from envvar GITHUB_PAT")
+    }
+    return(pat)
   }
-  pat
+
+  if (in_ci()) {
+    pat <- paste0(
+      "b2b7441d",
+      "aeeb010b",
+      "1df26f1f6",
+      "0a7f1ed",
+      "c485e443"
+    )
+
+    if (!quiet) {
+      message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
+    }
+
+    return(pat)
+  }
+
+  NULL
+}
+
+in_ci <- function() {
+  nzchar(Sys.getenv("CI"))
+}
+
+in_travis <- function() {
+  identical(Sys.getenv("TRAVIS", "false"), "true")
 }
 
 github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
@@ -102,8 +128,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
-      stop("HTTP error ", res$status_code, ".",
-           "\n", github_error_message(res), call. = FALSE)
+      stop(github_error(res))
     }
     rawToChar(res$content)
   } else {
@@ -113,11 +138,94 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", ho
     tmp <- tempfile()
     download(tmp, url, auth_token = pat)
 
-    base64_decode(gsub("\\\\n", "", fromJSONFile(tmp)$content))
+    base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
 }
 
-github_error_message <- function(res) {
-  msg <- fromJSON(rawToChar(res$content))
-  msg$message
+github_error <- function(res) {
+  res_headers <- curl::parse_headers_list(res$headers)
+
+  ratelimit_limit <- res_headers$`x-ratelimit-limit` %||% NA_character_
+
+  ratelimit_remaining <- res_headers$`x-ratelimit-remaining` %||% NA_character_
+
+  ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset` %||% NA_character_, tz = "UTC")
+
+  error_details <- json$parse(rawToChar(res$content))$message
+
+  guidance <- ""
+  if (identical(as.integer(ratelimit_remaining), 0L)) {
+    guidance <-
+      sprintf(
+"To increase your GitHub API rate limit
+  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - %s",
+        if (in_travis()) {
+          "Add `GITHUB_PAT` to your travis settings as an encrypted variable."
+        } else {
+          "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
+        }
+      )
+  } else if (identical(as.integer(res$status_code), 404L)) {
+    repo_information <- re_match(res$url, "(repos)/(?P<owner>[^/]+)/(?P<repo>[^/]++)/")
+    if(!is.na(repo_information$owner) && !is.na(repo_information$repo)) {
+      guidance <- sprintf(
+        "Did you spell the repo owner (`%s`) and repo name (`%s`) correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo.",
+        repo_information$owner,
+        repo_information$repo
+      )
+    } else {
+      guidance <- "Did you spell the repo owner and repo name correctly?
+  - If spelling is correct, check that you have the required permissions to access the repo."
+    }
+  }
+ if(identical(as.integer(res$status_code), 404L)) {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s
+
+  %s",
+
+     res$status_code,
+     error_details,
+     guidance
+   )
+ } else if (!is.na(ratelimit_limit)) {
+  msg <- sprintf(
+"HTTP error %s.
+  %s
+
+  Rate limit remaining: %s/%s
+  Rate limit reset at: %s
+
+  %s",
+
+    res$status_code,
+    error_details,
+    ratelimit_remaining,
+    ratelimit_limit,
+    format(ratelimit_reset, usetz = TRUE),
+    guidance
+  )
+ } else {
+   msg <- sprintf(
+     "HTTP error %s.
+  %s",
+
+     res$status_code,
+     error_details
+   )
+ }
+
+ status_type <- (as.integer(res$status_code) %/% 100) * 100
+
+ structure(list(message = msg, call = NULL), class = c(paste0("http_", unique(c(res$status_code, status_type, "error"))), "error", "condition"))
 }
+
+
+#> Error: HTTP error 404.
+#>   Not Found
+#>
+#>   Rate limit remaining: 4999
+#>   Rate limit reset at: 2018-10-10 19:43:52 UTC

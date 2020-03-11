@@ -178,6 +178,17 @@ test_that("Additional_repositories field", {
     parse_additional_repositories(pkg),
     c("http://packages.ropensci.org", "http://foo.bar.com")
   )
+
+  pkg <- list(
+    additional_repositories = 
+      "\n  http://packages.ropensci.org, \nhttp://foo.bar.com"
+  )
+
+  expect_equal(
+    parse_additional_repositories(pkg),
+    c("http://packages.ropensci.org", "http://foo.bar.com")
+  )
+
 })
 
 test_that("update.package_deps", {
@@ -190,11 +201,17 @@ test_that("update.package_deps", {
     diff = c(CURRENT, UNAVAILABLE, CURRENT),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(update, "install_packages", NULL)
   expect_message(
-    update(object, quiet = FALSE),
+    update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? not available: falsy"
   )
 })
@@ -209,11 +226,16 @@ test_that("update.package_deps 2", {
     diff = c(CURRENT, AHEAD, CURRENT),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(update, "install_packages", NULL)
   expect_message(
-    update(object, quiet = FALSE),
+    update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? ahead of CRAN: falsy"
   )
 })
@@ -228,6 +250,12 @@ test_that("update.package_deps 3", {
     diff = c(CURRENT, BEHIND, UNINSTALLED),
     is_cran = c(TRUE, TRUE, TRUE)
   )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+
   class(object) <- c("package_deps", "data.frame")
 
   mockery::stub(
@@ -242,13 +270,13 @@ test_that("update.package_deps 3", {
 
 context("Remotes")
 
-test_that("remote_deps returns if no remotes specified", {
+test_that("remote_deps returns an empty data frame if no remotes specified", {
 
   pkg <- list(
     package = "foo"
   )
 
-  expect_equal(remote_deps(pkg), NULL)
+  expect_equal(remote_deps(pkg), package_deps_new())
 })
 
 test_that("remote_deps works with implicit types", {
@@ -332,4 +360,162 @@ test_that("type = 'both' works well", {
     package_deps("falsy", type = "binary")[-6]
   )
 
+})
+
+test_that("resolve_upgrade works", {
+  # returns ask by default when used interactively
+  expect_equal(resolve_upgrade(c("default", "ask", "always", "never"), is_interactive = TRUE), "ask")
+
+  # returns always by default when used non-interactively
+  expect_equal(resolve_upgrade(c("default", "ask", "always", "never"), is_interactive = FALSE), "always")
+
+  # returns always when given TRUE or always input
+  expect_equal(resolve_upgrade(TRUE, is_interactive = FALSE), "always")
+  expect_equal(resolve_upgrade("always", is_interactive = FALSE), "always")
+
+  # returns never when given FALSE or never input
+  expect_equal(resolve_upgrade(FALSE, is_interactive = FALSE), "never")
+  expect_equal(resolve_upgrade("never", is_interactive = FALSE), "never")
+
+  # errors on unexpected inputs
+  expect_error(resolve_upgrade("sometimes"), "'arg' should be one of")
+})
+
+test_that("upgradeable_packages works", {
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "rlang", "magrittr"),
+    installed = c("1.0", "1.0", "abc123", NA),
+    available = c("1.0", "1.1", "zyx456", "1.0"),
+    diff = c(CURRENT, BEHIND, BEHIND, UNINSTALLED),
+    is_cran = c(TRUE, TRUE, FALSE, TRUE)
+  )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    github_remote("rlib/rlang"),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  # returns full object if "always"
+  expect_equal(upgradable_packages(object, "always", TRUE),
+               object)
+
+  # returns only uninstalled packages if "never"
+  expect_equal(upgradable_packages(object, "never", TRUE),
+               object[which(object$package == "magrittr"), ])
+
+  # returns full object if "ask" and not is_interactive
+  expect_equal(upgradable_packages(object, "ask", is_interactive = FALSE, TRUE),
+               object)
+
+  # returns selected row to update if "ask" and is_interactive
+  mockery::stub(upgradable_packages, "select_menu", function(...) "falsy (1.0    -> 1.1   ) [CRAN]", TRUE)
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object[c(
+                 which(object$package == "falsy"),
+                 which(object$package == "magrittr")
+               ), ]
+              )
+
+  # returns selected rows to update if "ask" and is_interactive
+  mockery::stub(upgradable_packages, "select_menu", function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"))
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object[c(
+                 which(object$package == "falsy"),
+                 which(object$package == "rlang"),
+                 which(object$package == "magrittr")
+               ), ]
+              )
+
+  # All should be the whole object
+  mockery::stub(upgradable_packages, "select_menu", function(...) "All")
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object)
+
+  # None should be only un-installed packages
+  mockery::stub(upgradable_packages, "select_menu", function(...) "None")
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object[which(object$package == "magrittr"), ])
+
+  # CRAN should be only the CRAN packages
+  mockery::stub(upgradable_packages, "select_menu", function(...) "CRAN packages only")
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object[c(
+                 which(object$package == "falsy"),
+                 which(object$package == "magrittr")
+               ), ]
+              )
+
+  # empty vector should be the 0 row object (you get this when canceling the selection)
+  mockery::stub(upgradable_packages, "select_menu", function(...) character(0))
+  expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
+               object[which(object$package == "magrittr"), ])
+
+  # If only given current or ahead packages (which dotenv is), just return that
+  expect_equal(upgradable_packages(object[object$package == "dotenv", ], "ask", TRUE, is_interactive = TRUE),
+               object[object$package == "dotenv", ])
+})
+
+test_that("format_upgrades works", {
+  object <- data.frame(
+    stringsAsFactors = FALSE,
+    package = c("dotenv", "falsy", "rlang", "magrittr"),
+    installed = c("1.0", "1.0", "abc123", NA),
+    available = c("1.0", "1.1", "zyx456", "1.0"),
+    diff = c(CURRENT, BEHIND, BEHIND, UNINSTALLED),
+    is_cran = c(TRUE, TRUE, FALSE, TRUE)
+  )
+  object$remote <- list(
+    cran_remote("dotenv", getOption("repos"), getOption("type")),
+    cran_remote("falsy", getOption("repos"), getOption("type")),
+    github_remote("rlib/rlang"),
+    cran_remote("magrittr", getOption("repos"), getOption("type"))
+  )
+  class(object) <- c("package_deps", "data.frame")
+
+  expect_equal(
+    format_upgrades(object[0, ]),
+    character(0)
+  )
+
+  expect_equal(
+    format_upgrades(object[object$diff < BEHIND, ]),
+    "magrittr (NA -> 1.0) [CRAN]"
+  )
+
+  expect_equal(
+    format_upgrades(object[object$diff <= BEHIND, ]),
+    c(
+      "falsy    (1.0    -> 1.1   ) [CRAN]",
+      "rlang    (abc123 -> zyx456) [GitHub]",
+      "magrittr (NA     -> 1.0   ) [CRAN]"
+    )
+  )
+
+  expect_equal(
+    format_upgrades(object),
+    c(
+      "dotenv   (1.0    -> 1.0   ) [CRAN]",
+      "falsy    (1.0    -> 1.1   ) [CRAN]",
+      "rlang    (abc123 -> zyx456) [GitHub]",
+      "magrittr (NA     -> 1.0   ) [CRAN]"
+    )
+  )
+})
+
+test_that("dev_package_deps works with package using remotes", {
+  skip_on_cran()
+  skip_if_offline()
+
+  res <- dev_package_deps(test_path("withremotes"), dependencies = TRUE)
+
+  is_falsy <- "falsy" == res$package
+  expect_true(any(is_falsy))
+  expect_is(res$remote[is_falsy][[1]], "github_remote")
+
+  is_testthat <- "testthat" == res$package
+  expect_true(any(is_testthat))
+  expect_is(res$remote[is_testthat][[1]], "cran_remote")
 })

@@ -1,20 +1,35 @@
 
 context("JSON parser")
 
+test_that("JSON is standalone", {
+  ## baseenv() makes sure that the remotes package env is not used
+  env <- new.env(parent = baseenv())
+  env$json <- json
+  stenv <- env$json$.internal
+  objs <- ls(stenv, all.names = TRUE)
+  funs <- Filter(function(x) is.function(stenv[[x]]), objs)
+  funobjs <- mget(funs, stenv)
+
+  expect_message(
+    mapply(codetools::checkUsage, funobjs, funs,
+           MoreArgs = list(report = message)),
+    NA)
+})
+
 test_that("JSON parser scalars", {
 
-  expect_equal(fromJSON('"foobar"'), "foobar" )
-  expect_equal(fromJSON('""'),       "")
+  expect_equal(json$parse('"foobar"'), "foobar" )
+  expect_equal(json$parse('""'),       "")
 
-  expect_equal(fromJSON("42"),       42)
-  expect_equal(fromJSON("-42"),      -42)
-  expect_equal(fromJSON("42.42"),    42.42)
-  expect_equal(fromJSON("1e2"),      1e2)
-  expect_equal(fromJSON("-0.1e-2"),  -0.1e-2)
+  expect_equal(json$parse("42"),       42)
+  expect_equal(json$parse("-42"),      -42)
+  expect_equal(json$parse("42.42"),    42.42)
+  expect_equal(json$parse("1e2"),      1e2)
+  expect_equal(json$parse("-0.1e-2"),  -0.1e-2)
 
-  expect_equal(fromJSON('null'),     NULL)
-  expect_equal(fromJSON('true'),     TRUE)
-  expect_equal(fromJSON('false'),    FALSE)
+  expect_equal(json$parse('null'),     NULL)
+  expect_equal(json$parse('true'),     TRUE)
+  expect_equal(json$parse('false'),    FALSE)
 
 })
 
@@ -29,7 +44,7 @@ test_that("JSON parser arrays", {
   )
 
   for (c in cases) {
-    r <- fromJSON(c[[1]])
+    r <- json$parse(c[[1]])
     expect_equal(r, c[[2]], info = c[[1]])
   }
 
@@ -44,7 +59,7 @@ test_that("JSON parser nested arrays", {
   )
 
   for (c in cases) {
-    r <- fromJSON(c[[1]])
+    r <- json$parse(c[[1]])
     expect_equal(r, c[[2]], info = c[[1]])
   }
 
@@ -97,35 +112,82 @@ test_that("JSON parser, real examples", {
     )
   )
 
-  expect_equal(fromJSON(inp), exp)
+  expect_equal(json$parse(inp), exp)
 
 })
 
 test_that("JSON parser, errors", {
 
   expect_error(
-    fromJSON("[1,2,3,"),
+    json$parse("[1,2,3,"),
     "EXPECTED value GOT EOF"
   )
 
   expect_error(
-    fromJSON('{ 123: "foo" }'),
+    json$parse('{ 123: "foo" }'),
     "EXPECTED string GOT 123"
   )
 
   expect_error(
-    fromJSON('{ "foo" "foobar" }'),
+    json$parse('{ "foo" "foobar" }'),
     'EXPECTED : GOT "foobar"'
   )
 
   expect_error(
-    fromJSON('{ "foo": "foobar" "foo2": "foobar2" }'),
+    json$parse('{ "foo": "foobar" "foo2": "foobar2" }'),
     'EXPECTED , or } GOT "foo2"'
   )
 
   expect_error(
-    fromJSON('[1,2,3 4]'),
+    json$parse('[1,2,3 4]'),
     'EXPECTED , GOT 4'
   )
 
+})
+
+test_that("get_json_sha", {
+
+  inp <- '
+{
+    "sha": "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp),
+    "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b")
+
+  inp2 <- '
+{
+    "sha":
+      "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp2),
+    "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b")
+
+  inp3 <- '
+{
+    "nosha":
+      "e183ccdc515bbb8e7f32d8d16586aed9eea6de0b",
+    "author": {
+      "name": "Hadley Wickham",
+      "email": "h.wickham@gmail.com",
+      "date": "2015-03-30T13:55:18Z"
+    },
+}'
+
+  expect_identical(
+    get_json_sha(inp3),
+    NA_character_)
 })

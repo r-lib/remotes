@@ -4,12 +4,25 @@
 \alias{install_git}
 \title{Install a package from a git repository}
 \usage{
-install_git(url, subdir = NULL, ref = NULL, branch = NULL,
-  credentials = NULL, git = c("auto", "git2r", "external"),
-  dependencies = NA, upgrade = TRUE, force = FALSE, quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_git(
+  url,
+  subdir = NULL,
+  ref = NULL,
+  branch = NULL,
+  credentials = git_credentials(),
+  git = c("auto", "git2r", "external"),
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{url}{Location of package. The url should point to a public or
@@ -38,7 +51,12 @@ Can be a character vector (selecting from "Depends", "Imports",
 and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
 just check this package, not its dependencies).}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "default", "ask", "always", or "never". "default"
+respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,
+and falls back to "ask" if unset. "ask" prompts the user for which out of
+date packages to upgrade. For non-interactive sessions "ask" is equivalent
+to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
+"always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
@@ -47,7 +65,11 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+
+\item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
+
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
 is \code{TRUE}.}
 
 \item{repos}{A character vector giving repositories to use.}
@@ -61,9 +83,28 @@ It is vectorised so you can install multiple packages with
 a single command. You do not need to have the \code{git2r} package,
 or an external git client installed.
 }
+\details{
+If you need to set git credentials for use in the \code{Remotes} field you can do
+so by placing the credentials in the \code{remotes.git_credentials} global
+option.
+}
 \examples{
 \dontrun{
 install_git("git://github.com/hadley/stringr.git")
 install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 }
 }
+\seealso{
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
+}
+\concept{package installation}

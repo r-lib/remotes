@@ -1,3 +1,10 @@
+^Meta$
+^doc$
+^docs$
+^_pkgdown\.yml$
+^codecov\.yml$
+^docs$
+^_pkgdown\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^Makefile$
@@ -8,3 +15,6 @@
 ^install-github.Rin$
 ^\.env$
 ^revdep$
+^cran-comments\.md$
+^CRAN-RELEASE$
+^\.gitattributes$

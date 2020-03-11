@@ -27,26 +27,12 @@ test_that("trim_ws", {
   expect_equal(trim_ws(c("1  ", "  2")), c("1", "2"))
 })
 
-get_desc_from_url <- function(url) {
-  tmp <- tempfile()
-  on.exit(unlink(tmp), add = TRUE)
-  dir.create(tmp)
-  tmp2 <- file.path(tmp, "DESCRIPTION")
-  download(tmp2, url, auth_token = NULL)
-  load_pkg_description(tmp)
-}
-
 test_that("is_bioconductor", {
 
-  skip_on_cran()
-  skip_if_offline()
-
-  url <- "https://readonly:readonly@hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/Biobase/DESCRIPTION"
-  D <- get_desc_from_url(url)
+  D <- load_pkg_description(test_path("Biobase"))
   expect_true(is_bioconductor(D))
 
-  url <- "https://raw.githubusercontent.com/cran/MASS/master/DESCRIPTION"
-  D <- get_desc_from_url(url)
+  D <- load_pkg_description(test_path("MASS"))
   expect_false(is_bioconductor(D))
 
 })
@@ -143,4 +129,51 @@ test_that("windows untar, --force-local errors", {
   do(FALSE, function() stop("failed"))
   do(FALSE, function() 1L)
   do(FALSE, function() structure("blah", status = 1L))
+})
+
+test_that("directories works", {
+  expect_equal(directories("foo"), character())
+  expect_equal(directories("foo/bar"), "foo")
+  expect_equal(sort(directories("foo/bar/baz")),
+               sort(c("foo", "foo/bar")))
+
+  expect_equal(directories(c("foo/bar", "foo/baz")), "foo")
+
+  expect_equal(sort(directories(c("foo/bar/baz", "foo2/1", "foo3/bar/3"))),
+               sort(c("foo", "foo/bar", "foo2", "foo3", "foo3/bar")))
+})
+
+test_that("in_r_build_ignore works", {
+  tf <- tempfile()
+  on.exit(unlink(tf))
+  writeLines(
+    c("^foo$",
+      "^blah/xyz"
+    ), tf)
+
+  expect_equal(
+    unname(
+      in_r_build_ignore(c("foo/bar/baz", "R/test.R"), tf)
+    ),
+    c(TRUE, FALSE)
+  )
+
+  expect_equal(
+    unname(
+      in_r_build_ignore(c("foo", "blah", "blah/abc", "blah/xyz", "R/test.R"), tf)
+    ),
+    c(TRUE, FALSE, FALSE, TRUE, FALSE)
+  )
+})
+
+test_that("dev_split_ref works", {
+  expect_equal(dev_split_ref("DT")[["pkg"]], "DT")
+  expect_equal(dev_split_ref("remotes")[["ref"]], "")
+  expect_equal(dev_split_ref("with.dot")[["pkg"]], "with.dot")
+  expect_equal(dev_split_ref("with2")[["pkg"]], "with2")
+  expect_equal(dev_split_ref("with@v1.2.1")[["ref"]], "@v1.2.1")
+  expect_equal(dev_split_ref("with@v1.0.0.999")[["ref"]], "@v1.0.0.999")
+  expect_equal(dev_split_ref("with@v1.0.0.999")[["pkg"]], "with")
+  expect_equal(dev_split_ref("with#279")[["ref"]], "#279")
+  expect_equal(dev_split_ref("with#1")[["pkg"]], "with")
 })

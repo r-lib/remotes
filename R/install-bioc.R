@@ -1,4 +1,4 @@
-#' Install a package from a Bioconductor repository
+#' Install a development package from the Bioconductor git repository
 #'
 #' This function requires `git` to be installed on your system in order to
 #' be used.
@@ -6,14 +6,16 @@
 #' It is vectorised so you can install multiple packages with
 #' a single command.
 #'
-#' '
+#' This is intended as an aid for Bioconductor developers. If you want to
+#' install the release version of a Bioconductor package one can use the
+#' `BiocManager` package.
 #' @inheritParams install_git
 #' @param repo Repository address in the format
 #'   `[username:password@@][release/]repo[#commit]`. Valid values for
 #'   the release are \sQuote{devel},
 #'   \sQuote{release} (the default if none specified), or numeric release
 #'   numbers (e.g. \sQuote{3.3}).
-#' @param mirror The bioconductor git mirror to use
+#' @param mirror The Bioconductor git mirror to use
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
 #' @export
@@ -31,10 +33,11 @@
 install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.bioconductor.org/packages")),
                          git = c("auto", "git2r", "external"),
                          dependencies = NA,
-                         upgrade = TRUE,
+                         upgrade = c("default", "ask", "always", "never"),
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          repos = getOption("repos"),
                          type = getOption("pkgType"),
                          ...) {
@@ -48,6 +51,8 @@ install_bioc <- function(repo, mirror = getOption("BioC_git", download_url("git.
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -224,7 +229,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
     found <- grep(pattern = paste0("/", remote$branch), x = names(res))
 
     if (length(found) == 0) {
-      return(NA)
+      return(NA_character_)
     }
 
     unname(res[found[1]])
@@ -241,7 +246,7 @@ remote_sha.bioc_xgit_remote <- function(remote, ...) {
     header = FALSE)
   names(refs_df) <- c("sha", "ref")
 
-  refs_df$sha[[1]]
+  refs_df$sha[[1]] %||% NA_character_
 }
 
 bioconductor_branch <- function(release, sha) {

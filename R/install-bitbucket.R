@@ -1,5 +1,5 @@
 
-#' Install a package directly from bitbucket
+#' Install a package directly from Bitbucket
 #'
 #' This function is vectorised so you can install multiple packages in
 #' a single command.
@@ -25,21 +25,36 @@
 #' App Passwords documentation}. The App Password requires read-only access to
 #' your repositories and pull requests. Then store your password in the
 #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
+#'
+#' Note that on Windows, authentication requires the "libcurl" download
+#' method. You can set the default download method via the
+#' `download.file.method` option:
+#' ```
+#' options(download.file.method = "libcurl")
+#' ```
+#' In particular, if unset, RStudio sets the download method to "wininet".
+#' To override this, you might want to set it to "libcurl" in your
+#' R profile, see [base::Startup]. The caveat of the "libcurl" method is
+#' that it does _not_ set the system proxies automatically, see
+#' "Setting Proxies" in [utils::download.file()].
+#'
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{
 #' install_bitbucket("sulab/mygene.r@@default")
-#' install_bitbucket("dannavarro/lsr-package")
+#' install_bitbucket("djnavarro/lsr")
 #' }
 install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
                               host = "api.bitbucket.org/2.0",
                               dependencies = NA,
-                              upgrade = TRUE,
+                              upgrade = c("default", "ask", "always", "never"),
                               force = FALSE,
                               quiet = FALSE,
                               build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                              build_manual = FALSE, build_vignettes = FALSE,
                               repos = getOption("repos"),
                               type = getOption("pkgType"),
                               ...) {
@@ -54,14 +69,16 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
 }
 
 bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
-                              auth_user = NULL, password = NULL, sha = NULL,
-                              host = NULL, ...) {
+                             auth_user = bitbucket_user(), password = bitbucket_password(),
+                             sha = NULL, host = "api.bitbucket.org/2.0", ...) {
 
   meta <- parse_git_repo(repo)
 
@@ -123,7 +140,7 @@ remote_package_name.bitbucket_remote <- function(remote, ...) {
 #' @export
 remote_sha.bitbucket_remote <- function(remote, ...) {
   bitbucket_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$sha %||% NA_character_
+    host = remote$host, ref = remote$ref, auth = basic_auth(remote))$hash %||% NA_character_
 }
 
 #' @export
@@ -139,12 +156,12 @@ bitbucket_commit <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  fromJSONFile(tmp)
+  json$parse_file(tmp)
 }
 
 bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
 
-  url <- build_url(host, "repositories", username, repo, "src", ref, paste0(subdir, "DESCRIPTION"))
+  url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
 
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
@@ -172,19 +189,19 @@ bitbucket_download_url <- function(username, repo, ref = "master",
   tmp <- tempfile()
   download(tmp, url, basic_auth = auth)
 
-  paste0(build_url(fromJSONFile(tmp)$links$html$href, "get", ref), ".tar.gz")
+  paste0(build_url(json$parse_file(tmp)$links$html$href, "get", ref), ".tar.gz")
 }
 
 bitbucket_password <- function(quiet = TRUE) {
   pass <- Sys.getenv("BITBUCKET_PASSWORD")
   if (identical(pass, "")) return(NULL)
-  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket password from envvar BITBUCKET_PASSWORD")
   pass
 }
 
 bitbucket_user <- function(quiet = TRUE) {
   user <- Sys.getenv("BITBUCKET_USER")
   if (identical(user, "")) return(NULL)
-  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_PAT")
+  if (!quiet) message("Using bitbucket user from envvar BITBUCKET_USER")
   user
 }

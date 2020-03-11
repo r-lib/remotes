@@ -4,16 +4,28 @@
 \alias{install_github}
 \title{Attempts to install a package directly from GitHub.}
 \usage{
-install_github(repo, ref = "master", subdir = NULL,
-  auth_token = github_pat(), host = "api.github.com",
-  dependencies = NA, upgrade = TRUE, force = FALSE, quiet = FALSE,
-  build = TRUE, build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), repos = getOption("repos"),
-  type = getOption("pkgType"), ...)
+install_github(
+  repo,
+  ref = "master",
+  subdir = NULL,
+  auth_token = github_pat(quiet),
+  host = "api.github.com",
+  dependencies = NA,
+  upgrade = c("default", "ask", "always", "never"),
+  force = FALSE,
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repo}{Repository address in the format
-\code{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
+\verb{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
 specify \code{subdir} and/or \code{ref} using the respective parameters
 (see below); if both is specified, the values in \code{repo} take
 precedence.}
@@ -24,7 +36,7 @@ name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{
 \item{subdir}{subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal
-access token (PAT) in \url{https://github.com/settings/applications} and
+access token (PAT) in "https://github.com/settings/tokens" and
 supply to this argument. This is safer than using a password because
 you can easily delete a PAT without affecting any others. Defaults to
 the \code{GITHUB_PAT} environment variable.}
@@ -41,7 +53,12 @@ Can be a character vector (selecting from "Depends", "Imports",
 and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
 just check this package, not its dependencies).}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "default", "ask", "always", or "never". "default"
+respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,
+and falls back to "ask" if unset. "ask" prompts the user for which out of
+date packages to upgrade. For non-interactive sessions "ask" is equivalent
+to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
+"always" and "never" respectively.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
@@ -50,7 +67,11 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+
+\item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
+
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
 is \code{TRUE}.}
 
 \item{repos}{A character vector giving repositories to use.}
@@ -76,7 +97,7 @@ install_github(c("hadley/httr@v0.4", "klutometis/roxygen#142",
   "mfrasca/r-logging/pkg"))
 
 # To install from a private repo, use auth_token with a token
-# from https://github.com/settings/applications. You only need the
+# from https://github.com/settings/tokens. You only need the
 # repo scope. Best practice is to save your PAT in env var called
 # GITHUB_PAT.
 install_github("hadley/private", auth_token = "abc")
@@ -85,4 +106,17 @@ install_github("hadley/private", auth_token = "abc")
 }
 \seealso{
 \code{\link[=github_pull]{github_pull()}}
+
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
 }
+\concept{package installation}

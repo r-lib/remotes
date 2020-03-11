@@ -7,19 +7,26 @@ latex: false
 install:
   - R CMD INSTALL .
   - R -e 'remotes::install_deps(dependencies = TRUE)'
+  - R -e 'if (getRversion() >= "3.5.0") install.packages("BiocManager")'
 
 matrix:
   include:
     - r: release
       after_success: Rscript -e 'covr::codecov()'
+      #deploy:
+        #provider: script
+        #script: Rscript -e 'remotes::install_github("r-lib/pkgdown")' -e 'pkgdown::deploy_site_github(verbose = TRUE)'
+        #skip-cleanup: true
+        #on:
+          #branch: pkgdown
     - r: release
       env: R_REMOTES_STANDALONE=true
 
 r:
- - 3.1
  - 3.2
  - 3.3
- - oldrel
+ - 3.4
+ - 3.5
  - devel
 
 env:

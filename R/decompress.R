@@ -1,6 +1,6 @@
 # Decompress pkg, if needed
 source_pkg <- function(path, subdir = NULL) {
-  if (!file.info(path)$isdir) {
+  if (!dir.exists(path)) {
     bundle <- path
     outdir <- tempfile(pattern = "remotes")
     dir.create(outdir)
@@ -53,9 +53,12 @@ getdir <- function(path)  sub("/[^/]*$", "", path)
 
 # Given a list of files, returns the root (the topmost folder)
 # getrootdir(c("path/to/file", "path/to/other/thing")) returns "path/to"
+# It does not check that all paths have a common prefix. It fails for
+# empty input vector. It assumes that directories end with '/'.
 getrootdir <- function(file_list) {
+  stopifnot(length(file_list) > 0)
   slashes <- nchar(gsub("[^/]", "", file_list))
-  if (min(slashes) == 0) return("")
+  if (min(slashes) == 0) return(".")
 
   getdir(file_list[which.min(slashes)])
 }

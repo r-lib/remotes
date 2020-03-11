@@ -4,11 +4,19 @@
 \alias{install_deps}
 \title{Install package dependencies if needed.}
 \usage{
-install_deps(pkgdir = ".", dependencies = NA,
-  repos = getOption("repos"), type = getOption("pkgType"),
-  upgrade = TRUE, quiet = FALSE, build = TRUE,
-  build_opts = c("--no-resave-data", "--no-manual",
-  "--no-build-vignettes"), ...)
+install_deps(
+  pkgdir = ".",
+  dependencies = NA,
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  upgrade = c("default", "ask", "always", "never"),
+  quiet = FALSE,
+  build = TRUE,
+  build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+  build_manual = FALSE,
+  build_vignettes = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pkgdir}{path to a package directory, or to a package tarball.}
@@ -26,13 +34,22 @@ just check this package, not its dependencies).}
 
 \item{type}{Type of package to \code{update}.}
 
-\item{upgrade}{If \code{TRUE}, also upgrade any of out date dependencies.}
+\item{upgrade}{One of "default", "ask", "always", or "never". "default"
+respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,
+and falls back to "ask" if unset. "ask" prompts the user for which out of
+date packages to upgrade. For non-interactive sessions "ask" is equivalent
+to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
+"always" and "never" respectively.}
 
 \item{quiet}{If \code{TRUE}, suppress output.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \code{R CMD build}, only used when \code{build}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+
+\item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
+
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
 is \code{TRUE}.}
 
 \item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}

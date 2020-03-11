@@ -26,7 +26,7 @@ A remote repo can be specified in two ways:
 \item{as a URL}{\code{parse_github_url()} handles HTTPS and SSH remote URLs
 and various GitHub browser URLs}
 \item{via a shorthand}{\code{parse_repo_spec()} handles this concise form:
-\code{[username/]repo[/subdir][#pull|@ref|@*release]}}
+\verb{[username/]repo[/subdir][#pull|@ref|@*release]}}
 }
 }
 \examples{
@@ -34,7 +34,6 @@ parse_repo_spec("metacran/crandb")
 parse_repo_spec("jimhester/covr#47")        ## pull request
 parse_repo_spec("jeroen/curl@v0.9.3")       ## specific tag
 parse_repo_spec("tidyverse/dplyr@*release") ## shorthand for latest release
-parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 parse_repo_spec("r-lib/remotes@550a3c7d3f9e1493a2ba") ## commit SHA
 parse_repo_spec("igraph=igraph/rigraph") ## Different package name from repo name
 

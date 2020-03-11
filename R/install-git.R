@@ -5,6 +5,10 @@
 #' a single command. You do not need to have the `git2r` package,
 #' or an external git client installed.
 #'
+#' If you need to set git credentials for use in the `Remotes` field you can do
+#' so by placing the credentials in the `remotes.git_credentials` global
+#' option.
+#'
 #' @param url Location of package. The url should point to a public or
 #'   private repository.
 #' @param ref Name of branch, tag or SHA reference to use, if not HEAD.
@@ -18,6 +22,7 @@
 #'   otherwise an external git installation.
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #' @examples
 #' \dontrun{
@@ -25,13 +30,14 @@
 #' install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
 #'}
 install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
-                        credentials = NULL,
+                        credentials = git_credentials(),
                         git = c("auto", "git2r", "external"),
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("default", "ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -51,13 +57,15 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
 }
 
 
-git_remote <- function(url, subdir = NULL, ref = NULL, credentials = NULL,
+git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials(),
                        git = c("auto", "git2r", "external"), ...) {
 
   git <- match.arg(git)
@@ -73,7 +81,7 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = NULL,
 }
 
 
-git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
+git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("git2r",
     url = url,
     subdir = subdir,
@@ -83,7 +91,7 @@ git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = NULL)
 }
 
 
-git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = NULL) {
+git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("xgit",
     url = url,
     subdir = subdir,
@@ -191,9 +199,13 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
   bundle <- tempfile()
 
   args <- c('clone', '--depth', '1', '--no-hardlinks')
-  if (!is.null(x$ref)) args <- c(args, "--branch", x$ref)
   args <- c(args, x$args, x$url, bundle)
   git(paste0(args, collapse = " "), quiet = quiet)
+
+  if (!is.null(x$ref)) {
+    git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
+    git(paste0(c("checkout", "FETCH_HEAD"), collapse = " "), quiet = quiet, path = bundle)
+  }
 
   bundle
 }
@@ -226,9 +238,24 @@ remote_sha.xgit_remote <- function(remote, ...) {
 
   refs <- git(paste("ls-remote", url, ref))
 
+  # If none found, it is either a SHA, so return the pinned SHA or NA
+  if (length(refs) == 0) {
+    return(remote$ref %||% NA_character_)
+  }
+
   refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
     header = FALSE)
   names(refs_df) <- c("sha", "ref")
 
   refs_df$sha[[1]]
+}
+
+#' Specify git credentials to use
+#'
+#' The global option `remotes.git_credentials` is used to set the git
+#' credentials.
+#' @export
+#' @keywords internal
+git_credentials <- function() {
+  getOption("remotes.git_credentials", NULL)
 }

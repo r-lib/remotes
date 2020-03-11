@@ -21,25 +21,41 @@
 
 install_version <- function(package, version = NULL,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("default", "ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = FALSE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            build_manual = FALSE, build_vignettes = FALSE,
                             repos = getOption("repos"),
-                            type = getOption("pkgType"),
+                            type = "source",
                             ...) {
 
+  if (!identical(type, "source")) {
+    stop("`type` must be 'source' for `install_version()`", call. = FALSE)
+  }
+
   url <- download_version_url(package, version, repos, type)
-  install_url(url,
+  res <- install_url(url,
               dependencies = dependencies,
               upgrade = upgrade,
               force = force,
               quiet = quiet,
               build = build,
               build_opts = build_opts,
+              build_manual = build_manual,
+              build_vignettes = build_vignettes,
               repos = repos,
               type = type,
               ...)
+
+  lib <- list(...)$lib %||% .libPaths()
+
+  # Remove Metadata from installed package
+  add_metadata(
+    system.file(package = package, lib.loc = lib),
+    list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL))
+
+  invisible(res)
 }
 
 package_find_repo <- function(package, repos) {

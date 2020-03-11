@@ -15,10 +15,11 @@
 #' }
 install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkgType"),
                          dependencies = NA,
-                         upgrade = TRUE,
+                         upgrade = c("default", "ask", "always", "never"),
                          force = FALSE,
                          quiet = FALSE,
                          build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                         build_manual = FALSE, build_vignettes = FALSE,
                          ...) {
 
   remotes <- lapply(pkgs, cran_remote, repos = repos, type = type)
@@ -30,6 +31,8 @@ install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkg
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)

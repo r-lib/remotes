@@ -17,7 +17,12 @@
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
 #' @param quiet If `TRUE`, suppress output.
-#' @param upgrade If `TRUE`, also upgrade any of out date dependencies.
+#' @param upgrade One of "default", "ask", "always", or "never". "default"
+#'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
+#'   and falls back to "ask" if unset. "ask" prompts the user for which out of
+#'   date packages to upgrade. For non-interactive sessions "ask" is equivalent
+#'   to "always". `TRUE` and `FALSE` are also accepted and correspond to
+#'   "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
 #'
@@ -53,7 +58,7 @@ package_deps <- function(packages, dependencies = NA,
   repos <- fix_repositories(repos)
   cran <- available_packages(repos, type)
 
-  deps <- sort(find_deps(packages, available = cran, top_dep = dependencies))
+  deps <- find_deps(packages, available = cran, top_dep = dependencies)
 
   # Remove base packages
   inst <- utils::installed.packages()
@@ -78,9 +83,7 @@ package_deps <- function(packages, dependencies = NA,
       is_cran = is_cran_remote,
       stringsAsFactors = FALSE
     ),
-    class = c("package_deps", "data.frame"),
-    repos = repos,
-    type = type
+    class = c("package_deps", "data.frame")
   )
 
   res$remote <- remote
@@ -112,7 +115,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -130,7 +133,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   combine_deps(
     package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg, ...))
+    remote_deps(pkg))
 }
 
 combine_deps <- function(cran_deps, remote_deps) {
@@ -140,13 +143,13 @@ combine_deps <- function(cran_deps, remote_deps) {
     return(cran_deps)
   }
 
-  # Only keep the remotes that are specified in the cran_deps
-  remote_deps <- remote_deps[remote_deps$package %in% cran_deps$package, ]
+  # Only keep the remotes that are specified in the cran_deps or are NA
+  remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
 
   # If there are remote deps remove the equivalent CRAN deps
   cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
 
-  rbind(cran_deps, remote_deps)
+  rbind(remote_deps, cran_deps)
 }
 
 ## -2 = not installed, but available on CRAN
@@ -236,17 +239,21 @@ UNAVAILABLE <- 2L
 
 update.package_deps <- function(object,
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("default", "ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
 
+
+  object <- upgradable_packages(object, upgrade, quiet)
+
   unavailable_on_cran <- object$diff == UNAVAILABLE & object$is_cran
 
-  unknown_remotes <- object$diff == UNAVAILABLE & !object$is_cran
+  unknown_remotes <- (object$diff == UNAVAILABLE | object$diff == UNINSTALLED) & !object$is_cran
 
   if (any(unavailable_on_cran) && !quiet) {
     message("Skipping ", sum(unavailable_on_cran), " packages not available: ",
@@ -254,21 +261,18 @@ update.package_deps <- function(object,
   }
 
   if (any(unknown_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[unknown_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(unknown_remotes), " packages not available: ",
-        paste(object$package[unknown_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[unknown_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    build_manual = build_manual,
+                    build_vignettes = build_vignettes,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
   ahead_of_cran <- object$diff == AHEAD & object$is_cran
@@ -279,32 +283,27 @@ update.package_deps <- function(object,
 
   ahead_remotes <- object$diff == AHEAD & !object$is_cran
   if (any(ahead_remotes)) {
-    if (upgrade) {
-      install_remotes(object$remote[ahead_remotes],
-                      dependencies = dependencies,
-                      upgrade = upgrade,
-                      force = force,
-                      quiet = quiet,
-                      build = build,
-                      build_opts = build_opts,
-                      repos = repos,
-                      type = type,
-                      ...)
-    } else if (!quiet) {
-      message("Skipping ", sum(ahead_remotes), " packages ahead of remote: ",
-        paste(object$package[ahead_remotes], collapse = ", "))
-    }
+    install_remotes(object$remote[ahead_remotes],
+                    dependencies = dependencies,
+                    upgrade = upgrade,
+                    force = force,
+                    quiet = quiet,
+                    build = build,
+                    build_opts = build_opts,
+                    build_manual = build_manual,
+                    build_vignettes = build_vignettes,
+                    repos = repos,
+                    type = type,
+                    ...)
   }
 
-  if (upgrade) {
-    behind <- object$diff < CURRENT
-  } else {
-    behind <- is.na(object$installed)
-  }
+  behind <- is.na(object$installed) | object$diff < CURRENT
 
-  if (any(object$is_cran & behind)) {
-    install_packages(object$package[object$is_cran & behind], repos = attr(object, "repos"),
-      type = attr(object, "type"), dependencies = dependencies, quiet = quiet, ...)
+  if (any(object$is_cran & !unavailable_on_cran & behind)) {
+    # get the first cran-like remote and use its repos and pkg_type
+    r <- object$remote[object$is_cran & behind][[1]]
+    install_packages(object$package[object$is_cran & behind], repos = r$repos,
+      type = r$pkg_type, dependencies = dependencies, quiet = quiet, ...)
   }
 
   install_remotes(object$remote[!object$is_cran & behind],
@@ -314,6 +313,8 @@ update.package_deps <- function(object,
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
@@ -378,7 +379,9 @@ find_deps <- function(packages, available = available_packages(),
     rec_flat <- character()
   }
 
-  unique(c(if (include_pkgs) packages, top_flat, rec_flat))
+  # We need to put the recursive dependencies _before_ the top dependencies, to
+  # ensure that any dependencies are installed before their parents are loaded.
+  unique(c(if (include_pkgs) packages, rec_flat, top_flat))
 }
 
 #' Standardise dependencies using the same logical as [install.packages]
@@ -427,10 +430,11 @@ standardise_dep <- function(x) {
 
 update_packages <- function(packages = TRUE,
                             dependencies = NA,
-                            upgrade = TRUE,
+                            upgrade = c("default", "ask", "always", "never"),
                             force = FALSE,
                             quiet = FALSE,
                             build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                            build_manual = FALSE, build_vignettes = FALSE,
                             repos = getOption("repos"),
                             type = getOption("pkgType"),
                             ...) {
@@ -446,6 +450,8 @@ update_packages <- function(packages = TRUE,
          quiet = quiet,
          build = build,
          build_opts = build_opts,
+         build_manual = build_manual,
+         build_vignettes = build_vignettes,
          repos = repos,
          type = type,
          ...)
@@ -457,7 +463,8 @@ has_additional_repositories <- function(pkg) {
 
 parse_additional_repositories <- function(pkg) {
   if (has_additional_repositories(pkg)) {
-    strsplit(pkg[["additional_repositories"]], "[,[:space:]]+")[[1]]
+
+    strsplit(trim_ws(pkg[["additional_repositories"]]), "[,[:space:]]+")[[1]]
   }
 }
 
@@ -506,32 +513,152 @@ split_remotes <- function(x) {
 }
 
 
-remote_deps <- function(pkg, ...) {
+package_deps_new <- function(package = character(), installed = character(),
+  available = character(), diff = logical(), is_cran = logical(),
+  remote = list()) {
+
+  res <- structure(
+    data.frame(package = package, installed = installed, available = available, diff = diff, is_cran = is_cran, stringsAsFactors = FALSE),
+    class = c("package_deps", "data.frame")
+  )
+
+  res$remote = structure(remote, class = "remotes")
+  res
+}
+
+remote_deps <- function(pkg) {
   if (!has_dev_remotes(pkg)) {
-    return(NULL)
+    return(package_deps_new())
   }
 
   dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote, ...)
+  remote <- lapply(dev_packages, parse_one_remote)
 
   package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
   available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
+  diff[is.na(installed)] <- UNINSTALLED
 
-  res <- structure(
-    data.frame(
-      package = package,
-      installed = installed,
-      available = available,
-      diff = diff,
-      is_cran = FALSE,
-      stringsAsFactors = FALSE
-      ),
-    class = c("package_deps", "data.frame"))
+  package_deps_new(package, installed, available, diff, is_cran = FALSE, remote)
+}
 
-  res$remote <- structure(remote, class = "remotes")
 
-  res
+# interactive is an argument to make testing easier.
+resolve_upgrade <- function(upgrade, is_interactive = interactive()) {
+  if (isTRUE(upgrade)) {
+    upgrade <- "always"
+  } else if (identical(upgrade, FALSE)) {
+    upgrade <- "never"
+  }
+
+  upgrade <- match.arg(upgrade[[1]], c("default", "ask", "always", "never"))
+
+  if (identical(upgrade, "default"))
+    upgrade <- Sys.getenv("R_REMOTES_UPGRADE", unset = "ask")
+
+  if (!is_interactive && identical(upgrade, "ask")) {
+    upgrade <- "always"
+  }
+
+  upgrade
+}
+
+upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive()) {
+
+  uninstalled <- x$diff == UNINSTALLED
+
+  behind <- x$diff == BEHIND
+
+  switch(resolve_upgrade(upgrade, is_interactive = is_interactive),
+
+    always = {
+      return(msg_upgrades(x, quiet))
+    },
+
+    never = return(x[uninstalled, ]),
+
+    ask = {
+
+      if (!any(behind)) {
+        return(x)
+      }
+
+      pkgs <- format_upgrades(x[behind, ])
+
+      choices <- pkgs
+      if (length(choices) > 0) {
+        choices <- c("All", "CRAN packages only", "None", choices)
+      }
+
+      res <- select_menu(choices, title = "These packages have more recent versions available.\nIt is recommended to update all of them.\nWhich would you like to update?")
+
+      if ("None" %in% res || length(res) == 0) {
+        return(x[uninstalled, ])
+      }
+
+      if ("All" %in% res) {
+        wch <- seq_len(NROW(x))
+      } else {
+
+        if ("CRAN packages only" %in% res) {
+          wch <- uninstalled | (behind & x$is_cran)
+        } else {
+          wch <- sort(c(which(uninstalled), which(behind)[pkgs %in% res]))
+        }
+      }
+
+      msg_upgrades(x[wch, ], quiet)
+    }
+  )
+}
+
+select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates:", width = getOption("width")) {
+  if (!is.null(title)) {
+    cat(title, "\n", sep = "")
+  }
+
+  nc <- length(choices)
+  op <- paste0(format(seq_len(nc)), ": ", choices)
+  fop <- format(op)
+  cat("", fop, "", sep = "\n")
+  repeat {
+    cat(msg, "\n", sep = "")
+    answer <- readLines(n = 1)
+    answer <- strsplit(answer, "[ ,]+")[[1]]
+    if (all(answer %in% seq_along(choices))) {
+      return(choices[as.integer(answer)])
+    }
+  }
+}
+
+
+msg_upgrades <- function(x, quiet) {
+
+  if (isTRUE(quiet) || nrow(x) == 0) {
+    return(invisible(x))
+  }
+
+  cat(format_upgrades(x[x$diff <= BEHIND, ]), sep = "\n")
+
+  invisible(x)
+}
+
+format_upgrades <- function(x) {
+
+  if (nrow(x) == 0) {
+    return(character(0))
+  }
+
+  remote_type <- lapply(x$remote, format)
+
+  # This call trims widths to 12 characters
+  x[] <- lapply(x, format_str, width = 12)
+
+  # This call aligns the columns
+  x[] <- lapply(x, format, trim = FALSE, justify = "left")
+
+  pkgs <- paste0(x$package, " (", x$installed, " -> ", x$available, ") ", "[", remote_type, "]")
+  pkgs
 }

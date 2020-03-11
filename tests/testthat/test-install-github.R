@@ -10,7 +10,8 @@ test_that("github_resolve_ref.github_release", {
   expect_error(
     github_resolve_ref.github_release(
       NA,
-      list(username = "hadley", repo = "devtools")
+      list(username = "hadley", repo = "devtools"),
+      host = "api.github.com"
     ),
     NA
   )
@@ -169,6 +170,29 @@ test_that("remote_sha.github_remote", {
   )
 })
 
+test_that("github_remote with deleted branch", {
+
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_over_rate_limit()
+
+  # skip this test unless we are using curl
+  skip_if(is_standalone() || !pkg_installed("curl"))
+
+
+  expect_equal(
+    remote_sha.github_remote(
+      list(
+        username = "tidyverse",
+        repo = "purrr",
+        ref = "rc-0.3.1",
+        host = "api.github.com"
+      )
+    ),
+    NA_character_
+  )
+})
+
 test_that("github_pull", {
 
   skip_on_cran()
@@ -182,16 +206,16 @@ test_that("github_pull", {
   dir.create(lib)
 
   install_github(
-    "MangoTheCat/pkgsnap",
-    ref = github_pull(10),
+    "r-lib/desc",
+    ref = github_pull(64),
     lib = lib,
     quiet = TRUE
   )
 
-  expect_silent(packageDescription("pkgsnap", lib.loc = lib))
+  expect_silent(packageDescription("desc", lib.loc = lib))
   expect_equal(
-    packageDescription("pkgsnap", lib.loc = lib)$RemoteRepo,
-    "pkgsnap")
+    packageDescription("desc", lib.loc = lib)$RemoteRepo,
+    "desc")
 })
 
 test_that("remote_sha.github_remote errors if remote doesn't exist", {

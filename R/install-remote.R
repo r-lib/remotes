@@ -9,14 +9,16 @@
 #' }
 #' @noRd
 install_remote <- function(remote,
-                           dependencies = dependencies,
-                           upgrade = upgrade,
-                           force = force,
-                           quiet = quiet,
-                           build = build,
-                           build_opts = build_opts,
-                           repos = repos,
-                           type = type,
+                           dependencies,
+                           upgrade,
+                           force,
+                           quiet,
+                           build,
+                           build_opts,
+                           build_manual,
+                           build_vignettes,
+                           repos,
+                           type,
                            ...) {
 
   stopifnot(is.remote(remote))
@@ -40,17 +42,23 @@ install_remote <- function(remote,
   if (inherits(remote, "cran_remote")) {
     install_packages(
       package_name, repos = remote$repos, type = remote$pkg_type,
-      ..., quiet = quiet)
+      dependencies = dependencies,
+      quiet = quiet,
+      ...)
     return(invisible(package_name))
   }
 
-  bundle <- remote_download(remote, quiet = quiet)
+  res <- try(bundle <- remote_download(remote, quiet = quiet), silent = quiet)
+  if (inherits(res, "try-error")) {
+    return(NA_character_)
+  }
+
   on.exit(unlink(bundle), add = TRUE)
 
   source <- source_pkg(bundle, subdir = remote$subdir)
   on.exit(unlink(source, recursive = TRUE), add = TRUE)
 
-  update_submodules(source, quiet)
+  update_submodules(source, remote$subdir, quiet)
 
   add_metadata(source, remote_metadata(remote, bundle, source, remote_sha))
 
@@ -64,23 +72,69 @@ install_remote <- function(remote,
           quiet = quiet,
           build = build,
           build_opts = build_opts,
+          build_manual = build_manual,
+          build_vignettes = build_vignettes,
           repos = repos,
           type = type,
           ...)
 }
 
 install_remotes <- function(remotes, ...) {
-  invisible(vapply(remotes, install_remote, ..., FUN.VALUE = character(1)))
+  res <- character(length(remotes))
+  for (i in seq_along(remotes)) {
+    tryCatch(
+      res[[i]] <- install_remote(remotes[[i]], ...),
+      error = function(e) {
+        stop(remote_install_error(remotes[[i]], e))
+      })
+  }
+  invisible(res)
+}
+
+remote_install_error <- function(remote, error) {
+  msg <- sprintf(
+    "Failed to install '%s' from %s:\n  %s", remote_name_or_unknown(remote), format(remote), conditionMessage(error)
+  )
+
+ structure(list(message = msg, call = NULL, error = error, remote = remote), class = c("install_error", "error", "condition"))
+}
+
+remote_name_or_unknown <- function(remote) {
+  res <- tryCatch(
+    res <- remote_package_name(remote),
+    error = function(e) NA_character_)
+
+  if (is.na(res)) {
+    return("unknown package")
+  }
+
+  res
 }
 
 # Add metadata
 add_metadata <- function(pkg_path, meta) {
-  path <- file.path(pkg_path, "DESCRIPTION")
-  desc <- read_dcf(path)
 
-  desc <- utils::modifyList(desc, meta)
+  # During installation, the DESCRIPTION file is read and an package.rds file
+  # created with most of the information from the DESCRIPTION file. Functions
+  # that read package metadata may use either the DESCRIPTION file or the
+  # package.rds file, therefore we attempt to modify both of them
+  source_desc <- file.path(pkg_path, "DESCRIPTION")
+  binary_desc <- file.path(pkg_path, "Meta", "package.rds")
+  if (file.exists(source_desc)) {
+    desc <- read_dcf(source_desc)
 
-  write_dcf(path, desc)
+    desc <- utils::modifyList(desc, meta)
+
+    write_dcf(source_desc, desc)
+  }
+
+  if (file.exists(binary_desc)) {
+    pkg_desc <- base::readRDS(binary_desc)
+    desc <- as.list(pkg_desc$DESCRIPTION)
+    desc <- utils::modifyList(desc, meta)
+    pkg_desc$DESCRIPTION <- stats::setNames(as.character(desc), names(desc))
+    base::saveRDS(pkg_desc, binary_desc)
+  }
 }
 
 # Modify the MD5 file - remove the line for DESCRIPTION
@@ -148,6 +202,11 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
   }
 
   switch(x$RemoteType,
+    standard = remote("cran",
+      name = x$Package,
+      repos = x$RemoteRepos %||% repos,
+      pkg_type = x$RemotePkgType %||% type,
+      sha = x$RemoteSha),
     github = remote("github",
       host = x$RemoteHost,
       package = x$RemotePackage,
@@ -155,14 +214,16 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,
       ref = x$RemoteRef,
-      sha = x$RemoteSha),
+      sha = x$RemoteSha,
+      auth_token = github_pat()),
     gitlab = remote("gitlab",
       host = x$RemoteHost,
       repo = x$RemoteRepo,
       subdir = x$RemoteSubdir,
       username = x$RemoteUsername,
       ref = x$RemoteRef,
-      sha = x$RemoteSha),
+      sha = x$RemoteSha,
+      auth_token = gitlab_pat()),
     xgit = remote("xgit",
       url = trim_ws(x$RemoteUrl),
       ref = x$RemoteRef %||% x$RemoteBranch,
@@ -173,14 +234,17 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       url = trim_ws(x$RemoteUrl),
       ref = x$RemoteRef %||% x$RemoteBranch,
       sha = x$RemoteSha,
-      subdir = x$RemoteSubdir),
+      subdir = x$RemoteSubdir,
+      credentials = git_credentials()),
     bitbucket = remote("bitbucket",
       host = x$RemoteHost,
       repo = x$RemoteRepo,
       username = x$RemoteUsername,
       ref = x$RemoteRef,
       sha = x$RemoteSha,
-      subdir = x$RemoteSubdir),
+      subdir = x$RemoteSubdir,
+      auth_user = bitbucket_user(),
+      password = bitbucket_password()),
     svn = remote("svn",
       url = trim_ws(x$RemoteUrl),
       svn_subdir = x$RemoteSubdir,
@@ -197,7 +261,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       url = trim_ws(x$RemoteUrl),
       subdir = x$RemoteSubdir,
       config = x$RemoteConfig,
-      pkg_type = x$RemotePkgType),
+      pkg_type = x$RemotePkgType %||% type),
     bioc_git2r = remote("bioc_git2r",
       mirror = x$RemoteMirror,
       repo = x$RemoteRepo,
@@ -209,7 +273,8 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
       repo = x$RemoteRepo,
       release = x$RemoteRelease,
       sha = x$RemoteSha,
-      branch = x$RemoteBranch)
+      branch = x$RemoteBranch),
+    stop(sprintf("can't convert package %s with RemoteType '%s' to remote", name, x$RemoteType))
   )
 }
 

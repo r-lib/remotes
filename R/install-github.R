@@ -12,7 +12,7 @@
 #'   name, or a call to [github_pull()]. Defaults to `"master"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
-#'   access token (PAT) in <https://github.com/settings/applications> and
+#'   access token (PAT) in "https://github.com/settings/tokens" and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
@@ -25,6 +25,7 @@
 #' @details
 #' If the repository uses submodules a command-line git client is required to
 #' clone the submodules.
+#' @family package installation
 #' @export
 #' @seealso [github_pull()]
 #' @examples
@@ -36,7 +37,7 @@
 #'   "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
-#' # from https://github.com/settings/applications. You only need the
+#' # from https://github.com/settings/tokens. You only need the
 #' # repo scope. Best practice is to save your PAT in env var called
 #' # GITHUB_PAT.
 #' install_github("hadley/private", auth_token = "abc")
@@ -45,13 +46,14 @@
 install_github <- function(repo,
                            ref = "master",
                            subdir = NULL,
-                           auth_token = github_pat(),
+                           auth_token = github_pat(quiet),
                            host = "api.github.com",
                            dependencies = NA,
-                           upgrade = TRUE,
+                           upgrade = c("default", "ask", "always", "never"),
                            force = FALSE,
                            quiet = FALSE,
                            build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                           build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
                            ...) {
@@ -66,6 +68,8 @@ install_github <- function(repo,
     quiet = quiet,
     build = build,
     build_opts = build_opts,
+    build_manual = build_manual,
+    build_vignettes = build_vignettes,
     repos = repos,
     type = type,
     ...)
@@ -76,7 +80,7 @@ github_remote <- function(repo, ref = "master", subdir = NULL,
                        host = "api.github.com", ...) {
 
   meta <- parse_git_repo(repo)
-  meta <- github_resolve_ref(meta$ref %||% ref, meta, auth_token)
+  meta <- github_resolve_ref(meta$ref %||% ref, meta, host = host, auth_token = auth_token)
 
   remote("github",
     host = host,
@@ -161,18 +165,19 @@ github_resolve_ref.NULL <- function(x, params, ...) {
 }
 
 #' @export
-github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
+github_resolve_ref.github_pull <- function(x, params, ..., host, auth_token = github_pat()) {
   # GET /repos/:user/:repo/pulls/:number
   path <- file.path("repos", params$username, params$repo, "pulls", x)
   response <- tryCatch(
-    github_GET(path, pat = auth_token),
+    github_GET(path, host = host, pat = auth_token),
     error = function(e) e
   )
 
   ## Just because libcurl might download the error page...
   if (methods::is(response, "error") || is.null(response$head)) {
     stop("Cannot find GitHub pull request ", params$username, "/",
-         params$repo, "#", x)
+         params$repo, "#", x, "\n",
+         response$message)
   }
 
   params$username <- response$head$user$login
@@ -182,16 +187,17 @@ github_resolve_ref.github_pull <- function(x, params, ..., auth_token = NULL) {
 
 # Retrieve the ref for the latest release
 #' @export
-github_resolve_ref.github_release <- function(x, params, ..., auth_token = NULL) {
+github_resolve_ref.github_release <- function(x, params, ..., host, auth_token = github_pat()) {
   # GET /repos/:user/:repo/releases
   path <- paste("repos", params$username, params$repo, "releases", sep = "/")
   response <- tryCatch(
-    github_GET(path, pat = auth_token),
+    github_GET(path, host = host, pat = auth_token),
     error = function(e) e
   )
 
   if (methods::is(response, "error") || !is.null(response$message)) {
-    stop("Cannot find repo ", params$username, "/", params$repo, ".")
+    stop("Cannot find repo ", params$username, "/", params$repo, ".", "\n",
+      response$message)
   }
 
   if (length(response) == 0L)
@@ -228,7 +234,7 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
   }
 
   tmp <- tempfile()
-  writeLines(desc, tmp)
+  writeChar(desc, tmp)
   on.exit(unlink(tmp))
 
   read_dcf(tmp)$Package
@@ -236,8 +242,14 @@ remote_package_name.github_remote <- function(remote, ..., use_local = TRUE,
 
 #' @export
 remote_sha.github_remote <- function(remote, ..., use_curl = !is_standalone() && pkg_installed("curl")) {
-  github_commit(username = remote$username, repo = remote$repo,
-    host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl)
+  tryCatch(
+    github_commit(username = remote$username, repo = remote$repo,
+      host = remote$host, ref = remote$ref, pat = remote$auth_token %||% github_pat(), use_curl = use_curl),
+
+    # 422 errors most often occur when a branch or PR has been deleted, so we
+    # ignore the error in this case
+    http_422 = function(e) NA_character_
+  )
 }
 
 #' @export

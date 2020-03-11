@@ -8,13 +8,14 @@
 #' a single command.
 #'
 #' @inheritParams install_git
-#' @param subdir A sub-directory withing a svn repository that contains the
+#' @param subdir A sub-directory within a svn repository that contains the
 #'   package we are interested in installing.
 #' @param args A character vector providing extra options to pass on to
 #'   \command{svn}.
 #' @param revision svn revision, if omitted updates to latest
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams install_github
+#' @family package installation
 #' @export
 #'
 #' @examples
@@ -25,10 +26,11 @@
 install_svn <- function(url, subdir = NULL, args = character(0),
                         revision = NULL,
                         dependencies = NA,
-                        upgrade = TRUE,
+                        upgrade = c("default", "ask", "always", "never"),
                         force = FALSE,
                         quiet = FALSE,
                         build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
+                        build_manual = FALSE, build_vignettes = FALSE,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
@@ -43,6 +45,8 @@ install_svn <- function(url, subdir = NULL, args = character(0),
                   quiet = quiet,
                   build = build,
                   build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
                   repos = repos,
                   type = type,
                   ...)
