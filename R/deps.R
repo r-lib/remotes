@@ -379,9 +379,10 @@ find_deps <- function(packages, available = available_packages(),
     rec_flat <- character()
   }
 
-  # We need to put the recursive dependencies _before_ the top dependencies, to
-  # ensure that any dependencies are installed before their parents are loaded.
-  unique(c(if (include_pkgs) packages, rec_flat, top_flat))
+  # We need to put the recursive dependencies _before_ the top dependencies and
+  # input packages, to ensure that any dependencies are installed before
+  # their parents are loaded.
+  unique(c(rec_flat, top_flat, if (include_pkgs) packages))
 }
 
 #' Standardise dependencies using the same logical as [install.packages]
