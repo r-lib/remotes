@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
+
 # remotes 2.1.1
 
 ## Minor improvements and fixes
