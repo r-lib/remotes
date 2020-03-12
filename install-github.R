@@ -1668,9 +1668,14 @@ function(...) {
       tmp <- tempfile()
       on.exit(unlink(tmp), add = TRUE)
   
-      download(tmp, url, auth_token = pat)
+      download(
+        tmp,
+        url,
+        auth_token = pat,
+        headers = c("Accept" = "application/vnd.github.VERSION.sha")
+      )
   
-      json$parse(readLines(tmp, warn = FALSE))$sha
+      readLines(tmp, warn = FALSE)
     }
   }
   
