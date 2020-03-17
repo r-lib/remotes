@@ -40,6 +40,8 @@ install_cran <- function(pkgs, repos = getOption("repos"), type = getOption("pkg
 
 cran_remote <- function(pkg, repos = getOption("repos"), type = getOption("pkgType"), ...) {
 
+  repos <- fix_repositories(repos)
+
   remote("cran",
     name = pkg,
     repos = repos,
