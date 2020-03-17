@@ -41,7 +41,15 @@ Can be a character vector (selecting from "Depends", "Imports",
 \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
 "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
 and is the default. \code{FALSE} is shorthand for no dependencies (i.e.
-just check this package, not its dependencies).}
+just check this package, not its dependencies).
+
+The values "soft" or "dev" mean the same as \code{TRUE}, "hard" or "user" mean
+the same as \code{NA}.
+
+You can also specify dependencies from one or more additional fields,
+common ones are "Config/pkgdown" for dependencies used in building the
+pkgdown site and "Config/coverage" for dependencies used in calculating
+test coverage.}
 
 \item{upgrade}{One of "default", "ask", "always", or "never". "default"
 respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,

@@ -1,6 +1,11 @@
 # remotes (development version)
 
 * Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
+* Remotes functions can now install dependencies from additional DESCRIPTION
+  fields, e.g. passing `dependencies = "Config/pkgdown"` will install the
+  dependencies listed in the `Config/pkgdown: ` field in the package's
+  DESCRIPTION. Prefixing fields with `Config/` allows them to pass `R CMD
+  check` without a NOTE, so it is the recommended format.
 
 # remotes 2.1.1
 

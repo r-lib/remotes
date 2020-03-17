@@ -16,6 +16,14 @@
 #'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
 #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
 #'   just check this package, not its dependencies).
+#'
+#'   The values "soft" or "dev" mean the same as `TRUE`, "hard" or "user" mean
+#'   the same as `NA`.
+#'
+#'   You can also specify dependencies from one or more additional fields,
+#'   common ones are "Config/pkgdown" for dependencies used in building the
+#'   pkgdown site and "Config/coverage" for dependencies used in calculating
+#'   test coverage.
 #' @param quiet If `TRUE`, suppress output.
 #' @param upgrade One of "default", "ask", "always", or "never". "default"
 #'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
@@ -131,12 +139,16 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
       repos[missing_repos] <- bioc_repos[missing_repos]
   }
 
-  combine_deps(
-    package_deps(deps, repos = repos, type = type),
-    remote_deps(pkg))
+  cran_deps <- package_deps(deps, repos = repos, type = type)
+
+  res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
+
+  res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
+
+  res[!duplicated(res$package, fromLast = TRUE), ]
 }
 
-combine_deps <- function(cran_deps, remote_deps) {
+combine_remote_deps <- function(cran_deps, remote_deps) {
   # If there are no dependencies there will be no remote dependencies either,
   # so just return them (and don't force the remote_deps promise)
   if (nrow(cran_deps) == 0) {
@@ -189,8 +201,17 @@ compare_versions <- function(inst, remote, is_cran) {
     integer(1))
 }
 
-has_dev_remotes <- function(pkg) {
-  !is.null(pkg[["remotes"]])
+has_extra_deps <- function(pkg, dependencies) {
+  any(dependencies %in% names(pkg))
+}
+
+get_extra_deps <- function(pkg, dependencies) {
+  dependencies <- tolower(dependencies)
+
+  dependencies <- intersect(dependencies, names(pkg))
+
+  #remove standard dependencies
+  setdiff(dependencies, tolower(standardise_dep(TRUE)))
 }
 
 #' @export
@@ -407,7 +428,13 @@ standardise_dep <- function(x) {
   } else if (identical(x, FALSE)) {
     character(0)
   } else if (is.character(x)) {
-    x
+    if (any(x %in% c("hard", "user"))) {
+      c("Depends", "Imports", "LinkingTo")
+    } else if (any(x %in% c("soft", "dev"))) {
+      c("Depends", "Imports", "LinkingTo", "Suggests")
+    } else {
+      intersect(x, c("Depends", "Imports", "LinkingTo", "Suggests"))
+    }
   } else {
     stop("Dependencies must be a boolean or a character vector", call. = FALSE)
   }
@@ -479,11 +506,15 @@ fix_repositories <- function(repos) {
   repos
 }
 
-parse_one_remote <- function(x, ...) {
+parse_one_extra <- function(x, ...) {
   pieces <- strsplit(x, "::", fixed = TRUE)[[1]]
 
   if (length(pieces) == 1) {
-    type <- "github"
+    if (!grepl("/", pieces)) {
+      type <- "cran"
+    } else {
+      type <- "github"
+    }
     repo <- pieces
   } else if (length(pieces) == 2) {
     type <- pieces[1]
@@ -505,10 +536,10 @@ parse_one_remote <- function(x, ...) {
   res
 }
 
-split_remotes <- function(x) {
+split_extra_deps <- function(x, name = "Remotes") {
   pkgs <- trim_ws(unlist(strsplit(x, ",[[:space:]]*")))
   if (any((res <- grep("[[:space:]]+", pkgs)) != -1)) {
-    stop("Missing commas separating Remotes: '", pkgs[res], "'", call. = FALSE)
+    stop("Missing commas separating ", name, ": '", pkgs[res], "'", call. = FALSE)
   }
   pkgs
 }
@@ -527,22 +558,21 @@ package_deps_new <- function(package = character(), installed = character(),
   res
 }
 
-remote_deps <- function(pkg) {
-  if (!has_dev_remotes(pkg)) {
+extra_deps <- function(pkg, field) {
+  if (!has_extra_deps(pkg, field)) {
     return(package_deps_new())
   }
+  dev_packages <- split_extra_deps(pkg[[field]])
+  extra <- lapply(dev_packages, parse_one_extra)
 
-  dev_packages <- split_remotes(pkg[["remotes"]])
-  remote <- lapply(dev_packages, parse_one_remote)
-
-  package <- vapply(remote, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
+  package <- vapply(extra, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)
-  available <- vapply(remote, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
+  available <- vapply(extra, function(x) remote_sha(x), character(1), USE.NAMES = FALSE)
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
   diff[is.na(installed)] <- UNINSTALLED
 
-  package_deps_new(package, installed, available, diff, is_cran = FALSE, remote)
+  package_deps_new(package, installed, available, diff, is_cran = FALSE, extra)
 }
 
 
