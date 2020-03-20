@@ -786,6 +786,7 @@ function(...) {
                              type = getOption("pkgType"),
                              ...) {
   
+    dependencies <- standardise_dep(dependencies)
   
     object <- upgradable_packages(object, upgrade, quiet)
   
