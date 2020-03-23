@@ -951,7 +951,7 @@ function(...) {
       } else if (any(x %in% c("soft", "dev"))) {
         c("Depends", "Imports", "LinkingTo", "Suggests")
       } else {
-        intersect(x, c("Depends", "Imports", "LinkingTo", "Suggests"))
+        intersect(x, c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances"))
       }
     } else {
       stop("Dependencies must be a boolean or a character vector", call. = FALSE)
