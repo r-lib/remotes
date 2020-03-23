@@ -534,13 +534,12 @@ function(...) {
   #'   and is the default. `FALSE` is shorthand for no dependencies (i.e.
   #'   just check this package, not its dependencies).
   #'
-  #'   The values "soft" or "dev" mean the same as `TRUE`, "hard" or "user" mean
-  #'   the same as `NA`.
+  #'   The value "soft" means the same as `TRUE`, "hard" means the same as `NA`.
   #'
   #'   You can also specify dependencies from one or more additional fields,
-  #'   common ones are "Config/pkgdown" for dependencies used in building the
-  #'   pkgdown site and "Config/coverage" for dependencies used in calculating
-  #'   test coverage.
+  #'   common ones include:
+  #'   - Config/Needs/website - for dependencies used in building the pkgdown site.
+  #'   - Config/Needs/coverage for dependencies used in calculating test coverage.
   #' @param quiet If `TRUE`, suppress output.
   #' @param upgrade One of "default", "ask", "always", or "never". "default"
   #'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
@@ -934,6 +933,11 @@ function(...) {
   #'   "Suggests". `NA` is shorthand for "Depends", "Imports" and "LinkingTo"
   #'   and is the default. `FALSE` is shorthand for no dependencies.
   #'
+  #'   The value "soft" means the same as `TRUE`, "hard" means the same as `NA`.
+  #'
+  #'   Any additional values that don't match one of the standard dependency
+  #'   types are filtered out.
+  #'
   #' @seealso <http://r-pkgs.had.co.nz/description.html#dependencies> for
   #' additional information on what each dependency type means.
   #' @keywords internal
@@ -946,9 +950,9 @@ function(...) {
     } else if (identical(x, FALSE)) {
       character(0)
     } else if (is.character(x)) {
-      if (any(x %in% c("hard", "user"))) {
+      if (any(x == "hard")) {
         c("Depends", "Imports", "LinkingTo")
-      } else if (any(x %in% c("soft", "dev"))) {
+      } else if (any(x == "soft")) {
         c("Depends", "Imports", "LinkingTo", "Suggests")
       } else {
         intersect(x, c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances"))
