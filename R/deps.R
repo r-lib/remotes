@@ -625,8 +625,7 @@ select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers,
   fop <- format(op)
   cat("", fop, "", sep = "\n")
   repeat {
-    cat(msg, "\n", sep = "")
-    answer <- readLines(n = 1)
+    answer <- readline(msg)
     answer <- strsplit(answer, "[ ,]+")[[1]]
     if (all(answer %in% seq_along(choices))) {
       return(choices[as.integer(answer)])
