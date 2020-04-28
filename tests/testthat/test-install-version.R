@@ -161,7 +161,12 @@ test_that("install_version with specific version on duplicating repository", {
   # set CRAN mirror
   repos <- getOption("repos")
   if (length(repos) == 0) repos <- character()
-  repos[repos == "@CRAN@"] <- sprintf("file://%s", gsub("\\\\", "/", local_cran))
+  repos[repos == "@CRAN@"] <-
+    if (.Platform$OS.type == "windows") {
+      sprintf("file:///%s", gsub("\\\\", "/", local_cran))
+    } else {
+      sprintf("file://%s", local_cran)
+    }
 
   # run test
   install_version("rstudioapi", lib = lib, repos = repos, quiet = TRUE)
@@ -207,7 +212,12 @@ test_that("install_version latest version on duplicating repository", {
   # set CRAN mirror
   repos <- getOption("repos")
   if (length(repos) == 0) repos <- character()
-  repos[repos == "@CRAN@"] <- sprintf("file://%s", gsub("\\\\", "/", local_cran))
+  repos[repos == "@CRAN@"] <-
+    if (.Platform$OS.type == "windows") {
+      sprintf("file:///%s", gsub("\\\\", "/", local_cran))
+    } else {
+      sprintf("file://%s", local_cran)
+    }
 
   # run test
   install_version("rstudioapi", "0.3.1", lib = lib, repos = repos, quiet = TRUE)
