@@ -103,13 +103,38 @@ download_version <- function(package, version = NULL,
 
 download_version_url <- function(package, version, repos, type) {
 
+  filters <- getOption("available_packages_filters")
+  if (is.null(filters)) {
+    filters <- c("R_version", "OS_type", "subarch")
+  } else {
+    filters <- setdiff(filters, "duplicates")
+  }
+
   contriburl <- contrib.url(repos, type)
-  available <- available.packages(contriburl)
+  available <- available.packages(contriburl, filters = filters)
 
   if (package %in% row.names(available)) {
-    current.version <- available[package, 'Version']
-    if (is.null(version) || version == current.version) {
-      row <- available[which(rownames(available) == package)[1], ]
+    the_package <- row.names(available) == package
+    if (is.null(version)) {
+      available <- available[the_package, , drop = FALSE]
+      # Sort by version if there are duplicates
+      for (i in seq_len(nrow(available) - 1L)) {
+        j <- i + 1L
+        if (compareVersion(available[i, "Version"], available[j, "Version"]) > 0) {
+          available[c(i, j), ] <- available[c(j, i), ]
+        }
+      }
+      row <- available[nrow(available), ]
+    } else {
+      the_version <- available[, "Version"] == version
+      available <- available[the_package & the_version, , drop = FALSE]
+      if (nrow(available) > 0) {
+        row <- available[1L, ]
+      } else {
+        row <- NULL
+      }
+    }
+    if (!is.null(row)) {
       return(paste0(
         row[["Repository"]],
         "/",

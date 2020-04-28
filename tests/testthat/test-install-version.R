@@ -127,6 +127,108 @@ test_that("install_version for archived packages", {
   )
 })
 
+test_that("install_version with specific version on duplicating repository", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  Sys.unsetenv("R_TESTS")
+
+  # path to install
+  lib <- tempfile()
+  setup(dir.create(lib))
+  teardown(unlink(lib, recursive = TRUE))
+
+  # path to local repository
+  local_cran <- tempfile("testdir")
+  contrib <- file.path(local_cran, "src", "contrib")
+  setup(dir.create(contrib, recursive = TRUE))
+  teardown(unlink(local_cran, recursive = TRUE))
+
+  # create local repository
+  download_rstudioapi <- function(version) {
+    filename <- sprintf("rstudioapi_%s.tar.gz", version)
+    url <- sprintf("https://cloud.r-project.org/src/contrib/Archive/rstudioapi/%s", filename)
+    destfile <- file.path(contrib, filename)
+    download.file(url, destfile = destfile)
+  }
+  download_rstudioapi("0.1")
+  download_rstudioapi("0.10")
+  download_rstudioapi("0.3.1")
+  download_rstudioapi("0.5")
+  tools::write_PACKAGES(contrib, latestOnly = FALSE)
+
+  # set CRAN mirror
+  repos <- getOption("repos")
+  if (length(repos) == 0) repos <- character()
+  repos[repos == "@CRAN@"] <-
+    if (.Platform$OS.type == "windows") {
+      sprintf("file:///%s", gsub("\\\\", "/", local_cran))
+    } else {
+      sprintf("file://%s", local_cran)
+    }
+
+  # run test
+  install_version("rstudioapi", lib = lib, repos = repos, quiet = TRUE)
+  expect_silent(packageDescription("rstudioapi", lib.loc = lib))
+  desc <- packageDescription("rstudioapi", lib.loc = lib)
+  expect_equal(desc$Version, "0.10")
+  expect_null(desc$RemoteType)
+  expect_null(desc$RemoteSubdir)
+  expect_null(desc$RemoteUrl)
+})
+
+test_that("install_version latest version on duplicating repository", {
+
+  skip_on_cran()
+  skip_if_offline()
+
+  Sys.unsetenv("R_TESTS")
+
+  # path to install
+  lib <- tempfile()
+  setup(dir.create(lib))
+  teardown(unlink(lib, recursive = TRUE))
+
+  # path to local repository
+  local_cran <- tempfile("testdir")
+  contrib <- file.path(local_cran, "src", "contrib")
+  setup(dir.create(contrib, recursive = TRUE))
+  teardown(unlink(local_cran, recursive = TRUE))
+
+  # create local repository
+  download_rstudioapi <- function(version) {
+    filename <- sprintf("rstudioapi_%s.tar.gz", version)
+    url <- sprintf("https://cloud.r-project.org/src/contrib/Archive/rstudioapi/%s", filename)
+    destfile <- file.path(contrib, filename)
+    download.file(url, destfile = destfile)
+  }
+  download_rstudioapi("0.1")
+  download_rstudioapi("0.10")
+  download_rstudioapi("0.3.1")
+  download_rstudioapi("0.5")
+  tools::write_PACKAGES(contrib, latestOnly = FALSE)
+
+  # set CRAN mirror
+  repos <- getOption("repos")
+  if (length(repos) == 0) repos <- character()
+  repos[repos == "@CRAN@"] <-
+    if (.Platform$OS.type == "windows") {
+      sprintf("file:///%s", gsub("\\\\", "/", local_cran))
+    } else {
+      sprintf("file://%s", local_cran)
+    }
+
+  # run test
+  install_version("rstudioapi", "0.3.1", lib = lib, repos = repos, quiet = TRUE)
+  expect_silent(packageDescription("rstudioapi", lib.loc = lib))
+  desc <- packageDescription("rstudioapi", lib.loc = lib)
+  expect_equal(desc$Version, "0.3.1")
+  expect_null(desc$RemoteType)
+  expect_null(desc$RemoteSubdir)
+  expect_null(desc$RemoteUrl)
+})
+
 test_that("install_version for other types fails", {
   expect_error(
     install_version("igraph0", type = "binary"),
