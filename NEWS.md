@@ -1,6 +1,7 @@
 # remotes (development version)
 
 * `parse_submodules()` internal regular expression is now PCRE 2 compatible (#502, @jan-glx)
+* New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
 
 * Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
 
