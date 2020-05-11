@@ -42,7 +42,7 @@ Suggests:
 Depends:
     R (>= 3.0.0)
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 SystemRequirements: Subversion for install_svn, git for install_git
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
