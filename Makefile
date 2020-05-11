@@ -8,3 +8,6 @@ inst/install-github.R: inst/install-github.Rin $(SRC)
 
 install-github.R: inst/install-github.R
 	cp $< $@
+
+clean:
+	rm inst/install-github.R install-github.R
