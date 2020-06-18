@@ -48,7 +48,7 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
   }
 
   remotes <- lapply(url, git_remote, subdir = subdir, ref = ref,
-    credentials = credentials, git = "auto")
+    credentials = credentials, git = match.arg(git))
 
   install_remotes(remotes, credentials = credentials,
                   dependencies = dependencies,
