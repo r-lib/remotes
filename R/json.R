@@ -6,7 +6,7 @@
 # jsonlite package.
 #
 # The canonical location of this file is in the remotes package:
-# https://github.com/r-lib/remotes/blob/master/R/json.R
+# https://github.com/r-lib/remotes/blob/HEAD/R/json.R
 #
 # API:
 # parse(text)

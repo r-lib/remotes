@@ -20,7 +20,7 @@ available_packages(repos = getOption("repos"), type = getOption("pkgType"))
 \item{type}{
     character string, indicate which type of packages: see
     \code{\link[utils]{install.packages}}.
-  
+
     If \code{type = "both"} this will use the source repository.
   }
 }

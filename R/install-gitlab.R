@@ -57,7 +57,7 @@ gitlab_remote <- function(repo, subdir = NULL,
                        host = "gitlab.com", ...) {
 
   meta <- parse_git_repo(repo)
-  meta$ref <- meta$ref %||% "master"
+  meta$ref <- meta$ref %||% "HEAD"
 
   remote("gitlab",
     host = host,
@@ -146,7 +146,7 @@ format.gitlab_remote <- function(x, ...) {
   "GitLab"
 }
 
-gitlab_commit <- function(username, repo, ref = "master",
+gitlab_commit <- function(username, repo, ref = "HEAD",
   host = "gitlab.com", pat = gitlab_pat()) {
 
   url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
@@ -175,7 +175,7 @@ gitlab_pat <- function(quiet = TRUE) {
   return(NULL)
 }
 
-gitlab_project_id <- function(username, repo, ref = "master",
+gitlab_project_id <- function(username, repo, ref = "HEAD",
   host = "gitlab.com", pat = gitlab_pat()) {
 
   url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)

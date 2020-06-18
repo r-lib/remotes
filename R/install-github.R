@@ -9,7 +9,7 @@
 #'   (see below); if both is specified, the values in `repo` take
 #'   precedence.
 #' @param ref Desired git reference. Could be a commit, tag, or branch
-#'   name, or a call to [github_pull()]. Defaults to `"master"`.
+#'   name, or a call to [github_pull()]. Defaults to `"HEAD"`.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
 #'   access token (PAT) in "https://github.com/settings/tokens" and
@@ -44,7 +44,7 @@
 #'
 #' }
 install_github <- function(repo,
-                           ref = "master",
+                           ref = "HEAD",
                            subdir = NULL,
                            auth_token = github_pat(quiet),
                            host = "api.github.com",
@@ -75,7 +75,7 @@ install_github <- function(repo,
     ...)
 }
 
-github_remote <- function(repo, ref = "master", subdir = NULL,
+github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
                        host = "api.github.com", ...) {
 
@@ -160,7 +160,7 @@ github_resolve_ref.default <- function(x, params, ...) {
 
 #' @export
 github_resolve_ref.NULL <- function(x, params, ...) {
-  params$ref <- "master"
+  params$ref <- "HEAD"
   params
 }
 

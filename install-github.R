@@ -1652,7 +1652,7 @@ function(...) {
     }
   }
   
-  github_commit <- function(username, repo, ref = "master",
+  github_commit <- function(username, repo, ref = "HEAD",
     host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl"), current_sha = NULL) {
   
     url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
@@ -1732,7 +1732,7 @@ function(...) {
     identical(Sys.getenv("TRAVIS", "false"), "true")
   }
   
-  github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
+  github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "api.github.com", ...,
     use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
   
     if (!is.null(subdir)) {
@@ -1881,7 +1881,7 @@ function(...) {
   #' @examples
   #' \dontrun{
   #' install_bioc("SummarizedExperiment")
-  #' install_bioc("release/SummarizedExperiment")
+  #' install_bioc("devel/SummarizedExperiment")
   #' install_bioc("3.3/SummarizedExperiment")
   #' install_bioc("SummarizedExperiment#abc123")
   #' install_bioc("user:password@release/SummarizedExperiment")
@@ -2117,12 +2117,14 @@ function(...) {
       if (release == "release") {
         release <- bioconductor_release()
       }
+      cat("\nrelease is extracted as ",release,"\n")
       switch(
         tolower(release),
-        devel = "master",
+        devel = "HEAD",
         paste0("RELEASE_",  gsub("\\.", "_", release))
       )
     }
+  
   }
   
   bioconductor_release <- function() {
@@ -2173,7 +2175,7 @@ function(...) {
   #'   environment variable. See details for further information on setting
   #'   up a password.
   #' @param ref Desired git reference; could be a commit, tag, or branch name.
-  #'   Defaults to master.
+  #'   Defaults to HEAD.
   #' @seealso Bitbucket API docs:
   #'   <https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html>
   #'
@@ -2206,7 +2208,7 @@ function(...) {
   #' install_bitbucket("sulab/mygene.r@@default")
   #' install_bitbucket("djnavarro/lsr")
   #' }
-  install_bitbucket <- function(repo, ref = "master", subdir = NULL,
+  install_bitbucket <- function(repo, ref = "HEAD", subdir = NULL,
                                 auth_user = bitbucket_user(), password = bitbucket_password(),
                                 host = "api.bitbucket.org/2.0",
                                 dependencies = NA,
@@ -2236,7 +2238,7 @@ function(...) {
                     ...)
   }
   
-  bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
+  bitbucket_remote <- function(repo, ref = "HEAD", subdir = NULL,
                                auth_user = bitbucket_user(), password = bitbucket_password(),
                                sha = NULL, host = "api.bitbucket.org/2.0", ...) {
   
@@ -2308,7 +2310,7 @@ function(...) {
     "Bitbucket"
   }
   
-  bitbucket_commit <- function(username, repo, ref = "master",
+  bitbucket_commit <- function(username, repo, ref = "HEAD",
     host = "api.bitbucket.org/2.0", auth = NULL) {
   
     url <- build_url(host, "repositories", username, repo, "commit", ref)
@@ -2319,7 +2321,7 @@ function(...) {
     json$parse_file(tmp)
   }
   
-  bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
+  bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
   
     url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
   
@@ -2341,7 +2343,7 @@ function(...) {
   }
   
   
-  bitbucket_download_url <- function(username, repo, ref = "master",
+  bitbucket_download_url <- function(username, repo, ref = "HEAD",
     host = "api.bitbucket.org/2.0", auth = NULL) {
   
     url <- build_url(host, "repositories", username, repo)
@@ -2563,7 +2565,7 @@ function(...) {
     }
   
     remotes <- lapply(url, git_remote, subdir = subdir, ref = ref,
-      credentials = credentials, git = match.arg(git))
+      credentials = credentials, git = "auto")
   
     install_remotes(remotes, credentials = credentials,
                     dependencies = dependencies,
@@ -2681,10 +2683,11 @@ function(...) {
       # set suppressWarnings in git2r 0.23.0+
       res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
   
-      # This needs to be master, not HEAD because no ref is called HEAD
-      ref <- remote$ref %||% "master"
+      ref <- remote$ref %||% "HEAD"
   
-      found <- grep(pattern = paste0("/", ref), x = names(res))
+      if(ref != "HEAD") ref <- paste0("/",ref)
+  
+      found <- grep(pattern = paste0(ref,"$"), x = names(res))
   
       # If none found, it is either a SHA, so return the pinned sha or NA
       if (length(found) == 0) {
@@ -2786,7 +2789,7 @@ function(...) {
   #'   (see below); if both is specified, the values in `repo` take
   #'   precedence.
   #' @param ref Desired git reference. Could be a commit, tag, or branch
-  #'   name, or a call to [github_pull()]. Defaults to `"master"`.
+  #'   name, or a call to [github_pull()]. Defaults to `"HEAD"`.
   #' @param subdir subdirectory within repo that contains the R package.
   #' @param auth_token To install from a private repo, generate a personal
   #'   access token (PAT) in "https://github.com/settings/tokens" and
@@ -2821,7 +2824,7 @@ function(...) {
   #'
   #' }
   install_github <- function(repo,
-                             ref = "master",
+                             ref = "HEAD",
                              subdir = NULL,
                              auth_token = github_pat(quiet),
                              host = "api.github.com",
@@ -2852,7 +2855,7 @@ function(...) {
       ...)
   }
   
-  github_remote <- function(repo, ref = "master", subdir = NULL,
+  github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                          auth_token = github_pat(), sha = NULL,
                          host = "api.github.com", ...) {
   
@@ -2937,7 +2940,7 @@ function(...) {
   
   #' @export
   github_resolve_ref.NULL <- function(x, params, ...) {
-    params$ref <- "master"
+    params$ref <- "HEAD"
     params
   }
   
@@ -3093,7 +3096,7 @@ function(...) {
                          host = "gitlab.com", ...) {
   
     meta <- parse_git_repo(repo)
-    meta$ref <- meta$ref %||% "master"
+    meta$ref <- meta$ref %||% "HEAD"
   
     remote("gitlab",
       host = host,
@@ -3182,7 +3185,7 @@ function(...) {
     "GitLab"
   }
   
-  gitlab_commit <- function(username, repo, ref = "master",
+  gitlab_commit <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
     url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
@@ -3211,7 +3214,7 @@ function(...) {
     return(NULL)
   }
   
-  gitlab_project_id <- function(username, repo, ref = "master",
+  gitlab_project_id <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
     url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
@@ -3812,7 +3815,7 @@ function(...) {
   #' @family package installation
   #' @examples
   #' \dontrun{
-  #' install_url("https://github.com/hadley/stringr/archive/master.zip")
+  #' install_url("https://github.com/hadley/stringr/archive/HEAD.zip")
   #' }
   
   install_url <- function(url, subdir = NULL,
@@ -4256,7 +4259,7 @@ function(...) {
   # jsonlite package.
   #
   # The canonical location of this file is in the remotes package:
-  # https://github.com/r-lib/remotes/blob/master/R/json.R
+  # https://github.com/r-lib/remotes/blob/HEAD/R/json.R
   #
   # API:
   # parse(text)

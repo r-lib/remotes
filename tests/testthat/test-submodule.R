@@ -101,11 +101,11 @@ test_that("Can install a repo with a submodule", {
 '[submodule "foo"]
 	path = R
 	url = file://%s
-	branch = master
+	branch = HEAD
 [submodule "bar"]
 	path = bar
 	url = file://%s
-	branch = master',
+	branch = HEAD',
       URLencode(dir),
       URLencode(dir)
     )

@@ -6,7 +6,7 @@
 \usage{
 install_bitbucket(
   repo,
-  ref = "master",
+  ref = "HEAD",
   subdir = NULL,
   auth_user = bitbucket_user(),
   password = bitbucket_password(),
@@ -32,7 +32,7 @@ specify \code{subdir} and/or \code{ref} using the respective parameters
 precedence.}
 
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
-Defaults to master.}
+Defaults to HEAD.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 

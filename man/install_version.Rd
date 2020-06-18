@@ -64,7 +64,9 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 since the previous install.}
 
 \item{quiet}{
-    logical: if true, reduce the amount of output.
+    logical: if true, reduce the amount of output.  This is \emph{not}
+    passed to \code{\link[utils]{available.packages}()} in case that is called, on
+    purpose.
   }
 
 \item{build}{If \code{TRUE} build the package before installing.}

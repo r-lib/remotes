@@ -41,7 +41,7 @@ Because GitHub is the most commonly used unofficial package distribution in R, i
 Remotes: r-lib/testthat
 ```
 
-You can also specify a specific hash, tag, or pull request (using the same syntax as `install_github()` if you want a particular commit. Otherwise the latest commit on the master branch is used.
+You can also specify a specific hash, tag, or pull request (using the same syntax as `install_github()` if you want a particular commit. Otherwise the latest commit on the default branch is used via a call to the HEAD commit.
 
 ```yaml
 Remotes: r-lib/httr@v0.4,
@@ -83,7 +83,7 @@ Remotes: bioc::3.3/SummarizedExperiment#117513, bioc::release/Biobase
 Remotes: svn::https://github.com/tidyverse/stringr
 
 # URL
-Remotes: url::https://github.com/tidyverse/stringr/archive/master.zip
+Remotes: url::https://github.com/tidyverse/stringr/archive/HEAD.zip
 
 # Local
 Remotes: local::/pkgs/testthat
