@@ -7,11 +7,11 @@
 
 <!-- badges: start -->
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Linux Build Status](https://travis-ci.org/r-lib/remotes.svg)](https://travis-ci.org/r-lib/remotes)
+[![Linux Build Status](https://travis-ci.org/r-lib/remotes.svg?branch=master)](https://travis-ci.org/r-lib/remotes)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-lib/remotes?svg=true)](https://ci.appveyor.com/project/gaborcsardi/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
-[![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/main.svg)](https://codecov.io/github/r-lib/remotes)
+[![Coverage Status](https://img.shields.io/codecov/c/github/r-lib/remotes/master.svg)](https://codecov.io/github/r-lib/remotes?branch=master)
 <!-- badges: end -->
 
 Download and install R packages stored in GitHub, GitLab, Bitbucket, 

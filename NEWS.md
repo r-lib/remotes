@@ -1,7 +1,10 @@
 # remotes (development version)
 
-* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
-* The upgrade menu is now interruptible in RStudio (#489)
+* `install_*()` family of functions defaults to the `default` branch, 
+  not the `master` branch (@MyKo101,#508).
+* Another fix for the mixed binary and source dependency issue, it 
+  should hopefully be fully squashed now (#296).
+* The upgrade menu is now interruptible in RStudio (#489).
 
 # remotes 2.1.1
 
