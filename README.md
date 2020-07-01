@@ -52,7 +52,7 @@ install.packages("remotes")
 Note that most of the examples here use GitHub. See below for other
 supported repository types.
 
-To install the latest version of a package in the `default` branch from
+To install the latest version of a package in the default branch from
 GitHub, you can use the `user/repo` form. Note that `user` can also be
 an organization:
 

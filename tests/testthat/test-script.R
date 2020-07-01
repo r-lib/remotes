@@ -61,4 +61,3 @@ test_that("install-github.R script does not load any package", {
 
   expect_equal(pkgs[[1]], pkgs[[2]])
 })
-

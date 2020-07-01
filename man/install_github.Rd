@@ -31,7 +31,10 @@ specify \code{subdir} and/or \code{ref} using the respective parameters
 precedence.}
 
 \item{ref}{Desired git reference. Could be a commit, tag, or branch
-name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{"HEAD"}.}
+name, or a call to \code{\link[=github_pull]{github_pull()}}. Defaults to \code{"HEAD"}, which
+means the default branch on GitHub and for git remotes. See
+\href{https://help.github.com/en/github/administering-a-repository/setting-the-default-branch}{here}
+for more details.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 

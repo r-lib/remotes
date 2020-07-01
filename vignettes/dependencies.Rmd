@@ -41,7 +41,7 @@ Because GitHub is the most commonly used unofficial package distribution in R, i
 Remotes: r-lib/testthat
 ```
 
-You can also specify a specific hash, tag, or pull request (using the same syntax as `install_github()` if you want a particular commit. Otherwise the latest commit on the default branch is used via a call to the HEAD commit.
+You can also specify a specific hash, tag, or pull request (using the same syntax as `install_github()` if you want a particular commit. Otherwise the latest commit on the default branch is used.
 
 ```yaml
 Remotes: r-lib/httr@v0.4,

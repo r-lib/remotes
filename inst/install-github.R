@@ -2789,7 +2789,10 @@ function(...) {
   #'   (see below); if both is specified, the values in `repo` take
   #'   precedence.
   #' @param ref Desired git reference. Could be a commit, tag, or branch
-  #'   name, or a call to [github_pull()]. Defaults to `"HEAD"`.
+  #'   name, or a call to [github_pull()]. Defaults to `"HEAD"`, which
+  #'   means the default branch on GitHub and for git remotes. See
+  #'   [here](https://help.github.com/en/github/administering-a-repository/setting-the-default-branch)
+  #'   for more details.
   #' @param subdir subdirectory within repo that contains the R package.
   #' @param auth_token To install from a private repo, generate a personal
   #'   access token (PAT) in "https://github.com/settings/tokens" and
@@ -4684,8 +4687,7 @@ function(...) {
     if (length(branch) > 0 && !is.na(branch)) {
       args <- c(args, "--branch", branch)
     }
-    #args <- c(args,paste0("'",url,"'"),paste0("'", path,"'"))
-    args <- c(args,url,path)
+    args <- c(args, url, path)
   
     git(paste0(args, collapse = " "), quiet = quiet)
   }

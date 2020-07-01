@@ -149,7 +149,7 @@ test_that("Can update a submodule with an empty .gitmodules submodule", {
 
   sub <- tempfile()
   dir.create(sub)
-  on.exit(unlink(sub,recursive=TRUE,force=TRUE),add=TRUE)
+  on.exit(unlink(sub, recursive=TRUE, force=TRUE), add=TRUE)
 
   module <- file.path(sub, ".gitmodules")
 

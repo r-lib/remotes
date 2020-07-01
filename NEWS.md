@@ -1,6 +1,6 @@
 # remotes (development version)
 
-* `install_*()` family of functions defaults to the `default` branch, 
+* `install_*()` family of functions defaults to the default branch, 
   not the `master` branch (@MyKo101,#508).
 * Another fix for the mixed binary and source dependency issue, it 
   should hopefully be fully squashed now (#296).

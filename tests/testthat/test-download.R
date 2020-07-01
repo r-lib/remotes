@@ -298,3 +298,7 @@ test_that("base curl download redirects", {
   resp <- json$parse(readLines(tmp))
   expect_equal(resp$url, "http://httpbin.org/get")
 })
+
+
+
+

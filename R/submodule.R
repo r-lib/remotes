@@ -79,8 +79,7 @@ update_submodule <- function(url, path, branch, quiet) {
   if (length(branch) > 0 && !is.na(branch)) {
     args <- c(args, "--branch", branch)
   }
-  #args <- c(args,paste0("'",url,"'"),paste0("'", path,"'"))
-  args <- c(args,url,path)
+  args <- c(args, url, path)
 
   git(paste0(args, collapse = " "), quiet = quiet)
 }
