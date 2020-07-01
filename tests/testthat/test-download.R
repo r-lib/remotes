@@ -286,6 +286,7 @@ test_that("base curl download redirects", {
   skip_on_cran()
   skip_if_offline()
   skip_without_program("curl")
+  skip("Link is broken ~ Skip until fixed or replaced")
 
   url <- "http://httpbin.org/absolute-redirect/1"
   tmp <- tempfile()
