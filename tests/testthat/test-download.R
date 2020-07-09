@@ -283,6 +283,7 @@ test_that("curl download with basic auth", {
 })
 
 test_that("base curl download redirects", {
+  skip("redirect endpoint not working")
   skip_on_cran()
   skip_if_offline()
   skip_without_program("curl")
