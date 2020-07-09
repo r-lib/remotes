@@ -1,8 +1,8 @@
-pandoc: 2.1.3
-pkgdown: 1.1.0.9000
-pkgdown_sha: 8922bbd8e73ced6900d74eb51832bcfe7376dffc
-articles:
-  dependencies: dependencies.html
+pandoc: 2.7.3
+pkgdown: 1.5.1.9000
+pkgdown_sha: caf7cc74e008e8d0d6e53eeda93cd3cad3545bf2
+articles: []
+last_built: 2020-07-09T20:33Z
 urls:
   reference: https://remotes.r-lib.org/reference
   article: https://remotes.r-lib.org/articles

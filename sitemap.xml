@@ -10,7 +10,13 @@
     <loc>https://remotes.r-lib.org/reference/bioc_install_repos.html</loc>
   </url>
   <url>
+    <loc>https://remotes.r-lib.org/reference/download.html</loc>
+  </url>
+  <url>
     <loc>https://remotes.r-lib.org/reference/download_version.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/reference/git_credentials.html</loc>
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/github_refs.html</loc>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Install a package from a SVN repository — install_svn • remotes</title>
+<title>Download a file — download • remotes</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Install a package from a SVN repository — install_svn" />
-<meta property="og:description" content="This function requires svn to be installed on your system in order to
-be used." />
+<meta property="og:title" content="Download a file — download" />
+<meta property="og:description" content="Uses either the curl package for R versions older than 3.2.0,
+otherwise a wrapper around download.file()." />
 
 
 
@@ -124,138 +124,76 @@ be used." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Install a package from a SVN repository</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-svn.R'><code>R/install-svn.R</code></a></small>
-    <div class="hidden name"><code>install_svn.Rd</code></div>
+    <h1>Download a file</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/download.R'><code>R/download.R</code></a></small>
+    <div class="hidden name"><code>download.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function requires <code class='command'>svn</code> to be installed on your system in order to
-be used.</p>
+    <p>Uses either the curl package for R versions older than 3.2.0,
+otherwise a wrapper around <code><a href='https://rdrr.io/r/utils/download.file.html'>download.file()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_svn</span>(
+    <pre class="usage"><span class='fu'>download</span>(
+  <span class='kw'>path</span>,
   <span class='kw'>url</span>,
-  subdir = <span class='kw'>NULL</span>,
-  args = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(<span class='fl'>0</span>),
-  revision = <span class='kw'>NULL</span>,
-  dependencies = <span class='fl'>NA</span>,
-  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  force = <span class='fl'>FALSE</span>,
-  quiet = <span class='fl'>FALSE</span>,
-  build = <span class='fl'>TRUE</span>,
-  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  build_manual = <span class='fl'>FALSE</span>,
-  build_vignettes = <span class='fl'>FALSE</span>,
-  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  type = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
-  <span class='kw'>...</span>
+  auth_token = <span class='kw'>NULL</span>,
+  basic_auth = <span class='kw'>NULL</span>,
+  quiet = <span class='fl'>TRUE</span>,
+  headers = <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>path</th>
+      <td><p>Path to download to. <code><a href='https://rdrr.io/r/base/basename.html'>dirname(path)</a></code> must exist.</p></td>
+    </tr>
+    <tr>
       <th>url</th>
-      <td><p>Location of package. The url should point to a public or
-private repository.</p></td>
+      <td><p>URL.</p></td>
     </tr>
     <tr>
-      <th>subdir</th>
-      <td><p>A sub-directory within a svn repository that contains the
-package we are interested in installing.</p></td>
+      <th>auth_token</th>
+      <td><p>Token for token-based authentication or <code>NULL</code>.</p></td>
     </tr>
     <tr>
-      <th>args</th>
-      <td><p>A character vector providing extra options to pass on to
-<code class='command'>svn</code>.</p></td>
-    </tr>
-    <tr>
-      <th>revision</th>
-      <td><p>svn revision, if omitted updates to latest</p></td>
-    </tr>
-    <tr>
-      <th>dependencies</th>
-      <td><p>Which dependencies do you want to check?
-Can be a character vector (selecting from "Depends", "Imports",
-"LinkingTo", "Suggests", or "Enhances"), or a logical vector.</p>
-<p><code>TRUE</code> is shorthand for "Depends", "Imports", "LinkingTo" and
-"Suggests". <code>NA</code> is shorthand for "Depends", "Imports" and "LinkingTo"
-and is the default. <code>FALSE</code> is shorthand for no dependencies (i.e.
-just check this package, not its dependencies).</p></td>
-    </tr>
-    <tr>
-      <th>upgrade</th>
-      <td><p>One of "default", "ask", "always", or "never". "default"
-respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
-and falls back to "ask" if unset. "ask" prompts the user for which out of
-date packages to upgrade. For non-interactive sessions "ask" is equivalent
-to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and correspond to
-"always" and "never" respectively.</p></td>
-    </tr>
-    <tr>
-      <th>force</th>
-      <td><p>Force installation, even if the remote state has not changed
-since the previous install.</p></td>
+      <th>basic_auth</th>
+      <td><p>List with <code>user</code> and <code>password</code> for basic HTTP
+authentication, or <code>NULL</code>.</p></td>
     </tr>
     <tr>
       <th>quiet</th>
-      <td><p>If <code>TRUE</code>, suppress output.</p></td>
+      <td><p>Passed to <code><a href='https://rdrr.io/r/utils/download.file.html'>download.file()</a></code> or <code><a href='https://jeroen.cran.dev/curl/reference/curl_download.html'>curl::curl_download()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>build</th>
-      <td><p>If <code>TRUE</code> build the package before installing.</p></td>
-    </tr>
-    <tr>
-      <th>build_opts</th>
-      <td><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code></p></td>
-    </tr>
-    <tr>
-      <th>build_manual</th>
-      <td><p>If <code>FALSE</code>, don't build PDF manual ('--no-manual').</p></td>
-    </tr>
-    <tr>
-      <th>build_vignettes</th>
-      <td><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').
-is <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>repos</th>
-      <td><p>A character vector giving repositories to use.</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>Type of package to <code>update</code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments passed on to <code><a href='https://rdrr.io/r/utils/install.packages.html'>utils::install.packages()</a></code>.</p></td>
+      <th>headers</th>
+      <td><p>Named character vector of HTTP headers to use.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>path</code>, if the download was successful.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>It is vectorised so you can install multiple packages with
-a single command.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>We respect the <code>download.file.method</code> setting of the user. If it is
+not set, then see <code>download_method()</code> for choosing a method.</p>
+<p>Authentication can be supplied three ways:</p><ul>
+<li><p>By setting <code>auth_token</code>. This will append an HTTP <code>Authorization</code>
+header: <code>Authorization: token {auth_token}</code>.</p></li>
+<li><p>By setting <code>basic_auth</code> to a list with elements <code>user</code> and <code>password</code>.
+This will append a proper <code>Authorization: Basic {encoded_password}</code>
+HTTP header.</p></li>
+<li><p>By specifying the proper <code>headers</code> directly.</p></li>
+</ul>
 
-    <div class='dont-index'><p>Other package installation: 
-<code>install_bioc()</code>,
-<code>install_bitbucket()</code>,
-<code>install_cran()</code>,
-<code>install_dev()</code>,
-<code>install_github()</code>,
-<code>install_gitlab()</code>,
-<code>install_git()</code>,
-<code>install_local()</code>,
-<code>install_url()</code>,
-<code>install_version()</code></p></div>
+<p>If both <code>auth_token</code> and <code>basic_auth</code> are specified, that's an error.
+<code>auth_token</code> and <code>basic_auth</code> are <em>appended</em> to <code>headers</code>, so they
+take precedence over an <code>Authorization</code> header that is specified
+directly in <code>headers</code>.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>install_svn</span>(<span class='st'>"https://github.com/hadley/stringr/trunk"</span>)
-<span class='fu'>install_svn</span>(<span class='st'>"https://github.com/hadley/httr/branches/oauth"</span>)
-}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
