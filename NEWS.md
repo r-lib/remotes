@@ -1,24 +1,18 @@
 # remotes (development version)
 
-* `install_*()` family of functions defaults to the default branch, 
-  not the `master` branch (@MyKo101,#508).
-* Another fix for the mixed binary and source dependency issue, it 
-  should hopefully be fully squashed now (#296).
-* The upgrade menu is now interruptible in RStudio (#489).
-* `install_version()` now keeps searching subsequent repositories for the
-  requested version, rather than failing if the version it finds in an early
-  repository is unsuitable. (#305, @kenahoo)
+* `install_*()` family of functions defaults to the default branch, not the `master` branch (@MyKo101,#508).
 
-* `install_version()` now understands specifications like '>= 1.0' or
-  '>= 1.12.0, < 1.14' to install the first version of the package it can
-  find that satisfies the criteria. (#305, @kenahoo)
+* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296).
+
+* The upgrade menu is now interruptible in RStudio (#489).
+
+* `install_version()` now keeps searching subsequent repositories for the requested version, rather than failing if the version it finds in an early repository is unsuitable. (#305, @kenahoo)
+
+* `install_version()` now understands specifications like '>= 1.0' or '>= 1.12.0, < 1.14' to install the first version of the package it can find that satisfies the criteria. (#305, @kenahoo)
 
 * `parse_submodules()` internal regular expression is now PCRE 2 compatible (#502, @jan-glx)
+
 * New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
-
-* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
-
-* The upgrade menu is now interruptible in RStudio (#489)
 
 # remotes 2.1.1
 
