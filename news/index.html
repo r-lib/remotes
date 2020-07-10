@@ -138,8 +138,7 @@
 <li><p><code>install_version()</code> now understands specifications like ‘&gt;= 1.0’ or ‘&gt;= 1.12.0, &lt; 1.14’ to install the first version of the package it can find that satisfies the criteria. (<a href='https://github.com/r-lib/remotes/issues/305'>#305</a>, <a href='https://github.com/kenahoo'>@kenahoo</a>)</p></li>
 <li><p><code>parse_submodules()</code> internal regular expression is now PCRE 2 compatible (<a href='https://github.com/r-lib/remotes/issues/502'>#502</a>, <a href='https://github.com/jan-glx'>@jan-glx</a>)</p></li>
 <li><p>New <code>system_requirements()</code> function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)</p></li>
-<li><p>Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>)</p></li>
-<li><p>The upgrade menu is now interruptible in RStudio (<a href='https://github.com/r-lib/remotes/issues/489'>#489</a>)</p></li>
+<li><p><code>install_version()</code> now avoids use of <code><a href="https://rdrr.io/r/base/connections.html">base::url()</a></code>, as prior to R 3.6.2 it had a bug when downloading large files (<a href='https://github.com/r-lib/remotes/issues/463'>#463</a>)</p></li>
 </ul>
 </div>
     <div id="remotes-211" class="section level1">
