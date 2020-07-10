@@ -9,4 +9,4 @@ Suggests: testthat
 Imports:
   falsy
 Remotes:
-  gaborcsardi/falsy
+  cran/falsy

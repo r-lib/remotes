@@ -283,10 +283,10 @@ test_that("curl download with basic auth", {
 })
 
 test_that("base curl download redirects", {
+  skip("redirect endpoint not working")
   skip_on_cran()
   skip_if_offline()
   skip_without_program("curl")
-  skip("Link is broken ~ Skip until fixed or replaced")
 
   url <- "http://httpbin.org/absolute-redirect/1"
   tmp <- tempfile()
@@ -299,7 +299,3 @@ test_that("base curl download redirects", {
   resp <- json$parse(readLines(tmp))
   expect_equal(resp$url, "http://httpbin.org/get")
 })
-
-
-
-
