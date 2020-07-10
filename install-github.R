@@ -4055,8 +4055,11 @@ function(...) {
     archive <-
       tryCatch(
         {
-          con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
-          on.exit(close(con))
+          tf <- tempfile(fileext = ".gz")
+          on.exit(unlink(tf), add = TRUE)
+          download(tf, sprintf("%s/src/contrib/Meta/archive.rds", repo))
+          con <- gzfile(tf, "rb")
+          on.exit(close(con), add = TRUE)
           readRDS(con)
         },
         warning = function(e) list(),
