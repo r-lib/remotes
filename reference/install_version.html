@@ -73,7 +73,7 @@ archive directories, in order to find specific versions of the requested package
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9001</span>
       </span>
     </div>
 
@@ -202,7 +202,9 @@ since the previous install.</p></td>
     </tr>
     <tr>
       <th>quiet</th>
-      <td><p>logical: if true, reduce the amount of output.</p></td>
+      <td><p>logical: if true, reduce the amount of output.  This is <em>not</em>
+    passed to <code><a href='https://rdrr.io/r/utils/available.packages.html'>available.packages</a>()</code> in case that is called, on
+    purpose.</p></td>
     </tr>
     <tr>
       <th>build</th>
@@ -264,21 +266,20 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 <code>install_local()</code>,
 <code>install_svn()</code>,
 <code>install_url()</code></p></div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Jeremy Stephens and Ken Williams</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>install_version</span>(<span class='st'>'devtools'</span>, <span class='st'>'1.11.0'</span>)
-<span class='fu'>install_version</span>(<span class='st'>'devtools'</span>, <span class='st'>'&gt;= 1.12.0, &lt; 1.14'</span>)
+<span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"1.11.0"</span>)
+<span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"&gt;= 1.12.0, &lt; 1.14"</span>)
 
 <span class='co'>## Specify search order (e.g. in ~/.Rprofile)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(repos=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(prod = <span class='st'>'http://mycompany.example.com/r-repo'</span>,
-                dev  = <span class='st'>'http://mycompany.example.com/r-repo-dev'</span>,
-                CRAN = <span class='st'>'https://cran.revolutionanalytics.com'</span>))
-<span class='fu'>install_version</span>(<span class='st'>'mypackage'</span>, <span class='st'>'1.15'</span>)        <span class='co'># finds in 'prod'</span>
-<span class='fu'>install_version</span>(<span class='st'>'mypackage'</span>, <span class='st'>'1.16-39487'</span>)  <span class='co'># finds in 'dev'</span>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(repos = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  prod = <span class='st'>"http://mycompany.example.com/r-repo"</span>,
+  dev = <span class='st'>"http://mycompany.example.com/r-repo-dev"</span>,
+  CRAN = <span class='st'>"https://cran.revolutionanalytics.com"</span>
+))
+<span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.15"</span>) <span class='co'># finds in 'prod'</span>
+<span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.16-39487"</span>) <span class='co'># finds in 'dev'</span>
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

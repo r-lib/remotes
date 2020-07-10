@@ -73,7 +73,7 @@ packages in a single command." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9001</span>
       </span>
     </div>
 
@@ -136,7 +136,7 @@ packages in a single command.</p>
 
     <pre class="usage"><span class='fu'>install_github</span>(
   <span class='kw'>repo</span>,
-  ref = <span class='st'>"master"</span>,
+  ref = <span class='st'>"HEAD"</span>,
   subdir = <span class='kw'>NULL</span>,
   auth_token = <span class='fu'>github_pat</span>(<span class='kw'>quiet</span>),
   host = <span class='st'>"api.github.com"</span>,
@@ -168,7 +168,9 @@ precedence.</p></td>
       <th>ref</th>
       <td><p>Desired git reference. Could be a commit, tag, or branch
 name, or a call to <code>github_pull()</code> or <code>github_release()</code>. Defaults to
-<code>"master"</code>.</p></td>
+<code>"HEAD"</code>, which means the default branch on GitHub and for git remotes.
+See <a href='https://help.github.com/en/github/administering-a-repository/setting-the-default-branch'>setting-the-default-branch</a>
+for more details.</p></td>
     </tr>
     <tr>
       <th>subdir</th>

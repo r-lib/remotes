@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • remotes</title>
+<title>Query the system requirements for a dev package (and its dependencies) — system_requirements • remotes</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Query the system requirements for a dev package (and its dependencies) — system_requirements" />
+<meta property="og:description" content="Returns a character vector of commands to run that will install system
+requirements for the queried operating system." />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,18 +124,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Query the system requirements for a dev package (and its dependencies)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/system_requirements.R'><code>R/system_requirements.R</code></a></small>
+    <div class="hidden name"><code>system_requirements.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="dependencies.html">Dependency resolution for R package development</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Returns a character vector of commands to run that will install system
+requirements for the queried operating system.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>system_requirements</span>(<span class='kw'>os</span>, <span class='kw'>os_release</span>, path = <span class='st'>"."</span>, curl = <span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"curl"</span>))</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>os, os_release</th>
+      <td><p>The operating system and operating system release version, see
+<a href='https://github.com/rstudio/r-system-requirements#operating-systems'>https://github.com/rstudio/r-system-requirements#operating-systems</a> for the
+list of supported operating systems.</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>The path to the dev package's root directory.</p></td>
+    </tr>
+    <tr>
+      <th>curl</th>
+      <td><p>The location of the curl binary on your system.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A character vector of commands needed to install the system requirements for the package.</p>
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
