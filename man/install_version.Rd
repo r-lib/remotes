@@ -64,7 +64,9 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 since the previous install.}
 
 \item{quiet}{
-    logical: if true, reduce the amount of output.
+    logical: if true, reduce the amount of output.  This is \emph{not}
+    passed to \code{\link[utils]{available.packages}()} in case that is called, on
+    purpose.
   }
 
 \item{build}{If \code{TRUE} build the package before installing.}
@@ -109,15 +111,17 @@ can check if you do by running \code{devtools::has_devel} (you need the \code{de
 }
 \examples{
 \dontrun{
-install_version('devtools', '1.11.0')
-install_version('devtools', '>= 1.12.0, < 1.14')
+install_version("devtools", "1.11.0")
+install_version("devtools", ">= 1.12.0, < 1.14")
 
 ## Specify search order (e.g. in ~/.Rprofile)
-options(repos=c(prod = 'http://mycompany.example.com/r-repo',
-                dev  = 'http://mycompany.example.com/r-repo-dev',
-                CRAN = 'https://cran.revolutionanalytics.com'))
-install_version('mypackage', '1.15')        # finds in 'prod'
-install_version('mypackage', '1.16-39487')  # finds in 'dev'
+options(repos = c(
+  prod = "http://mycompany.example.com/r-repo",
+  dev = "http://mycompany.example.com/r-repo-dev",
+  CRAN = "https://cran.revolutionanalytics.com"
+))
+install_version("mypackage", "1.15") # finds in 'prod'
+install_version("mypackage", "1.16-39487") # finds in 'dev'
 }
 }
 \seealso{
@@ -132,8 +136,5 @@ Other package installation:
 \code{\link{install_local}()},
 \code{\link{install_svn}()},
 \code{\link{install_url}()}
-}
-\author{
-Jeremy Stephens and Ken Williams
 }
 \concept{package installation}
