@@ -137,9 +137,9 @@ test_that("download_version_url for multiple repositories", {
 
   # download_version_url() is the workhorse function for install_version().
 
-  repos <- c("Prod" = "http://example.com/repo-prod/",
-             "Dev"  = "http://example.com/repo-dev/",
-             "CRAN" = "http://cran.rstudio.example.com/")
+  repos <- c("Prod" = "http://example.com/repo-prod",
+             "Dev"  = "http://example.com/repo-dev",
+             "CRAN" = "http://cran.rstudio.example.com")
 
   available <-
   '
