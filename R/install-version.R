@@ -219,7 +219,7 @@ download_version_url <- function(package, version, repos, type, available, verbo
     for (i in rev(seq_len(nrow(info)))) {
       package_path <- row.names(info)[i]
       if (version_satisfies_criteria(version_from_tarball(package_path), version)) {
-        return(paste(repo, "src/contrib/Archive/", package_path, sep = ""))
+        return(file.path(repo, "src", "contrib", "Archive", package_path))
       }
     }
   }
