@@ -23,18 +23,19 @@
 #' @param ... Other arguments passed on to [utils::install.packages()].
 #' @inheritParams utils::install.packages
 #' @inheritParams install_github
-#' @author Jeremy Stephens and Ken Williams
 #' @examples
 #' \dontrun{
-#' install_version('devtools', '1.11.0')
-#' install_version('devtools', '>= 1.12.0, < 1.14')
+#' install_version("devtools", "1.11.0")
+#' install_version("devtools", ">= 1.12.0, < 1.14")
 #'
 #' ## Specify search order (e.g. in ~/.Rprofile)
-#' options(repos=c(prod = 'http://mycompany.example.com/r-repo',
-#'                 dev  = 'http://mycompany.example.com/r-repo-dev',
-#'                 CRAN = 'https://cran.revolutionanalytics.com'))
-#' install_version('mypackage', '1.15')        # finds in 'prod'
-#' install_version('mypackage', '1.16-39487')  # finds in 'dev'
+#' options(repos = c(
+#'   prod = "http://mycompany.example.com/r-repo",
+#'   dev = "http://mycompany.example.com/r-repo-dev",
+#'   CRAN = "https://cran.revolutionanalytics.com"
+#' ))
+#' install_version("mypackage", "1.15") # finds in 'prod'
+#' install_version("mypackage", "1.16-39487") # finds in 'dev'
 #' }
 #' @importFrom utils available.packages contrib.url install.packages
 
@@ -50,9 +51,12 @@ install_version <- function(package, version = NULL,
                             ...) {
 
   # TODO would it make sense to vectorize this, e.g. `install_version(c("foo", "bar"), c("1.1", "2.2"))`?
-  if (length(package) < 1) return()
-  if (length(package) > 1)
+  if (length(package) < 1) {
+    return()
+  }
+  if (length(package) > 1) {
     stop("install_version() must be called with a single 'package' argument - multiple packages given")
+  }
 
   if (!identical(type, "source")) {
     stop("`type` must be 'source' for `install_version()`", call. = FALSE)
@@ -60,24 +64,26 @@ install_version <- function(package, version = NULL,
 
   url <- download_version_url(package, version, repos, type)
   res <- install_url(url,
-              dependencies = dependencies,
-              upgrade = upgrade,
-              force = force,
-              quiet = quiet,
-              build = build,
-              build_opts = build_opts,
-              build_manual = build_manual,
-              build_vignettes = build_vignettes,
-              repos = repos,
-              type = type,
-              ...)
+    dependencies = dependencies,
+    upgrade = upgrade,
+    force = force,
+    quiet = quiet,
+    build = build,
+    build_opts = build_opts,
+    build_manual = build_manual,
+    build_vignettes = build_vignettes,
+    repos = repos,
+    type = type,
+    ...
+  )
 
   lib <- list(...)$lib %||% .libPaths()
 
   # Remove Metadata from installed package
   add_metadata(
     system.file(package = package, lib.loc = lib),
-    list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL))
+    list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL)
+  )
 
   invisible(res)
 }
@@ -95,8 +101,11 @@ version_from_tarball <- function(tarball_name) {
 version_satisfies_criteria <- function(to_check, criteria) {
   to_check <- package_version(to_check)
   result <- apply(version_criteria(criteria), 1, function(r) {
-    if(is.na(r['compare'])) TRUE
-    else get(r['compare'], mode='function')(to_check, r['version'])
+    if (is.na(r["compare"])) {
+      TRUE
+    } else {
+      get(r["compare"], mode = "function")(to_check, r["version"])
+    }
   })
   all(result)
 }
@@ -120,36 +129,43 @@ package_installed <- function(pkg, criteria) {
 #' \end{itemize}
 #' @return `data.frame` with columns `compare` and `version` expressing the criteria
 version_criteria <- function(criteria) {
-  if (is.character(criteria) && length(criteria) == 1)
-    criteria <- strsplit(criteria, ',')[[1]]
+  if (is.character(criteria) && length(criteria) == 1) {
+    criteria <- strsplit(criteria, ",")[[1]]
+  }
 
   numeric_ver <- .standard_regexps()$valid_numeric_version
 
-  package <- "p"  # dummy package name, required by parse_deps()
+  package <- "p" # dummy package name, required by parse_deps()
 
-  spec <- if(is.null(criteria) || is.na(criteria)) package else
+  spec <- if (is.null(criteria) || is.na(criteria)) {
+    package
+  } else {
     ifelse(grepl(paste0("^", numeric_ver, "$"), criteria),
-           paste0(package, "(== ", criteria, ")"),
-           paste0(package, "(", criteria, ")"))
+      paste0(package, "(== ", criteria, ")"),
+      paste0(package, "(", criteria, ")")
+    )
+  }
 
-  parse_deps(paste(spec, collapse=", "))[c("compare", "version")]
+  parse_deps(paste(spec, collapse = ", "))[c("compare", "version")]
 }
 
 # Find a given package record in the `archive.rds` file of a repository
-package_find_archives <- function(package, repo, verbose=FALSE) {
-
-  if (verbose)
+package_find_archives <- function(package, repo, verbose = FALSE) {
+  if (verbose) {
     message("Trying ", repo)
+  }
 
   # TODO it would be nice to cache these downloaded files like `available.packages` does
   archive <-
-    tryCatch({
-      con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
-      on.exit(close(con))
-      readRDS(con)
-    },
-    warning = function(e) list(),
-    error = function(e) list())
+    tryCatch(
+      {
+        con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
+        on.exit(close(con))
+        readRDS(con)
+      },
+      warning = function(e) list(),
+      error = function(e) list()
+    )
 
   info <- archive[[package]]
   if (!is.null(info)) {
@@ -174,12 +190,11 @@ package_find_archives <- function(package, repo, verbose=FALSE) {
 download_version <- function(package, version = NULL,
                              repos = getOption("repos"),
                              type = getOption("pkgType"), ...) {
-
   url <- download_version_url(package, version, repos, type)
   download(path = tempfile(), url = url)
 }
 
-download_version_url <- function(package, version, repos, type, available, verbose=length(repos) > 1) {
+download_version_url <- function(package, version, repos, type, available, verbose = length(repos) > 1) {
 
   ## TODO should we do for(r in repos) { for (t in c('published','archive')) {...}}, or
   ## for (t in c('published','archive')) { for(r in repos) {...}} ? Right now it's the latter.  It
@@ -210,9 +225,10 @@ download_version_url <- function(package, version, repos, type, available, verbo
   }
 
   for (repo in repos) {
-    info <- package_find_archives(package, repo, verbose=verbose)
-    if (is.null(info))
+    info <- package_find_archives(package, repo, verbose = verbose)
+    if (is.null(info)) {
       next
+    }
 
     package_exists <- TRUE
 
@@ -224,8 +240,9 @@ download_version_url <- function(package, version, repos, type, available, verbo
     }
   }
 
-  if (!package_exists)
+  if (!package_exists) {
     stop(sprintf("couldn't find package '%s'", package))
+  }
 
   stop(sprintf("version '%s' is invalid for package '%s'", version, package))
 }
