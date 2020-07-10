@@ -4633,7 +4633,7 @@ function(...) {
     # Extract name = value
     # The variable names are case-insensitive, allow only alphanumeric characters
     # and -, and must start with an alphabetic character.
-    variable_name <- "[[:alpha:]][[:alnum:]-]*"
+    variable_name <- "[[:alpha:]][[:alnum:]\\-]*"
     mapping_values <- re_match(
       x,
       sprintf('^[[:space:]]*(?<name>%s)[[:space:]]*=[[:space:]]*(?<value>.*)[[:space:]]*$', variable_name),
