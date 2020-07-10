@@ -21,7 +21,7 @@ test_that("github_resolve_ref.NULL", {
 
   expect_equal(
     github_resolve_ref(NULL, list()),
-    list(ref = "master")
+    list(ref = "HEAD")
   )
 })
 
@@ -103,7 +103,7 @@ test_that("install_github", {
   expect_equal(remote$host, "api.github.com")
   expect_equal(remote$username, "cran")
   expect_equal(remote$repo, "falsy")
-  expect_equal(remote$ref, "master")
+  expect_equal(remote$ref, "HEAD")
   expect_equal(remote$subdir, NULL)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
@@ -135,7 +135,7 @@ test_that("remote_download.github_remote messages", {
         host = "api.github.com",
         username = "cran",
         repo = "falsy",
-        ref = "master"
+        ref = "HEAD"
       )
     ),
     "Downloading GitHub repo"

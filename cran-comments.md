@@ -10,5 +10,5 @@
 ## Downstream dependencies
 
 I ran `R CMD check` on all 16 reverse dependencies
-(https://github.com/r-lib/remotes/tree/master/revdep) there were no regressions
+(https://github.com/r-lib/remotes/tree/HEAD/revdep) there were no regressions
 detected.

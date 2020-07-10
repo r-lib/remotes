@@ -30,7 +30,7 @@ Indeed most of the code was copied over from `devtools`.
   * Install specific package versions from CRAN.
 * Supports [Bioconductor](https://bioconductor.org/) packages.
 * Supports the `Remotes` field in `DESCRIPTION`. See more in the
-  [dependencies](https://github.com/r-lib/remotes/blob/master/vignettes/dependencies.Rmd) vignette.
+  [dependencies](https://github.com/r-lib/remotes/blob/HEAD/vignettes/dependencies.Rmd) vignette.
 * Supports the `Additional_repositories` field in `DESCRIPTION`.
 * Can install itself from GitHub (see below).
 * Does not depend on other R packages.
@@ -51,7 +51,7 @@ install.packages("remotes")
 Note that most of the examples here use GitHub. See below for other
 supported repository types.
 
-To install the latest version of a package in the `master` branch from
+To install the latest version of a package in the default branch from
 GitHub, you can use the `user/repo` form. Note that `user` can also be
 an organization:
 

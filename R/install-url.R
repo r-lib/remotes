@@ -14,7 +14,7 @@
 #' @family package installation
 #' @examples
 #' \dontrun{
-#' install_url("https://github.com/hadley/stringr/archive/master.zip")
+#' install_url("https://github.com/hadley/stringr/archive/HEAD.zip")
 #' }
 
 install_url <- function(url, subdir = NULL,

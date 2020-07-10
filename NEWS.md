@@ -1,5 +1,10 @@
 # remotes (development version)
 
+* `install_*()` family of functions defaults to the default branch, 
+  not the `master` branch (@MyKo101,#508).
+* Another fix for the mixed binary and source dependency issue, it 
+  should hopefully be fully squashed now (#296).
+* The upgrade menu is now interruptible in RStudio (#489).
 * `install_version()` now keeps searching subsequent repositories for the
   requested version, rather than failing if the version it finds in an early
   repository is unsuitable. (#305, @kenahoo)
