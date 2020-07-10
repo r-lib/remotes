@@ -14,6 +14,8 @@
 
 * New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
 
+* `install_version()` now avoids use of `base::url()`, as prior to R 3.6.2 it had a bug when downloading large files (#463)
+
 # remotes 2.1.1
 
 ## Minor improvements and fixes
