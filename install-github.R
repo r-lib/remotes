@@ -72,7 +72,8 @@ function(...) {
   #'
   #' \section{NEWS:}
   #' * 2019-05-30 First version in remotes.
-  #'
+  #' * 2020-03-22 get_matching_bioc_version() is now correct if the current
+  #'              R version is not in the builtin mapping.
   #'
   #' @name bioconductor
   #' @keywords internal
@@ -208,10 +209,24 @@ function(...) {
       if (minor %in% names(builtin_map)) return(builtin_map[[minor]])
   
       # If we are not in the map, then we need to look this up in
-      # YAML data.
+      # YAML data. It is possible that the current R version matches multiple
+      # Bioc versions. Then we choose the latest released version. If none
+      # of them were released (e.g. they are 'devel' and 'future'), then
+      # we'll use the 'devel' version.
   
       map <- get_version_map(forget = forget)
-      mine <- match(package_version(minor), map$r_version)
+      mine <- which(package_version(minor) == map$r_version)
+      if (length(mine) == 0) {
+        mine <- NA
+      } else if (length(mine) > 1) {
+        if ("release" %in% map$bioc_status[mine]) {
+          mine <- mine["release" == map$bioc_status[mine]]
+        } else if ("devel" %in% map$bioc_status[mine]) {
+          mine <- mine["devel" == map$bioc_status[mine]]
+        } else {
+          mine <- rev(mine)[1]
+        }
+      }
       if (!is.na(mine)) return(map$bioc_version[mine])
   
       # If it is not even in the YAML, then it must be some very old
@@ -917,10 +932,9 @@ function(...) {
       rec_flat <- character()
     }
   
-    # We need to put the recursive dependencies _before_ the top dependencies and
-    # input packages, to ensure that any dependencies are installed before
-    # their parents are loaded.
-    unique(c(rec_flat, top_flat, if (include_pkgs) packages))
+    # We need to return these in reverse order, so that the packages furthest
+    # down in the tree are installed first.
+    unique(rev(c(if (include_pkgs) packages, top_flat, rec_flat)))
   }
   
   #' Standardise dependencies using the same logical as [install.packages]
@@ -1177,8 +1191,7 @@ function(...) {
     fop <- format(op)
     cat("", fop, "", sep = "\n")
     repeat {
-      cat(msg, "\n", sep = "")
-      answer <- readLines(n = 1)
+      answer <- readline(msg)
       answer <- strsplit(answer, "[ ,]+")[[1]]
       if (all(answer %in% seq_along(choices))) {
         return(choices[as.integer(answer)])
@@ -1673,7 +1686,7 @@ function(...) {
     }
   }
   
-  github_commit <- function(username, repo, ref = "master",
+  github_commit <- function(username, repo, ref = "HEAD",
     host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl"), current_sha = NULL) {
   
     url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
@@ -1753,7 +1766,7 @@ function(...) {
     identical(Sys.getenv("TRAVIS", "false"), "true")
   }
   
-  github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
+  github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "api.github.com", ...,
     use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
   
     if (!is.null(subdir)) {
@@ -1902,7 +1915,7 @@ function(...) {
   #' @examples
   #' \dontrun{
   #' install_bioc("SummarizedExperiment")
-  #' install_bioc("release/SummarizedExperiment")
+  #' install_bioc("devel/SummarizedExperiment")
   #' install_bioc("3.3/SummarizedExperiment")
   #' install_bioc("SummarizedExperiment#abc123")
   #' install_bioc("user:password@release/SummarizedExperiment")
@@ -2138,12 +2151,14 @@ function(...) {
       if (release == "release") {
         release <- bioconductor_release()
       }
+      cat("\nrelease is extracted as ",release,"\n")
       switch(
         tolower(release),
-        devel = "master",
+        devel = "HEAD",
         paste0("RELEASE_",  gsub("\\.", "_", release))
       )
     }
+  
   }
   
   bioconductor_release <- function() {
@@ -2193,8 +2208,13 @@ function(...) {
   #' @param password your password. Defaults to the `BITBUCKET_PASSWORD`
   #'   environment variable. See details for further information on setting
   #'   up a password.
+  #' @param repo Repository address in the format
+  #'   `username/repo[/subdir][@@ref]`. Alternatively, you can
+  #'   specify `subdir` and/or `ref` using the respective parameters
+  #'   (see below); if both are specified, the values in `repo` take
+  #'   precedence.
   #' @param ref Desired git reference; could be a commit, tag, or branch name.
-  #'   Defaults to master.
+  #'   Defaults to HEAD.
   #' @seealso Bitbucket API docs:
   #'   <https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html>
   #'
@@ -2227,7 +2247,7 @@ function(...) {
   #' install_bitbucket("sulab/mygene.r@@default")
   #' install_bitbucket("djnavarro/lsr")
   #' }
-  install_bitbucket <- function(repo, ref = "master", subdir = NULL,
+  install_bitbucket <- function(repo, ref = "HEAD", subdir = NULL,
                                 auth_user = bitbucket_user(), password = bitbucket_password(),
                                 host = "api.bitbucket.org/2.0",
                                 dependencies = NA,
@@ -2257,7 +2277,7 @@ function(...) {
                     ...)
   }
   
-  bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
+  bitbucket_remote <- function(repo, ref = "HEAD", subdir = NULL,
                                auth_user = bitbucket_user(), password = bitbucket_password(),
                                sha = NULL, host = "api.bitbucket.org/2.0", ...) {
   
@@ -2329,7 +2349,7 @@ function(...) {
     "Bitbucket"
   }
   
-  bitbucket_commit <- function(username, repo, ref = "master",
+  bitbucket_commit <- function(username, repo, ref = "HEAD",
     host = "api.bitbucket.org/2.0", auth = NULL) {
   
     url <- build_url(host, "repositories", username, repo, "commit", ref)
@@ -2340,7 +2360,7 @@ function(...) {
     json$parse_file(tmp)
   }
   
-  bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
+  bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
   
     url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
   
@@ -2362,7 +2382,7 @@ function(...) {
   }
   
   
-  bitbucket_download_url <- function(username, repo, ref = "master",
+  bitbucket_download_url <- function(username, repo, ref = "HEAD",
     host = "api.bitbucket.org/2.0", auth = NULL) {
   
     url <- build_url(host, "repositories", username, repo)
@@ -2704,10 +2724,11 @@ function(...) {
       # set suppressWarnings in git2r 0.23.0+
       res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
   
-      # This needs to be master, not HEAD because no ref is called HEAD
-      ref <- remote$ref %||% "master"
+      ref <- remote$ref %||% "HEAD"
   
-      found <- grep(pattern = paste0("/", ref), x = names(res))
+      if(ref != "HEAD") ref <- paste0("/",ref)
+  
+      found <- grep(pattern = paste0(ref,"$"), x = names(res))
   
       # If none found, it is either a SHA, so return the pinned sha or NA
       if (length(found) == 0) {
@@ -2804,12 +2825,15 @@ function(...) {
   #' packages in a single command.
   #'
   #' @param repo Repository address in the format
-  #'   `username/repo[/subdir][@@ref|#pull]`. Alternatively, you can
+  #'   `username/repo[/subdir][@@ref|#pull|@@*release]`. Alternatively, you can
   #'   specify `subdir` and/or `ref` using the respective parameters
-  #'   (see below); if both is specified, the values in `repo` take
+  #'   (see below); if both are specified, the values in `repo` take
   #'   precedence.
   #' @param ref Desired git reference. Could be a commit, tag, or branch
-  #'   name, or a call to [github_pull()]. Defaults to `"master"`.
+  #'   name, or a call to [github_pull()] or [github_release()]. Defaults to
+  #'   `"HEAD"`, which means the default branch on GitHub and for git remotes.
+  #'   See [setting-the-default-branch](https://help.github.com/en/github/administering-a-repository/setting-the-default-branch)
+  #'   for more details.
   #' @param subdir subdirectory within repo that contains the R package.
   #' @param auth_token To install from a private repo, generate a personal
   #'   access token (PAT) in "https://github.com/settings/tokens" and
@@ -2834,7 +2858,7 @@ function(...) {
   #' install_github("wch/ggplot2")
   #' install_github(c("rstudio/httpuv", "rstudio/shiny"))
   #' install_github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
-  #'   "mfrasca/r-logging/pkg"))
+  #'   "r-lib/roxygen2@@*release", "mfrasca/r-logging/pkg"))
   #'
   #' # To install from a private repo, use auth_token with a token
   #' # from https://github.com/settings/tokens. You only need the
@@ -2844,7 +2868,7 @@ function(...) {
   #'
   #' }
   install_github <- function(repo,
-                             ref = "master",
+                             ref = "HEAD",
                              subdir = NULL,
                              auth_token = github_pat(quiet),
                              host = "api.github.com",
@@ -2875,7 +2899,7 @@ function(...) {
       ...)
   }
   
-  github_remote <- function(repo, ref = "master", subdir = NULL,
+  github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                          auth_token = github_pat(), sha = NULL,
                          host = "api.github.com", ...) {
   
@@ -2960,7 +2984,7 @@ function(...) {
   
   #' @export
   github_resolve_ref.NULL <- function(x, params, ...) {
-    params$ref <- "master"
+    params$ref <- "HEAD"
     params
   }
   
@@ -3116,7 +3140,7 @@ function(...) {
                          host = "gitlab.com", ...) {
   
     meta <- parse_git_repo(repo)
-    meta$ref <- meta$ref %||% "master"
+    meta$ref <- meta$ref %||% "HEAD"
   
     remote("gitlab",
       host = host,
@@ -3205,7 +3229,7 @@ function(...) {
     "GitLab"
   }
   
-  gitlab_commit <- function(username, repo, ref = "master",
+  gitlab_commit <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
     url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
@@ -3234,7 +3258,7 @@ function(...) {
     return(NULL)
   }
   
-  gitlab_project_id <- function(username, repo, ref = "master",
+  gitlab_project_id <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
     url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
@@ -3835,7 +3859,7 @@ function(...) {
   #' @family package installation
   #' @examples
   #' \dontrun{
-  #' install_url("https://github.com/hadley/stringr/archive/master.zip")
+  #' install_url("https://github.com/hadley/stringr/archive/HEAD.zip")
   #' }
   
   install_url <- function(url, subdir = NULL,
@@ -3908,24 +3932,44 @@ function(...) {
   }
   # Contents of R/install-version.R
   
-  #' Install specified version of a CRAN package.
+  #' Install specific version of a package.
   #'
-  #' If you are installing an package that contains compiled code, you will
-  #' need to have an R development environment installed.  You can check
-  #' if you do by running `devtools::has_devel` (you need the
-  #' `devtools` package for this).
+  #' This function knows how to look in multiple CRAN-like package repositories, and in their
+  #' \code{archive} directories, in order to find specific versions of the requested package.
+  #'
+  #' The repositories are searched in the order specified by the \code{repos} argument.  This enables
+  #' teams to maintain multiple in-house repositories with different policies - for instance, one repo
+  #' for development snapshots and one for official releases.  A common setup would be to first search
+  #' the official release repo, then the dev snapshot repo, then a public CRAN mirror.
+  #'
+  #' Older versions of packages on CRAN are usually only available in source form.  If your requested
+  #' package contains compiled code, you will need to have an R development environment installed. You
+  #' can check if you do by running `devtools::has_devel` (you need the `devtools` package for this).
   #'
   #' @export
   #' @family package installation
-  #' @param package package name
-  #' @param version If the specified version is NULL or the same as the most
-  #'   recent version of the package, this function simply calls
-  #'   [utils::install.packages()]. Otherwise, it looks at the list of
-  #'   archived source tarballs and tries to install an older version instead.
+  #' @param package Name of the package to install.
+  #' @param version Version of the package to install.  Can either be a string giving the exact
+  #'   version required, or a specification in the same format as the parenthesized expressions used
+  #'   in package dependencies (see \code{\link{parse_deps}} and/or
+  #'   \url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies}).
   #' @param ... Other arguments passed on to [utils::install.packages()].
   #' @inheritParams utils::install.packages
   #' @inheritParams install_github
-  #' @author Jeremy Stephens
+  #' @examples
+  #' \dontrun{
+  #' install_version("devtools", "1.11.0")
+  #' install_version("devtools", ">= 1.12.0, < 1.14")
+  #'
+  #' ## Specify search order (e.g. in ~/.Rprofile)
+  #' options(repos = c(
+  #'   prod = "http://mycompany.example.com/r-repo",
+  #'   dev = "http://mycompany.example.com/r-repo-dev",
+  #'   CRAN = "https://cran.revolutionanalytics.com"
+  #' ))
+  #' install_version("mypackage", "1.15") # finds in 'prod'
+  #' install_version("mypackage", "1.16-39487") # finds in 'dev'
+  #' }
   #' @importFrom utils available.packages contrib.url install.packages
   
   install_version <- function(package, version = NULL,
@@ -3939,56 +3983,130 @@ function(...) {
                               type = "source",
                               ...) {
   
+    # TODO would it make sense to vectorize this, e.g. `install_version(c("foo", "bar"), c("1.1", "2.2"))`?
+    if (length(package) < 1) {
+      return()
+    }
+    if (length(package) > 1) {
+      stop("install_version() must be called with a single 'package' argument - multiple packages given")
+    }
+  
     if (!identical(type, "source")) {
       stop("`type` must be 'source' for `install_version()`", call. = FALSE)
     }
   
     url <- download_version_url(package, version, repos, type)
     res <- install_url(url,
-                dependencies = dependencies,
-                upgrade = upgrade,
-                force = force,
-                quiet = quiet,
-                build = build,
-                build_opts = build_opts,
-                build_manual = build_manual,
-                build_vignettes = build_vignettes,
-                repos = repos,
-                type = type,
-                ...)
+      dependencies = dependencies,
+      upgrade = upgrade,
+      force = force,
+      quiet = quiet,
+      build = build,
+      build_opts = build_opts,
+      build_manual = build_manual,
+      build_vignettes = build_vignettes,
+      repos = repos,
+      type = type,
+      ...
+    )
   
     lib <- list(...)$lib %||% .libPaths()
   
     # Remove Metadata from installed package
     add_metadata(
       system.file(package = package, lib.loc = lib),
-      list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL))
+      list(RemoteType = NULL, RemoteUrl = NULL, RemoteSubdir = NULL)
+    )
   
     invisible(res)
   }
   
-  package_find_repo <- function(package, repos) {
-    for (repo in repos) {
-      if (length(repos) > 1)
-        message("Trying ", repo)
+  #' @param tarball_name character vector of files or paths from which to extract version numbers
+  #' @return versions extracted, or `NULL` when extraction fails
+  version_from_tarball <- function(tarball_name) {
+    package_ver_regex <- paste0(".+_(", .standard_regexps()$valid_package_version, ")\\.tar\\.gz$")
+    ifelse(grepl(package_ver_regex, tarball_name), sub(package_ver_regex, "\\1", tarball_name), NULL)
+  }
   
-      archive <-
-        tryCatch({
+  #' @param to_check version as a string or `package_version` object
+  #' @inheritParams version_criteria
+  #' @return TRUE if version 'to.check' satisfies all version criteria 'criteria'
+  version_satisfies_criteria <- function(to_check, criteria) {
+    to_check <- package_version(to_check)
+    result <- apply(version_criteria(criteria), 1, function(r) {
+      if (is.na(r["compare"])) {
+        TRUE
+      } else {
+        get(r["compare"], mode = "function")(to_check, r["version"])
+      }
+    })
+    all(result)
+  }
+  
+  #' @param pkg package name
+  #' @inheritParams version_criteria
+  #' @return TRUE if `pkg` is already installed, and its version satisfies all criteria `criteria`
+  package_installed <- function(pkg, criteria) {
+    v <- suppressWarnings(packageDescription(pkg, fields = "Version"))
+    !is.na(v) && version_satisfies_criteria(v, criteria)
+  }
+  
+  #' @param criteria character vector expressing criteria for some version to satisfy.  Options include:
+  #' \begin{itemize}
+  #'   \item `NULL` or `NA`, indicating that the package must be present, but need not satisfy any
+  #'   particular version
+  #'   \item An exact version required, as a string, e.g. `"0.1.13"`
+  #'   \item A comparison operator and a version, e.g. `">= 0.1.12"`
+  #'   \item Several criteria to satisfy, as a comma-separated string, e.g. `">= 1.12.0, < 1.14"`
+  #'   \item Several criteria to satisfy, as elements of a character vector, e.g. `c(">= 1.12.0", "< 1.14")`
+  #' \end{itemize}
+  #' @return `data.frame` with columns `compare` and `version` expressing the criteria
+  version_criteria <- function(criteria) {
+    if (is.character(criteria) && length(criteria) == 1) {
+      criteria <- strsplit(criteria, ",")[[1]]
+    }
+  
+    numeric_ver <- .standard_regexps()$valid_numeric_version
+  
+    package <- "p" # dummy package name, required by parse_deps()
+  
+    spec <- if (is.null(criteria) || is.na(criteria)) {
+      package
+    } else {
+      ifelse(grepl(paste0("^", numeric_ver, "$"), criteria),
+        paste0(package, "(== ", criteria, ")"),
+        paste0(package, "(", criteria, ")")
+      )
+    }
+  
+    parse_deps(paste(spec, collapse = ", "))[c("compare", "version")]
+  }
+  
+  # Find a given package record in the `archive.rds` file of a repository
+  package_find_archives <- function(package, repo, verbose = FALSE) {
+    if (verbose) {
+      message("Trying ", repo)
+    }
+  
+    # TODO it would be nice to cache these downloaded files like `available.packages` does
+    archive <-
+      tryCatch(
+        {
           con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
           on.exit(close(con))
           readRDS(con)
         },
         warning = function(e) list(),
-        error = function(e) list())
+        error = function(e) list()
+      )
   
-      info <- archive[[package]]
-      if (!is.null(info)) {
-        info$repo <- repo
-        return(info)
-      }
+    info <- archive[[package]]
+    if (!is.null(info)) {
+      info$repo <- repo
+      return(info)
     }
   
-    stop(sprintf("couldn't find package '%s'", package))
+    NULL
   }
   
   
@@ -4005,46 +4123,61 @@ function(...) {
   download_version <- function(package, version = NULL,
                                repos = getOption("repos"),
                                type = getOption("pkgType"), ...) {
-  
     url <- download_version_url(package, version, repos, type)
     download(path = tempfile(), url = url)
   }
   
-  download_version_url <- function(package, version, repos, type) {
+  download_version_url <- function(package, version, repos, type, available, verbose = length(repos) > 1) {
   
-    contriburl <- contrib.url(repos, type)
-    available <- available.packages(contriburl)
+    ## TODO should we do for(r in repos) { for (t in c('published','archive')) {...}}, or
+    ## for (t in c('published','archive')) { for(r in repos) {...}} ? Right now it's the latter.  It
+    ## only matters if required version is satisfied by both an early repo in archive/ and a late repo
   
-    if (package %in% row.names(available)) {
-      current.version <- available[package, 'Version']
-      if (is.null(version) || version == current.version) {
-        row <- available[which(rownames(available) == package)[1], ]
+    if (missing(available)) {
+      contriburl <- contrib.url(repos, type)
+      available <- available.packages(contriburl, filters = c("R_version", "OS_type", "subarch"))
+    }
+  
+    package_exists <- FALSE
+  
+    # available.packages() returns a matrix with entries in the same order as the repositories in
+    # `repos`, so the first packages we encounter should be preferred.
+    for (ix in which(available[, "Package"] == package)) {
+      package_exists <- TRUE
+      row <- available[ix, ]
+      if (version_satisfies_criteria(row["Version"], version)) {
         return(paste0(
-          row[["Repository"]],
+          row["Repository"],
           "/",
-          row[["Package"]],
+          row["Package"],
           "_",
-          row[["Version"]],
+          row["Version"],
           ".tar.gz"
         ))
       }
     }
   
-    info <- package_find_repo(package, repos)
+    for (repo in repos) {
+      info <- package_find_archives(package, repo, verbose = verbose)
+      if (is.null(info)) {
+        next
+      }
   
-    if (is.null(version)) {
-      # Grab the latest one: only happens if pulled from CRAN
-      package.path <- row.names(info)[nrow(info)]
-    } else {
-      package.path <- paste(package, "/", package, "_", version, ".tar.gz",
-        sep = "")
-      if (!(package.path %in% row.names(info))) {
-        stop(sprintf("version '%s' is invalid for package '%s'", version,
-          package))
+      package_exists <- TRUE
+  
+      for (i in rev(seq_len(nrow(info)))) {
+        package_path <- row.names(info)[i]
+        if (version_satisfies_criteria(version_from_tarball(package_path), version)) {
+          return(file.path(repo, "src", "contrib", "Archive", package_path))
+        }
       }
     }
   
-    paste(info$repo[1L], "/src/contrib/Archive/", package.path, sep = "")
+    if (!package_exists) {
+      stop(sprintf("couldn't find package '%s'", package))
+    }
+  
+    stop(sprintf("version '%s' is invalid for package '%s'", version, package))
   }
   # Contents of R/install.R
   install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual, build_vignettes,
@@ -4258,6 +4391,7 @@ function(...) {
       build_manual = build_manual,
       build_vignettes = build_vignettes,
       type = type,
+      repos = repos,
       ...
     )
   }
@@ -4279,7 +4413,7 @@ function(...) {
   # jsonlite package.
   #
   # The canonical location of this file is in the remotes package:
-  # https://github.com/r-lib/remotes/blob/master/R/json.R
+  # https://github.com/r-lib/remotes/blob/HEAD/R/json.R
   #
   # API:
   # parse(text)
@@ -4650,7 +4784,7 @@ function(...) {
     # Extract name = value
     # The variable names are case-insensitive, allow only alphanumeric characters
     # and -, and must start with an alphabetic character.
-    variable_name <- "[[:alpha:]][[:alnum:]-]*"
+    variable_name <- "[[:alpha:]][[:alnum:]\\-]*"
     mapping_values <- re_match(
       x,
       sprintf('^[[:space:]]*(?<name>%s)[[:space:]]*=[[:space:]]*(?<value>.*)[[:space:]]*$', variable_name),
@@ -4789,6 +4923,79 @@ function(...) {
   
   read_char <- function(path, ...) {
     readChar(path, nchars = file.info(path)$size, ...)
+  }
+  # Contents of R/system_requirements.R
+  DEFAULT_RSPM_REPO_ID <-  "1" # cran
+  DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
+  
+  #' Query the system requirements for a dev package (and its dependencies)
+  #'
+  #' Returns a character vector of commands to run that will install system
+  #' requirements for the queried operating system.
+  #'
+  #' @param os,os_release The operating system and operating system release version, see
+  #'   <https://github.com/rstudio/r-system-requirements#operating-systems> for the
+  #'   list of supported operating systems.
+  #' @param path The path to the dev package's root directory.
+  #' @param curl The location of the curl binary on your system.
+  #' @return A character vector of commands needed to install the system requirements for the package.
+  #' @export
+  system_requirements <- function(os, os_release, path = ".", curl = Sys.which("curl")) {
+    os_versions <- supported_os_versions()
+  
+    os <- match.arg(os, names(os_versions))
+  
+    os_release <- match.arg(os_release, os_versions[[os]])
+  
+    if (!nzchar(curl)) {
+      stop("`curl` must be on the `PATH`.", call. = FALSE)
+    }
+  
+    rspm <- Sys.getenv("RSPM_ROOT", DEFAULT_RSPM)
+    rspm_repo_id <- Sys.getenv("RSPM_REPO_ID", DEFAULT_RSPM_REPO_ID)
+    rspm_repo_url <- sprintf("%s/__api__/repos/%s", rspm, rspm_repo_id)
+  
+    desc_file <- normalizePath(file.path(path, "DESCRIPTION"), mustWork = FALSE)
+    if (!file.exists(desc_file)) {
+      stop("`", path, "` must contain a package.", call. = FALSE)
+    }
+  
+    res <- system2(
+      curl,
+      args = c(
+        "--silent",
+        "--data-binary",
+        shQuote(paste0("@", desc_file)),
+        shQuote(sprintf("%s/sysreqs?distribution=%s&release=%s&suggests=true",
+            rspm_repo_url,
+            os,
+            os_release)
+          )
+        ),
+      stdout = TRUE
+    )
+  
+    res <- json$parse(res)
+  
+    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["dependencies"]], `[[`, "pre_install"))))
+  
+    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["dependencies"]], `[[`, "install_scripts"))))
+  
+    as.character(c(pre_install, install_scripts))
+  }
+  
+  # Adapted from https://github.com/rstudio/r-system-requirements/blob/master/systems.json
+  # OSs commented out are not currently supported by the API
+  supported_os_versions <- function() {
+    list(
+      #"debian" = c("8", "9"),
+      "ubuntu" = c("14.04", "16.04", "18.04", "20.04"),
+      "centos" = c("6", "7", "8"),
+      "redhat" = c("6", "7", "8"),
+      "opensuse" = c("42.3", "15.0"),
+      "sle" = c("12.3", "15.0")
+      #"windows" = c("")
+    )
   }
   # Contents of R/utils.R
   

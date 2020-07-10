@@ -81,7 +81,7 @@ test_that("JSON parser, real examples", {
       "email": "h.wickham@gmail.com",
       "date": "2015-03-30T13:55:18Z"
     },
-    "message": "Merge pull request #22 from paulstaab/master\\n\\nImprove error message for assertions of length 0",
+    "message": "Merge pull request #22 from paulstaab/HEAD\\n\\nImprove error message for assertions of length 0",
     "tree": {
       "sha": "f2e840b7a134fbc118597842992aa50048e0fa04",
       "url": "https://api.github.com/repos/hadley/assertthat/git/trees/f2e840b7a134fbc118597842992aa50048e0fa04"
@@ -102,7 +102,7 @@ test_that("JSON parser, real examples", {
         name = "Hadley Wickham",
         email = "h.wickham@gmail.com",
         date = "2015-03-30T13:55:18Z"),
-      message = "Merge pull request #22 from paulstaab/master\\n\\nImprove error message for assertions of length 0",
+      message = "Merge pull request #22 from paulstaab/HEAD\\n\\nImprove error message for assertions of length 0",
       tree = list(
         sha = "f2e840b7a134fbc118597842992aa50048e0fa04",
         url = "https://api.github.com/repos/hadley/assertthat/git/trees/f2e840b7a134fbc118597842992aa50048e0fa04"

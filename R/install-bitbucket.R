@@ -12,8 +12,13 @@
 #' @param password your password. Defaults to the `BITBUCKET_PASSWORD`
 #'   environment variable. See details for further information on setting
 #'   up a password.
+#' @param repo Repository address in the format
+#'   `username/repo[/subdir][@@ref]`. Alternatively, you can
+#'   specify `subdir` and/or `ref` using the respective parameters
+#'   (see below); if both are specified, the values in `repo` take
+#'   precedence.
 #' @param ref Desired git reference; could be a commit, tag, or branch name.
-#'   Defaults to master.
+#'   Defaults to HEAD.
 #' @seealso Bitbucket API docs:
 #'   <https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html>
 #'
@@ -46,7 +51,7 @@
 #' install_bitbucket("sulab/mygene.r@@default")
 #' install_bitbucket("djnavarro/lsr")
 #' }
-install_bitbucket <- function(repo, ref = "master", subdir = NULL,
+install_bitbucket <- function(repo, ref = "HEAD", subdir = NULL,
                               auth_user = bitbucket_user(), password = bitbucket_password(),
                               host = "api.bitbucket.org/2.0",
                               dependencies = NA,
@@ -76,7 +81,7 @@ install_bitbucket <- function(repo, ref = "master", subdir = NULL,
                   ...)
 }
 
-bitbucket_remote <- function(repo, ref = "master", subdir = NULL,
+bitbucket_remote <- function(repo, ref = "HEAD", subdir = NULL,
                              auth_user = bitbucket_user(), password = bitbucket_password(),
                              sha = NULL, host = "api.bitbucket.org/2.0", ...) {
 
@@ -148,7 +153,7 @@ format.bitbucket_remote <- function(x, ...) {
   "Bitbucket"
 }
 
-bitbucket_commit <- function(username, repo, ref = "master",
+bitbucket_commit <- function(username, repo, ref = "HEAD",
   host = "api.bitbucket.org/2.0", auth = NULL) {
 
   url <- build_url(host, "repositories", username, repo, "commit", ref)
@@ -159,7 +164,7 @@ bitbucket_commit <- function(username, repo, ref = "master",
   json$parse_file(tmp)
 }
 
-bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
+bitbucket_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "https://api.bitbucket.org/2.0", auth = NULL,...) {
 
   url <- build_url(host, "repositories", username, repo, "src", ref, subdir, "DESCRIPTION")
 
@@ -181,7 +186,7 @@ basic_auth <- function(x) {
 }
 
 
-bitbucket_download_url <- function(username, repo, ref = "master",
+bitbucket_download_url <- function(username, repo, ref = "HEAD",
   host = "api.bitbucket.org/2.0", auth = NULL) {
 
   url <- build_url(host, "repositories", username, repo)

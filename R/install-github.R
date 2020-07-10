@@ -4,12 +4,15 @@
 #' packages in a single command.
 #'
 #' @param repo Repository address in the format
-#'   `username/repo[/subdir][@@ref|#pull]`. Alternatively, you can
+#'   `username/repo[/subdir][@@ref|#pull|@@*release]`. Alternatively, you can
 #'   specify `subdir` and/or `ref` using the respective parameters
-#'   (see below); if both is specified, the values in `repo` take
+#'   (see below); if both are specified, the values in `repo` take
 #'   precedence.
 #' @param ref Desired git reference. Could be a commit, tag, or branch
-#'   name, or a call to [github_pull()]. Defaults to `"master"`.
+#'   name, or a call to [github_pull()] or [github_release()]. Defaults to
+#'   `"HEAD"`, which means the default branch on GitHub and for git remotes.
+#'   See [setting-the-default-branch](https://help.github.com/en/github/administering-a-repository/setting-the-default-branch)
+#'   for more details.
 #' @param subdir subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
 #'   access token (PAT) in "https://github.com/settings/tokens" and
@@ -34,7 +37,7 @@
 #' install_github("wch/ggplot2")
 #' install_github(c("rstudio/httpuv", "rstudio/shiny"))
 #' install_github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
-#'   "mfrasca/r-logging/pkg"))
+#'   "r-lib/roxygen2@@*release", "mfrasca/r-logging/pkg"))
 #'
 #' # To install from a private repo, use auth_token with a token
 #' # from https://github.com/settings/tokens. You only need the
@@ -44,7 +47,7 @@
 #'
 #' }
 install_github <- function(repo,
-                           ref = "master",
+                           ref = "HEAD",
                            subdir = NULL,
                            auth_token = github_pat(quiet),
                            host = "api.github.com",
@@ -75,7 +78,7 @@ install_github <- function(repo,
     ...)
 }
 
-github_remote <- function(repo, ref = "master", subdir = NULL,
+github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
                        host = "api.github.com", ...) {
 
@@ -160,7 +163,7 @@ github_resolve_ref.default <- function(x, params, ...) {
 
 #' @export
 github_resolve_ref.NULL <- function(x, params, ...) {
-  params$ref <- "master"
+  params$ref <- "HEAD"
   params
 }
 

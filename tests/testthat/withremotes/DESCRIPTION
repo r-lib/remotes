@@ -9,6 +9,6 @@ Suggests: testthat
 Imports:
   falsy
 Remotes:
-  gaborcsardi/falsy
-Config/coverage: covr
-Config/pkgdown: r-lib/pkgdown, tidyverse/tidytemplate
+  cran/falsy
+Config/Needs/coverage: covr
+Config/Needs/pkgdown: r-lib/pkgdown, tidyverse/tidytemplate

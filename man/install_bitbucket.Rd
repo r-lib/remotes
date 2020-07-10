@@ -6,7 +6,7 @@
 \usage{
 install_bitbucket(
   repo,
-  ref = "master",
+  ref = "HEAD",
   subdir = NULL,
   auth_user = bitbucket_user(),
   password = bitbucket_password(),
@@ -26,13 +26,13 @@ install_bitbucket(
 }
 \arguments{
 \item{repo}{Repository address in the format
-\verb{username/repo[/subdir][@ref|#pull]}. Alternatively, you can
+\verb{username/repo[/subdir][@ref]}. Alternatively, you can
 specify \code{subdir} and/or \code{ref} using the respective parameters
-(see below); if both is specified, the values in \code{repo} take
+(see below); if both are specified, the values in \code{repo} take
 precedence.}
 
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
-Defaults to master.}
+Defaults to HEAD.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 

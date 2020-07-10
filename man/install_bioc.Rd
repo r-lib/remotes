@@ -94,7 +94,7 @@ install the release version of a Bioconductor package one can use the
 \examples{
 \dontrun{
 install_bioc("SummarizedExperiment")
-install_bioc("release/SummarizedExperiment")
+install_bioc("devel/SummarizedExperiment")
 install_bioc("3.3/SummarizedExperiment")
 install_bioc("SummarizedExperiment#abc123")
 install_bioc("user:password@release/SummarizedExperiment")

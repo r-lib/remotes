@@ -400,10 +400,9 @@ find_deps <- function(packages, available = available_packages(),
     rec_flat <- character()
   }
 
-  # We need to put the recursive dependencies _before_ the top dependencies and
-  # input packages, to ensure that any dependencies are installed before
-  # their parents are loaded.
-  unique(c(rec_flat, top_flat, if (include_pkgs) packages))
+  # We need to return these in reverse order, so that the packages furthest
+  # down in the tree are installed first.
+  unique(rev(c(if (include_pkgs) packages, top_flat, rec_flat)))
 }
 
 #' Standardise dependencies using the same logical as [install.packages]
@@ -660,8 +659,7 @@ select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers,
   fop <- format(op)
   cat("", fop, "", sep = "\n")
   repeat {
-    cat(msg, "\n", sep = "")
-    answer <- readLines(n = 1)
+    answer <- readline(msg)
     answer <- strsplit(answer, "[ ,]+")[[1]]
     if (all(answer %in% seq_along(choices))) {
       return(choices[as.integer(answer)])

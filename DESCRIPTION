@@ -1,6 +1,6 @@
 Package: remotes
 Title: R Package Installation from Remote Repositories, Including 'GitHub'
-Version: 2.1.1.9000
+Version: 2.1.1.9001
 Authors@R: c(
     person("Jim", "Hester", , "jim.hester@rstudio.com", role = c("aut", "cre")),
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut")),
@@ -41,7 +41,7 @@ Suggests:
 Depends:
     R (>= 3.0.0)
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 SystemRequirements: Subversion for install_svn, git for install_git
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
