@@ -182,6 +182,8 @@
 <li><p>remotes now uses locking by default when installing binary packages, which avoids issues when installing binaries that are already open in other R processes (<a href='https://github.com/r-lib/remotes/issues/368'>#368</a>)</p></li>
 <li><p><code>update_deps()</code> no longer fails if a local package no longer exists (<a href='https://github.com/r-lib/remotes/issues/289'>#289</a>)</p></li>
 <li><p><code>install_version()</code> now errors with a more informative message when <code>type</code> is not ‘source’ (<a href='https://github.com/r-lib/remotes/issues/323'>#323</a>)</p></li>
+<li><p><code>install_version()</code> now keeps searching subsequent repositories for the requested version, rather than failing if the version it finds in an early repository is unsuitable.</p></li>
+<li><p><code>install_version()</code> now understands specifications like ‘&gt;= 1.0’ or ‘&gt;= 1.12.0, &lt; 1.14’ to install the first version of the package it can find that satisfies the criteria.</p></li>
 <li><p>Bioc <code>remote_sha()</code> now always returns a character result (<a href='https://github.com/r-lib/remotes/issues/379'>#379</a>)</p></li>
 <li><p>Fix API call for private repositories in <code>install_gitlab</code> (<a href='https://github.com/aornugent'>@aornugent</a>, <a href='https://github.com/r-lib/remotes/issues/359'>#359</a>, <a href='https://github.com/r-lib/remotes/issues/363'>#363</a>)</p></li>
 <li><p>git submodules now work if the submodule file is empty (<a href='https://github.com/muschellij2'>@muschellij2</a>, <a href='https://github.com/r-lib/remotes/issues/234'>#234</a>)</p></li>

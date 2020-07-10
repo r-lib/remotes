@@ -147,14 +147,14 @@ returns the name of the file.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>package</th>
-      <td><p>package name</p></td>
+      <td><p>Name of the package to install.</p></td>
     </tr>
     <tr>
       <th>version</th>
-      <td><p>If the specified version is NULL or the same as the most
-recent version of the package, this function simply calls
-<code><a href='https://rdrr.io/r/utils/install.packages.html'>utils::install.packages()</a></code>. Otherwise, it looks at the list of
-archived source tarballs and tries to install an older version instead.</p></td>
+      <td><p>Version of the package to install.  Can either be a string giving the exact
+version required, or a specification in the same format as the parenthesized expressions used
+in package dependencies (see <code>parse_deps</code> and/or
+<a href='https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies'>https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies</a>).</p></td>
     </tr>
     <tr>
       <th>repos</th>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Install specified version of a CRAN package. — install_version • remotes</title>
+<title>Install specific version of a package. — install_version • remotes</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,9 @@
 
 
 
-<meta property="og:title" content="Install specified version of a CRAN package. — install_version" />
-<meta property="og:description" content="If you are installing an package that contains compiled code, you will
-need to have an R development environment installed.  You can check
-if you do by running devtools::has_devel (you need the
-devtools package for this)." />
+<meta property="og:title" content="Install specific version of a package. — install_version" />
+<meta property="og:description" content="This function knows how to look in multiple CRAN-like package repositories, and in their
+archive directories, in order to find specific versions of the requested package." />
 
 
 
@@ -126,16 +124,14 @@ devtools package for this)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Install specified version of a CRAN package.</h1>
+    <h1>Install specific version of a package.</h1>
     <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-version.R'><code>R/install-version.R</code></a></small>
     <div class="hidden name"><code>install_version.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>If you are installing an package that contains compiled code, you will
-need to have an R development environment installed.  You can check
-if you do by running <code>devtools::has_devel</code> (you need the
-<code>devtools</code> package for this).</p>
+    <p>This function knows how to look in multiple CRAN-like package repositories, and in their
+<code>archive</code> directories, in order to find specific versions of the requested package.</p>
     </div>
 
     <pre class="usage"><span class='fu'>install_version</span>(
@@ -159,14 +155,14 @@ if you do by running <code>devtools::has_devel</code> (you need the
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>package</th>
-      <td><p>package name</p></td>
+      <td><p>Name of the package to install.</p></td>
     </tr>
     <tr>
       <th>version</th>
-      <td><p>If the specified version is NULL or the same as the most
-recent version of the package, this function simply calls
-<code><a href='https://rdrr.io/r/utils/install.packages.html'>utils::install.packages()</a></code>. Otherwise, it looks at the list of
-archived source tarballs and tries to install an older version instead.</p></td>
+      <td><p>Version of the package to install.  Can either be a string giving the exact
+version required, or a specification in the same format as the parenthesized expressions used
+in package dependencies (see <code>parse_deps</code> and/or
+<a href='https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies'>https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies</a>).</p></td>
     </tr>
     <tr>
       <th>dependencies</th>
@@ -246,6 +242,15 @@ is <code>TRUE</code>.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The repositories are searched in the order specified by the <code>repos</code> argument.  This enables
+teams to maintain multiple in-house repositories with different policies - for instance, one repo
+for development snapshots and one for official releases.  A common setup would be to first search
+the official release repo, then the dev snapshot repo, then a public CRAN mirror.</p>
+<p>Older versions of packages on CRAN are usually only available in source form.  If your requested
+package contains compiled code, you will need to have an R development environment installed. You
+can check if you do by running <code>devtools::has_devel</code> (you need the <code>devtools</code> package for this).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other package installation: 
@@ -261,8 +266,20 @@ is <code>TRUE</code>.</p></td>
 <code>install_url()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p>Jeremy Stephens</p>
+    <p>Jeremy Stephens and Ken Williams</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'>install_version</span>(<span class='st'>'devtools'</span>, <span class='st'>'1.11.0'</span>)
+<span class='fu'>install_version</span>(<span class='st'>'devtools'</span>, <span class='st'>'&gt;= 1.12.0, &lt; 1.14'</span>)
+
+<span class='co'>## Specify search order (e.g. in ~/.Rprofile)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(repos=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(prod = <span class='st'>'http://mycompany.example.com/r-repo'</span>,
+                dev  = <span class='st'>'http://mycompany.example.com/r-repo-dev'</span>,
+                CRAN = <span class='st'>'https://cran.revolutionanalytics.com'</span>))
+<span class='fu'>install_version</span>(<span class='st'>'mypackage'</span>, <span class='st'>'1.15'</span>)        <span class='co'># finds in 'prod'</span>
+<span class='fu'>install_version</span>(<span class='st'>'mypackage'</span>, <span class='st'>'1.16-39487'</span>)  <span class='co'># finds in 'dev'</span>
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
