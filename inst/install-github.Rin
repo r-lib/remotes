@@ -6,6 +6,7 @@ function(...) {
   ## This is the code of the package, put in here by brew
 
 <%
+Sys.setlocale("LC_COLLATE","C")
 lapply(
   sort(list.files("R", full.names = TRUE)),
   function(x) {
