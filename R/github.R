@@ -25,7 +25,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
   }
 }
 
-github_commit <- function(username, repo, ref = "master",
+github_commit <- function(username, repo, ref = "HEAD",
   host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl"), current_sha = NULL) {
 
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
@@ -105,7 +105,7 @@ in_travis <- function() {
   identical(Sys.getenv("TRAVIS", "false"), "true")
 }
 
-github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "master", host = "api.github.com", ...,
+github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host = "api.github.com", ...,
   use_curl = !is_standalone() && pkg_installed("curl"), pat = github_pat()) {
 
   if (!is.null(subdir)) {

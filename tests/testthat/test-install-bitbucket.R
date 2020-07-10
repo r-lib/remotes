@@ -26,14 +26,13 @@ test_that("", {
   expect_equal(remote$host, "api.bitbucket.org/2.0")
   expect_equal(remote$repo, "withr")
   expect_equal(remote$username, "jimhester")
-  expect_equal(remote$ref, "master")
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
 
 test_that("remote_download.bitbucket_remote", {
 
-  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "master",
+  x <- list(username = "csardigabor", repo = "pkgconfig", ref = "HEAD",
     host = "api.bitbucket.org/2.0")
 
   mockery::stub(
@@ -46,7 +45,7 @@ test_that("remote_download.bitbucket_remote", {
 
   expect_message(
     remote_download.bitbucket_remote(x),
-    "Downloading bitbucket repo csardigabor/pkgconfig@master"
+    "Downloading bitbucket repo csardigabor/pkgconfig@HEAD"
   )
 })
 
@@ -89,7 +88,7 @@ test_that("more bitbucket password", {
   x <- list(
     username = "username",
     repo = "repo",
-    ref = "master",
+    ref = "HEAD",
     auth_user = "foo",
     password = "pass",
     host = "api.bitbucket.com/2.0"

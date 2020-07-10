@@ -25,7 +25,7 @@ test_that("install_gitlab", {
   expect_equal(remote$host, "gitlab.com")
   expect_equal(remote$username, "jimhester")
   expect_equal(remote$repo, "falsy")
-  expect_equal(remote$ref, "master")
+  expect_equal(remote$ref, "HEAD")
   expect_equal(remote$subdir, NULL)
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
@@ -93,7 +93,7 @@ test_that("remote_download.gitlab_remote messages", {
         host = "https://gitlab.com",
         username = "jimhester",
         repo = "falsy",
-        ref = "master"
+        ref = "HEAD"
       )
     ),
     "Downloading GitLab repo"
@@ -129,7 +129,7 @@ test_that("gitlab_project_id", {
       username = "jimhester",
       repo = "covr",
       host = "https://gitlab.com",
-      ref = "master"
+      ref = "HEAD"
     ),
     1486846
   )

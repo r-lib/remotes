@@ -6,7 +6,7 @@
 \usage{
 install_github(
   repo,
-  ref = "master",
+  ref = "HEAD",
   subdir = NULL,
   auth_token = github_pat(quiet),
   host = "api.github.com",
@@ -32,7 +32,9 @@ precedence.}
 
 \item{ref}{Desired git reference. Could be a commit, tag, or branch
 name, or a call to \code{\link[=github_pull]{github_pull()}} or \code{\link[=github_release]{github_release()}}. Defaults to
-\code{"master"}.}
+\code{"HEAD"}, which means the default branch on GitHub and for git remotes.
+See \href{https://help.github.com/en/github/administering-a-repository/setting-the-default-branch}{setting-the-default-branch}
+for more details.}
 
 \item{subdir}{subdirectory within repo that contains the R package.}
 

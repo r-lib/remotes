@@ -93,43 +93,47 @@ test_that("Can install a repo with a submodule", {
       "-c", "user.name=foobar", "-c", paste0("user.email=", shQuote("<>")),
       "commit", "-m", shQuote("Initial commit")))
   })
-  module <- file.path("submodule", ".gitmodules")
-  on.exit(unlink(module), add = TRUE)
+
+  sub <- tempfile()
+  dir.create(sub)
+  on.exit(unlink(sub,recursive=TRUE,force=TRUE),add=TRUE)
+
+  module <- file.path(sub, ".gitmodules")
 
   writeLines(con = module,
     sprintf(
 '[submodule "foo"]
 	path = R
 	url = file://%s
-	branch = master
 [submodule "bar"]
 	path = bar
-	url = file://%s
-	branch = master',
+	url = file://%s',
       URLencode(dir),
       URLencode(dir)
     )
   )
 
   # The bar submodule is in .Rbuildignore, so we will not fetch it
-  build_ignore <- file.path("submodule", ".Rbuildignore")
-  on.exit(unlink(build_ignore), add = TRUE)
-
+  build_ignore <- file.path(sub, ".Rbuildignore")
   writeLines("^bar$", build_ignore)
 
-  update_submodules("submodule", NULL, quiet = TRUE)
-  expect_true(dir.exists(file.path("submodule", "R")))
-  expect_false(dir.exists(file.path("submodule", "bar")))
+
+  update_submodules(sub, NULL, quiet = TRUE)
+  expect_true(dir.exists(file.path(sub, "R")))
+  expect_false(dir.exists(file.path(sub, "bar")))
 
   # Now remove the R directory so we can try installing the full package
-  unlink(file.path("submodule", "R"), recursive = TRUE, force = TRUE)
+  unlink(file.path(sub, "R"), recursive = TRUE, force = TRUE)
 
   # Install the package to a temporary library and verify it works
   lib <- tempfile()
   on.exit(unlink(lib, recursive = TRUE, force = TRUE), add = TRUE)
   dir.create(lib)
 
-  install_local("submodule", lib = lib, quiet = TRUE)
+  DESC_file <- file.path(sub,"DESCRIPTION")
+  writeLines("Package: submodule\nVersion: 0.0.0.9000",DESC_file)
+
+  install_local(sub, lib = lib, quiet = TRUE)
   withr::with_libpaths(lib,
     expect_equal(submodule::foo, 1)
   )
@@ -143,19 +147,21 @@ test_that("Can update a submodule with an empty .gitmodules submodule", {
   dir.create(dir)
   on.exit(unlink(dir, recursive = TRUE, force = TRUE))
 
-  module <- file.path("submodule", ".gitmodules")
-  on.exit(unlink(module), add = TRUE)
+  sub <- tempfile()
+  dir.create(sub)
+  on.exit(unlink(sub, recursive=TRUE, force=TRUE), add=TRUE)
+
+  module <- file.path(sub, ".gitmodules")
 
   writeLines(con = module,text = "")
 
   # The bar submodule is in .Rbuildignore, so we will not fetch it
-  build_ignore <- file.path("submodule", ".Rbuildignore")
-  on.exit(unlink(build_ignore), add = TRUE)
+  build_ignore <- file.path(sub, ".Rbuildignore")
 
   writeLines("^bar$", build_ignore)
 
   expect_error(
-    update_submodules("submodule", NULL, quiet = TRUE),
+    update_submodules(sub, NULL, quiet = TRUE),
     NA
   )
 })

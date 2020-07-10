@@ -166,10 +166,11 @@ remote_sha.git2r_remote <- function(remote, ...) {
     # set suppressWarnings in git2r 0.23.0+
     res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
 
-    # This needs to be master, not HEAD because no ref is called HEAD
-    ref <- remote$ref %||% "master"
+    ref <- remote$ref %||% "HEAD"
 
-    found <- grep(pattern = paste0("/", ref), x = names(res))
+    if(ref != "HEAD") ref <- paste0("/",ref)
+
+    found <- grep(pattern = paste0(ref,"$"), x = names(res))
 
     # If none found, it is either a SHA, so return the pinned sha or NA
     if (length(found) == 0) {
