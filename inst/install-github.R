@@ -3951,8 +3951,11 @@ function(...) {
   #' @param package Name of the package to install.
   #' @param version Version of the package to install.  Can either be a string giving the exact
   #'   version required, or a specification in the same format as the parenthesized expressions used
-  #'   in package dependencies (see \code{\link{parse_deps}} and/or
-  #'   \url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies}).
+  #'   in package dependencies. One of the following formats:
+  #'   - An exact version required, as a string, e.g. `"0.1.13"`
+  #'   - A comparison operator and a version, e.g. `">= 0.1.12"`
+  #'   - Several criteria to satisfy, as a comma-separated string, e.g. `">= 1.12.0, < 1.14"`
+  #'   - Several criteria to satisfy, as elements of a character vector, e.g. `c(">= 1.12.0", "< 1.14")`
   #' @param ... Other arguments passed on to [utils::install.packages()].
   #' @inheritParams utils::install.packages
   #' @inheritParams install_github
@@ -4021,16 +4024,11 @@ function(...) {
     invisible(res)
   }
   
-  #' @param tarball_name character vector of files or paths from which to extract version numbers
-  #' @return versions extracted, or `NULL` when extraction fails
   version_from_tarball <- function(tarball_name) {
     package_ver_regex <- paste0(".+_(", .standard_regexps()$valid_package_version, ")\\.tar\\.gz$")
     ifelse(grepl(package_ver_regex, tarball_name), sub(package_ver_regex, "\\1", tarball_name), NULL)
   }
   
-  #' @param to_check version as a string or `package_version` object
-  #' @inheritParams version_criteria
-  #' @return TRUE if version 'to.check' satisfies all version criteria 'criteria'
   version_satisfies_criteria <- function(to_check, criteria) {
     to_check <- package_version(to_check)
     result <- apply(version_criteria(criteria), 1, function(r) {
@@ -4043,24 +4041,11 @@ function(...) {
     all(result)
   }
   
-  #' @param pkg package name
-  #' @inheritParams version_criteria
-  #' @return TRUE if `pkg` is already installed, and its version satisfies all criteria `criteria`
   package_installed <- function(pkg, criteria) {
     v <- suppressWarnings(packageDescription(pkg, fields = "Version"))
     !is.na(v) && version_satisfies_criteria(v, criteria)
   }
   
-  #' @param criteria character vector expressing criteria for some version to satisfy.  Options include:
-  #' \begin{itemize}
-  #'   \item `NULL` or `NA`, indicating that the package must be present, but need not satisfy any
-  #'   particular version
-  #'   \item An exact version required, as a string, e.g. `"0.1.13"`
-  #'   \item A comparison operator and a version, e.g. `">= 0.1.12"`
-  #'   \item Several criteria to satisfy, as a comma-separated string, e.g. `">= 1.12.0, < 1.14"`
-  #'   \item Several criteria to satisfy, as elements of a character vector, e.g. `c(">= 1.12.0", "< 1.14")`
-  #' \end{itemize}
-  #' @return `data.frame` with columns `compare` and `version` expressing the criteria
   version_criteria <- function(criteria) {
     if (is.character(criteria) && length(criteria) == 1) {
       criteria <- strsplit(criteria, ",")[[1]]
@@ -4070,7 +4055,7 @@ function(...) {
   
     package <- "p" # dummy package name, required by parse_deps()
   
-    spec <- if (is.null(criteria) || is.na(criteria)) {
+    spec <- if (is.null(criteria) || (length(criteria) == 1 && is.na(criteria[[1L]]))) {
       package
     } else {
       ifelse(grepl(paste0("^", numeric_ver, "$"), criteria),
@@ -4092,8 +4077,11 @@ function(...) {
     archive <-
       tryCatch(
         {
-          con <- gzcon(url(sprintf("%s/src/contrib/Meta/archive.rds", repo), "rb"))
-          on.exit(close(con))
+          tf <- tempfile(fileext = ".gz")
+          on.exit(unlink(tf), add = TRUE)
+          download(tf, sprintf("%s/src/contrib/Meta/archive.rds", repo))
+          con <- gzfile(tf, "rb")
+          on.exit(close(con), add = TRUE)
           readRDS(con)
         },
         warning = function(e) list(),
