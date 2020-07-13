@@ -153,8 +153,12 @@ returns the name of the file.</p>
       <th>version</th>
       <td><p>Version of the package to install.  Can either be a string giving the exact
 version required, or a specification in the same format as the parenthesized expressions used
-in package dependencies (see <code>parse_deps</code> and/or
-<a href='https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies'>https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies</a>).</p></td>
+in package dependencies. One of the following formats:</p><ul>
+<li><p>An exact version required, as a string, e.g. <code>"0.1.13"</code></p></li>
+<li><p>A comparison operator and a version, e.g. <code>"&gt;= 0.1.12"</code></p></li>
+<li><p>Several criteria to satisfy, as a comma-separated string, e.g. <code>"&gt;= 1.12.0, &lt; 1.14"</code></p></li>
+<li><p>Several criteria to satisfy, as elements of a character vector, e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("&gt;= 1.12.0", "&lt; 1.14")</a></code></p></li>
+</ul></td>
     </tr>
     <tr>
       <th>repos</th>
