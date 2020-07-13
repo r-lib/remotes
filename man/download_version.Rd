@@ -17,8 +17,13 @@ download_version(
 
 \item{version}{Version of the package to install.  Can either be a string giving the exact
 version required, or a specification in the same format as the parenthesized expressions used
-in package dependencies (see \code{\link{parse_deps}} and/or
-\url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-Dependencies}).}
+in package dependencies. One of the following formats:
+\itemize{
+\item An exact version required, as a string, e.g. \code{"0.1.13"}
+\item A comparison operator and a version, e.g. \code{">= 0.1.12"}
+\item Several criteria to satisfy, as a comma-separated string, e.g. \code{">= 1.12.0, < 1.14"}
+\item Several criteria to satisfy, as elements of a character vector, e.g. \code{c(">= 1.12.0", "< 1.14")}
+}}
 
 \item{repos}{
     character vector, the base URL(s) of the repositories
