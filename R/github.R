@@ -64,7 +64,7 @@ github_commit <- function(username, repo, ref = "HEAD",
 #' Retrieve Github personal access token.
 #'
 #' A github personal access token
-#' Looks in env var `GITHUB_PAT`
+#' Looks in env vars `GITHUB_PAT` and (if in CI) `GITHUB_TOKEN`
 #'
 #' @keywords internal
 #' @noRd
@@ -79,6 +79,15 @@ github_pat <- function(quiet = TRUE) {
   }
 
   if (in_ci()) {
+    pat <- Sys.getenv("GITHUB_TOKEN")
+
+    if (nzchar(pat)) {
+      if (!quiet) {
+        message("Using github PAT from envvar GITHUB_TOKEN")
+      }
+      return(pat)
+    }
+
     pat <- paste0(
       "b2b7441d",
       "aeeb010b",

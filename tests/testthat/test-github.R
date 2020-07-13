@@ -2,19 +2,22 @@
 context("GitHub")
 
 test_that("github_pat", {
-  withr::local_envvar(c(GITHUB_PAT="badcafe"))
-
-  expect_equal(github_pat(), "badcafe")
-  expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
+  withr::with_envvar(c(GITHUB_PAT="badcafe"), {
+    expect_equal(github_pat(), "badcafe")
+    expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
+  })
 
   withr::with_envvar(c(GITHUB_PAT=NA, CI=NA), {
-     expect_equal(github_pat(), NULL)
+     expect_null(github_pat())
   })
 
   withr::with_envvar(c(GITHUB_PAT=NA, CI="true"), {
     expect_true(nzchar(github_pat()))
   })
-  expect_true(nzchar(github_pat()))
+
+  withr::with_envvar(c(GITHUB_PAT=NA, GITHUB_TOKEN="cee1", CI="true"), {
+    expect_equal(github_pat(), "cee1")
+  })
 })
 
 test_that("github_commit", {
