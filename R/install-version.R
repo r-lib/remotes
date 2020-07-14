@@ -109,7 +109,7 @@ version_satisfies_criteria <- function(to_check, criteria) {
 }
 
 package_installed <- function(pkg, criteria) {
-  v <- suppressWarnings(packageDescription(pkg, fields = "Version"))
+  v <- suppressWarnings(utils::packageDescription(pkg, fields = "Version"))
   !is.na(v) && version_satisfies_criteria(v, criteria)
 }
 
