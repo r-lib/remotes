@@ -13,7 +13,12 @@ A character vector (selecting from "Depends", "Imports",
 
 \code{TRUE} is shorthand for "Depends", "Imports", "LinkingTo" and
 "Suggests". \code{NA} is shorthand for "Depends", "Imports" and "LinkingTo"
-and is the default. \code{FALSE} is shorthand for no dependencies.}
+and is the default. \code{FALSE} is shorthand for no dependencies.
+
+The value "soft" means the same as \code{TRUE}, "hard" means the same as \code{NA}.
+
+Any additional values that don't match one of the standard dependency
+types are filtered out.}
 }
 \description{
 Standardise dependencies using the same logical as \link{install.packages}
