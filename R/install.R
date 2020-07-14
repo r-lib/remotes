@@ -1,6 +1,5 @@
 install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual, build_vignettes,
                     upgrade, repos, type, ...) {
-
   warn_for_potential_errors()
 
   if (file.exists(file.path(pkgdir, "src"))) {

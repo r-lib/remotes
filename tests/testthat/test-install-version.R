@@ -228,10 +228,10 @@ test_that("version requirement comparisons", {
     expect_false(version_satisfies_criteria("2.1", required))
     expect_false(version_satisfies_criteria("1.5", required))
 
-    mockery::stub(package_installed, "packageDescription", function(...) "2.0")
+    mockery::stub(package_installed, "utils::packageDescription", function(...) "2.0")
     expect_true(package_installed("foo", required))
 
-    mockery::stub(package_installed, "packageDescription", function(...) "1.0")
+    mockery::stub(package_installed, "utils::packageDescription", function(...) "1.0")
     expect_false(package_installed("foo", required))
   }
 

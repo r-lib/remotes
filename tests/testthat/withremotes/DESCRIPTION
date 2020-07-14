@@ -10,3 +10,5 @@ Imports:
   falsy
 Remotes:
   cran/falsy
+Config/Needs/coverage: covr
+Config/Needs/pkgdown: r-lib/pkgdown, tidyverse/tidytemplate

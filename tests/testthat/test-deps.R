@@ -52,7 +52,7 @@ test_that("compare_versions", {
 })
 
 
-test_that("remote_deps", {
+test_that("extra_deps", {
   skip_on_cran()
   skip_if_offline()
   skip_if_over_rate_limit()
@@ -62,7 +62,7 @@ test_that("remote_deps", {
     remotes = "github::hadley/testthat@v2.0.0,klutometis/roxygen@v6.0.1"
   )
 
-  res <- remote_deps(pkg)
+  res <- extra_deps(pkg, "remotes")
 
   expect_equal(res$package, c("testthat", "roxygen2"))
 
@@ -270,59 +270,59 @@ test_that("update.package_deps 3", {
 
 context("Remotes")
 
-test_that("remote_deps returns an empty data frame if no remotes specified", {
+test_that("extra_deps returns an empty data frame if no remotes specified", {
 
   pkg <- list(
     package = "foo"
   )
 
-  expect_equal(remote_deps(pkg), package_deps_new())
+  expect_equal(extra_deps(pkg, "Remotes"), package_deps_new())
 })
 
-test_that("remote_deps works with implicit types", {
+test_that("extra_deps works with implicit types", {
 
   expect_equal(
-    parse_one_remote("hadley/testthat"),
+    parse_one_extra("hadley/testthat"),
     github_remote("hadley/testthat")
   )
 
-  expect_equal(split_remotes("hadley/testthat,klutometis/roxygen"),
+  expect_equal(split_extra_deps("hadley/testthat,klutometis/roxygen"),
       c("hadley/testthat", "klutometis/roxygen"))
 
-  expect_equal(split_remotes("hadley/testthat,\n  klutometis/roxygen"),
+  expect_equal(split_extra_deps("hadley/testthat,\n  klutometis/roxygen"),
     c("hadley/testthat", "klutometis/roxygen"))
 
-  expect_equal(split_remotes("hadley/testthat,\n\t klutometis/roxygen"),
+  expect_equal(split_extra_deps("hadley/testthat,\n\t klutometis/roxygen"),
     c("hadley/testthat", "klutometis/roxygen"))
 })
 
-test_that("split_remotes errors with missing commas", {
-  expect_error(split_remotes("hadley/testthat hadley/ggplot2"), "Missing commas")
-  expect_error(split_remotes("hadley/testthat\n  hadley/ggplot2"), "Missing commas")
-  expect_error(split_remotes("hadley/testthat, hadley/ggplot2, klutometis/roxygen r-lib/devtools"), "Missing commas.*'klutometis")
+test_that("split_extra_deps errors with missing commas", {
+  expect_error(split_extra_deps("hadley/testthat hadley/ggplot2"), "Missing commas")
+  expect_error(split_extra_deps("hadley/testthat\n  hadley/ggplot2"), "Missing commas")
+  expect_error(split_extra_deps("hadley/testthat, hadley/ggplot2, klutometis/roxygen r-lib/devtools"), "Missing commas.*'klutometis")
 })
 
-test_that("parse_one_remote errors", {
-  expect_error(parse_one_remote(""),
+test_that("parse_one_extra errors", {
+  expect_error(parse_one_extra(""),
     "Malformed remote specification ''")
 
-  expect_error(parse_one_remote("git::testthat::blah"),
+  expect_error(parse_one_extra("git::testthat::blah"),
     "Malformed remote specification 'git::testthat::blah'")
-  expect_error(parse_one_remote("hadley::testthat"),
+  expect_error(parse_one_extra("hadley::testthat"),
     "Unknown remote type: hadley")
-  expect_error(parse_one_remote("SVN2::testthat"),
+  expect_error(parse_one_extra("SVN2::testthat"),
     "Unknown remote type: SVN2")
 
   expect_error(
-    parse_one_remote("git::testthat::blah"),
+    parse_one_extra("git::testthat::blah"),
     "Malformed remote specification 'git::testthat::blah'"
   )
   expect_error(
-    parse_one_remote("hadley::testthat"),
+    parse_one_extra("hadley::testthat"),
     "Unknown remote type: hadley"
   )
   expect_error(
-    parse_one_remote("SVN2::testthat"),
+    parse_one_extra("SVN2::testthat"),
     "Unknown remote type: SVN2"
   )
 })
@@ -330,19 +330,19 @@ test_that("parse_one_remote errors", {
 test_that("remotes are parsed with explicit types", {
 
   expect_equal(
-    parse_one_remote("github::hadley/testthat"),
+    parse_one_extra("github::hadley/testthat"),
     github_remote("hadley/testthat"))
 
-  expect_equal(split_remotes("github::hadley/testthat,klutometis/roxygen"),
+  expect_equal(split_extra_deps("github::hadley/testthat,klutometis/roxygen"),
     c("github::hadley/testthat", "klutometis/roxygen"))
 
-  expect_equal(split_remotes("hadley/testthat,github::klutometis/roxygen"),
+  expect_equal(split_extra_deps("hadley/testthat,github::klutometis/roxygen"),
     c("hadley/testthat", "github::klutometis/roxygen"))
 
-  expect_equal(split_remotes("github::hadley/testthat,github::klutometis/roxygen"),
+  expect_equal(split_extra_deps("github::hadley/testthat,github::klutometis/roxygen"),
     c("github::hadley/testthat", "github::klutometis/roxygen"))
 
-  expect_equal(split_remotes("bioc::user:password@release/Biobase#12345,github::klutometis/roxygen"),
+  expect_equal(split_extra_deps("bioc::user:password@release/Biobase#12345,github::klutometis/roxygen"),
     c("bioc::user:password@release/Biobase#12345", "github::klutometis/roxygen"))
 
 })
@@ -518,4 +518,18 @@ test_that("dev_package_deps works with package using remotes", {
   is_testthat <- "testthat" == res$package
   expect_true(any(is_testthat))
   expect_is(res$remote[is_testthat][[1]], "cran_remote")
+})
+
+test_that("dev_package_deps can retrieve custom fields", {
+  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/pkgdown")
+
+  is_pkgdown <- "pkgdown" == res$package
+  expect_true(any(is_pkgdown))
+  expect_is(res$remote[is_pkgdown][[1]], "github_remote")
+
+  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/coverage")
+
+  is_covr <- "covr" == res$package
+  expect_true(any(is_covr))
+  expect_is(res$remote[is_covr][[1]], "cran_remote")
 })

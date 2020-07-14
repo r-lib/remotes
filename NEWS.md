@@ -1,5 +1,10 @@
 # remotes (development version)
 
+* Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing `dependencies = "Config/Needs/website"` will install the dependencies listed in the `Config/Needs/website: ` field in the package's DESCRIPTION.
+  Prefixing fields with `Config/Needs` allows them to pass `R CMD check` without a NOTE, so it is the recommended format.
+
+* New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
+
 * `install_*()` family of functions defaults to the default branch, not the `master` branch (@MyKo101,#508).
 
 * Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296).
@@ -12,7 +17,7 @@
 
 * `parse_submodules()` internal regular expression is now PCRE 2 compatible (#502, @jan-glx)
 
-* New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
+* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
 
 * `install_version()` now avoids use of `base::url()`, as prior to R 3.6.2 it had a bug when downloading large files (#463)
 
