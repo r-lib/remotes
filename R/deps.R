@@ -575,8 +575,9 @@ extra_deps <- function(pkg, field) {
   diff <- installed == available
   diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
   diff[is.na(installed)] <- UNINSTALLED
+  is_cran_remote <- vapply(extra, inherits, logical(1), "cran_remote")
 
-  package_deps_new(package, installed, available, diff, is_cran = FALSE, extra)
+  package_deps_new(package, installed, available, diff, is_cran = is_cran_remote, extra)
 }
 
 

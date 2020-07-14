@@ -1107,8 +1107,9 @@ function(...) {
     diff <- installed == available
     diff <- ifelse(!is.na(diff) & diff, CURRENT, BEHIND)
     diff[is.na(installed)] <- UNINSTALLED
+    is_cran_remote <- vapply(extra, inherits, logical(1), "cran_remote")
   
-    package_deps_new(package, installed, available, diff, is_cran = FALSE, extra)
+    package_deps_new(package, installed, available, diff, is_cran = is_cran_remote, extra)
   }
   
   
@@ -4170,7 +4171,6 @@ function(...) {
   # Contents of R/install.R
   install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual, build_vignettes,
                       upgrade, repos, type, ...) {
-  
     warn_for_potential_errors()
   
     if (file.exists(file.path(pkgdir, "src"))) {
