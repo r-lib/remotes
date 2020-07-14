@@ -521,13 +521,13 @@ test_that("dev_package_deps works with package using remotes", {
 })
 
 test_that("dev_package_deps can retrieve custom fields", {
-  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/pkgdown")
+  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/pkgdown")
 
   is_pkgdown <- "pkgdown" == res$package
   expect_true(any(is_pkgdown))
   expect_is(res$remote[is_pkgdown][[1]], "github_remote")
 
-  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/coverage")
+  res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/coverage")
 
   is_covr <- "covr" == res$package
   expect_true(any(is_covr))
