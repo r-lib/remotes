@@ -78,6 +78,9 @@ install_github <- function(repo,
     ...)
 }
 
+#' @inheritParams install_github
+#' @export
+#' @keywords internal
 github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                        auth_token = github_pat(), sha = NULL,
                        host = "api.github.com", ...) {

@@ -1,5 +1,9 @@
 # remotes (development version)
 
+* Internal functions `remote_download()`, `remote_metadata()`, `remote_package_name()` and `remote_sha()` are now exported, so 3rd party packages could provide methods for new remote types (#509, #56)
+
+* Internal functions `add_metadata()`, `github_remote()` are now exported. They should not be used by most users (#485).
+
 * `update_packages()` no longer has a `force` argument (#521)
 
 * Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing `dependencies = "Config/Needs/website"` will install the dependencies listed in the `Config/Needs/website: ` field in the package's DESCRIPTION.

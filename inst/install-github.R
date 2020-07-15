@@ -1062,8 +1062,7 @@ function(...) {
       # `asNamespace("remotes")` because when used as a script in
       # install-github.R there is no remotes namespace.
   
-      fun <- get(paste0(tolower(type), "_remote"),
-        envir = environment(sys.function()), mode = "function", inherits = FALSE)
+      fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
   
       res <- fun(repo, ...)
       }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
@@ -2898,6 +2897,9 @@ function(...) {
       ...)
   }
   
+  #' @inheritParams install_github
+  #' @export
+  #' @keywords internal
   github_remote <- function(repo, ref = "HEAD", subdir = NULL,
                          auth_token = github_pat(), sha = NULL,
                          host = "api.github.com", ...) {
@@ -3383,7 +3385,12 @@ function(...) {
   #'   \item adds metadata to DESCRIPTION
   #'   \item calls install
   #' }
-  #' @noRd
+  #'
+  #' It uses the additional S3 generic functions to work. Writing methods for
+  #' these functions would allow 3rd party packages to define custom remotes.
+  #' @inheritParams install_github
+  #' @keywords internal
+  #' @export
   install_remote <- function(remote,
                              dependencies,
                              upgrade,
@@ -3487,7 +3494,9 @@ function(...) {
     res
   }
   
-  # Add metadata
+  #' @rdname install_remote
+  #' @export
+  #' @keywords internal
   add_metadata <- function(pkg_path, meta) {
   
     # During installation, the DESCRIPTION file is read and an package.rds file
@@ -3528,11 +3537,27 @@ function(...) {
   remote <- function(type, ...) {
     structure(list(...), class = c(paste0(type, "_remote"), "remote"))
   }
+  
   is.remote <- function(x) inherits(x, "remote")
   
+  #' @rdname install_remote
+  #' @keywords internal
+  #' @export
   remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
+  
+  #' @rdname install_remote
+  #' @keywords internal
+  #' @export
   remote_metadata <- function(x, bundle = NULL, source = NULL, sha = NULL) UseMethod("remote_metadata")
+  
+  #' @rdname install_remote
+  #' @keywords internal
+  #' @export
   remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
+  
+  #' @rdname install_remote
+  #' @keywords internal
+  #' @export
   remote_sha <- function(remote, ...) UseMethod("remote_sha")
   
   remote_package_name.default <- function(remote, ...) remote$repo

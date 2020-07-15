@@ -7,7 +7,12 @@
 #'   \item adds metadata to DESCRIPTION
 #'   \item calls install
 #' }
-#' @noRd
+#'
+#' It uses the additional S3 generic functions to work. Writing methods for
+#' these functions would allow 3rd party packages to define custom remotes.
+#' @inheritParams install_github
+#' @keywords internal
+#' @export
 install_remote <- function(remote,
                            dependencies,
                            upgrade,
@@ -111,7 +116,9 @@ remote_name_or_unknown <- function(remote) {
   res
 }
 
-# Add metadata
+#' @rdname install_remote
+#' @export
+#' @keywords internal
 add_metadata <- function(pkg_path, meta) {
 
   # During installation, the DESCRIPTION file is read and an package.rds file
@@ -152,11 +159,27 @@ clear_description_md5 <- function(pkg_path) {
 remote <- function(type, ...) {
   structure(list(...), class = c(paste0(type, "_remote"), "remote"))
 }
+
 is.remote <- function(x) inherits(x, "remote")
 
+#' @rdname install_remote
+#' @keywords internal
+#' @export
 remote_download <- function(x, quiet = FALSE) UseMethod("remote_download")
+
+#' @rdname install_remote
+#' @keywords internal
+#' @export
 remote_metadata <- function(x, bundle = NULL, source = NULL, sha = NULL) UseMethod("remote_metadata")
+
+#' @rdname install_remote
+#' @keywords internal
+#' @export
 remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
+
+#' @rdname install_remote
+#' @keywords internal
+#' @export
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
 
 remote_package_name.default <- function(remote, ...) remote$repo
