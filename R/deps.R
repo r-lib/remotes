@@ -530,8 +530,7 @@ parse_one_extra <- function(x, ...) {
     # `asNamespace("remotes")` because when used as a script in
     # install-github.R there is no remotes namespace.
 
-    fun <- get(paste0(tolower(type), "_remote"),
-      envir = environment(sys.function()), mode = "function", inherits = FALSE)
+    fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
 
     res <- fun(repo, ...)
     }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
