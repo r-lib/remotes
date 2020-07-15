@@ -2151,7 +2151,6 @@ function(...) {
       if (release == "release") {
         release <- bioconductor_release()
       }
-      cat("\nrelease is extracted as ",release,"\n")
       switch(
         tolower(release),
         devel = "HEAD",
