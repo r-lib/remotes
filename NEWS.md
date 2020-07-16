@@ -1,33 +1,35 @@
 # remotes (development version)
 
-* Internal GitHub functions now correctly handle cases when characters are not representable in the default locale, but are representable in UTF-8 (#492).
-
-* Internal functions `remote_download()`, `remote_metadata()`, `remote_package_name()` and `remote_sha()` are now exported, so 3rd party packages could provide methods for new remote types (#509, #56)
-
-* Internal functions `add_metadata()`, `github_remote()` are now exported. They should not be used by most users (#485).
-
-* `update_packages()` no longer has a `force` argument (#521)
-
-* Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing `dependencies = "Config/Needs/website"` will install the dependencies listed in the `Config/Needs/website: ` field in the package's DESCRIPTION.
-  Prefixing fields with `Config/Needs` allows them to pass `R CMD check` without a NOTE, so it is the recommended format.
+##  New functions and features
 
 * New `system_requirements()` function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)
 
-* `install_*()` family of functions defaults to the default branch, not the `master` branch (@MyKo101,#508).
+* Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing `dependencies = "Config/Needs/website"` will install the dependencies listed in the `Config/Needs/website: ` field in the package's DESCRIPTION.
+  Prefixing fields with `Config/Needs` allows them to pass `R CMD check` without a NOTE, so it is the recommended format for these extra dependencies.
 
-* Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296).
+* `install_*()` family of functions now use the default branch in the repository, not the `master` branch (@MyKo101,#508).
 
-* The upgrade menu is now interruptible in RStudio (#489).
+## Minor improvements and fixes
+
+* Internal functions `remote_download()`, `remote_metadata()`, `remote_package_name()` and `remote_sha()` are now exported, so 3rd party packages could provide methods for new remote types (#509, #56)
+
+* Internal functions `add_metadata()`, `github_remote()` are now exported. They are mainly for 3rd party extensions and should not be used by most users (#485).
 
 * `install_version()` now keeps searching subsequent repositories for the requested version, rather than failing if the version it finds in an early repository is unsuitable. (#305, @kenahoo)
 
 * `install_version()` now understands specifications like '>= 1.0' or '>= 1.12.0, < 1.14' to install the first version of the package it can find that satisfies the criteria. (#305, @kenahoo)
 
+* `install_version()` now avoids use of `base::url()`, as prior to R 3.6.2 it had a bug when downloading large files (#463)
+
 * `parse_submodules()` internal regular expression is now PCRE 2 compatible (#502, @jan-glx)
+
+* `update_packages()` no longer has a `force` argument (#521)
 
 * Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
 
-* `install_version()` now avoids use of `base::url()`, as prior to R 3.6.2 it had a bug when downloading large files (#463)
+* The upgrade menu is now interruptible in RStudio (#489).
+
+* Internal GitHub functions now correctly handle cases when characters are not representable in the default locale, but are representable in UTF-8 (#492).
 
 # remotes 2.1.1
 
