@@ -982,6 +982,7 @@ function(...) {
   #' that are already installed, and also upgrades out dated dependencies.
   #'
   #' @param packages Character vector of packages to update.
+  #' @param force Deprecated, this argument has no effect.
   #' @inheritParams install_github
   #' @seealso [package_deps()] to see which packages are out of date/
   #'   missing.
@@ -995,12 +996,18 @@ function(...) {
   update_packages <- function(packages = TRUE,
                               dependencies = NA,
                               upgrade = c("default", "ask", "always", "never"),
+                              force = FALSE,
                               quiet = FALSE,
                               build = TRUE, build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                               build_manual = FALSE, build_vignettes = FALSE,
                               repos = getOption("repos"),
                               type = getOption("pkgType"),
                               ...) {
+  
+    if (isTRUE(force)) {
+      .Deprecated(msg = "`update_packages(force = TRUE)` is deprecated and has no effect.")
+    }
+  
     if (isTRUE(packages)) {
       packages <- utils::installed.packages()[, "Package"]
     }

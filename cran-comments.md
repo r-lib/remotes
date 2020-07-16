@@ -9,6 +9,7 @@
 
 ## Downstream dependencies
 
-I ran `R CMD check` on all 16 reverse dependencies
-(https://github.com/r-lib/remotes/tree/HEAD/revdep) there were no regressions
-detected.
+I ran `R CMD check` on all 38 reverse dependencies
+(https://github.com/r-lib/remotes/tree/HEAD/revdep).
+
+devtools is affected due to a documentation mismatch with this release. I will release a new version of devtools shortly which addresses that issue.
