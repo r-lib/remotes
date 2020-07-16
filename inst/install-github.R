@@ -1676,7 +1676,7 @@ function(...) {
       if (res$status_code >= 300) {
         stop(github_error(res))
       }
-      json$parse(rawToChar(res$content))
+      json$parse(raw_to_char_utf8(res$content))
     } else {
       tmp <- tempfile()
       download(tmp, url, auth_token = pat)
@@ -1711,7 +1711,7 @@ function(...) {
         stop(github_error(res))
       }
   
-      rawToChar(res$content)
+      raw_to_char_utf8(res$content)
     } else {
       tmp <- tempfile()
       on.exit(unlink(tmp), add = TRUE)
@@ -1789,7 +1789,7 @@ function(...) {
       if (res$status_code >= 300) {
         stop(github_error(res))
       }
-      rawToChar(res$content)
+      raw_to_char_utf8(res$content)
     } else {
       tmp <- tempfile()
       on.exit(unlink(tmp), add = TRUE)
@@ -1810,7 +1810,7 @@ function(...) {
   
     ratelimit_reset <- .POSIXct(res_headers$`x-ratelimit-reset` %||% NA_character_, tz = "UTC")
   
-    error_details <- json$parse(rawToChar(res$content))$message
+    error_details <- json$parse(raw_to_char_utf8(res$content))$message
   
     guidance <- ""
     if (identical(as.integer(ratelimit_remaining), 0L)) {
@@ -5521,6 +5521,12 @@ function(...) {
     else {
       NA
     }
+  }
+  
+  raw_to_char_utf8 <- function(x) {
+    res <- rawToChar(x)
+    Encoding(res) <- "UTF-8"
+    res
   }
 
 

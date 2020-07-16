@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Internal GitHub functions now correctly handle cases when characters are not representable in the default locale, but are representable in UTF-8 (#492).
+
 * Internal functions `remote_download()`, `remote_metadata()`, `remote_package_name()` and `remote_sha()` are now exported, so 3rd party packages could provide methods for new remote types (#509, #56)
 
 * Internal functions `add_metadata()`, `github_remote()` are now exported. They should not be used by most users (#485).
