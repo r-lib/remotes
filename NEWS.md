@@ -23,7 +23,7 @@
 
 * `parse_submodules()` internal regular expression is now PCRE 2 compatible (#502, @jan-glx)
 
-* `update_packages()` no longer has a `force` argument (#521)
+* `update_packages()` argument `force` has been deprecated and no longer has any effect (#521)
 
 * Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (#296)
 
