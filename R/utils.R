@@ -511,3 +511,9 @@ config_val_to_logical <- function (val) {
     NA
   }
 }
+
+raw_to_char_utf8 <- function(x) {
+  res <- rawToChar(x)
+  Encoding(res) <- "UTF-8"
+  res
+}
