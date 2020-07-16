@@ -4,8 +4,6 @@
 
 * Internal functions `add_metadata()`, `github_remote()` are now exported. They should not be used by most users (#485).
 
-* `update_packages()` no longer has a `force` argument (#521)
-
 * Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing `dependencies = "Config/Needs/website"` will install the dependencies listed in the `Config/Needs/website: ` field in the package's DESCRIPTION.
   Prefixing fields with `Config/Needs` allows them to pass `R CMD check` without a NOTE, so it is the recommended format.
 
