@@ -318,6 +318,13 @@ update.package_deps <- function(object,
                     ...)
   }
 
+  unchanged <- object$diff == CURRENT & !force
+  if (any(unchanged) && !quiet) {
+    message("Skipping ", sum(unchanged), " packages. The current version is already installed: ",
+            paste(object$package[unchanged], collapse = ", "),
+            "\n  Use `force = TRUE` to force installation")
+  }
+
   behind <- is.na(object$installed) | object$diff < CURRENT
 
   if (any(object$is_cran & !unavailable_on_cran & behind)) {
