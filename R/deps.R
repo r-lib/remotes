@@ -327,14 +327,21 @@ update.package_deps <- function(object,
 
   behind <- is.na(object$installed) | object$diff < CURRENT
 
-  if (any(object$is_cran & !unavailable_on_cran & behind)) {
+  current_force <- object$diff == CURRENT & force
+
+  if (any(object$is_cran & !unavailable_on_cran & (behind | current_force))) {
     # get the first cran-like remote and use its repos and pkg_type
-    r <- object$remote[object$is_cran & behind][[1]]
-    install_packages(object$package[object$is_cran & behind], repos = r$repos,
-      type = r$pkg_type, dependencies = dependencies, quiet = quiet, ...)
+    r <- object$remote[object$is_cran & (behind | current_force)][[1]]
+    install_packages(object$package[object$is_cran & (behind | current_force)],
+                     repos = r$repos,
+                     type = r$pkg_type,
+                     dependencies = dependencies,
+                     quiet = quiet,
+                     ...
+                     )
   }
 
-  install_remotes(object$remote[!object$is_cran & behind],
+  install_remotes(object$remote[!object$is_cran & (behind | current_force)],
                   dependencies = dependencies,
                   upgrade = upgrade,
                   force = force,
