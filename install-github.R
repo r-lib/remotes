@@ -2897,6 +2897,10 @@ function(...) {
       ...)
   }
   
+  #' Create a new github_remote
+  #'
+  #' This is an internal function to create a new github_remote, users should
+  #' generally have no need for it.
   #' @inheritParams install_github
   #' @export
   #' @keywords internal
