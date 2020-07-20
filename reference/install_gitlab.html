@@ -75,7 +75,7 @@ not changed since the previous installation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -139,21 +139,21 @@ not changed since the previous installation.</p>
     </div>
 
     <pre class="usage"><span class='fu'>install_gitlab</span>(
-  <span class='kw'>repo</span>,
-  subdir = <span class='kw'>NULL</span>,
-  auth_token = <span class='fu'>gitlab_pat</span>(<span class='kw'>quiet</span>),
-  host = <span class='st'>"gitlab.com"</span>,
-  dependencies = <span class='fl'>NA</span>,
-  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  force = <span class='fl'>FALSE</span>,
-  quiet = <span class='fl'>FALSE</span>,
-  build = <span class='fl'>TRUE</span>,
-  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  build_manual = <span class='fl'>FALSE</span>,
-  build_vignettes = <span class='fl'>FALSE</span>,
-  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  type = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
-  <span class='kw'>...</span>
+  <span class='no'>repo</span>,
+  <span class='kw'>subdir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>auth_token</span> <span class='kw'>=</span> <span class='fu'><a href='gitlab_pat.html'>gitlab_pat</a></span>(<span class='no'>quiet</span>),
+  <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"gitlab.com"</span>,
+  <span class='kw'>dependencies</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
+  <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>build</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
+  <span class='kw'>build_manual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>build_vignettes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -171,7 +171,7 @@ not changed since the previous installation.</p>
     <tr>
       <th>auth_token</th>
       <td><p>To install from a private repo, generate a personal access
-token (PAT) in <a href='https://gitlab.com/profile/personal_access_tokens'>https://gitlab.com/profile/personal_access_tokens</a> and
+token (PAT) in <a href='https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html'>https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html</a> and
 supply to this argument. This is safer than using a password because you
 can easily delete a PAT without affecting any others. Defaults to the
 GITLAB_PAT environment variable.</p></td>
@@ -189,7 +189,13 @@ Can be a character vector (selecting from "Depends", "Imports",
 <p><code>TRUE</code> is shorthand for "Depends", "Imports", "LinkingTo" and
 "Suggests". <code>NA</code> is shorthand for "Depends", "Imports" and "LinkingTo"
 and is the default. <code>FALSE</code> is shorthand for no dependencies (i.e.
-just check this package, not its dependencies).</p></td>
+just check this package, not its dependencies).</p>
+<p>The value "soft" means the same as <code>TRUE</code>, "hard" means the same as <code>NA</code>.</p>
+<p>You can also specify dependencies from one or more additional fields,
+common ones include:</p><ul>
+<li><p>Config/Needs/website - for dependencies used in building the pkgdown site.</p></li>
+<li><p>Config/Needs/coverage for dependencies used in calculating test coverage.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>upgrade</th>
@@ -243,19 +249,19 @@ is <code>TRUE</code>.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other package installation: 
-<code>install_bioc()</code>,
-<code>install_bitbucket()</code>,
-<code>install_cran()</code>,
-<code>install_dev()</code>,
-<code>install_github()</code>,
-<code>install_git()</code>,
-<code>install_local()</code>,
-<code>install_svn()</code>,
-<code>install_url()</code>,
-<code>install_version()</code></p></div>
+<code><a href='install_bioc.html'>install_bioc</a>()</code>,
+<code><a href='install_bitbucket.html'>install_bitbucket</a>()</code>,
+<code><a href='install_cran.html'>install_cran</a>()</code>,
+<code><a href='install_dev.html'>install_dev</a>()</code>,
+<code><a href='install_github.html'>install_github</a>()</code>,
+<code><a href='install_git.html'>install_git</a>()</code>,
+<code><a href='install_local.html'>install_local</a>()</code>,
+<code><a href='install_svn.html'>install_svn</a>()</code>,
+<code><a href='install_url.html'>install_url</a>()</code>,
+<code><a href='install_version.html'>install_version</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'>install_gitlab</span>(<span class='st'>"jimhester/covr"</span>)
 }</div></pre>
   </div>
@@ -273,7 +279,7 @@ is <code>TRUE</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

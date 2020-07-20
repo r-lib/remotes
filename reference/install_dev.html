@@ -75,7 +75,7 @@ development package." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -138,7 +138,7 @@ URLs. It then calls the appropriate <code>install_()</code> function to install 
 development package.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_dev</span>(<span class='kw'>package</span>, cran_url = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>)[[<span class='st'>"CRAN"</span>]], <span class='kw'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>install_dev</span>(<span class='no'>package</span>, <span class='kw'>cran_url</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>)<span class='kw'>[[</span><span class='st'>"CRAN"</span>]], <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,27 +154,27 @@ development package.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments passed to <code>install_github()</code>,
-<code>install_gitlab()</code>, or <code>install_bitbucket()</code> functions.</p></td>
+      <td><p>Additional arguments passed to <code><a href='install_github.html'>install_github()</a></code>,
+<code><a href='install_gitlab.html'>install_gitlab()</a></code>, or <code><a href='install_bitbucket.html'>install_bitbucket()</a></code> functions.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other package installation: 
-<code>install_bioc()</code>,
-<code>install_bitbucket()</code>,
-<code>install_cran()</code>,
-<code>install_github()</code>,
-<code>install_gitlab()</code>,
-<code>install_git()</code>,
-<code>install_local()</code>,
-<code>install_svn()</code>,
-<code>install_url()</code>,
-<code>install_version()</code></p></div>
+<code><a href='install_bioc.html'>install_bioc</a>()</code>,
+<code><a href='install_bitbucket.html'>install_bitbucket</a>()</code>,
+<code><a href='install_cran.html'>install_cran</a>()</code>,
+<code><a href='install_github.html'>install_github</a>()</code>,
+<code><a href='install_gitlab.html'>install_gitlab</a>()</code>,
+<code><a href='install_git.html'>install_git</a>()</code>,
+<code><a href='install_local.html'>install_local</a>()</code>,
+<code><a href='install_svn.html'>install_svn</a>()</code>,
+<code><a href='install_url.html'>install_url</a>()</code>,
+<code><a href='install_version.html'>install_version</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'># From GitHub</span>
 <span class='fu'>install_dev</span>(<span class='st'>"dplyr"</span>)
 
@@ -199,7 +199,7 @@ development package.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

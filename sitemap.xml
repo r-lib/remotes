@@ -22,6 +22,9 @@
     <loc>https://remotes.r-lib.org/reference/github_refs.html</loc>
   </url>
   <url>
+    <loc>https://remotes.r-lib.org/reference/github_remote.html</loc>
+  </url>
+  <url>
     <loc>https://remotes.r-lib.org/reference/gitlab_pat.html</loc>
   </url>
   <url>
@@ -50,6 +53,9 @@
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/install_local.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/reference/install_remote.html</loc>
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/install_svn.html</loc>

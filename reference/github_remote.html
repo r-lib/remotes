@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a> — standardise_dep • remotes</title>
+<title>Create a new github_remote — github_remote • remotes</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a> — standardise_dep" />
-<meta property="og:description" content="Standardise dependencies using the same logical as install.packages" />
+<meta property="og:title" content="Create a new github_remote — github_remote" />
+<meta property="og:description" content="This is an internal function to create a new github_remote, users should
+generally have no need for it." />
 
 
 
@@ -123,38 +124,68 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/deps.R'><code>R/deps.R</code></a></small>
-    <div class="hidden name"><code>standardise_dep.Rd</code></div>
+    <h1>Create a new github_remote</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-github.R'><code>R/install-github.R</code></a></small>
+    <div class="hidden name"><code>github_remote.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></p>
+    <p>This is an internal function to create a new github_remote, users should
+generally have no need for it.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>standardise_dep</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>github_remote</span>(
+  <span class='no'>repo</span>,
+  <span class='kw'>ref</span> <span class='kw'>=</span> <span class='st'>"HEAD"</span>,
+  <span class='kw'>subdir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>auth_token</span> <span class='kw'>=</span> <span class='fu'>github_pat</span>(),
+  <span class='kw'>sha</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"api.github.com"</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>The dependencies to standardise.
-A character vector (selecting from "Depends", "Imports",
-"LinkingTo", "Suggests", or "Enhances"), or a logical vector.</p>
-<p><code>TRUE</code> is shorthand for "Depends", "Imports", "LinkingTo" and
-"Suggests". <code>NA</code> is shorthand for "Depends", "Imports" and "LinkingTo"
-and is the default. <code>FALSE</code> is shorthand for no dependencies.</p>
-<p>The value "soft" means the same as <code>TRUE</code>, "hard" means the same as <code>NA</code>.</p>
-<p>Any additional values that don't match one of the standard dependency
-types are filtered out.</p></td>
+      <th>repo</th>
+      <td><p>Repository address in the format
+<code>username/repo[/subdir][@ref|#pull|@*release]</code>. Alternatively, you can
+specify <code>subdir</code> and/or <code>ref</code> using the respective parameters
+(see below); if both are specified, the values in <code>repo</code> take
+precedence.</p></td>
+    </tr>
+    <tr>
+      <th>ref</th>
+      <td><p>Desired git reference. Could be a commit, tag, or branch
+name, or a call to <code><a href='github_refs.html'>github_pull()</a></code> or <code><a href='github_refs.html'>github_release()</a></code>. Defaults to
+<code>"HEAD"</code>, which means the default branch on GitHub and for git remotes.
+See <a href='https://help.github.com/en/github/administering-a-repository/setting-the-default-branch'>setting-the-default-branch</a>
+for more details.</p></td>
+    </tr>
+    <tr>
+      <th>subdir</th>
+      <td><p>subdirectory within repo that contains the R package.</p></td>
+    </tr>
+    <tr>
+      <th>auth_token</th>
+      <td><p>To install from a private repo, generate a personal
+access token (PAT) in "https://github.com/settings/tokens" and
+supply to this argument. This is safer than using a password because
+you can easily delete a PAT without affecting any others. Defaults to
+the <code>GITHUB_PAT</code> environment variable.</p></td>
+    </tr>
+    <tr>
+      <th>host</th>
+      <td><p>GitHub API host to use. Override with your GitHub enterprise
+hostname, for example, <code>"github.hostname.com/api/v3"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments passed on to <code><a href='https://rdrr.io/r/utils/install.packages.html'>utils::install.packages()</a></code>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><a href='http://r-pkgs.had.co.nz/description.html#dependencies'>http://r-pkgs.had.co.nz/description.html#dependencies</a> for
-additional information on what each dependency type means.</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

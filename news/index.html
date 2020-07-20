@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -126,35 +126,50 @@
       <small>Source: <a href='https://github.com/r-lib/remotes/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="remotes-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#remotes-development-version" class="anchor"></a>remotes (development version)<small> Unreleased </small>
+    <div id="remotes-220" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.0">
+<a href="#remotes-220" class="anchor"></a>remotes 2.2.0<small> Unreleased </small>
 </h1>
+<div id="new-functions-and-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions-and-features" class="anchor"></a>New functions and features</h2>
 <ul>
-<li><p><code>install_*()</code> family of functions defaults to the default branch, not the <code>master</code> branch (<a href='https://github.com/MyKo101'>@MyKo101</a>,<a href='https://github.com/r-lib/remotes/issues/508'>#508</a>).</p></li>
-<li><p>Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>).</p></li>
-<li><p>The upgrade menu is now interruptible in RStudio (<a href='https://github.com/r-lib/remotes/issues/489'>#489</a>).</p></li>
-<li><p><code>install_version()</code> now keeps searching subsequent repositories for the requested version, rather than failing if the version it finds in an early repository is unsuitable. (<a href='https://github.com/r-lib/remotes/issues/305'>#305</a>, <a href='https://github.com/kenahoo'>@kenahoo</a>)</p></li>
-<li><p><code>install_version()</code> now understands specifications like ‘&gt;= 1.0’ or ‘&gt;= 1.12.0, &lt; 1.14’ to install the first version of the package it can find that satisfies the criteria. (<a href='https://github.com/r-lib/remotes/issues/305'>#305</a>, <a href='https://github.com/kenahoo'>@kenahoo</a>)</p></li>
-<li><p><code>parse_submodules()</code> internal regular expression is now PCRE 2 compatible (<a href='https://github.com/r-lib/remotes/issues/502'>#502</a>, <a href='https://github.com/jan-glx'>@jan-glx</a>)</p></li>
-<li><p>New <code>system_requirements()</code> function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)</p></li>
-<li><p><code>install_version()</code> now avoids use of <code><a href="https://rdrr.io/r/base/connections.html">base::url()</a></code>, as prior to R 3.6.2 it had a bug when downloading large files (<a href='https://github.com/r-lib/remotes/issues/463'>#463</a>)</p></li>
+<li><p>New <code><a href="../reference/system_requirements.html">system_requirements()</a></code> function to query the Public RStudio Package Manager for system requirements for a package (and its dependencies)</p></li>
+<li><p>Remotes functions can now install dependencies from additional DESCRIPTION fields, e.g. passing <code>dependencies = "Config/Needs/website"</code> will install the dependencies listed in the <code>Config/Needs/website:</code> field in the package’s DESCRIPTION. Prefixing fields with <code>Config/Needs</code> allows them to pass <code>R CMD check</code> without a NOTE, so it is the recommended format for these extra dependencies.</p></li>
+<li><p><code>install_*()</code> family of functions now use the default branch in the repository, not the <code>master</code> branch (<a href='https://github.com/MyKo101'>@MyKo101</a>,<a href='https://github.com/r-lib/remotes/issues/508'>#508</a>).</p></li>
 </ul>
+</div>
+<div id="minor-improvements-and-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
+<ul>
+<li><p>Internal functions <code><a href="../reference/install_remote.html">remote_download()</a></code>, <code><a href="../reference/install_remote.html">remote_metadata()</a></code>, <code><a href="../reference/install_remote.html">remote_package_name()</a></code> and <code><a href="../reference/install_remote.html">remote_sha()</a></code> are now exported, so 3rd party packages could provide methods for new remote types (<a href='https://github.com/r-lib/remotes/issues/509'>#509</a>, <a href='https://github.com/r-lib/remotes/issues/56'>#56</a>)</p></li>
+<li><p>Internal functions <code><a href="../reference/install_remote.html">add_metadata()</a></code>, <code><a href="../reference/github_remote.html">github_remote()</a></code> are now exported. They are mainly for 3rd party extensions and should not be used by most users (<a href='https://github.com/r-lib/remotes/issues/485'>#485</a>).</p></li>
+<li><p><code><a href="../reference/install_version.html">install_version()</a></code> now keeps searching subsequent repositories for the requested version, rather than failing if the version it finds in an early repository is unsuitable. (<a href='https://github.com/r-lib/remotes/issues/305'>#305</a>, <a href='https://github.com/kenahoo'>@kenahoo</a>)</p></li>
+<li><p><code><a href="../reference/install_version.html">install_version()</a></code> now understands specifications like ‘&gt;= 1.0’ or ‘&gt;= 1.12.0, &lt; 1.14’ to install the first version of the package it can find that satisfies the criteria. (<a href='https://github.com/r-lib/remotes/issues/305'>#305</a>, <a href='https://github.com/kenahoo'>@kenahoo</a>)</p></li>
+<li><p><code><a href="../reference/install_version.html">install_version()</a></code> now avoids use of <code><a href="https://rdrr.io/r/base/connections.html">base::url()</a></code>, as prior to R 3.6.2 it had a bug when downloading large files (<a href='https://github.com/r-lib/remotes/issues/463'>#463</a>)</p></li>
+<li><p><code>parse_submodules()</code> internal regular expression is now PCRE 2 compatible (<a href='https://github.com/r-lib/remotes/issues/502'>#502</a>, <a href='https://github.com/jan-glx'>@jan-glx</a>)</p></li>
+<li><p><code><a href="../reference/update_packages.html">update_packages()</a></code> argument <code>force</code> has been deprecated and no longer has any effect (<a href='https://github.com/r-lib/remotes/issues/521'>#521</a>)</p></li>
+<li><p>Another fix for the mixed binary and source dependency issue, it should hopefully be fully squashed now (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>)</p></li>
+<li><p>The upgrade menu is now interruptible in RStudio (<a href='https://github.com/r-lib/remotes/issues/489'>#489</a>).</p></li>
+<li><p>Internal GitHub functions now correctly handle cases when characters are not representable in the default locale, but are representable in UTF-8 (<a href='https://github.com/r-lib/remotes/issues/492'>#492</a>).</p></li>
+</ul>
+</div>
 </div>
     <div id="remotes-211" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.1">
 <a href="#remotes-211" class="anchor"></a>remotes 2.1.1<small> 2020-02-15 </small>
 </h1>
-<div id="minor-improvements-and-fixes" class="section level2">
+<div id="minor-improvements-and-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Installing mixed binary and source dependencies when the latest versions of some packages do not have binaries yet should now install dependencies in the correct order to prevent load failures (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>)</p></li>
 <li><p><code>github_error()</code> now also works when a GitHub (Enterprise) server does not return information about the rate limit (<a href='https://github.com/dpprdan'>@dpprdan</a>, <a href='https://github.com/r-lib/remotes/issues/396'>#396</a>, <a href='https://github.com/r-lib/remotes/issues/413'>#413</a>).</p></li>
 <li><p><code>install_gitlab</code> passes the <code>quiet</code> argument on to <code>gitlab_pat</code> (<a href='https://github.com/michaelchirico'>@michaelchirico</a>, <a href='https://github.com/r-lib/remotes/issues/437'>#437</a>)</p></li>
 <li><p><code>remotes</code> is now resilient against installed packages that declare <code>RemoteType: standard</code> but do not include a <code>RemoteRepos</code> or <code>RemotePkgType</code> field. In such a case, the values for <code><a href="https://rdrr.io/r/base/options.html">getOption("repos")</a></code> and <code><a href="https://rdrr.io/r/base/options.html">getOption("pkgType")</a></code> will be used (respectively).</p></li>
-<li><p><code>install_gitlab()</code> now installs from repositories in subgroups and with dots in their name. <code>subdir</code> is now an explicit argument instead of implicit in <code>repo</code> (<a href='https://github.com/robertdj'>@robertdj</a>, <a href='https://github.com/r-lib/remotes/issues/259'>#259</a>, <a href='https://github.com/r-lib/remotes/issues/420'>#420</a>).</p></li>
-<li><p><code>install()</code> now passes the ellipsis <code>...</code> to <code>install_deps()</code> (<a href='https://github.com/Neil-Schneider'>@Neil-Schneider</a>, <a href='https://github.com/r-lib/remotes/issues/411'>#411</a>)</p></li>
+<li><p><code><a href="../reference/install_gitlab.html">install_gitlab()</a></code> now installs from repositories in subgroups and with dots in their name. <code>subdir</code> is now an explicit argument instead of implicit in <code>repo</code> (<a href='https://github.com/robertdj'>@robertdj</a>, <a href='https://github.com/r-lib/remotes/issues/259'>#259</a>, <a href='https://github.com/r-lib/remotes/issues/420'>#420</a>).</p></li>
+<li><p><code>install()</code> now passes the ellipsis <code>...</code> to <code><a href="../reference/install_deps.html">install_deps()</a></code> (<a href='https://github.com/Neil-Schneider'>@Neil-Schneider</a>, <a href='https://github.com/r-lib/remotes/issues/411'>#411</a>)</p></li>
 <li><p>The tests have been updated to work with newer versions of callr and R 4.0</p></li>
 </ul>
 </div>
@@ -172,14 +187,14 @@
 <li><p>Credentials are now passed via HTTP headers, to reduce exposure when requests fail (<a href='https://github.com/r-lib/remotes/issues/391'>#391</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-1" class="section level2">
+<div id="minor-improvements-and-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
-<li><p><code>download()</code> with the external curl download method now always uses <code>-L</code> to follow redirects. (<a href='https://github.com/r-lib/remotes/issues/350'>#350</a>)</p></li>
-<li><p><code>update_packages()</code> now has a more informative error message when the update fails (<a href='https://github.com/r-lib/remotes/issues/223'>#223</a>, <a href='https://github.com/r-lib/remotes/issues/232'>#232</a>)</p></li>
-<li><p><code>install_git()</code> now can take credentials from the global option <code>remotes.git_credentials</code> (<a href='https://github.com/r-lib/remotes/issues/378'>#378</a>).</p></li>
-<li><p><code>install_git()</code> now works with SHA references and external git (<a href='https://github.com/r-lib/remotes/issues/389'>#389</a>).</p></li>
+<li><p><code><a href="../reference/download.html">download()</a></code> with the external curl download method now always uses <code>-L</code> to follow redirects. (<a href='https://github.com/r-lib/remotes/issues/350'>#350</a>)</p></li>
+<li><p><code><a href="../reference/update_packages.html">update_packages()</a></code> now has a more informative error message when the update fails (<a href='https://github.com/r-lib/remotes/issues/223'>#223</a>, <a href='https://github.com/r-lib/remotes/issues/232'>#232</a>)</p></li>
+<li><p><code><a href="../reference/install_git.html">install_git()</a></code> now can take credentials from the global option <code>remotes.git_credentials</code> (<a href='https://github.com/r-lib/remotes/issues/378'>#378</a>).</p></li>
+<li><p><code><a href="../reference/install_git.html">install_git()</a></code> now works with SHA references and external git (<a href='https://github.com/r-lib/remotes/issues/389'>#389</a>).</p></li>
 <li><p>GitHub remotes that point to branches no longer fail when the branch is later deleted (<a href='https://github.com/r-lib/remotes/issues/274'>#274</a>).</p></li>
 <li><p>Local remotes whose original location has been moved will no longer error when updating (<a href='https://github.com/r-lib/remotes/issues/370'>#370</a>).</p></li>
 <li><p><code>update_deps()</code> no longer sorts the dependencies alphabetically (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>, <a href='https://github.com/r-lib/remotes/issues/301'>#301</a>)</p></li>
@@ -187,12 +202,12 @@
 <li><p>Remotes specific environment variables now accept 0 and 1 as valid values (<a href='https://github.com/r-lib/remotes/issues/238'>#238</a>)</p></li>
 <li><p>remotes now uses locking by default when installing binary packages, which avoids issues when installing binaries that are already open in other R processes (<a href='https://github.com/r-lib/remotes/issues/368'>#368</a>)</p></li>
 <li><p><code>update_deps()</code> no longer fails if a local package no longer exists (<a href='https://github.com/r-lib/remotes/issues/289'>#289</a>)</p></li>
-<li><p><code>install_version()</code> now errors with a more informative message when <code>type</code> is not ‘source’ (<a href='https://github.com/r-lib/remotes/issues/323'>#323</a>)</p></li>
-<li><p>Bioc <code>remote_sha()</code> now always returns a character result (<a href='https://github.com/r-lib/remotes/issues/379'>#379</a>)</p></li>
+<li><p><code><a href="../reference/install_version.html">install_version()</a></code> now errors with a more informative message when <code>type</code> is not ‘source’ (<a href='https://github.com/r-lib/remotes/issues/323'>#323</a>)</p></li>
+<li><p>Bioc <code><a href="../reference/install_remote.html">remote_sha()</a></code> now always returns a character result (<a href='https://github.com/r-lib/remotes/issues/379'>#379</a>)</p></li>
 <li><p>Fix API call for private repositories in <code>install_gitlab</code> (<a href='https://github.com/aornugent'>@aornugent</a>, <a href='https://github.com/r-lib/remotes/issues/359'>#359</a>, <a href='https://github.com/r-lib/remotes/issues/363'>#363</a>)</p></li>
 <li><p>git submodules now work if the submodule file is empty (<a href='https://github.com/muschellij2'>@muschellij2</a>, <a href='https://github.com/r-lib/remotes/issues/234'>#234</a>)</p></li>
 <li><p>git submodules now work if the R package is stored in a subfolder (<a href='https://github.com/pommedeterresautee'>@pommedeterresautee</a>, <a href='https://github.com/r-lib/remotes/issues/233'>#233</a>)</p></li>
-<li><p><code>install_gitlab()</code> no longer adds the access token twice to the request (<a href='https://github.com/aornugent'>@aornugent</a>, <a href='https://github.com/r-lib/remotes/issues/363'>#363</a>).</p></li>
+<li><p><code><a href="../reference/install_gitlab.html">install_gitlab()</a></code> no longer adds the access token twice to the request (<a href='https://github.com/aornugent'>@aornugent</a>, <a href='https://github.com/r-lib/remotes/issues/363'>#363</a>).</p></li>
 <li><p>Bitbucket dependencies now actually use the <code>BITBUCKET_USER</code> and <code>BITBUCKET_PASSWORD</code> environment variables (<a href='https://github.com/antoine-sachet'>@antoine-sachet</a>, <a href='https://github.com/r-lib/remotes/issues/347'>#347</a>).</p></li>
 <li><p><code>parse_deps()</code> now ignores trailing whitespaces around comparison operators in DESCRIPTION fields (<a href='https://github.com/LiNk-NY'>@LiNk-NY</a>, <a href='https://github.com/r-lib/remotes/issues/366'>#366</a>)</p></li>
 </ul>
@@ -217,17 +232,17 @@
 <li><p>The order of choices for <code>upgrade = "ask"</code> now puts the stable ones ‘All’, ‘CRAN only’, ‘none’ first, so they always have the same numbers (<a href='https://github.com/r-lib/remotes/issues/287'>#287</a>).</p></li>
 <li><p><code>update_submodules()</code> now works with empty .gitmodules files (<a href='https://github.com/jsilve24'>@jsilve24</a>, <a href='https://github.com/r-lib/remotes/issues/329'>#329</a>).</p></li>
 <li><p>remotes now understands the “standard” remote type, as produced by packages installed from CRAN using <code>pak</code> (<a href='https://github.com/r-lib/remotes/issues/309'>#309</a>)</p></li>
-<li><p><code>install_dev()</code> now supports ref/pull format, e.g. <code>install_dev('shiny@v1.2-rc')</code> (<a href='https://github.com/mkearney'>@mkearney</a>, <a href='https://github.com/r-lib/remotes/issues/279'>#279</a>).</p></li>
-<li><p>Fix return type of <code>install_remote()</code> when there is a circular dependency (<a href='https://github.com/r-lib/remotes/issues/225'>#225</a>)</p></li>
+<li><p><code><a href="../reference/install_dev.html">install_dev()</a></code> now supports ref/pull format, e.g. <code><a href="../reference/install_dev.html">install_dev('shiny@v1.2-rc')</a></code> (<a href='https://github.com/mkearney'>@mkearney</a>, <a href='https://github.com/r-lib/remotes/issues/279'>#279</a>).</p></li>
+<li><p>Fix return type of <code><a href="../reference/install_remote.html">install_remote()</a></code> when there is a circular dependency (<a href='https://github.com/r-lib/remotes/issues/225'>#225</a>)</p></li>
 <li><p><code>remote_package_name.github_remote()</code> now works properly on Windows (<a href='https://github.com/r-lib/remotes/issues/248'>#248</a>)</p></li>
-<li><p><code>install_bioc()</code> repositories now updated for the Bioconductor 3.8 release. (<a href='https://github.com/r-lib/remotes/issues/239'>#239</a>)</p></li>
+<li><p><code><a href="../reference/install_bioc.html">install_bioc()</a></code> repositories now updated for the Bioconductor 3.8 release. (<a href='https://github.com/r-lib/remotes/issues/239'>#239</a>)</p></li>
 <li><p><code>install_*</code> functions now set the <code>R_LIBS*</code> environment variables for child processes correctly on Windows (<a href='https://github.com/HenrikBengtsson'>@HenrikBengtsson</a>, <a href='https://github.com/r-lib/remotes/issues/253'>#253</a>)</p></li>
 <li><p><code>install_*</code> functions now support the <code>R_REMOTES_UPGRADE</code> environment variable, to set the default for the <code>upgrade</code> argument. See README for details (<a href='https://github.com/kevinushey'>@kevinushey</a>, <a href='https://github.com/r-lib/remotes/issues/240'>#240</a>).</p></li>
-<li><p><code>install_*</code> functions perform basic HTTP authentication using HTTP headers now. This fixes an issue with <code>install_bitbucket()</code> and private repos (<a href='https://github.com/r-lib/remotes/issues/255'>#255</a>).</p></li>
+<li><p><code>install_*</code> functions perform basic HTTP authentication using HTTP headers now. This fixes an issue with <code><a href="../reference/install_bitbucket.html">install_bitbucket()</a></code> and private repos (<a href='https://github.com/r-lib/remotes/issues/255'>#255</a>).</p></li>
 <li><p><code>install_*</code> functions now respect the <code>download.file.method</code> option, if <code>download_file()</code> is used for HTTP.</p></li>
 <li><p><code>install_*</code> functions now use the <em>libcurl</em> method, if the <code>download.file.method</code> option is not set to a different one, and libcurl is available. Before, the <em>wininet</em> method was preferred on Windows. If you rely on the proxy configuration of <em>wininet</em>, then you might want to set the <code>download.file.method</code> option, or use another way to set up proxies, see <code><a href="https://rdrr.io/r/utils/download.file.html">?download.file</a></code>.</p></li>
 <li><p>Remotes without package names are now unconditionally installed (<a href='https://github.com/r-lib/remotes/issues/246'>#246</a>).</p></li>
-<li><p><code>install_github()</code> now includes a more informative error message when the status code is 404, asking the user to check that they have spelled the repo owner and repo correctly (included in the error message), and that they have the required permissions to access the repository.</p></li>
+<li><p><code><a href="../reference/install_github.html">install_github()</a></code> now includes a more informative error message when the status code is 404, asking the user to check that they have spelled the repo owner and repo correctly (included in the error message), and that they have the required permissions to access the repository.</p></li>
 <li><p><code>install_*</code> functions (via the underlying private <code>install</code> function) now set <code>RGL_USE_NULL="TRUE"</code> in order to avoid errors when running headless and installing any package using <code>rgl</code> (<a href='https://github.com/jefferis'>@jefferis</a>, #<a href='https://github.com/r-lib/remotes/issues/333'>#333</a>)</p></li>
 </ul>
 </div>
@@ -236,11 +251,11 @@
 <a href="#remotes-202" class="anchor"></a>remotes 2.0.2<small> 2018-10-30 </small>
 </h1>
 <ul>
-<li><p><code>install_deps()</code> now installs un-installed remotes packages even when <code>upgrade = "never"</code> (<a href='https://github.com/ankane'>@ankane</a>, <a href='https://github.com/r-lib/remotes/issues/227'>#227</a>)</p></li>
-<li><p><code>install_version()</code> now removes metadata added as a byproduct of using <code>install_url()</code> internally() (<a href='https://github.com/r-lib/remotes/issues/224'>#224</a>)</p></li>
+<li><p><code><a href="../reference/install_deps.html">install_deps()</a></code> now installs un-installed remotes packages even when <code>upgrade = "never"</code> (<a href='https://github.com/ankane'>@ankane</a>, <a href='https://github.com/r-lib/remotes/issues/227'>#227</a>)</p></li>
+<li><p><code><a href="../reference/install_version.html">install_version()</a></code> now removes metadata added as a byproduct of using <code><a href="../reference/install_url.html">install_url()</a></code> internally() (<a href='https://github.com/r-lib/remotes/issues/224'>#224</a>)</p></li>
 <li><p><code>install()</code> now avoids converting warnings to errors if <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS</code> is unset and <code>_R_CHECK_FORCE_SUGGESTS_=false</code>. This avoids failures due to Suggested packages potentially being missing.</p></li>
-<li><p><code>install_bitbucket()</code> now works properly with packages in subdirectories (<a href='https://github.com/r-lib/remotes/issues/220'>#220</a>)</p></li>
-<li><p><code>install_deps()</code> now installs un-installed packages even when <code>upgrade = "never"</code> (<a href='https://github.com/r-lib/remotes/issues/218'>#218</a>)</p></li>
+<li><p><code><a href="../reference/install_bitbucket.html">install_bitbucket()</a></code> now works properly with packages in subdirectories (<a href='https://github.com/r-lib/remotes/issues/220'>#220</a>)</p></li>
+<li><p><code><a href="../reference/install_deps.html">install_deps()</a></code> now installs un-installed packages even when <code>upgrade = "never"</code> (<a href='https://github.com/r-lib/remotes/issues/218'>#218</a>)</p></li>
 </ul>
 </div>
     <div id="remotes-201" class="section level1">
@@ -248,11 +263,11 @@
 <a href="#remotes-201" class="anchor"></a>remotes 2.0.1<small> 2018-10-19 </small>
 </h1>
 <ul>
-<li><p><code>install_github()</code> now bundles a GitHub PAT which is used on Travis to avoid hitting the rate limit too frequently. It also contains a more informative error message when the rate limit is hit on how to setup a GitHub personal access token.</p></li>
+<li><p><code><a href="../reference/install_github.html">install_github()</a></code> now bundles a GitHub PAT which is used on Travis to avoid hitting the rate limit too frequently. It also contains a more informative error message when the rate limit is hit on how to setup a GitHub personal access token.</p></li>
 <li><p>The dialog when <code>upgrade = "ask"</code> now has a ‘CRAN only’ option, to update only CRAN packages.</p></li>
 <li><p>No longer include project specific .Rprofile code in the temporary .Rprofile when <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS=false</code> (the default).</p></li>
-<li><p><code>update.package_deps()</code> no longer prompts to install uninstalled dependencies, they are always installed (<a href='https://github.com/r-lib/remotes/issues/203'>#203</a>).</p></li>
-<li><p><code>available_packages()</code>, <code>available_packages_set()</code> and <code>available_packges_reset()</code> added to allow caching of the <code><a href="https://rdrr.io/r/utils/available.packages.html">available.packages()</a></code> database.</p></li>
+<li><p><code><a href="../reference/package_deps.html">update.package_deps()</a></code> no longer prompts to install uninstalled dependencies, they are always installed (<a href='https://github.com/r-lib/remotes/issues/203'>#203</a>).</p></li>
+<li><p><code><a href="../reference/available_packages.html">available_packages()</a></code>, <code><a href="../reference/available_packages.html">available_packages_set()</a></code> and <code>available_packges_reset()</code> added to allow caching of the <code><a href="https://rdrr.io/r/utils/available.packages.html">available.packages()</a></code> database.</p></li>
 </ul>
 </div>
     <div id="remotes-200" class="section level1">
@@ -263,9 +278,9 @@
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li><p><code>install_github()</code>’s previously deprecated <code>username</code> argument has been removed. (<a href='https://github.com/r-lib/remotes/issues/142'>#142</a>)</p></li>
-<li><p><code>install_deps()</code>’s <code>threads</code> argument has been removed, use the <code>Ncpus</code> argument instead (<a href='https://github.com/r-lib/remotes/issues/153'>#153</a>, <a href='https://github.com/r-lib/remotes/issues/154'>#154</a>)</p></li>
-<li><p><code>install_git()</code>’s <code>branch</code> argument has been renamed to <code>ref</code> and <code>branch</code> has been deprecated.</p></li>
+<li><p><code><a href="../reference/install_github.html">install_github()</a></code>’s previously deprecated <code>username</code> argument has been removed. (<a href='https://github.com/r-lib/remotes/issues/142'>#142</a>)</p></li>
+<li><p><code><a href="../reference/install_deps.html">install_deps()</a></code>’s <code>threads</code> argument has been removed, use the <code>Ncpus</code> argument instead (<a href='https://github.com/r-lib/remotes/issues/153'>#153</a>, <a href='https://github.com/r-lib/remotes/issues/154'>#154</a>)</p></li>
+<li><p><code><a href="../reference/install_git.html">install_git()</a></code>’s <code>branch</code> argument has been renamed to <code>ref</code> and <code>branch</code> has been deprecated.</p></li>
 </ul>
 </div>
 <div id="new-features-1" class="section level2">
@@ -273,34 +288,34 @@
 <a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li><p>remotes now builds packages by default before installing them. This step uses the pkgbuild package, if available. If not, it calls <code>R CMD build</code> directly.</p></li>
-<li><p>New <code>install_dev()</code> to install the development version of a CRAN package, based on the URL and BugReports fields in the DESCRIPTION file (<a href='https://github.com/r-lib/remotes/issues/144'>#144</a>).</p></li>
+<li><p>New <code><a href="../reference/install_dev.html">install_dev()</a></code> to install the development version of a CRAN package, based on the URL and BugReports fields in the DESCRIPTION file (<a href='https://github.com/r-lib/remotes/issues/144'>#144</a>).</p></li>
 <li><p><code>install_()*</code> functions now temporally put Rtools on the PATH when necessary, as long as the pkgbuild package is installed.</p></li>
 <li><p>remotes can be forced to use only its internal code by setting the environment variable <code>R_REMOTES_STANDALONE</code> = “true”. This is useful when installing optional dependencies of remotes on Windows, such as curl or git2r (<a href='https://github.com/r-lib/remotes/issues/147'>#147</a>)</p></li>
 <li><p>When installing, remotes now errors on warnings, to catch cases where packages are only partially installed. This often happens on windows when the package dll is opened in another R process (<a href='https://github.com/r-lib/remotes/issues/113'>#113</a>).</p></li>
 <li><p><code>install_()</code> functions now pass arguments, including authentication information and upgrade down to dependencies (<a href='https://github.com/r-lib/remotes/issues/53'>#53</a>, <a href='https://github.com/r-lib/remotes/issues/86'>#86</a>, <a href='https://github.com/r-lib/remotes/issues/87'>#87</a>).</p></li>
 <li><p><code>install_()</code> functions allow the selection of a subset of packages to upgrade, in interactive mode, when <code>upgrade = "ask"</code>.</p></li>
-<li><p><code>install_git()</code> now supports passing credentials, when it is used with <code>git = "git2r"</code> (<a href='https://github.com/r-lib/remotes/issues/106'>#106</a>)</p></li>
+<li><p><code><a href="../reference/install_git.html">install_git()</a></code> now supports passing credentials, when it is used with <code>git = "git2r"</code> (<a href='https://github.com/r-lib/remotes/issues/106'>#106</a>)</p></li>
 <li><p><code>install_()</code> functions now return the name of the package(s) which were installed (<a href='https://github.com/r-lib/remotes/issues/55'>#55</a>).</p></li>
 <li><p>git submodules are now installed if they exist and a git client is available (<a href='https://github.com/r-lib/remotes/issues/138'>#138</a>, <a href='https://github.com/r-lib/remotes/issues/133'>#133</a>, <a href='https://github.com/r-lib/remotes/issues/103'>#103</a>, <a href='https://github.com/r-lib/remotes/issues/82'>#82</a>).</p></li>
-<li><p>New <code>install_gitlab()</code> and <code>install_bioc()</code> functions, to install <code>gitlab</code> and <code>bioc</code> remote types.</p></li>
+<li><p>New <code><a href="../reference/install_gitlab.html">install_gitlab()</a></code> and <code><a href="../reference/install_bioc.html">install_bioc()</a></code> functions, to install <code>gitlab</code> and <code>bioc</code> remote types.</p></li>
 <li><p>remotes now uses the same SHA updating logic for remotes as devtools, including checking if the SHA of the remote has changed since the last installation. (<a href='https://github.com/r-lib/remotes/issues/135'>#135</a>)</p></li>
-<li><p><code>install_url()</code> can now install package binaries on windows (r-lib/devtools<a href='https://github.com/r-lib/remotes/issues/1765'>#1765</a>)</p></li>
+<li><p><code><a href="../reference/install_url.html">install_url()</a></code> can now install package binaries on windows (r-lib/devtools<a href='https://github.com/r-lib/remotes/issues/1765'>#1765</a>)</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-2" class="section level2">
+<div id="minor-improvements-and-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
-<li><p><code>install_deps()</code> et al. now do not rewrite the <code>type</code> argument from <code>both</code> to <code>binary</code> to allow falling back to <code>source</code>. This fixes various installation failures.</p></li>
+<li><p><code><a href="../reference/install_deps.html">install_deps()</a></code> et al. now do not rewrite the <code>type</code> argument from <code>both</code> to <code>binary</code> to allow falling back to <code>source</code>. This fixes various installation failures.</p></li>
 <li><p>remotes now looks up GitHub package names locally, if possible, and uses the GitHub REST API (if the curl package is available, and not in standalone mode). This makes the remote lookup about 10x faster when the remote package has not changed since the last install.</p></li>
 <li><p>Using a GITHUB_PAT no longer prints diagnostic messages by default (r-lib/devtools<a href='https://github.com/r-lib/remotes/issues/1752'>#1752</a>).</p></li>
 <li><p>remotes now always uses https URLs for R versions that support them (<a href='https://github.com/ankane'>@ankane</a>, <a href='https://github.com/r-lib/remotes/issues/139'>#139</a>)</p></li>
 <li><p>Do not include the BioCextra repository in versions after it was deprecated (R 3.5+, Bioc 3.6+).</p></li>
 <li><p><code>install_()</code> functions now download tarballs (.tar.gz) files rather than zip archives (.zip). This results in generally smaller files and avoids issues with script permissions being lost and strange behavior of some external unzip programs on Windows (<a href='https://github.com/r-lib/remotes/issues/96'>#96</a>).</p></li>
 <li><p>Dependency parsing is now more robust to whitespace around the dependency specifications (<a href='https://github.com/r-lib/remotes/issues/73'>#73</a>).</p></li>
-<li><p><code>standardise_dep()</code> exported, for use in devtools.</p></li>
-<li><p><code>install_local()</code> now defaults to the current directory.</p></li>
-<li><p><code>install_bitbucket()</code> now correctly supports authentication, and the <code>subdir</code> argument.</p></li>
+<li><p><code><a href="../reference/standardise_dep.html">standardise_dep()</a></code> exported, for use in devtools.</p></li>
+<li><p><code><a href="../reference/install_local.html">install_local()</a></code> now defaults to the current directory.</p></li>
+<li><p><code><a href="../reference/install_bitbucket.html">install_bitbucket()</a></code> now correctly supports authentication, and the <code>subdir</code> argument.</p></li>
 <li><p><code>install_()</code> functions give a helpful warning when the package has long path names, on Windows. In this case building the package usually fails. (<a href='https://github.com/r-lib/remotes/issues/84'>#84</a>, <a href='https://github.com/r-lib/remotes/issues/178'>#178</a>).</p></li>
 <li><p><code>install_()</code> functions have now a more robust way of handling various tar programs on Windows (<a href='https://github.com/r-lib/remotes/issues/172'>#172</a>).</p></li>
 <li><p><code>install_()</code> functions now give a helpful warning on older R versions, on Windows, if <code><a href="https://rdrr.io/r/base/Rhome.html">R.home()</a></code> contains a space character. Installation usually fails in this case.</p></li>
@@ -323,7 +338,7 @@
 <ul>
 <li><p>URL encode GitHub references, to allow installing from non-alphanumeric branch or tags, <a href='https://github.com/krlmlr'>@krlmlr</a> <a href='https://github.com/r-lib/remotes/issues/38'>#38</a></p></li>
 <li><p>Better cooperation with proxy servers, and better download method selection on Windows, <a href='https://github.com/cderv'>@cderv</a>, <a href='https://github.com/r-lib/remotes/issues/45'>#45</a>, <a href='https://github.com/r-lib/remotes/issues/46'>#46</a></p></li>
-<li><p><code>install_deps()</code> supports tar balls, <a href='https://github.com/r-lib/remotes/issues/47'>#47</a></p></li>
+<li><p><code><a href="../reference/install_deps.html">install_deps()</a></code> supports tar balls, <a href='https://github.com/r-lib/remotes/issues/47'>#47</a></p></li>
 <li><p>Allow training slash in GitHub repo specification, <a href='https://github.com/r-lib/remotes/issues/54'>#54</a></p></li>
 <li><p>Work around on some Linux systems, where unzip is set to the empty string, <a href='https://github.com/HenrikBengtsson'>@HenrikBengtsson</a>, <a href='https://github.com/r-lib/remotes/issues/57'>#57</a></p></li>
 <li><p>Check for circular dependencies while installing, <a href='https://github.com/r-lib/remotes/issues/31'>#31</a></p></li>
@@ -353,7 +368,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

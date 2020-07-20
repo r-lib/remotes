@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a> — standardise_dep • remotes</title>
+<title>Install a remote package. — install_remote • remotes</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,14 @@
 
 
 
-<meta property="og:title" content="Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a> — standardise_dep" />
-<meta property="og:description" content="Standardise dependencies using the same logical as install.packages" />
+<meta property="og:title" content="Install a remote package. — install_remote" />
+<meta property="og:description" content="This:
+downloads source bundle
+decompresses &amp;amp; checks that it's a package
+adds metadata to DESCRIPTION
+calls install
+
+" />
 
 
 
@@ -123,38 +129,118 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/deps.R'><code>R/deps.R</code></a></small>
-    <div class="hidden name"><code>standardise_dep.Rd</code></div>
+    <h1>Install a remote package.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/install-remote.R'><code>R/install-remote.R</code></a></small>
+    <div class="hidden name"><code>install_remote.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Standardise dependencies using the same logical as <a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></p>
+    <p>This:</p><ol>
+<li><p>downloads source bundle</p></li>
+<li><p>decompresses &amp; checks that it's a package</p></li>
+<li><p>adds metadata to DESCRIPTION</p></li>
+<li><p>calls install</p></li>
+</ol>
+
     </div>
 
-    <pre class="usage"><span class='fu'>standardise_dep</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>install_remote</span>(
+  <span class='no'>remote</span>,
+  <span class='no'>dependencies</span>,
+  <span class='no'>upgrade</span>,
+  <span class='no'>force</span>,
+  <span class='no'>quiet</span>,
+  <span class='no'>build</span>,
+  <span class='no'>build_opts</span>,
+  <span class='no'>build_manual</span>,
+  <span class='no'>build_vignettes</span>,
+  <span class='no'>repos</span>,
+  <span class='no'>type</span>,
+  <span class='no'>...</span>
+)
+
+<span class='fu'>add_metadata</span>(<span class='no'>pkg_path</span>, <span class='no'>meta</span>)
+
+<span class='fu'>remote_download</span>(<span class='no'>x</span>, <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>remote_metadata</span>(<span class='no'>x</span>, <span class='kw'>bundle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>source</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sha</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>remote_package_name</span>(<span class='no'>remote</span>, <span class='no'>...</span>)
+
+<span class='fu'>remote_sha</span>(<span class='no'>remote</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>The dependencies to standardise.
-A character vector (selecting from "Depends", "Imports",
+      <th>dependencies</th>
+      <td><p>Which dependencies do you want to check?
+Can be a character vector (selecting from "Depends", "Imports",
 "LinkingTo", "Suggests", or "Enhances"), or a logical vector.</p>
 <p><code>TRUE</code> is shorthand for "Depends", "Imports", "LinkingTo" and
 "Suggests". <code>NA</code> is shorthand for "Depends", "Imports" and "LinkingTo"
-and is the default. <code>FALSE</code> is shorthand for no dependencies.</p>
+and is the default. <code>FALSE</code> is shorthand for no dependencies (i.e.
+just check this package, not its dependencies).</p>
 <p>The value "soft" means the same as <code>TRUE</code>, "hard" means the same as <code>NA</code>.</p>
-<p>Any additional values that don't match one of the standard dependency
-types are filtered out.</p></td>
+<p>You can also specify dependencies from one or more additional fields,
+common ones include:</p><ul>
+<li><p>Config/Needs/website - for dependencies used in building the pkgdown site.</p></li>
+<li><p>Config/Needs/coverage for dependencies used in calculating test coverage.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>upgrade</th>
+      <td><p>One of "default", "ask", "always", or "never". "default"
+respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
+and falls back to "ask" if unset. "ask" prompts the user for which out of
+date packages to upgrade. For non-interactive sessions "ask" is equivalent
+to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and correspond to
+"always" and "never" respectively.</p></td>
+    </tr>
+    <tr>
+      <th>force</th>
+      <td><p>Force installation, even if the remote state has not changed
+since the previous install.</p></td>
+    </tr>
+    <tr>
+      <th>quiet</th>
+      <td><p>If <code>TRUE</code>, suppress output.</p></td>
+    </tr>
+    <tr>
+      <th>build</th>
+      <td><p>If <code>TRUE</code> build the package before installing.</p></td>
+    </tr>
+    <tr>
+      <th>build_opts</th>
+      <td><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code></p></td>
+    </tr>
+    <tr>
+      <th>build_manual</th>
+      <td><p>If <code>FALSE</code>, don't build PDF manual ('--no-manual').</p></td>
+    </tr>
+    <tr>
+      <th>build_vignettes</th>
+      <td><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').
+is <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>repos</th>
+      <td><p>A character vector giving repositories to use.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>Type of package to <code>update</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments passed on to <code><a href='https://rdrr.io/r/utils/install.packages.html'>utils::install.packages()</a></code>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <div class='dont-index'><p><a href='http://r-pkgs.had.co.nz/description.html#dependencies'>http://r-pkgs.had.co.nz/description.html#dependencies</a> for
-additional information on what each dependency type means.</p></div>
+    <p>It uses the additional S3 generic functions to work. Writing methods for
+these functions would allow 3rd party packages to define custom remotes.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
