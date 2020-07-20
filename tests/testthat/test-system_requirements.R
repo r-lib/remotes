@@ -37,6 +37,9 @@ test_that("system_requirements errors curl is not found", {
 })
 
 test_that("system_requirements returns an empty character vector if a package has no system requirements", {
+  skip_on_cran()
+  skip_if_offline()
+
   pkg <- tempfile()
   dir.create(pkg)
   on.exit(unlink(pkg, recursive = TRUE))
@@ -50,6 +53,9 @@ test_that("system_requirements returns an empty character vector if a package ha
 })
 
 test_that("system requirements return the system requirements if it has a direct system requirement", {
+  skip_on_cran()
+  skip_if_offline()
+
   pkg <- tempfile()
   dir.create(pkg)
   on.exit(unlink(pkg, recursive = TRUE))
@@ -68,6 +74,9 @@ test_that("system requirements return the system requirements if it has a direct
 })
 
 test_that("system_requirements return the system requirements if it has a hard dependency with a system requirement", {
+  skip_on_cran()
+  skip_if_offline()
+
   pkg <- tempfile()
   dir.create(pkg)
   on.exit(unlink(pkg, recursive = TRUE))
@@ -90,6 +99,9 @@ test_that("system_requirements return the system requirements if it has a hard d
 })
 
 test_that("system_requirements return the system requirements if it has a soft dependency with a system requirement", {
+  skip_on_cran()
+  skip_if_offline()
+
   pkg <- tempfile()
   dir.create(pkg)
   on.exit(unlink(pkg, recursive = TRUE))
@@ -112,6 +124,9 @@ test_that("system_requirements return the system requirements if it has a soft d
 })
 
 test_that("system_requirements return the system requirements if 2nd order dependencies have system requirements", {
+  skip_on_cran()
+  skip_if_offline()
+
   pkg <- tempfile()
   dir.create(pkg)
   on.exit(unlink(pkg, recursive = TRUE))
