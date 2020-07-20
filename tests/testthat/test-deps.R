@@ -521,6 +521,9 @@ test_that("dev_package_deps works with package using remotes", {
 })
 
 test_that("dev_package_deps can retrieve custom fields", {
+  skip_on_cran()
+  skip_if_offline()
+
   res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/pkgdown")
 
   is_pkgdown <- "pkgdown" == res$package
