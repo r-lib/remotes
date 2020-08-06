@@ -223,8 +223,7 @@
 <li><p>The <code>R_BIOC_VERSION</code> environment variable can be used to force a Bioconductor version.</p></li>
 <li><p>The <code>R_REMOTES_UPGRADE</code> environment variable can be used to set a default preferred value for the <code>upgrade =</code> argument accepted by the various <code>install_*()</code> functions. For example, you can set <code>R_REMOTES_UPGRADE="always"</code> to upgrade dependent packages without asking the user.</p></li>
 <li><p>Setting <code>R_REMOTES_STANDALONE="true"</code> forces remotes to work in standalone mode and avoid loading its optional dependencies (curl, git2 and pkgbuild currently. See “Standalone mode” above.</p></li>
-<li><p>Setting <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS="true"</code> avoids stopping the installation for warning messages. Warnings usually mean installation errors, so by default remotes stops for a warning. However, sometimes other warnings might happen, that could be ignored by setting this environment variable.</p></li>
-<li><p>Setting <code>_R_CHECK_FORCE_SUGGESTS_="false"</code> while <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS</code> is unset will also avoid stopping the installation for error messages. This is done because a warning is generated during installation when not all Suggested packages are not available.</p></li>
+<li><p>Setting <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"</code> will cause warning messages during calls to <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code> to become errors. Often warning messages are caused by dependencies failing to install.</p></li>
 </ul>
 </div>
 </div>
