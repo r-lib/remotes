@@ -215,9 +215,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
 
 should_error_for_warnings <- function() {
 
-  force_suggests <- Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "true")
-
-  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", !config_val_to_logical(force_suggests))
+  no_errors <- Sys.getenv("R_REMOTES_NO_ERRORS_FROM_WARNINGS", "true")
 
   !config_val_to_logical(no_errors)
 }

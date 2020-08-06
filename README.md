@@ -211,16 +211,9 @@ It also uses some remotes specific options:
   mode and avoid loading its optional dependencies (curl, git2 and pkgbuild
   currently. See "Standalone mode" above.
 
-* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS="true"` avoids stopping the
-  installation for warning messages. Warnings usually mean installation
-  errors, so by default remotes stops for a warning. However, sometimes
-  other warnings might happen, that could be ignored by setting this
-  environment variable.
-
-* Setting `_R_CHECK_FORCE_SUGGESTS_="false"` while
-  `R_REMOTES_NO_ERRORS_FROM_WARNINGS` is unset will also avoid stopping the
-  installation for error messages. This is done because a warning is generated
-  during installation when not all Suggested packages are not available.
+* Setting `R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"` will cause warning
+  messages during calls to `install.packages()` to become errors. Often warning
+  messages are caused by dependencies failing to install.
 
 ## License
 
