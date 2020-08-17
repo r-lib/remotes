@@ -144,7 +144,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
 
-  res[!duplicated(res$package, fromLast = TRUE), ]
+  res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
 }
 
 combine_remote_deps <- function(cran_deps, remote_deps) {
