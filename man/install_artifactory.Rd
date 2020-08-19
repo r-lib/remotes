@@ -77,3 +77,23 @@ is \code{TRUE}.}
 This function is vectorised on \code{pkgs} to allow installing
 multiple packages with a single command.
 }
+\examples{
+\dontrun{
+install_artifactory(c("pkg1", "pkg2"))
+}
+}
+\seealso{
+Other package installation: 
+\code{\link{install_bioc}()},
+\code{\link{install_bitbucket}()},
+\code{\link{install_cran}()},
+\code{\link{install_dev}()},
+\code{\link{install_github}()},
+\code{\link{install_gitlab}()},
+\code{\link{install_git}()},
+\code{\link{install_local}()},
+\code{\link{install_svn}()},
+\code{\link{install_url}()},
+\code{\link{install_version}()}
+}
+\concept{package installation}

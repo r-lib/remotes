@@ -79,6 +79,7 @@ install_cran(c("httpuv", "shiny"))
 }
 \seealso{
 Other package installation: 
+\code{\link{install_artifactory}()},
 \code{\link{install_bioc}()},
 \code{\link{install_bitbucket}()},
 \code{\link{install_dev}()},

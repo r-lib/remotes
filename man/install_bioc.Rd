@@ -104,6 +104,7 @@ install_bioc("user:password@SummarizedExperiment#abc123")
 }
 \seealso{
 Other package installation: 
+\code{\link{install_artifactory}()},
 \code{\link{install_bitbucket}()},
 \code{\link{install_cran}()},
 \code{\link{install_dev}()},

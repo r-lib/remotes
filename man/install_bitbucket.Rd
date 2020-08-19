@@ -129,6 +129,7 @@ Bitbucket API docs:
 \url{https://confluence.atlassian.com/bitbucket/use-the-bitbucket-cloud-rest-apis-222724129.html}
 
 Other package installation: 
+\code{\link{install_artifactory}()},
 \code{\link{install_bioc}()},
 \code{\link{install_cran}()},
 \code{\link{install_dev}()},

@@ -129,6 +129,7 @@ install_version("mypackage", "1.16-39487") # finds in 'dev'
 }
 \seealso{
 Other package installation: 
+\code{\link{install_artifactory}()},
 \code{\link{install_bioc}()},
 \code{\link{install_bitbucket}()},
 \code{\link{install_cran}()},

@@ -10,6 +10,12 @@
 #'   since the previous install.
 #' @inheritParams install_deps
 #' @param ... Other arguments passed on to [utils::install.packages()].
+#' @family package installation
+#' @export
+#' @examples
+#' \dontrun{
+#' install_artifactory(c("pkg1", "pkg2"))
+#' }
 install_artifactory <- function(pkgs,
                                 repo = artifactory_repo(quiet),
                                 auth_token = artifactory_key(quiet),

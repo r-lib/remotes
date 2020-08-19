@@ -120,6 +120,7 @@ install_github("hadley/private", auth_token = "abc")
 \code{\link[=github_pull]{github_pull()}}
 
 Other package installation: 
+\code{\link{install_artifactory}()},
 \code{\link{install_bioc}()},
 \code{\link{install_bitbucket}()},
 \code{\link{install_cran}()},
