@@ -12,6 +12,8 @@ artifactory_remote(
 }
 \arguments{
 \item{repo}{Artifactory repo URL, e.g., \code{"company.jfrog.io/artifactory/cran-local"}.}
+
+\item{auth_token}{Artifactory API key.}
 }
 \description{
 This is an internal function to create a new \code{artifactory_remote}.

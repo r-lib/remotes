@@ -1,1 +1,0 @@
-context("Install from Artifactory")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/install-artifactory.R
 \name{artifactory_package_metadata}
 \alias{artifactory_package_metadata}
-\title{Fetch package metadata using Artifactory API.}
+\title{Fetch package metadata using the Artifactory API.}
 \usage{
 artifactory_package_metadata(
   pkgname,
@@ -24,6 +24,6 @@ artifactory_package_metadata(
 A list of package metadata.
 }
 \description{
-Fetch package metadata using Artifactory API.
+Fetch package metadata using the Artifactory API.
 }
 \keyword{internal}

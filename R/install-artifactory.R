@@ -5,7 +5,7 @@
 #'
 #' @param pkgs One or more package names to install.
 #' @param repo Artifactory repo URL, e.g., `"company.jfrog.io/artifactory/cran-local"`.
-#' @param auth_key Artifactory API key.
+#' @param auth_token Artifactory API key.
 #' @param force Force installation, even if the remote state has not changed
 #'   since the previous install.
 #' @inheritParams install_deps
@@ -75,11 +75,6 @@ artifactory_remote <- function(package,
 }
 
 #' @export
-format.artifactory_remote <- function(x, ...) {
-  "Artifactory"
-}
-
-#' @export
 remote_download.artifactory_remote <- function(x, quiet = FALSE) {
   dest <- tempfile(fileext = ".tar.gz")
   if (!quiet) {
@@ -94,9 +89,14 @@ remote_package_name.artifactory_remote <- function(remote, ...) {
   remote$package
 }
 
-#'  @export
+#' @export
 remote_sha.artifactory_remote <- function(remote, ...) {
   remote$sha
+}
+
+#' @export
+format.artifactory_remote <- function(x, ...) {
+  "Artifactory"
 }
 
 #' @export
@@ -109,7 +109,7 @@ remote_metadata.artifactory_remote <- function(x, bundle = NULL, source = NULL, 
 }
 
 
-#' Fetch package metadata using Artifactory API.
+#' Fetch package metadata using the Artifactory API.
 #'
 #' @param pkgname The remote package name.
 #' @param repo Artifactory repository URL (assumed `"<host>/<repo>"`).
@@ -131,8 +131,8 @@ artifactory_package_metadata <- function(pkgname,
 
   # Separate the host from the repo
   url_parts <- unlist(strsplit(sub("^.*?://", "", repo), "/", fixed = TRUE))
-  url_host <- build_url(parts[1:(length(parts) - 1)])
-  url_repo <- tail(parts, 1)
+  url_host <- build_url(url_parts[1:(length(url_parts) - 1)])
+  url_repo <- utils::tail(url_parts, 1)
 
   api_url <- build_url(
     url_host, "api", "search",

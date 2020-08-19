@@ -26,6 +26,8 @@ install_artifactory(
 
 \item{repo}{Artifactory repo URL, e.g., \code{"company.jfrog.io/artifactory/cran-local"}.}
 
+\item{auth_token}{Artifactory API key.}
+
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
 
@@ -70,8 +72,6 @@ is \code{TRUE}.}
 \item{type}{Type of package to \code{update}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
-
-\item{auth_key}{Artifactory API key.}
 }
 \description{
 This function is vectorised on \code{pkgs} to allow installing
