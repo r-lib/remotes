@@ -180,7 +180,7 @@ test_that("Additional_repositories field", {
   )
 
   pkg <- list(
-    additional_repositories = 
+    additional_repositories =
       "\n  http://packages.ropensci.org, \nhttp://foo.bar.com"
   )
 
@@ -535,4 +535,14 @@ test_that("dev_package_deps can retrieve custom fields", {
   is_covr <- "covr" == res$package
   expect_true(any(is_covr))
   expect_is(res$remote[is_covr][[1]], "cran_remote")
+})
+
+test_that("dev_package_deps works with url remotes", {
+  skip_on_cran()
+  skip_if_offline()
+
+  res <- dev_package_deps(test_path("urlremotes"), dependencies = TRUE)
+
+  expect_equal(sum(is.na(res$package)), 2)
+
 })
