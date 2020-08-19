@@ -2,13 +2,12 @@
 % Please edit documentation in R/install-artifactory.R
 \name{install_artifactory}
 \alias{install_artifactory}
-\title{Attempts to install a package directly from GitHub.}
+\title{Attempt to install package(s) from an Artifactory repo.}
 \usage{
 install_artifactory(
   pkgs,
   repo = artifactory_repo(quiet),
-  auth_user = artifactory_user(quiet),
-  auth_key = artifactory_key(quiet),
+  auth_token = artifactory_key(quiet),
   force = FALSE,
   dependencies = NA,
   upgrade = c("default", "ask", "always", "never"),
@@ -23,11 +22,9 @@ install_artifactory(
 )
 }
 \arguments{
-\item{pkgs}{Repository address in the format
-\verb{username/repo[/subdir][@ref|#pull|@*release]}. Alternatively, you can
-specify \code{subdir} and/or \code{ref} using the respective parameters
-(see below); if both are specified, the values in \code{repo} take
-precedence.}
+\item{pkgs}{One or more package names to install.}
+
+\item{repo}{Artifactory repo URL, e.g., \code{"company.jfrog.io/artifactory/cran-local"}.}
 
 \item{force}{Force installation, even if the remote state has not changed
 since the previous install.}
@@ -74,16 +71,9 @@ is \code{TRUE}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 
-\item{auth_token}{To install from a private repo, generate a personal
-access token (PAT) in "https://github.com/settings/tokens" and
-supply to this argument. This is safer than using a password because
-you can easily delete a PAT without affecting any others. Defaults to
-the \code{GITHUB_PAT} environment variable.}
-
-\item{host}{GitHub API host to use. Override with your GitHub enterprise
-hostname, for example, \code{"github.hostname.com/api/v3"}.}
+\item{auth_key}{Artifactory API key.}
 }
 \description{
-This function is vectorised on \code{repo} so you can install multiple
-packages in a single command.
+This function is vectorised on \code{pkgs} to allow installing
+multiple packages with a single command.
 }

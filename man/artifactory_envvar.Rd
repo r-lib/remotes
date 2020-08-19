@@ -9,7 +9,7 @@ artifactory_envvar(key, desc, quiet = TRUE)
 \arguments{
 \item{key}{Environment variable name.}
 
-\item{desc}{Short description, e.g., "user name."}
+\item{desc}{Short description, e.g., "API key."}
 
 \item{quiet}{Print status message.}
 }

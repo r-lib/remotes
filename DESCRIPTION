@@ -30,6 +30,7 @@ Suggests:
     curl,
     covr,
     git2r (>= 0.23.0),
+    jsonlite,
     knitr,
     mockery,
     pkgbuild (>= 1.0.1),

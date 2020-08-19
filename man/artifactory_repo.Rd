@@ -2,28 +2,24 @@
 % Please edit documentation in R/install-artifactory.R
 \name{artifactory_repo}
 \alias{artifactory_repo}
-\alias{artifactory_user}
 \alias{artifactory_key}
 \title{Set Artifactory environmental variables.}
 \usage{
 artifactory_repo(quiet = TRUE)
 
-artifactory_user(quiet = TRUE)
-
 artifactory_key(quiet = TRUE)
 }
 \arguments{
-\item{quiet}{XXSD}
+\item{quiet}{Do not show any status messages.}
 }
 \description{
-DFGHJKL
+Attempt to set Artifactory URL and authentication parameters
+from the environment.
 }
 \section{Functions}{
 \itemize{
-\item \code{artifactory_repo}: AAA
+\item \code{artifactory_repo}: Artifactory repository URL (\code{ARTIFACTORY_REPO}).
 
-\item \code{artifactory_user}: XXX
-
-\item \code{artifactory_key}: YYY
+\item \code{artifactory_key}: Artifactory API key (\code{ARTIFACTORY_KEY}).
 }}
 

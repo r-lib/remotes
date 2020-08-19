@@ -1,0 +1,1 @@
+context("Install from Artifactory")

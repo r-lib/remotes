@@ -2,24 +2,18 @@
 % Please edit documentation in R/install-artifactory.R
 \name{artifactory_remote}
 \alias{artifactory_remote}
-\title{Create a new github_remote}
+\title{Create a new Artifactory remote}
 \usage{
 artifactory_remote(
   package,
   repo = artifactory_repo(),
-  user = artifactory_user(),
-  key = artifactory_key()
+  auth_token = artifactory_key()
 )
 }
 \arguments{
-\item{repo}{Repository address in the format
-\verb{username/repo[/subdir][@ref|#pull|@*release]}. Alternatively, you can
-specify \code{subdir} and/or \code{ref} using the respective parameters
-(see below); if both are specified, the values in \code{repo} take
-precedence.}
+\item{repo}{Artifactory repo URL, e.g., \code{"company.jfrog.io/artifactory/cran-local"}.}
 }
 \description{
-This is an internal function to create a new github_remote, users should
-generally have no need for it.
+This is an internal function to create a new \code{artifactory_remote}.
 }
 \keyword{internal}
