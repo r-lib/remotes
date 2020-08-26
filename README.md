@@ -11,6 +11,7 @@
 [![Codecov test coverage](https://codecov.io/gh/r-lib/remotes/branch/master/graph/badge.svg)](https://codecov.io/gh/r-lib/remotes?branch=master)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 <!-- badges: end -->
 
 Download and install R packages stored in GitHub, GitLab, Bitbucket, 
