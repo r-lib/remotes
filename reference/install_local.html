@@ -135,19 +135,19 @@ a single command.</p>
     </div>
 
     <pre class="usage"><span class='fu'>install_local</span>(
-  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"."</span>,
-  <span class='kw'>subdir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dependencies</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>build</span> <span class='kw'>=</span> !<span class='fu'>is_binary_pkg</span>(<span class='no'>path</span>),
-  <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  <span class='kw'>build_manual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>build_vignettes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
-  <span class='no'>...</span>
+  path = <span class='st'>"."</span>,
+  subdir = <span class='kw'>NULL</span>,
+  dependencies = <span class='fl'>NA</span>,
+  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
+  force = <span class='fl'>FALSE</span>,
+  quiet = <span class='fl'>FALSE</span>,
+  build = <span class='op'>!</span><span class='fu'>is_binary_pkg</span>(<span class='kw'>path</span>),
+  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
+  build_manual = <span class='fl'>FALSE</span>,
+  build_vignettes = <span class='fl'>FALSE</span>,
+  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
+  type = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -242,12 +242,13 @@ is <code>TRUE</code>.</p></td>
 <code><a href='install_version.html'>install_version</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span>(<span class='no'>dir</span>)
-<span class='no'>pkg</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/download.packages.html'>download.packages</a></span>(<span class='st'>"testthat"</span>, <span class='no'>dir</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"source"</span>)
-<span class='fu'>install_local</span>(<span class='no'>pkg</span>[, <span class='fl'>2</span>])
-}</div></pre>
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>()
+<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span>(<span class='kw'>dir</span>)
+<span class='kw'>pkg</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/download.packages.html'>download.packages</a></span>(<span class='st'>"testthat"</span>, <span class='kw'>dir</span>, type = <span class='st'>"source"</span>)
+<span class='fu'>install_local</span>(<span class='kw'>pkg</span>[, <span class='fl'>2</span>])
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -263,7 +264,7 @@ is <code>TRUE</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

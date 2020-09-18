@@ -135,19 +135,19 @@ archive directories, in order to find specific versions of the requested package
     </div>
 
     <pre class="usage"><span class='fu'>install_version</span>(
-  <span class='no'>package</span>,
-  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dependencies</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>upgrade</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>build</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>build_opts</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  <span class='kw'>build_manual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>build_vignettes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"source"</span>,
-  <span class='no'>...</span>
+  <span class='kw'>package</span>,
+  version = <span class='kw'>NULL</span>,
+  dependencies = <span class='fl'>NA</span>,
+  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
+  force = <span class='fl'>FALSE</span>,
+  quiet = <span class='fl'>FALSE</span>,
+  build = <span class='fl'>FALSE</span>,
+  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
+  build_manual = <span class='fl'>FALSE</span>,
+  build_vignettes = <span class='fl'>FALSE</span>,
+  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
+  type = <span class='st'>"source"</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -272,19 +272,20 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 <code><a href='install_url.html'>install_url</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"1.11.0"</span>)
 <span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"&gt;= 1.12.0, &lt; 1.14"</span>)
 
 <span class='co'>## Specify search order (e.g. in ~/.Rprofile)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>repos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-  <span class='kw'>prod</span> <span class='kw'>=</span> <span class='st'>"http://mycompany.example.com/r-repo"</span>,
-  <span class='kw'>dev</span> <span class='kw'>=</span> <span class='st'>"http://mycompany.example.com/r-repo-dev"</span>,
-  <span class='kw'>CRAN</span> <span class='kw'>=</span> <span class='st'>"https://cran.revolutionanalytics.com"</span>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(repos = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
+  prod = <span class='st'>"http://mycompany.example.com/r-repo"</span>,
+  dev = <span class='st'>"http://mycompany.example.com/r-repo-dev"</span>,
+  CRAN = <span class='st'>"https://cran.revolutionanalytics.com"</span>
 ))
 <span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.15"</span>) <span class='co'># finds in 'prod'</span>
 <span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.16-39487"</span>) <span class='co'># finds in 'dev'</span>
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -300,7 +301,7 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -136,7 +136,7 @@ via a shorthandparse_repo_spec() handles this concise form:
     </div>
 
     <div class="ref-description">
-    <p>A remote repo can be specified in two ways:</p><dl'>
+    <p>A remote repo can be specified in two ways:</p><dl>
 <dt>as a URL</dt><dd><p><code>parse_github_url()</code> handles HTTPS and SSH remote URLs
 and various GitHub browser URLs</p></dd>
 <dt>via a shorthand</dt><dd><p><code>parse_repo_spec()</code> handles this concise form:
@@ -146,11 +146,11 @@ and various GitHub browser URLs</p></dd>
 
     </div>
 
-    <pre class="usage"><span class='fu'>parse_repo_spec</span>(<span class='no'>repo</span>)
+    <pre class="usage"><span class='fu'>parse_repo_spec</span>(<span class='kw'>repo</span>)
 
-<span class='fu'>parse_github_repo_spec</span>(<span class='no'>repo</span>)
+<span class='fu'>parse_github_repo_spec</span>(<span class='kw'>repo</span>)
 
-<span class='fu'>parse_github_url</span>(<span class='no'>repo</span>)</pre>
+<span class='fu'>parse_github_url</span>(<span class='kw'>repo</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -167,7 +167,8 @@ and various GitHub browser URLs</p></dd>
 <code>ref</code>, <code>pull</code>, <code>release</code>, some which will be empty.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"metacran/crandb"</span>)</div><div class='output co'>#&gt; $package
+    <pre class="examples"><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"metacran/crandb"</span>)
+</div><div class='output co'>#&gt; $package
 #&gt; [1] ""
 #&gt; 
 #&gt; $username
@@ -187,7 +188,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"jimhester/covr#47"</span>)        <span class='co'>## pull request</span></div><div class='output co'>#&gt; $package
+#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"jimhester/covr#47"</span>)        <span class='co'>## pull request</span>
+</div><div class='output co'>#&gt; $package
 #&gt; [1] ""
 #&gt; 
 #&gt; $username
@@ -207,7 +209,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"jeroen/curl@v0.9.3"</span>)       <span class='co'>## specific tag</span></div><div class='output co'>#&gt; $package
+#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"jeroen/curl@v0.9.3"</span>)       <span class='co'>## specific tag</span>
+</div><div class='output co'>#&gt; $package
 #&gt; [1] ""
 #&gt; 
 #&gt; $username
@@ -227,7 +230,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"tidyverse/dplyr@*release"</span>) <span class='co'>## shorthand for latest release</span></div><div class='output co'>#&gt; $package
+#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"tidyverse/dplyr@*release"</span>) <span class='co'>## shorthand for latest release</span>
+</div><div class='output co'>#&gt; $package
 #&gt; [1] ""
 #&gt; 
 #&gt; $username
@@ -247,7 +251,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] "*release"
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"r-lib/remotes@550a3c7d3f9e1493a2ba"</span>) <span class='co'>## commit SHA</span></div><div class='output co'>#&gt; $package
+#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"r-lib/remotes@550a3c7d3f9e1493a2ba"</span>) <span class='co'>## commit SHA</span>
+</div><div class='output co'>#&gt; $package
 #&gt; [1] ""
 #&gt; 
 #&gt; $username
@@ -267,7 +272,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"igraph=igraph/rigraph"</span>) <span class='co'>## Different package name from repo name</span></div><div class='output co'>#&gt; $package
+#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span>(<span class='st'>"igraph=igraph/rigraph"</span>) <span class='co'>## Different package name from repo name</span>
+</div><div class='output co'>#&gt; $package
 #&gt; [1] "igraph"
 #&gt; 
 #&gt; $username
@@ -288,7 +294,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; $release
 #&gt; [1] ""
 #&gt; </div><div class='input'>
-<span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/jeroen/curl.git"</span>)</div><div class='output co'>#&gt; $username
+<span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/jeroen/curl.git"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "jeroen"
 #&gt; 
 #&gt; $repo
@@ -302,7 +309,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"git@github.com:metacran/crandb.git"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"git@github.com:metacran/crandb.git"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "metacran"
 #&gt; 
 #&gt; $repo
@@ -316,7 +324,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/jimhester/covr"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/jimhester/covr"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "jimhester"
 #&gt; 
 #&gt; $repo
@@ -330,7 +339,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.example.com/user/repo.git"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.example.com/user/repo.git"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "user"
 #&gt; 
 #&gt; $repo
@@ -344,7 +354,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"git@github.example.com:user/repo.git"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"git@github.example.com:user/repo.git"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "user"
 #&gt; 
 #&gt; $repo
@@ -359,7 +370,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; $release
 #&gt; [1] ""
 #&gt; </div><div class='input'>
-<span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/pull/108"</span>)</div><div class='output co'>#&gt; $username
+<span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/pull/108"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "r-lib"
 #&gt; 
 #&gt; $repo
@@ -373,7 +385,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/tree/name-of-branch"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/tree/name-of-branch"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "r-lib"
 #&gt; 
 #&gt; $repo
@@ -387,7 +400,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/commit/1234567"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/commit/1234567"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "r-lib"
 #&gt; 
 #&gt; $repo
@@ -401,7 +415,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/releases/latest"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/releases/latest"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "r-lib"
 #&gt; 
 #&gt; $repo
@@ -415,7 +430,8 @@ and various GitHub browser URLs</p></dd>
 #&gt; 
 #&gt; $release
 #&gt; [1] "*release"
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span>)</div><div class='output co'>#&gt; $username
+#&gt; </div><div class='input'><span class='fu'>parse_github_url</span>(<span class='st'>"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span>)
+</div><div class='output co'>#&gt; $username
 #&gt; [1] "r-lib"
 #&gt; 
 #&gt; $repo
@@ -445,7 +461,7 @@ and various GitHub browser URLs</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
