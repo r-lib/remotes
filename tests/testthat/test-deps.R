@@ -180,7 +180,7 @@ test_that("Additional_repositories field", {
   )
 
   pkg <- list(
-    additional_repositories = 
+    additional_repositories =
       "\n  http://packages.ropensci.org, \nhttp://foo.bar.com"
   )
 
@@ -344,6 +344,18 @@ test_that("remotes are parsed with explicit types", {
 
   expect_equal(split_extra_deps("bioc::user:password@release/Biobase#12345,github::klutometis/roxygen"),
     c("bioc::user:password@release/Biobase#12345", "github::klutometis/roxygen"))
+
+})
+
+test_that("remotes are parsed with explicit host", {
+
+  expect_equal(
+    parse_one_extra("github@api.github.com::hadley/testthat"),
+    github_remote("hadley/testthat"))
+
+  expect_equal(
+    parse_one_extra("gitlab@gitlab.com::r-packages/psyverse"),
+    gitlab_remote("r-packages/psyverse"))
 
 })
 

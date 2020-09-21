@@ -1064,6 +1064,16 @@ function(...) {
     } else {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
+  
+    if (grepl("@", type)) {
+      # Custom host
+      tah <- strsplit(type, "@", fixed = TRUE)[[1]]
+      type <- tah[1]
+      host <- tah[2]
+    } else {
+      host <- NULL
+    }
+  
     tryCatch({
       # We need to use `environment(sys.function())` instead of
       # `asNamespace("remotes")` because when used as a script in
@@ -1071,7 +1081,11 @@ function(...) {
   
       fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
   
-      res <- fun(repo, ...)
+      if (!is.null(host)) {
+        res <- fun(repo, host = host, ...)
+      } else {
+        res <- fun(repo, ...)
+      }
       }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
     )
     res
