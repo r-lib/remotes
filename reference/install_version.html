@@ -134,21 +134,21 @@ archive directories, in order to find specific versions of the requested package
 <code>archive</code> directories, in order to find specific versions of the requested package.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_version</span>(
-  <span class='kw'>package</span>,
-  version = <span class='kw'>NULL</span>,
-  dependencies = <span class='fl'>NA</span>,
-  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  force = <span class='fl'>FALSE</span>,
-  quiet = <span class='fl'>FALSE</span>,
-  build = <span class='fl'>FALSE</span>,
-  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  build_manual = <span class='fl'>FALSE</span>,
-  build_vignettes = <span class='fl'>FALSE</span>,
-  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  type = <span class='st'>"source"</span>,
-  <span class='kw'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>install_version</span><span class='op'>(</span>
+  <span class='va'>package</span>,
+  version <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dependencies <span class='op'>=</span> <span class='cn'>NA</span>,
+  upgrade <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span><span class='op'>)</span>,
+  force <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  build <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  build_opts <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span><span class='op'>)</span>,
+  build_manual <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  build_vignettes <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  repos <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"repos"</span><span class='op'>)</span>,
+  type <span class='op'>=</span> <span class='st'>"source"</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -192,7 +192,7 @@ in package dependencies. One of the following formats:</p><ul>
     </tr>
     <tr>
       <th>upgrade</th>
-      <td><p>One of "default", "ask", "always", or "never". "default"
+      <td><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
 and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent
@@ -272,19 +272,19 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 <code><a href='install_url.html'>install_url</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"1.11.0"</span>)
-<span class='fu'>install_version</span>(<span class='st'>"devtools"</span>, <span class='st'>"&gt;= 1.12.0, &lt; 1.14"</span>)
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>install_version</span><span class='op'>(</span><span class='st'>"devtools"</span>, <span class='st'>"1.11.0"</span><span class='op'>)</span>
+<span class='fu'>install_version</span><span class='op'>(</span><span class='st'>"devtools"</span>, <span class='st'>"&gt;= 1.12.0, &lt; 1.14"</span><span class='op'>)</span>
 
 <span class='co'>## Specify search order (e.g. in ~/.Rprofile)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(repos = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(
-  prod = <span class='st'>"http://mycompany.example.com/r-repo"</span>,
-  dev = <span class='st'>"http://mycompany.example.com/r-repo-dev"</span>,
-  CRAN = <span class='st'>"https://cran.revolutionanalytics.com"</span>
-))
-<span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.15"</span>) <span class='co'># finds in 'prod'</span>
-<span class='fu'>install_version</span>(<span class='st'>"mypackage"</span>, <span class='st'>"1.16-39487"</span>) <span class='co'># finds in 'dev'</span>
-}
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span><span class='op'>(</span>repos <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+  prod <span class='op'>=</span> <span class='st'>"http://mycompany.example.com/r-repo"</span>,
+  dev <span class='op'>=</span> <span class='st'>"http://mycompany.example.com/r-repo-dev"</span>,
+  CRAN <span class='op'>=</span> <span class='st'>"https://cran.revolutionanalytics.com"</span>
+<span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>install_version</span><span class='op'>(</span><span class='st'>"mypackage"</span>, <span class='st'>"1.15"</span><span class='op'>)</span> <span class='co'># finds in 'prod'</span>
+<span class='fu'>install_version</span><span class='op'>(</span><span class='st'>"mypackage"</span>, <span class='st'>"1.16-39487"</span><span class='op'>)</span> <span class='co'># finds in 'dev'</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

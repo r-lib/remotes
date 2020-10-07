@@ -134,9 +134,9 @@ specified R version." />
 specified R version.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bioc_version</span>(r_ver = <span class='fu'><a href='https://rdrr.io/r/base/numeric_version.html'>getRversion</a></span>())
+    <pre class="usage"><span class='fu'>bioc_version</span><span class='op'>(</span>r_ver <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric_version.html'>getRversion</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>bioc_install_repos</span>(r_ver = <span class='fu'><a href='https://rdrr.io/r/base/numeric_version.html'>getRversion</a></span>(), bioc_ver = <span class='fu'>bioc_version</span>(<span class='kw'>r_ver</span>))</pre>
+<span class='fu'>bioc_install_repos</span><span class='op'>(</span>r_ver <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric_version.html'>getRversion</a></span><span class='op'>(</span><span class='op'>)</span>, bioc_ver <span class='op'>=</span> <span class='fu'>bioc_version</span><span class='op'>(</span><span class='va'>r_ver</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,9 +172,9 @@ Bioconductor mirror. The option takes precedence if both are set. Its
 default value is <code>https://bioconductor.org</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>bioc_version</span>()
-</div><div class='output co'>#&gt; [1] ‘3.11’</div><div class='input'><span class='fu'>bioc_version</span>(<span class='st'>"3.4"</span>)
-</div><div class='output co'>#&gt; [1] ‘3.6’</div><div class='input'><span class='fu'>bioc_install_repos</span>()
+    <pre class="examples"><div class='input'><span class='fu'>bioc_version</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] ‘3.11’</div><div class='input'><span class='fu'>bioc_version</span><span class='op'>(</span><span class='st'>"3.4"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] ‘3.6’</div><div class='input'><span class='fu'>bioc_install_repos</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;                                                 BioCsoft 
 #&gt;            "https://bioconductor.org/packages/3.11/bioc" 
 #&gt;                                                  BioCann 

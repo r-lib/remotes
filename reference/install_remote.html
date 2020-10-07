@@ -144,30 +144,30 @@ calls install
 
     </div>
 
-    <pre class="usage"><span class='fu'>install_remote</span>(
-  <span class='kw'>remote</span>,
-  <span class='kw'>dependencies</span>,
-  <span class='kw'>upgrade</span>,
-  <span class='kw'>force</span>,
-  <span class='kw'>quiet</span>,
-  <span class='kw'>build</span>,
-  <span class='kw'>build_opts</span>,
-  <span class='kw'>build_manual</span>,
-  <span class='kw'>build_vignettes</span>,
-  <span class='kw'>repos</span>,
-  <span class='kw'>type</span>,
-  <span class='kw'>...</span>
-)
+    <pre class="usage"><span class='fu'>install_remote</span><span class='op'>(</span>
+  <span class='va'>remote</span>,
+  <span class='va'>dependencies</span>,
+  <span class='va'>upgrade</span>,
+  <span class='va'>force</span>,
+  <span class='va'>quiet</span>,
+  <span class='va'>build</span>,
+  <span class='va'>build_opts</span>,
+  <span class='va'>build_manual</span>,
+  <span class='va'>build_vignettes</span>,
+  <span class='va'>repos</span>,
+  <span class='va'>type</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
-<span class='fu'>add_metadata</span>(<span class='kw'>pkg_path</span>, <span class='kw'>meta</span>)
+<span class='fu'>add_metadata</span><span class='op'>(</span><span class='va'>pkg_path</span>, <span class='va'>meta</span><span class='op'>)</span>
 
-<span class='fu'>remote_download</span>(<span class='kw'>x</span>, quiet = <span class='fl'>FALSE</span>)
+<span class='fu'>remote_download</span><span class='op'>(</span><span class='va'>x</span>, quiet <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>remote_metadata</span>(<span class='kw'>x</span>, bundle = <span class='kw'>NULL</span>, source = <span class='kw'>NULL</span>, sha = <span class='kw'>NULL</span>)
+<span class='fu'>remote_metadata</span><span class='op'>(</span><span class='va'>x</span>, bundle <span class='op'>=</span> <span class='cn'>NULL</span>, source <span class='op'>=</span> <span class='cn'>NULL</span>, sha <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>remote_package_name</span>(<span class='kw'>remote</span>, <span class='kw'>...</span>)
+<span class='fu'>remote_package_name</span><span class='op'>(</span><span class='va'>remote</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>remote_sha</span>(<span class='kw'>remote</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>remote_sha</span><span class='op'>(</span><span class='va'>remote</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,7 +190,7 @@ common ones include:</p><ul>
     </tr>
     <tr>
       <th>upgrade</th>
-      <td><p>One of "default", "ask", "always", or "never". "default"
+      <td><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
 and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent

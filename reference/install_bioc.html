@@ -134,22 +134,22 @@ be used." />
 be used.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_bioc</span>(
-  <span class='kw'>repo</span>,
-  mirror = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"BioC_git"</span>, <span class='fu'>download_url</span>(<span class='st'>"git.bioconductor.org/packages"</span>)),
-  git = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"auto"</span>, <span class='st'>"git2r"</span>, <span class='st'>"external"</span>),
-  dependencies = <span class='fl'>NA</span>,
-  upgrade = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span>),
-  force = <span class='fl'>FALSE</span>,
-  quiet = <span class='fl'>FALSE</span>,
-  build = <span class='fl'>TRUE</span>,
-  build_opts = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span>),
-  build_manual = <span class='fl'>FALSE</span>,
-  build_vignettes = <span class='fl'>FALSE</span>,
-  repos = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"repos"</span>),
-  type = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"pkgType"</span>),
-  <span class='kw'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>install_bioc</span><span class='op'>(</span>
+  <span class='va'>repo</span>,
+  mirror <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"BioC_git"</span>, <span class='fu'>download_url</span><span class='op'>(</span><span class='st'>"git.bioconductor.org/packages"</span><span class='op'>)</span><span class='op'>)</span>,
+  git <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"auto"</span>, <span class='st'>"git2r"</span>, <span class='st'>"external"</span><span class='op'>)</span>,
+  dependencies <span class='op'>=</span> <span class='cn'>NA</span>,
+  upgrade <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"default"</span>, <span class='st'>"ask"</span>, <span class='st'>"always"</span>, <span class='st'>"never"</span><span class='op'>)</span>,
+  force <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  build <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  build_opts <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"--no-resave-data"</span>, <span class='st'>"--no-manual"</span>, <span class='st'>"--no-build-vignettes"</span><span class='op'>)</span>,
+  build_manual <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  build_vignettes <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  repos <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"repos"</span><span class='op'>)</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"pkgType"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,7 +190,7 @@ common ones include:</p><ul>
     </tr>
     <tr>
       <th>upgrade</th>
-      <td><p>One of "default", "ask", "always", or "never". "default"
+      <td><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
 and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent
@@ -259,15 +259,15 @@ install the release version of a Bioconductor package one can use the
 <code><a href='install_version.html'>install_version</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>install_bioc</span>(<span class='st'>"SummarizedExperiment"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"devel/SummarizedExperiment"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"3.3/SummarizedExperiment"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"SummarizedExperiment#abc123"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"user:password@release/SummarizedExperiment"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"user:password@devel/SummarizedExperiment"</span>)
-<span class='fu'>install_bioc</span>(<span class='st'>"user:password@SummarizedExperiment#abc123"</span>)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"SummarizedExperiment"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"devel/SummarizedExperiment"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"3.3/SummarizedExperiment"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"SummarizedExperiment#abc123"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"user:password@release/SummarizedExperiment"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"user:password@devel/SummarizedExperiment"</span><span class='op'>)</span>
+<span class='fu'>install_bioc</span><span class='op'>(</span><span class='st'>"user:password@SummarizedExperiment#abc123"</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
