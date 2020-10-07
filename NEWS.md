@@ -2,6 +2,8 @@
 
 * `install_*()` functions will no longer fail by default if there warnings from `install.packages()`. Concretely the default value of `R_REMOTES_NO_ERRORS_FROM_WARNINGS` has changed to `true` from the previous value of `false`. (#403)
 
+* `system_requirements()` now supports querying released packages as well as development dependencies (#545)
+
 # remotes 2.2.0
 
 ##  New functions and features

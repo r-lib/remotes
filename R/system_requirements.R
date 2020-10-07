@@ -10,10 +10,11 @@ DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 #'   <https://github.com/rstudio/r-system-requirements#operating-systems> for the
 #'   list of supported operating systems.
 #' @param path The path to the dev package's root directory.
+#' @param package A CRAN package name. If not `NULL`, this is used and `path` is ignored.
 #' @param curl The location of the curl binary on your system.
 #' @return A character vector of commands needed to install the system requirements for the package.
 #' @export
-system_requirements <- function(os, os_release, path = ".", curl = Sys.which("curl")) {
+system_requirements <- function(os, os_release, path = ".", package = NULL, curl = Sys.which("curl")) {
   os_versions <- supported_os_versions()
 
   os <- match.arg(os, names(os_versions))
@@ -28,31 +29,48 @@ system_requirements <- function(os, os_release, path = ".", curl = Sys.which("cu
   rspm_repo_id <- Sys.getenv("RSPM_REPO_ID", DEFAULT_RSPM_REPO_ID)
   rspm_repo_url <- sprintf("%s/__api__/repos/%s", rspm, rspm_repo_id)
 
-  desc_file <- normalizePath(file.path(path, "DESCRIPTION"), mustWork = FALSE)
-  if (!file.exists(desc_file)) {
-    stop("`", path, "` must contain a package.", call. = FALSE)
-  }
-
-  res <- system2(
-    curl,
-    args = c(
-      "--silent",
-      "--data-binary",
-      shQuote(paste0("@", desc_file)),
-      shQuote(sprintf("%s/sysreqs?distribution=%s&release=%s&suggests=true",
+  if (!is.null(package)) {
+    res <- system2(
+      curl,
+      args = c(
+        "--silent",
+        shQuote(sprintf("%s/sysreqs?all=false&pkgname=%s&distribution=%s&release=%s",
           rspm_repo_url,
+          package,
           os,
           os_release)
+      )),
+      stdout = TRUE
+    )
+    res <- json$parse(res)
+
+    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["pre_install"]]))))
+    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["install_scripts"]]))))
+  } else {
+    desc_file <- normalizePath(file.path(path, "DESCRIPTION"), mustWork = FALSE)
+    if (!file.exists(desc_file)) {
+      stop("`", path, "` must contain a package.", call. = FALSE)
+    }
+
+    res <- system2(
+      curl,
+      args = c(
+        "--silent",
+        "--data-binary",
+        shQuote(paste0("@", desc_file)),
+        shQuote(sprintf("%s/sysreqs?distribution=%s&release=%s&suggests=true",
+            rspm_repo_url,
+            os,
+            os_release)
         )
-      ),
-    stdout = TRUE
-  )
+        ),
+      stdout = TRUE
+    )
+    res <- json$parse(res)
 
-  res <- json$parse(res)
-
-  pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["dependencies"]], `[[`, "pre_install"))))
-
-  install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["dependencies"]], `[[`, "install_scripts"))))
+    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["dependencies"]], `[[`, "pre_install"))))
+    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["dependencies"]], `[[`, "install_scripts"))))
+  }
 
   as.character(c(pre_install, install_scripts))
 }
