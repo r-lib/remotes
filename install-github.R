@@ -1709,7 +1709,7 @@ function(...) {
   github_commit <- function(username, repo, ref = "HEAD",
     host = "api.github.com", pat = github_pat(), use_curl = !is_standalone() && pkg_installed("curl"), current_sha = NULL) {
   
-    url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
+    url <- build_url(host, "repos", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "commits", utils::URLencode(ref, reserved = TRUE))
   
     if (isTRUE(use_curl)) {
       h <- curl::new_handle()
@@ -3261,7 +3261,7 @@ function(...) {
   gitlab_commit <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
-    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
   
     tmp <- tempfile()
     download(tmp, url, headers = c("Private-Token" = pat))
