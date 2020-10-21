@@ -43,7 +43,7 @@ common ones include:
 
 \item{type}{Type of package to \code{update}.}
 
-\item{upgrade}{One of "default", "ask", "always", or "never". "default"
+\item{upgrade}{Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the \code{R_REMOTES_UPGRADE} environment variable if set,
 and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent

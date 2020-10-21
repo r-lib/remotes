@@ -4,7 +4,13 @@
 \alias{system_requirements}
 \title{Query the system requirements for a dev package (and its dependencies)}
 \usage{
-system_requirements(os, os_release, path = ".", curl = Sys.which("curl"))
+system_requirements(
+  os,
+  os_release,
+  path = ".",
+  package = NULL,
+  curl = Sys.which("curl")
+)
 }
 \arguments{
 \item{os, os_release}{The operating system and operating system release version, see
@@ -12,6 +18,8 @@ system_requirements(os, os_release, path = ".", curl = Sys.which("curl"))
 list of supported operating systems.}
 
 \item{path}{The path to the dev package's root directory.}
+
+\item{package}{A CRAN package name. If not \code{NULL}, this is used and \code{path} is ignored.}
 
 \item{curl}{The location of the curl binary on your system.}
 }
