@@ -178,7 +178,7 @@ gitlab_pat <- function(quiet = TRUE) {
 gitlab_project_id <- function(username, repo, ref = "HEAD",
   host = "gitlab.com", pat = gitlab_pat()) {
 
-  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
 
   tmp <- tempfile()
   download(tmp, url, headers = c("Private-Token" = pat))
