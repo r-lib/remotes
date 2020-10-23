@@ -125,7 +125,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
       is.null(remote$subdir),
       "DESCRIPTION",
       utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
-    "/raw?ref=", remote$ref)
+    "/raw?ref=", utils::URLencode(remote$ref, reserved = TRUE))
 
   dest <- tempfile()
   res <- download(dest, src, headers = c("Private-Token" = remote$auth_token))
