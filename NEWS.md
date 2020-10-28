@@ -4,6 +4,8 @@
 
 * `system_requirements()` now supports querying released packages as well as development dependencies (#545)
 
+* `system_requirements()` now supports OS name + version in the `os` argument (#549, @krlmlr).
+
 # remotes 2.2.0
 
 ##  New functions and features
