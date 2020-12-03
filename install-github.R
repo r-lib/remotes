@@ -1187,7 +1187,7 @@ function(...) {
     )
   }
   
-  select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates:", width = getOption("width")) {
+  select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates: ", width = getOption("width")) {
     if (!is.null(title)) {
       cat(title, "\n", sep = "")
     }
