@@ -556,7 +556,7 @@ function(...) {
   #'   - Config/Needs/website - for dependencies used in building the pkgdown site.
   #'   - Config/Needs/coverage for dependencies used in calculating test coverage.
   #' @param quiet If `TRUE`, suppress output.
-  #' @param upgrade One of "default", "ask", "always", or "never". "default"
+  #' @param upgrade Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
   #'   respects the value of the `R_REMOTES_UPGRADE` environment variable if set,
   #'   and falls back to "ask" if unset. "ask" prompts the user for which out of
   #'   date packages to upgrade. For non-interactive sessions "ask" is equivalent
@@ -1187,7 +1187,7 @@ function(...) {
     )
   }
   
-  select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates:", width = getOption("width")) {
+  select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates: ", width = getOption("width")) {
     if (!is.null(title)) {
       cat(title, "\n", sep = "")
     }
