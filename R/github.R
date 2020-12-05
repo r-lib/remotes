@@ -4,12 +4,13 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
   url <- build_url(host, path)
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       if (!is.null(pat)) {
         c("Authorization" = paste0("token ", pat))
       }
     )
+
+    h <- curl::new_handle()
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
 
@@ -31,7 +32,6 @@ github_commit <- function(username, repo, ref = "HEAD",
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       "Accept" = "application/vnd.github.v3.sha",
       if (!is.null(pat)) {
@@ -42,6 +42,7 @@ github_commit <- function(username, repo, ref = "HEAD",
       }
     )
 
+    h <- curl::new_handle()
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code == 304) {
@@ -116,7 +117,6 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
   url <- paste0(url, "?ref=", utils::URLencode(ref))
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       "Accept" = "application/vnd.github.v3.raw",
       if (!is.null(pat)) {
@@ -124,6 +124,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
       }
     )
 
+    h <- curl::new_handle()
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code >= 300) {
