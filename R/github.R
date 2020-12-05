@@ -10,7 +10,7 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
       }
     )
 
-    res <- curl_fetch_memory(url, headers)
+    res <- github_curl_fetch_memory(url, headers)
     json$parse(raw_to_char_utf8(res$content))
   } else {
     tmp <- tempfile()
@@ -36,7 +36,7 @@ github_commit <- function(username, repo, ref = "HEAD",
       }
     )
 
-    res <- curl_fetch_memory(url, headers, accept = 304)
+    res <- github_curl_fetch_memory(url, headers, accept = 304)
 
     if (res$status_code == 304) {
       return(current_sha)
@@ -114,7 +114,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
       }
     )
 
-    res <- curl_fetch_memory(url, headers)
+    res <- github_curl_fetch_memory(url, headers)
 
     raw_to_char_utf8(res$content)
   } else {
@@ -128,7 +128,7 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
   }
 }
 
-curl_fetch_memory <- function(url, headers, accept = NULL) {
+github_curl_fetch_memory <- function(url, headers, accept = NULL) {
   h <- curl::new_handle()
   curl::handle_setheaders(h, .list = headers)
   res <- curl::curl_fetch_memory(url, handle = h)
