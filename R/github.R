@@ -36,7 +36,7 @@ github_commit <- function(username, repo, ref = "HEAD",
       }
     )
 
-    res <- curl_fetch_memory(url, headers, accept == 304)
+    res <- curl_fetch_memory(url, headers, accept = 304)
 
     if (res$status_code == 304) {
       return(current_sha)
