@@ -36,12 +36,12 @@ github_commit <- function(username, repo, ref = "HEAD",
       "Accept" = "application/vnd.github.v3.sha",
       if (!is.null(pat)) {
         c("Authorization" = paste0("token ", pat))
+      },
+      if (!is.null(current_sha)) {
+        c("If-None-Match" = paste0('"', current_sha, '"'))
       }
     )
 
-    if (!is.null(current_sha)) {
-      headers <- c(headers, "If-None-Match" = paste0('"', current_sha, '"'))
-    }
     curl::handle_setheaders(h, .list = headers)
     res <- curl::curl_fetch_memory(url, handle = h)
     if (res$status_code == 304) {
