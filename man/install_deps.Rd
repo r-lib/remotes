@@ -54,12 +54,11 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build} is \code{TRUE}.}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
-\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
-is \code{TRUE}.}
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
 
 \item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
