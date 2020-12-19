@@ -26,7 +26,7 @@ install_gitlab(
 \item{repo}{Repository address in the format
 \verb{username/repo[@ref]}.}
 
-\item{subdir}{subdirectory within repo that contains the R package.}
+\item{subdir}{Subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal access
 token (PAT) in \url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and

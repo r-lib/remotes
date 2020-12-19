@@ -36,7 +36,7 @@ name, or a call to \code{\link[=github_pull]{github_pull()}} or \code{\link[=git
 See \href{https://help.github.com/en/github/administering-a-repository/setting-the-default-branch}{setting-the-default-branch}
 for more details.}
 
-\item{subdir}{subdirectory within repo that contains the R package.}
+\item{subdir}{Subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal
 access token (PAT) in "https://github.com/settings/tokens" and

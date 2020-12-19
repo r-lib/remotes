@@ -19,7 +19,7 @@ install_deps(
 )
 }
 \arguments{
-\item{pkgdir}{path to a package directory, or to a package tarball.}
+\item{pkgdir}{Path to a package directory, or to a package tarball.}
 
 \item{dependencies}{Which dependencies do you want to check?
 Can be a character vector (selecting from "Depends", "Imports",

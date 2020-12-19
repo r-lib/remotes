@@ -20,7 +20,7 @@ install_cran(
 )
 }
 \arguments{
-\item{pkgs}{Character vector of packages to install.}
+\item{pkgs}{A character vector of packages to install.}
 
 \item{repos}{A character vector giving repositories to use.}
 

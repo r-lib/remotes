@@ -63,7 +63,7 @@ common ones include:
 
 \item{type}{Type of package to \code{update}.}
 
-\item{pkgdir}{path to a package directory, or to a package tarball.}
+\item{pkgdir}{Path to a package directory, or to a package tarball.}
 
 \item{object}{A \code{package_deps} object.}
 

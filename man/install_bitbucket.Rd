@@ -34,7 +34,7 @@ precedence.}
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
 Defaults to HEAD.}
 
-\item{subdir}{subdirectory within repo that contains the R package.}
+\item{subdir}{Subdirectory within repo that contains the R package.}
 
 \item{auth_user}{your account username if you're attempting to install
 a package hosted in a private repository (and your username is different
