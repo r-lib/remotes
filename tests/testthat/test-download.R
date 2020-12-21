@@ -257,3 +257,42 @@ test_that("base curl download redirects", {
   resp <- json$parse(readLines(tmp, warn = FALSE))
   expect_equal(resp$url, httpbin$url("/get"))
 })
+
+test_that("basic + token auth is error", {
+  expect_error(
+    download(
+      httpbin$url("/get"),
+      auth_token = "foo",
+      basic_auth = list(user = "user", password = "pass")
+    ),
+    "Cannot use both Basic and Token authentication"
+  )
+})
+
+test_that("curl is needed for older R", {
+  mockery::stub(curl_download, "pkg_installed", FALSE)
+  expect_error(
+    curl_download(httpbin$url("/get"), tempfile(), TRUE, list()),
+    "The 'curl' package is required"
+  )
+})
+
+test_that("base download fails", {
+  skip_without_program("curl")
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+
+  url <- httpbin$url("/status/404")
+  msg <- if (getRversion() < "3.4.0") {
+    "Cannot download file from"
+  } else {
+    "'curl' call had nonzero exit status"
+  }
+  expect_error(
+    with_options(
+      list(download.file.method = "curl"),
+      base_download(url, path = tmp, quiet = TRUE, headers = list())),
+    msg
+  )
+})
