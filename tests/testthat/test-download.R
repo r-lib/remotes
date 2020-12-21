@@ -49,7 +49,7 @@ test_that("os_type", {
 test_that("download fallback to curl, https", {
   skip_if(is_standalone())
 
-  mockery::stub(download, "get_r_version", "3.0.0")
+  mockery::stub(download, "getRversion", package_version("3.0.0"))
   download(tmp <- tempfile(), httpbin$url("/ip"))
   expect_match(paste(readLines(tmp, warn = FALSE), collapse = "\n"), "origin")
 })
@@ -57,7 +57,7 @@ test_that("download fallback to curl, https", {
 test_that("download with curl, basic auth", {
   skip_if(is_standalone())
 
-  mockery::stub(download, "get_r_version", "3.0.0")
+  mockery::stub(download, "getRversion", package_version("3.0.0"))
   download(
     tmp <- tempfile(),
     httpbin$url("/basic-auth/user/passwd"),
@@ -230,7 +230,7 @@ test_that("base wininet download with basic auth", {
 })
 
 test_that("curl download with basic auth", {
-  mockery::stub(download, "get_r_version", "3.0.0")
+  mockery::stub(download, "getRversion", package_version("3.0.0"))
 
   url <- httpbin$url("/basic-auth/ruser/rpass")
   tmp <- tempfile()
