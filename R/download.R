@@ -109,7 +109,7 @@ base_download_curl <- function(url, path, quiet, headers) {
 
   # always add `-L`, so that curl follows redirects. GitHub in particular uses
   # 302 redirects extensively, so without -L these requests fail.
-  extra <- c(extra, "-L")
+  extra <- c(extra, "--fail", "-L")
 
   if (length(headers)) {
     qh <- shQuote(paste0(names(headers), ": ", headers))
