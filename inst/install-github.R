@@ -1066,6 +1066,16 @@ function(...) {
     } else {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
+  
+    if (grepl("@", type)) {
+      # Custom host
+      tah <- strsplit(type, "@", fixed = TRUE)[[1]]
+      type <- tah[1]
+      host <- tah[2]
+    } else {
+      host <- NULL
+    }
+  
     tryCatch({
       # We need to use `environment(sys.function())` instead of
       # `asNamespace("remotes")` because when used as a script in
@@ -1073,7 +1083,11 @@ function(...) {
   
       fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
   
-      res <- fun(repo, ...)
+      if (!is.null(host)) {
+        res <- fun(repo, host = host, ...)
+      } else {
+        res <- fun(repo, ...)
+      }
       }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
     )
     res
@@ -3225,7 +3239,7 @@ function(...) {
         is.null(remote$subdir),
         "DESCRIPTION",
         utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
-      "/raw?ref=", remote$ref)
+      "/raw?ref=", utils::URLencode(remote$ref, reserved = TRUE))
   
     dest <- tempfile()
     res <- download(dest, src, headers = c("Private-Token" = remote$auth_token))
@@ -3249,7 +3263,7 @@ function(...) {
   gitlab_commit <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
-    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
   
     tmp <- tempfile()
     download(tmp, url, headers = c("Private-Token" = pat))
@@ -3278,7 +3292,7 @@ function(...) {
   gitlab_project_id <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
-    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
   
     tmp <- tempfile()
     download(tmp, url, headers = c("Private-Token" = pat))
