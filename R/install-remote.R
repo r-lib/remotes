@@ -27,7 +27,7 @@ install_remote <- function(remote,
                            ...) {
 
   stopifnot(is.remote(remote))
-
+  
   package_name <- remote_package_name(remote)
   local_sha <- local_sha(package_name)
   remote_sha <- remote_sha(remote, local_sha)
