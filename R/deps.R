@@ -532,6 +532,16 @@ parse_one_extra <- function(x, ...) {
   } else {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
+
+  if (grepl("@", type)) {
+    # Custom host
+    tah <- strsplit(type, "@", fixed = TRUE)[[1]]
+    type <- tah[1]
+    host <- tah[2]
+  } else {
+    host <- NULL
+  }
+
   tryCatch({
     # We need to use `environment(sys.function())` instead of
     # `asNamespace("remotes")` because when used as a script in
@@ -539,7 +549,11 @@ parse_one_extra <- function(x, ...) {
 
     fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
 
-    res <- fun(repo, ...)
+    if (!is.null(host)) {
+      res <- fun(repo, host = host, ...)
+    } else {
+      res <- fun(repo, ...)
+    }
     }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
   )
   res
@@ -655,7 +669,7 @@ upgradable_packages <- function(x, upgrade, quiet, is_interactive = interactive(
   )
 }
 
-select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates:", width = getOption("width")) {
+select_menu <- function(choices, title = NULL, msg = "Enter one or more numbers, or an empty line to skip updates: ", width = getOption("width")) {
   if (!is.null(title)) {
     cat(title, "\n", sep = "")
   }

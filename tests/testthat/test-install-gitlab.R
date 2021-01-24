@@ -117,6 +117,18 @@ test_that("remote_sha.gitlab_remote", {
     "0f39d9eb735bf16909831c0bb129063dda388375"
   )
 
+  expect_equal(
+    remote_sha(
+      remote("gitlab",
+        host = "https://gitlab.com",
+        username = "drgola",
+        repo = "r_pkg_test",
+        ref = "feature/foo_mult"
+      )
+    ),
+    "58376e96e9b42baece2ab7c0414db6064740c6b6"
+  )
+
 })
 
 test_that("gitlab_project_id", {
