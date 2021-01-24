@@ -125,7 +125,7 @@ remote_package_name.gitlab_remote <- function(remote, ...) {
       is.null(remote$subdir),
       "DESCRIPTION",
       utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
-    "/raw?ref=", remote$ref)
+    "/raw?ref=", utils::URLencode(remote$ref, reserved = TRUE))
 
   dest <- tempfile()
   res <- download(dest, src, headers = c("Private-Token" = remote$auth_token))
@@ -149,7 +149,7 @@ format.gitlab_remote <- function(x, ...) {
 gitlab_commit <- function(username, repo, ref = "HEAD",
   host = "gitlab.com", pat = gitlab_pat()) {
 
-  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
 
   tmp <- tempfile()
   download(tmp, url, headers = c("Private-Token" = pat))
@@ -178,7 +178,7 @@ gitlab_pat <- function(quiet = TRUE) {
 gitlab_project_id <- function(username, repo, ref = "HEAD",
   host = "gitlab.com", pat = gitlab_pat()) {
 
-  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+  url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
 
   tmp <- tempfile()
   download(tmp, url, headers = c("Private-Token" = pat))

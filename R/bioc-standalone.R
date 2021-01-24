@@ -66,6 +66,7 @@
 #' * 2019-05-30 First version in remotes.
 #' * 2020-03-22 get_matching_bioc_version() is now correct if the current
 #'              R version is not in the builtin mapping.
+#' * 2020-11-21 Update internal map for 3.12.
 #'
 #' @name bioconductor
 #' @keywords internal
@@ -102,7 +103,8 @@ bioconductor <- local({
     "3.3"  = package_version("3.4"),
     "3.4"  = package_version("3.6"),
     "3.5"  = package_version("3.8"),
-    "3.6"  = package_version("3.10")
+    "3.6"  = package_version("3.10"),
+    "4.0"  = package_version("3.12")
   )
 
   # -------------------------------------------------------------------

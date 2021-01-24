@@ -74,6 +74,7 @@ function(...) {
   #' * 2019-05-30 First version in remotes.
   #' * 2020-03-22 get_matching_bioc_version() is now correct if the current
   #'              R version is not in the builtin mapping.
+  #' * 2020-11-21 Update internal map for 3.12.
   #'
   #' @name bioconductor
   #' @keywords internal
@@ -110,7 +111,8 @@ function(...) {
       "3.3"  = package_version("3.4"),
       "3.4"  = package_version("3.6"),
       "3.5"  = package_version("3.8"),
-      "3.6"  = package_version("3.10")
+      "3.6"  = package_version("3.10"),
+      "4.0"  = package_version("3.12")
     )
   
     # -------------------------------------------------------------------
@@ -1064,6 +1066,16 @@ function(...) {
     } else {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
+  
+    if (grepl("@", type)) {
+      # Custom host
+      tah <- strsplit(type, "@", fixed = TRUE)[[1]]
+      type <- tah[1]
+      host <- tah[2]
+    } else {
+      host <- NULL
+    }
+  
     tryCatch({
       # We need to use `environment(sys.function())` instead of
       # `asNamespace("remotes")` because when used as a script in
@@ -1071,7 +1083,11 @@ function(...) {
   
       fun <- get(paste0(tolower(type), "_remote"), mode = "function", inherits = TRUE)
   
-      res <- fun(repo, ...)
+      if (!is.null(host)) {
+        res <- fun(repo, host = host, ...)
+      } else {
+        res <- fun(repo, ...)
+      }
       }, error = function(e) stop("Unknown remote type: ", type, "\n  ", conditionMessage(e), call. = FALSE)
     )
     res
@@ -1422,7 +1438,7 @@ function(...) {
   
     # always add `-L`, so that curl follows redirects. GitHub in particular uses
     # 302 redirects extensively, so without -L these requests fail.
-    extra <- c(extra, "-L")
+    extra <- c(extra, "--fail", "-L")
   
     if (length(headers)) {
       qh <- shQuote(paste0(names(headers), ": ", headers))
@@ -3223,7 +3239,7 @@ function(...) {
         is.null(remote$subdir),
         "DESCRIPTION",
         utils::URLencode(paste0(remote$subdir, "/DESCRIPTION"), reserved = TRUE)),
-      "/raw?ref=", remote$ref)
+      "/raw?ref=", utils::URLencode(remote$ref, reserved = TRUE))
   
     dest <- tempfile()
     res <- download(dest, src, headers = c("Private-Token" = remote$auth_token))
@@ -3247,7 +3263,7 @@ function(...) {
   gitlab_commit <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
-    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
   
     tmp <- tempfile()
     download(tmp, url, headers = c("Private-Token" = pat))
@@ -3276,7 +3292,7 @@ function(...) {
   gitlab_project_id <- function(username, repo, ref = "HEAD",
     host = "gitlab.com", pat = gitlab_pat()) {
   
-    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", ref)
+    url <- build_url(host, "api", "v4", "projects", utils::URLencode(paste0(username, "/", repo), reserved = TRUE), "repository", "commits", utils::URLencode(ref, reserved = TRUE))
   
     tmp <- tempfile()
     download(tmp, url, headers = c("Private-Token" = pat))
