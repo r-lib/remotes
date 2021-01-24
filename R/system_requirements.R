@@ -19,13 +19,13 @@ DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 #' @export
 system_requirements <- function(os, os_release = NULL, path = ".", package = NULL, curl = Sys.which("curl")) {
   if (is.null(os_release)) {
-    rx <- "^([^-]+)-([^-]+)$"
-    if (!grepl(rx, os)) {
+    os_release <- strsplit(os_release, "-", fixed = TRUE)[[1]]
+    if (length(os_release) != 2) {
       stop("If os_release is missing, os must consist of name and release.", call. = FALSE)
     }
 
-    os_release <- gsub(rx, "\\2", os)
-    os <- gsub(rx, "\\1", os)
+    os <- os_release[[1]]
+    os_release <- os_release[[2]]
   }
 
   os_versions <- supported_os_versions()
