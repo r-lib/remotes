@@ -52,12 +52,12 @@ install_gitlab <- function(repo,
                   ...)
 }
 
-gitlab_remote <- function(repo, subdir = NULL,
+gitlab_remote <- function(repo, ref = "HEAD", subdir = NULL,
                        auth_token = gitlab_pat(), sha = NULL,
                        host = "gitlab.com", ...) {
 
   meta <- parse_git_repo(repo)
-  meta$ref <- meta$ref %||% "HEAD"
+  meta <- gitlab_resolve_ref(meta$ref %||% ref, meta, host = host, auth_token = auth_token)
 
   remote("gitlab",
     host = host,
@@ -106,6 +106,72 @@ remote_metadata.gitlab_remote <- function(x, bundle = NULL, source = NULL, sha =
     RemoteSha = sha,
     RemoteSubdir = x$subdir
   )
+}
+
+#' GitLab references
+#'
+#' Use as `ref` parameter to [install_gitlab()].
+#' Allows installing a specific pull request or the latest release.
+#'
+#' @param pull The pull request to install
+#' @seealso [install_gitlab()]
+#' @rdname gitlab_refs
+#' @export
+gitlab_pull <- function(pull) structure(pull, class = "gitlab_pull")
+
+#' @rdname gitlab_refs
+#' @export
+gitlab_release <- function() structure(NA_integer_, class = "gitlab_release")
+
+gitlab_resolve_ref <- function(x, params, ...) UseMethod("gitlab_resolve_ref")
+
+#' @export
+gitlab_resolve_ref.default <- function(x, params, ...) {
+  params$ref <- x
+  params
+}
+
+#' @export
+gitlab_resolve_ref.NULL <- function(x, params, ...) {
+  params$ref <- "HEAD"
+  params
+}
+
+#' @export
+gitlab_resolve_ref.github_pull <- function(x, params, ..., host, auth_token = gitlab_pat()) {
+
+}
+
+# Retrieve the ref for the latest release
+#' @export
+gitlab_resolve_ref.github_release <- function(x, params, ..., host, auth_token = gitlab_pat()) {
+  # GET /projects/:user%2F:repo
+  path <- paste("projects",
+    utils::URLencode(paste0(params$username, "/", params$repo), reserved = TRUE),
+    sep = "/")
+  response <- tryCatch(
+    gitab_GET(path, host = host, pat = auth_token),
+    error = function(e) e
+  )
+
+  # GET /projects/:id/:releases
+  path <- paste("projects", response$id, "releases", sep = "/")
+  response <- tryCatch(
+    gitab_GET(path, host = host, pat = auth_token),
+    error = function(e) e
+  )
+
+  if (methods::is(response, "error") || !is.null(response$message)) {
+    stop("Cannot find repo ", params$username, "/", params$repo, ".", "\n",
+      response$message)
+  }
+
+  if (length(response) == 0L)
+    stop("No releases found for repo ", params$username, "/", params$repo, ".")
+
+  params$ref <- response[[1L]]$tag_name
+  params
+
 }
 
 #' @export
