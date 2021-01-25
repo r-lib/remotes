@@ -136,7 +136,7 @@ requirements for the queried operating system.</p>
 
     <pre class="usage"><span class='fu'>system_requirements</span><span class='op'>(</span>
   <span class='va'>os</span>,
-  <span class='va'>os_release</span>,
+  os_release <span class='op'>=</span> <span class='cn'>NULL</span>,
   path <span class='op'>=</span> <span class='st'>"."</span>,
   package <span class='op'>=</span> <span class='cn'>NULL</span>,
   curl <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"curl"</span><span class='op'>)</span>
@@ -149,7 +149,9 @@ requirements for the queried operating system.</p>
       <th>os, os_release</th>
       <td><p>The operating system and operating system release version, see
 <a href='https://github.com/rstudio/r-system-requirements#operating-systems'>https://github.com/rstudio/r-system-requirements#operating-systems</a> for the
-list of supported operating systems.</p></td>
+list of supported operating systems.</p>
+<p>If <code>os_release</code> is <code>NULL</code>, <code>os</code> must consist of the operating system
+and the version separated by a dash, e.g. <code>"ubuntu-18.04"</code>.</p></td>
     </tr>
     <tr>
       <th>path</th>
