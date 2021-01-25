@@ -9,12 +9,25 @@ DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 #' @param os,os_release The operating system and operating system release version, see
 #'   <https://github.com/rstudio/r-system-requirements#operating-systems> for the
 #'   list of supported operating systems.
+#'
+#'   If `os_release` is `NULL`, `os` must consist of the operating system
+#'   and the version separated by a dash, e.g. `"ubuntu-18.04"`.
 #' @param path The path to the dev package's root directory.
 #' @param package A CRAN package name. If not `NULL`, this is used and `path` is ignored.
 #' @param curl The location of the curl binary on your system.
 #' @return A character vector of commands needed to install the system requirements for the package.
 #' @export
-system_requirements <- function(os, os_release, path = ".", package = NULL, curl = Sys.which("curl")) {
+system_requirements <- function(os, os_release = NULL, path = ".", package = NULL, curl = Sys.which("curl")) {
+  if (is.null(os_release)) {
+    os_release <- strsplit(os_release, "-", fixed = TRUE)[[1]]
+    if (length(os_release) != 2) {
+      stop("If os_release is missing, os must consist of name and release.", call. = FALSE)
+    }
+
+    os <- os_release[[1]]
+    os_release <- os_release[[2]]
+  }
+
   os_versions <- supported_os_versions()
 
   os <- match.arg(os, names(os_versions))
