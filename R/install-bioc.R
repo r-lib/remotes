@@ -254,10 +254,12 @@ bioconductor_branch <- function(release, sha) {
     sha
   } else {
     if (is.null(release)) {
-      release <- "release"
+      release <- ifelse(Sys.getenv("R_BIOC_VERSION") != "", yes = Sys.getenv("R_BIOC_VERSION"), no = "release")
     }
     if (release == "release") {
       release <- bioconductor_release()
+    } else if (release == bioconductor$get_devel_version()) {
+      release = "devel"
     }
     switch(
       tolower(release),
