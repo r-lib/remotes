@@ -254,7 +254,7 @@ bioconductor_branch <- function(release, sha) {
     sha
   } else {
     if (is.null(release)) {
-      release <- "release"
+      release <- getOption("Bioc_git_branch", "release")
     }
     if (release == "release") {
       release <- bioconductor_release()
