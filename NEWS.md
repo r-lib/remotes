@@ -1,6 +1,7 @@
 # remotes (development version)
 
 * It is now possible to specify a custom host for dependencies listed in the `DESCRIPTION` file with `Remotes: <type>[@host]::<username>/<repo>[@ref]`. The `ref` now supports `/` in it for `GitLab` repositories as it did for `GitHub`repositories. (@dagola, #448)
+* Internal `package2remote()` function now supports local remotes created by pak.
 
 * `install_*()` functions will no longer fail by default if there warnings from `install.packages()`. Concretely the default value of `R_REMOTES_NO_ERRORS_FROM_WARNINGS` has changed to `true` from the previous value of `false`. (#403)
 

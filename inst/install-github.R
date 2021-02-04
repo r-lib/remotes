@@ -3682,7 +3682,12 @@ function(...) {
         revision = x$RemoteSha,
         args = x$RemoteArgs),
       local = remote("local",
-        path = trim_ws(x$RemoteUrl),
+        path = {
+          path <- trim_ws(x$RemoteUrl)
+          if (length(path) == 0) {
+            path <- parse_pkg_ref(x$RemotePkgRef)$ref
+          }
+        },
         subdir = x$RemoteSubdir,
         sha = {
           # Packages installed locally might have RemoteSha == NA_character_
@@ -3707,6 +3712,14 @@ function(...) {
         branch = x$RemoteBranch),
       stop(sprintf("can't convert package %s with RemoteType '%s' to remote", name, x$RemoteType))
     )
+  }
+  
+  parse_pkg_ref <- function(x) {
+    res <- re_match(x, "(?<type>[^:]+)::(?<ref>.*)")
+    if (is.na(res$ref)) {
+      stop("Invalid package reference:\n  ", x, call. = FALSE)
+    }
+    res
   }
   
   #' @export
