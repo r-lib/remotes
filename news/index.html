@@ -136,6 +136,7 @@
 <li><p><code>install_*()</code> functions will no longer fail by default if there warnings from <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code>. Concretely the default value of <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS</code> has changed to <code>true</code> from the previous value of <code>false</code>. (<a href='https://github.com/r-lib/remotes/issues/403'>#403</a>)</p></li>
 <li><p><code><a href="../reference/system_requirements.html">system_requirements()</a></code> now supports querying released packages as well as development dependencies (<a href='https://github.com/r-lib/remotes/issues/545'>#545</a>)</p></li>
 <li><p><code><a href="../reference/system_requirements.html">system_requirements()</a></code> now supports OS name + version in the <code>os</code> argument (<a href='https://github.com/r-lib/remotes/issues/549'>#549</a>, <a href='https://github.com/krlmlr'>@krlmlr</a>).</p></li>
+<li><p><code><a href="../reference/install_bioc.html">install_bioc()</a></code> now respects the environment variable R_BIOC_VERSION, and will use the git branch corresponding to this Bioconductor version (<a href='https://github.com/bbimber'>@bbimber</a>, <a href='https://github.com/r-lib/remotes/issues/580'>#580</a>).</p></li>
 </ul>
 </div>
     <div id="remotes-220" class="section level1">
