@@ -9,6 +9,8 @@
 
 * `system_requirements()` now supports OS name + version in the `os` argument (#549, @krlmlr).
 
+* `install_bioc()` now respects the environment variable R_BIOC_VERSION, and will use the git branch corresponding to this Bioconductor version (@bbimber, #580).
+
 # remotes 2.2.0
 
 ##  New functions and features
