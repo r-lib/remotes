@@ -114,8 +114,8 @@ remote_download.github_remote <- function(x, quiet = FALSE) {
   }
 
   dest <- tempfile(fileext = paste0(".tar.gz"))
-  src_root <- build_url(x$host, "repos", x$username, x$repo)
-  src <- paste0(src_root, "/tarball/", utils::URLencode(x$ref, reserved = TRUE))
+  src_root <- build_url("https://github.com", x$username, x$repo)
+  src <- paste0(src_root, "/archive/v", utils::URLencode(x$ref, reserved = TRUE), ".tar.gz")
 
   download(dest, src, auth_token = x$auth_token)
 }
