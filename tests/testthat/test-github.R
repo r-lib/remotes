@@ -7,13 +7,21 @@ test_that("github_pat", {
   expect_equal(github_pat(), "badcafe")
   expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
 
+  # Check standard GITHUB_PAT
   withr::with_envvar(c(GITHUB_PAT=NA, CI=NA), {
      expect_equal(github_pat(), NULL)
   })
 
+  # Check for embedded token
   withr::with_envvar(c(GITHUB_PAT=NA, CI="true"), {
     expect_true(nzchar(github_pat()))
   })
+
+  # Check for GITHUB_TOKEN
+  withr::with_envvar(c(GITHUB_PAT=NA, GITHUB_TOKEN="hi!", CI=NA), {
+    expect_true(nzchar(github_pat()))
+  })
+
   expect_true(nzchar(github_pat()))
 })
 

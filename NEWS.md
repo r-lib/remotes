@@ -5,6 +5,8 @@
 
 * `install_*()` functions will no longer fail by default if there warnings from `install.packages()`. Concretely the default value of `R_REMOTES_NO_ERRORS_FROM_WARNINGS` has changed to `true` from the previous value of `false`. (#403)
 
+* `github_pat()` will now check if `GITHUB_TOKEN` is set if it cannot find `GITHUB_PAT`. (@coatless)
+
 * `system_requirements()` now supports querying released packages as well as development dependencies (#545)
 
 * `system_requirements()` now supports OS name + version in the `os` argument (#549, @krlmlr).
