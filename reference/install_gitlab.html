@@ -166,7 +166,7 @@ not changed since the previous installation.</p>
     </tr>
     <tr>
       <th>subdir</th>
-      <td><p>subdirectory within repo that contains the R package.</p></td>
+      <td><p>Subdirectory within repo that contains the R package.</p></td>
     </tr>
     <tr>
       <th>auth_token</th>
@@ -179,7 +179,10 @@ GITLAB_PAT environment variable.</p></td>
     <tr>
       <th>host</th>
       <td><p>GitLab API host to use. Override with your GitLab enterprise
-hostname, for example, <code>"gitlab.hostname.com"</code>.</p></td>
+hostname, for example, <code>"&lt;PROTOCOL://&gt;gitlab.hostname.com"</code>.
+The PROTOCOL is required by packrat during RStudio Connect deployment. While
+install_gitlab may work without, omitting it generally
+leads to package restoration errors.</p></td>
     </tr>
     <tr>
       <th>dependencies</th>
@@ -221,7 +224,7 @@ since the previous install.</p></td>
     </tr>
     <tr>
       <th>build_opts</th>
-      <td><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code></p></td>
+      <td><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code> is <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>build_manual</th>
@@ -229,8 +232,7 @@ since the previous install.</p></td>
     </tr>
     <tr>
       <th>build_vignettes</th>
-      <td><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').
-is <code>TRUE</code>.</p></td>
+      <td><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').</p></td>
     </tr>
     <tr>
       <th>repos</th>
