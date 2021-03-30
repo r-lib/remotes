@@ -8,7 +8,7 @@ test_that("github_pat", {
   expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
 
   # Check standard GITHUB_PAT
-  withr::with_envvar(c(GITHUB_PAT=NA, CI=NA), {
+  withr::with_envvar(c(GITHUB_PAT = NA, GITHUB_TOKEN = NA, CI = NA), {
      expect_equal(github_pat(), NULL)
   })
 
