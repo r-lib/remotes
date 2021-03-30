@@ -45,6 +45,9 @@
 #' # GITHUB_PAT.
 #' install_github("hadley/private", auth_token = "abc")
 #'
+#' # To pass option arguments to `R CDM INSTALL` use `INSTALL_opts`. e.g. to
+#' install a package with source references and tests
+#' install_github("rstudio/shiny", INSTALL_opts = c("--with-keep.source", "--install-tests"))
 #' }
 install_github <- function(repo,
                            ref = "HEAD",

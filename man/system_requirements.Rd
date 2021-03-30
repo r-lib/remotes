@@ -4,14 +4,25 @@
 \alias{system_requirements}
 \title{Query the system requirements for a dev package (and its dependencies)}
 \usage{
-system_requirements(os, os_release, path = ".", curl = Sys.which("curl"))
+system_requirements(
+  os,
+  os_release = NULL,
+  path = ".",
+  package = NULL,
+  curl = Sys.which("curl")
+)
 }
 \arguments{
 \item{os, os_release}{The operating system and operating system release version, see
 \url{https://github.com/rstudio/r-system-requirements#operating-systems} for the
-list of supported operating systems.}
+list of supported operating systems.
+
+If \code{os_release} is \code{NULL}, \code{os} must consist of the operating system
+and the version separated by a dash, e.g. \code{"ubuntu-18.04"}.}
 
 \item{path}{The path to the dev package's root directory.}
+
+\item{package}{A CRAN package name. If not \code{NULL}, this is used and \code{path} is ignored.}
 
 \item{curl}{The location of the curl binary on your system.}
 }

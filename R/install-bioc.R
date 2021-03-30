@@ -254,10 +254,12 @@ bioconductor_branch <- function(release, sha) {
     sha
   } else {
     if (is.null(release)) {
-      release <- "release"
+      release <- Sys.getenv("R_BIOC_VERSION", "release")
     }
     if (release == "release") {
       release <- bioconductor_release()
+    } else if (release == bioconductor$get_devel_version()) {
+      release <- "devel"
     }
     switch(
       tolower(release),
@@ -299,4 +301,3 @@ git_repo_sha1 <- function(r) {
     git2r::branch_target(rev)
   }
 }
-
