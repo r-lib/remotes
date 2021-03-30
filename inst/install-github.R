@@ -541,7 +541,7 @@ function(...) {
   #' `update()` method installs outdated or missing packages from CRAN.
   #'
   #' @param packages A character vector of package names.
-  #' @param pkgdir path to a package directory, or to a package tarball.
+  #' @param pkgdir Path to a package directory, or to a package tarball.
   #' @param dependencies Which dependencies do you want to check?
   #'   Can be a character vector (selecting from "Depends", "Imports",
   #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.
@@ -678,7 +678,7 @@ function(...) {
   
     res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
   
-    res[!duplicated(res$package, fromLast = TRUE), ]
+    res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
   }
   
   combine_remote_deps <- function(cran_deps, remote_deps) {
@@ -1747,18 +1747,25 @@ function(...) {
   #' Retrieve Github personal access token.
   #'
   #' A github personal access token
-  #' Looks in env var `GITHUB_PAT`
+  #' Looks in env var `GITHUB_PAT` or `GITHUB_TOKEN`.
   #'
   #' @keywords internal
   #' @noRd
   github_pat <- function(quiet = TRUE) {
-    pat <- Sys.getenv("GITHUB_PAT")
   
-    if (nzchar(pat)) {
-      if (!quiet) {
-        message("Using github PAT from envvar GITHUB_PAT")
+    env_var_aliases <- c(
+      "GITHUB_PAT",
+      "GITHUB_TOKEN"
+    )
+  
+    for (env_var in env_var_aliases) {
+      pat <- Sys.getenv(env_var)
+      if (nzchar(pat)) {
+        if (!quiet) {
+          message("Using github PAT from envvar ", env_var)
+        }
+        return(pat)
       }
-      return(pat)
     }
   
     if (in_ci()) {
@@ -2168,10 +2175,12 @@ function(...) {
       sha
     } else {
       if (is.null(release)) {
-        release <- "release"
+        release <- Sys.getenv("R_BIOC_VERSION", "release")
       }
       if (release == "release") {
         release <- bioconductor_release()
+      } else if (release == bioconductor$get_devel_version()) {
+        release <- "devel"
       }
       switch(
         tolower(release),
@@ -2213,7 +2222,6 @@ function(...) {
       git2r::branch_target(rev)
     }
   }
-  
   # Contents of R/install-bitbucket.R
   
   #' Install a package directly from Bitbucket
@@ -2434,7 +2442,7 @@ function(...) {
   #' This function is vectorised on `pkgs` so you can install multiple
   #' packages in a single command.
   #'
-  #' @param pkgs Character vector of packages to install.
+  #' @param pkgs A character vector of packages to install.
   #' @inheritParams install_github
   #' @export
   #' @family package installation
@@ -2855,7 +2863,7 @@ function(...) {
   #'   `"HEAD"`, which means the default branch on GitHub and for git remotes.
   #'   See [setting-the-default-branch](https://help.github.com/en/github/administering-a-repository/setting-the-default-branch)
   #'   for more details.
-  #' @param subdir subdirectory within repo that contains the R package.
+  #' @param subdir Subdirectory within repo that contains the R package.
   #' @param auth_token To install from a private repo, generate a personal
   #'   access token (PAT) in "https://github.com/settings/tokens" and
   #'   supply to this argument. This is safer than using a password because
@@ -3123,7 +3131,10 @@ function(...) {
   #' @param repo Repository address in the format
   #'   `username/repo[@@ref]`.
   #' @param host GitLab API host to use. Override with your GitLab enterprise
-  #'   hostname, for example, `"gitlab.hostname.com"`.
+  #'   hostname, for example, `"<PROTOCOL://>gitlab.hostname.com"`.
+  #'   The PROTOCOL is required by packrat during RStudio Connect deployment. While
+  #'   \link{install_gitlab} may work without, omitting it generally
+  #'   leads to package restoration errors.
   #' @param auth_token To install from a private repo, generate a personal access
   #'   token (PAT) in \url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and
   #'   supply to this argument. This is safer than using a password because you
@@ -4409,10 +4420,9 @@ function(...) {
   #' @inheritParams package_deps
   #' @param ... additional arguments passed to [utils::install.packages()].
   #' @param build If `TRUE` build the package before installing.
-  #' @param build_opts Options to pass to `R CMD build`, only used when `build`
+  #' @param build_opts Options to pass to `R CMD build`, only used when `build` is `TRUE`.
   #' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
   #' @param build_vignettes If `FALSE`, don't build package vignettes ('--no-build-vignettes').
-  #' is `TRUE`.
   #' @export
   #' @examples
   #' \dontrun{install_deps(".")}
