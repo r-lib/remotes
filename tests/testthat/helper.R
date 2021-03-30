@@ -56,3 +56,5 @@ test_temp_dir <- function(pattern = "test-dir-", envir = parent.frame()) {
   dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
   tmp
 }
+
+httpbin <- webfakes::new_app_process(webfakes::httpbin_app())

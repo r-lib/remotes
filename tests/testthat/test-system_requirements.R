@@ -148,3 +148,15 @@ test_that("system_requirements return the system requirements if 2nd order depen
     )
   )
 })
+
+test_that("system_requirements work with package arguments", {
+  skip_on_cran()
+  skip_if_offline()
+
+  expect_equal(
+    system_requirements("ubuntu", "16.04", package = "curl"),
+    c("apt-get install -y libcurl4-openssl-dev",
+      "apt-get install -y libssl-dev"
+    )
+  )
+})

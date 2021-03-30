@@ -37,6 +37,7 @@ Suggests:
     rmarkdown,
     rprojroot,
     testthat,
+    webfakes,
     withr
 Depends:
     R (>= 3.0.0)
