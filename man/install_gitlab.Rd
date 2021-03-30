@@ -35,7 +35,10 @@ can easily delete a PAT without affecting any others. Defaults to the
 GITLAB_PAT environment variable.}
 
 \item{host}{GitLab API host to use. Override with your GitLab enterprise
-hostname, for example, \code{"gitlab.hostname.com"}.}
+hostname, for example, \code{"<PROTOCOL://>gitlab.hostname.com"}.
+The PROTOCOL is required by packrat during RStudio Connect deployment. While
+\link{install_gitlab} may work without, omitting it generally
+leads to package restoration errors.}
 
 \item{dependencies}{Which dependencies do you want to check?
 Can be a character vector (selecting from "Depends", "Imports",
