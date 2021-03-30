@@ -7,7 +7,7 @@
 #' `update()` method installs outdated or missing packages from CRAN.
 #'
 #' @param packages A character vector of package names.
-#' @param pkgdir path to a package directory, or to a package tarball.
+#' @param pkgdir Path to a package directory, or to a package tarball.
 #' @param dependencies Which dependencies do you want to check?
 #'   Can be a character vector (selecting from "Depends", "Imports",
 #'    "LinkingTo", "Suggests", or "Enhances"), or a logical vector.

@@ -76,12 +76,11 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build} is \code{TRUE}.}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
-\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
-is \code{TRUE}.}
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
 
 \item{repos}{
     character vector, the base URL(s) of the repositories

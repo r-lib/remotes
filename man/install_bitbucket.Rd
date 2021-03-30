@@ -34,7 +34,7 @@ precedence.}
 \item{ref}{Desired git reference; could be a commit, tag, or branch name.
 Defaults to HEAD.}
 
-\item{subdir}{subdirectory within repo that contains the R package.}
+\item{subdir}{Subdirectory within repo that contains the R package.}
 
 \item{auth_user}{your account username if you're attempting to install
 a package hosted in a private repository (and your username is different
@@ -80,12 +80,11 @@ since the previous install.}
 
 \item{build}{If \code{TRUE} build the package before installing.}
 
-\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build}}
+\item{build_opts}{Options to pass to \verb{R CMD build}, only used when \code{build} is \code{TRUE}.}
 
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
-\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').
-is \code{TRUE}.}
+\item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
 
 \item{repos}{A character vector giving repositories to use.}
 

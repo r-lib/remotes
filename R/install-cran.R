@@ -4,7 +4,7 @@
 #' This function is vectorised on `pkgs` so you can install multiple
 #' packages in a single command.
 #'
-#' @param pkgs Character vector of packages to install.
+#' @param pkgs A character vector of packages to install.
 #' @inheritParams install_github
 #' @export
 #' @family package installation
