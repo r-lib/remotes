@@ -3698,6 +3698,7 @@ function(...) {
           if (length(path) == 0) {
             path <- parse_pkg_ref(x$RemotePkgRef)$ref
           }
+          path
         },
         subdir = x$RemoteSubdir,
         sha = {
