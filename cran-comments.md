@@ -7,9 +7,9 @@
 
 0 errors | 0 warnings | 0 notes
 
-## Downstream dependencies
+## revdepcheck results
 
-I ran `R CMD check` on all 38 reverse dependencies
-(https://github.com/r-lib/remotes/tree/HEAD/revdep).
+We checked 53 reverse dependencies (51 from CRAN + 2 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
-devtools is affected due to a documentation mismatch with this release. I will release a new version of devtools shortly which addresses that issue.
+ * We saw 0 new problems
+ * We failed to check 0 packages
