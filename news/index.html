@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">remotes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
@@ -126,20 +126,31 @@
       <small>Source: <a href='https://github.com/r-lib/remotes/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="remotes-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#remotes-development-version" class="anchor"></a>remotes (development version)<small> Unreleased </small>
+    <div id="remotes-230" class="section level1">
+<h1 class="page-header" data-toc-text="2.3.0">
+<a href="#remotes-230" class="anchor"></a>remotes 2.3.0<small> Unreleased </small>
 </h1>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
 <ul>
+<li>
+<code>install_*()</code> functions will no longer fail by default if there warnings from <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code>. Concretely the default value of <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS</code> has changed to <code>true</code> from the previous value of <code>false</code>. (<a href='https://github.com/r-lib/remotes/issues/403'>#403</a>)</li>
+</ul>
+</div>
+<div id="minor-improvements-and-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
+<ul>
+<li><p><code><a href="../reference/install_bioc.html">install_bioc()</a></code> now respects the environment variable R_BIOC_VERSION, and will use the git branch corresponding to this Bioconductor version (<a href='https://github.com/bbimber'>@bbimber</a>, <a href='https://github.com/r-lib/remotes/issues/580'>#580</a>).</p></li>
 <li><p>remotes without package names are now unconditionally installed (<a href='https://github.com/r-lib/remotes/issues/532'>#532</a>, <a href='https://github.com/jakubkovac'>@jakubkovac</a>)</p></li>
 <li><p>It is now possible to specify a custom host for dependencies listed in the <code>DESCRIPTION</code> file with <code>Remotes: &lt;type&gt;[@host]::&lt;username&gt;/&lt;repo&gt;[@ref]</code>. The <code>ref</code> now supports <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code> in it for <code>GitLab</code> repositories as it did for <code>GitHub</code>repositories. (<a href='https://github.com/dagola'>@dagola</a>, <a href='https://github.com/r-lib/remotes/issues/448'>#448</a>)</p></li>
 <li><p>Internal <code>package2remote()</code> function now supports local remotes created by pak.</p></li>
-<li><p><code>install_*()</code> functions will no longer fail by default if there warnings from <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code>. Concretely the default value of <code>R_REMOTES_NO_ERRORS_FROM_WARNINGS</code> has changed to <code>true</code> from the previous value of <code>false</code>. (<a href='https://github.com/r-lib/remotes/issues/403'>#403</a>)</p></li>
 <li><p><code>github_pat()</code> will now check if <code>GITHUB_TOKEN</code> is set if it cannot find <code>GITHUB_PAT</code>. (<a href='https://github.com/coatless'>@coatless</a>)</p></li>
 <li><p><code><a href="../reference/system_requirements.html">system_requirements()</a></code> now supports querying released packages as well as development dependencies (<a href='https://github.com/r-lib/remotes/issues/545'>#545</a>)</p></li>
 <li><p><code><a href="../reference/system_requirements.html">system_requirements()</a></code> now supports OS name + version in the <code>os</code> argument (<a href='https://github.com/r-lib/remotes/issues/549'>#549</a>, <a href='https://github.com/krlmlr'>@krlmlr</a>).</p></li>
-<li><p><code><a href="../reference/install_bioc.html">install_bioc()</a></code> now respects the environment variable R_BIOC_VERSION, and will use the git branch corresponding to this Bioconductor version (<a href='https://github.com/bbimber'>@bbimber</a>, <a href='https://github.com/r-lib/remotes/issues/580'>#580</a>).</p></li>
 </ul>
+</div>
 </div>
     <div id="remotes-220" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.0">
@@ -154,9 +165,9 @@
 <li><p><code>install_*()</code> family of functions now use the default branch in the repository, not the <code>master</code> branch (<a href='https://github.com/MyKo101'>@MyKo101</a>,<a href='https://github.com/r-lib/remotes/issues/508'>#508</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes" class="section level2">
+<div id="minor-improvements-and-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Internal functions <code><a href="../reference/install_remote.html">remote_download()</a></code>, <code><a href="../reference/install_remote.html">remote_metadata()</a></code>, <code><a href="../reference/install_remote.html">remote_package_name()</a></code> and <code><a href="../reference/install_remote.html">remote_sha()</a></code> are now exported, so 3rd party packages could provide methods for new remote types (<a href='https://github.com/r-lib/remotes/issues/509'>#509</a>, <a href='https://github.com/r-lib/remotes/issues/56'>#56</a>)</p></li>
 <li><p>Internal functions <code><a href="../reference/install_remote.html">add_metadata()</a></code>, <code><a href="../reference/github_remote.html">github_remote()</a></code> are now exported. They are mainly for 3rd party extensions and should not be used by most users (<a href='https://github.com/r-lib/remotes/issues/485'>#485</a>).</p></li>
@@ -175,9 +186,9 @@
 <h1 class="page-header" data-toc-text="2.1.1">
 <a href="#remotes-211" class="anchor"></a>remotes 2.1.1<small> 2020-02-15 </small>
 </h1>
-<div id="minor-improvements-and-fixes-1" class="section level2">
+<div id="minor-improvements-and-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Installing mixed binary and source dependencies when the latest versions of some packages do not have binaries yet should now install dependencies in the correct order to prevent load failures (<a href='https://github.com/r-lib/remotes/issues/296'>#296</a>)</p></li>
 <li><p><code>github_error()</code> now also works when a GitHub (Enterprise) server does not return information about the rate limit (<a href='https://github.com/dpprdan'>@dpprdan</a>, <a href='https://github.com/r-lib/remotes/issues/396'>#396</a>, <a href='https://github.com/r-lib/remotes/issues/413'>#413</a>).</p></li>
@@ -202,9 +213,9 @@
 <li><p>Credentials are now passed via HTTP headers, to reduce exposure when requests fail (<a href='https://github.com/r-lib/remotes/issues/391'>#391</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-2" class="section level2">
+<div id="minor-improvements-and-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p><code><a href="../reference/download.html">download()</a></code> with the external curl download method now always uses <code>-L</code> to follow redirects. (<a href='https://github.com/r-lib/remotes/issues/350'>#350</a>)</p></li>
 <li><p><code><a href="../reference/update_packages.html">update_packages()</a></code> now has a more informative error message when the update fails (<a href='https://github.com/r-lib/remotes/issues/223'>#223</a>, <a href='https://github.com/r-lib/remotes/issues/232'>#232</a>)</p></li>
@@ -317,9 +328,9 @@
 <li><p><code><a href="../reference/install_url.html">install_url()</a></code> can now install package binaries on windows (r-lib/devtools<a href='https://github.com/r-lib/remotes/issues/1765'>#1765</a>)</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-3" class="section level2">
+<div id="minor-improvements-and-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-4" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p><code><a href="../reference/install_deps.html">install_deps()</a></code> et al. now do not rewrite the <code>type</code> argument from <code>both</code> to <code>binary</code> to allow falling back to <code>source</code>. This fixes various installation failures.</p></li>
 <li><p>remotes now looks up GitHub package names locally, if possible, and uses the GitHub REST API (if the curl package is available, and not in standalone mode). This makes the remote lookup about 10x faster when the remote package has not changed since the last install.</p></li>
