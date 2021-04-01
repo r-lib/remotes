@@ -16,6 +16,7 @@ reference:
     - install_version
     - download_version
     - update_packages
+    - system_requirements
   - title: Dependencies
     desc: Tools for working with package dependencies.
     contents:
