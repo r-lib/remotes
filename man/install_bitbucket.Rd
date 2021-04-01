@@ -101,7 +101,7 @@ To install from a private repo, or more generally, access the
 Bitbucket API with your own credentials, you will need to get an access
 token. You can create an access token following the instructions found in
 the
-\href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
+\href{https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/}{Bitbucket
 App Passwords documentation}. The App Password requires read-only access to
 your repositories and pull requests. Then store your password in the
 environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofhonour})

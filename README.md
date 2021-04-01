@@ -6,12 +6,11 @@
 
 
 <!-- badges: start -->
-[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![R build status](https://github.com/r-lib/remotes/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/remotes/actions)
 [![Codecov test coverage](https://codecov.io/gh/r-lib/remotes/branch/master/graph/badge.svg)](https://codecov.io/gh/r-lib/remotes?branch=master)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->
 
 Download and install R packages stored in GitHub, GitLab, Bitbucket, 

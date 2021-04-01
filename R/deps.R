@@ -420,7 +420,7 @@ find_deps <- function(packages, available = available_packages(),
 #'   Any additional values that don't match one of the standard dependency
 #'   types are filtered out.
 #'
-#' @seealso <http://r-pkgs.had.co.nz/description.html#dependencies> for
+#' @seealso <https://r-pkgs.org/description.html> for
 #' additional information on what each dependency type means.
 #' @keywords internal
 #' @export

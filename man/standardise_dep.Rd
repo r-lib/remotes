@@ -24,7 +24,7 @@ types are filtered out.}
 Standardise dependencies using the same logical as \link{install.packages}
 }
 \seealso{
-\url{http://r-pkgs.had.co.nz/description.html#dependencies} for
+\url{https://r-pkgs.org/description.html} for
 additional information on what each dependency type means.
 }
 \keyword{internal}

@@ -954,7 +954,7 @@ function(...) {
   #'   Any additional values that don't match one of the standard dependency
   #'   types are filtered out.
   #'
-  #' @seealso <http://r-pkgs.had.co.nz/description.html#dependencies> for
+  #' @seealso <https://r-pkgs.org/description.html> for
   #' additional information on what each dependency type means.
   #' @keywords internal
   #' @export
@@ -2251,7 +2251,7 @@ function(...) {
   #' Bitbucket API with your own credentials, you will need to get an access
   #' token. You can create an access token following the instructions found in
   #' the
-  #' \href{https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html}{Bitbucket
+  #' \href{https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/}{Bitbucket
   #' App Passwords documentation}. The App Password requires read-only access to
   #' your repositories and pull requests. Then store your password in the
   #' environment variable `BITBUCKET_PASSWORD` (e.g. `evelynwaugh:swordofhonour`)
