@@ -1,4 +1,4 @@
-# remotes (development version)
+# remotes 2.3.0
 
 ## Major changes
 
