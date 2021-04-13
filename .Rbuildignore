@@ -19,3 +19,4 @@
 ^CRAN-RELEASE$
 ^\.gitattributes$
 ^\.github$
+^LICENSE\.md$
