@@ -2613,8 +2613,8 @@ function(...) {
   #' @export
   #' @examples
   #' \dontrun{
-  #' install_git("git://github.com/hadley/stringr.git")
-  #' install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
+  #' install_git("https://github.com/hadley/stringr.git")
+  #' install_git("https://github.com/hadley/stringr.git", ref = "stringr-0.2")
   #' }
   install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                           credentials = git_credentials(),
