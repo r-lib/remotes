@@ -146,6 +146,48 @@ test_that("install_git with command line git and full SHA ref", {
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
+test_that("remote_package_name.git2r_remote returns the package name if it exists", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if_not_installed("git2r")
+
+  # works without ref
+  url <- "https://github.com/cran/falsy.git"
+  remote <- git_remote(url, git = "git2r")
+  expect_equal(remote_package_name(remote), "falsy")
+
+  # works with SHAs in URL
+  url <- "https://github.com/igraph/rigraph.git@46bfafd"
+  remote <- git_remote(url, git = "git2r")
+  expect_equal(remote_package_name(remote), "igraph")
+
+  # works with tags in URL (and different name from repo name)
+  url <- "https://github.com/igraph/rigraph.git@master"
+  remote <- git_remote(url, git = "git2r")
+  expect_equal(remote_package_name(remote), "igraph")
+})
+
+test_that("remote_package_name.xgit_remote returns the package name if it exists", {
+  skip_on_cran()
+  skip_if_offline()
+  if (is.null(git_path())) skip("git is not installed")
+
+  # works without ref
+  url <- "https://github.com/cran/falsy.git"
+  remote <- git_remote(url, git = "external")
+  expect_equal(remote_package_name(remote), "falsy")
+
+  # works with SHAs in URL
+  url <- "https://github.com/igraph/rigraph.git@46bfafd"
+  remote <- git_remote(url, git = "external")
+  expect_equal(remote_package_name(remote), "igraph")
+
+  # works with tags in URL (and different name from repo name)
+  url <- "https://github.com/igraph/rigraph.git@master"
+  remote <- git_remote(url, git = "external")
+  expect_equal(remote_package_name(remote), "igraph")
+})
+
 test_that("remote_sha.xgit remote returns the SHA if it exists", {
   skip_on_cran()
   skip_if_offline()
