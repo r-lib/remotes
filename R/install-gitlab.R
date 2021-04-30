@@ -57,20 +57,55 @@ install_gitlab <- function(repo,
 
 gitlab_remote <- function(repo, subdir = NULL,
                        auth_token = gitlab_pat(), sha = NULL,
-                       host = "gitlab.com", ...) {
+                       host = "gitlab.com", ..., 
+                       git_fallback = getOption("remotes.gitlab_git_fallback", TRUE)) {
 
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "HEAD"
 
-  remote("gitlab",
-    host = host,
-    repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
-    subdir = subdir,
-    username = meta$username,
-    ref = meta$ref,
-    sha = sha,
-    auth_token = auth_token
-  )
+  if (auth_token_has_gitlab_api_access(host = host, pat = auth_token)) {
+    remote("gitlab",
+      host = host,
+      repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
+      subdir = subdir,
+      username = meta$username,
+      ref = meta$ref,
+      sha = sha,
+      auth_token = auth_token
+    )
+  } else if (isTRUE(git_fallback)) {
+    credentials <- git_credentials()
+    url <- paste0(build_url(host, repo), ".git")
+
+    git2r_inst <- pkg_installed("git2r")
+    has_token  <- !is.null(auth_token)
+    url_has_token <- grepl("^(.*://)?[^@/]+@", url)
+
+    if (git2r_inst && has_token) {
+      credentials <- getExportedValue("git2r", "cred_user_pass")(
+        username = "gitlab-ci-token",
+        password = auth_token
+      )
+    } else if (!url_has_token && !git2r_inst && has_token) {
+      url_protocol <- gsub("((.*)://)?.*", "\\1", url)
+      url_path     <- gsub("((.*)://)?", "", url)
+      url <- paste0(
+        url_protocol,
+        "gitlab-ci-token:",
+        auth_token,
+        "@",
+        url_path
+      )
+    }
+
+    git_remote(
+      url = url,
+      subdir = subdir,
+      credentials = credentials,
+      ref = sha %||% meta$ref,
+      ...
+    )
+  }
 }
 
 #' @export
@@ -158,6 +193,19 @@ gitlab_commit <- function(username, repo, ref = "HEAD",
   download(tmp, url, headers = c("Private-Token" = pat))
 
   json$parse_file(tmp)$id
+}
+
+auth_token_has_gitlab_api_access <- function(host = "gitlab.com", pat) {
+  # use the /version endpoint - general access endpoint with small payload, but 
+  # inaccessible to CI tokens
+  url <- build_url(host, "api", "v4", "version")
+  has_access <- tryCatch({
+    download(tempfile(), url, headers = c("Private-Token" = pat))
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+  has_access
 }
 
 #' Retrieve GitLab personal access token.
