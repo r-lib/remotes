@@ -63,7 +63,7 @@ gitlab_remote <- function(repo, subdir = NULL,
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "HEAD"
 
-  if (auth_token_has_gitlab_api_access(host = host, pat = auth_token)) {
+  if (auth_token_has_gitlab_api_access(host = host, pat = auth_token) || !isTRUE(git_fallback)) {
     remote("gitlab",
       host = host,
       repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
@@ -73,7 +73,7 @@ gitlab_remote <- function(repo, subdir = NULL,
       sha = sha,
       auth_token = auth_token
     )
-  } else if (isTRUE(git_fallback)) {
+  } else {
     credentials <- git_credentials()
     url <- paste0(build_url(host, repo), ".git")
 
