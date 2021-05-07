@@ -263,7 +263,7 @@ bioconductor_branch <- function(release, sha) {
     }
     switch(
       tolower(release),
-      devel = "HEAD",
+      devel = "master",
       paste0("RELEASE_",  gsub("\\.", "_", release))
     )
   }
