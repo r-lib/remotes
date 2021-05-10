@@ -161,7 +161,7 @@ remote_download.bioc_xgit_remote <- function(x, quiet = FALSE) {
 
   args <- c('clone', '--depth', '1', '--no-hardlinks')
 
-  if (!is.null(x$branch)) {
+  if (!is.null(x$branch) && x&branch != 'HEAD') {
     args <- c(args, "--branch", x$branch)
   }
 

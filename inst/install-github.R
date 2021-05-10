@@ -2082,7 +2082,7 @@ function(...) {
   
     args <- c('clone', '--depth', '1', '--no-hardlinks')
   
-    if (!is.null(x$branch)) {
+    if (!is.null(x$branch) && x&branch != 'HEAD') {
       args <- c(args, "--branch", x$branch)
     }
   
@@ -4898,7 +4898,7 @@ function(...) {
   
   update_submodule <- function(url, path, branch, quiet) {
     args <- c('clone', '--depth', '1', '--no-hardlinks --recurse-submodules')
-    if (length(branch) > 0 && !is.na(branch)) {
+    if (length(branch) > 0 && !is.na(branch) && branch != 'HEAD') {
       args <- c(args, "--branch", branch)
     }
     args <- c(args, url, path)
