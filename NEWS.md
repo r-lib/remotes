@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `system_requirements()` now works as intended if only the `os` argument is used (@mdneuzerling, #609)
+
 * skip tests for `download.file(method = "internal")`, on R > 4.1, since that method is now defunct on those versions.
 
 * Re-license as MIT. (#551)

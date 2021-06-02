@@ -160,3 +160,16 @@ test_that("system_requirements work with package arguments", {
     )
   )
 })
+
+test_that("system_requirements allow specifying os_release within os", {
+  skip_on_cran()
+  skip_if_offline()
+
+  expect_equal(
+    system_requirements("ubuntu-16.04", package = "curl"),
+    c("apt-get install -y libcurl4-openssl-dev",
+      "apt-get install -y libssl-dev"
+    )
+  )
+})
+
