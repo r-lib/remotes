@@ -115,6 +115,8 @@ test_that("curl method download with custom headers", {
 })
 
 test_that("internal method download with custom headers", {
+  skip_if(getRversion() > "4.1")
+
   url <- httpbin$url("/anything")
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
@@ -199,6 +201,8 @@ test_that("base curl download with basic auth", {
 })
 
 test_that("base internal download with basic auth", {
+  skip_if(getRversion() > "4.1")
+
   url <- httpbin$url("/basic-auth/ruser/rpass")
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
