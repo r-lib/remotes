@@ -1,4 +1,4 @@
-# remotes (development version)
+# remotes 2.4.0
 
 * Re-license as MIT. (#551)
 
