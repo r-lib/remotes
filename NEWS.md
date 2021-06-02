@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* skip tests for `download.file(method = "internal")`, on R > 4.1, since that method is now defunct on those versions.
+
 * Re-license as MIT. (#551)
 
 # remotes 2.3.0
