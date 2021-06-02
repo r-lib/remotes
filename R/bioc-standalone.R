@@ -104,7 +104,8 @@ bioconductor <- local({
     "3.4"  = package_version("3.6"),
     "3.5"  = package_version("3.8"),
     "3.6"  = package_version("3.10"),
-    "4.0"  = package_version("3.12")
+    "4.0"  = package_version("3.12"),
+    "4.1"  = package_version("3.13")
   )
 
   # -------------------------------------------------------------------
