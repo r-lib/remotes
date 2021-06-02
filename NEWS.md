@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* `system_requirements()` now works as intended if only the `os` argument is used (@mdneuzerling, #609)
+
 * Re-license as MIT. (#551)
 
 # remotes 2.3.0
