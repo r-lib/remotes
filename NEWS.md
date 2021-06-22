@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Using `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote`, http responses returning an invalid `DESCRIPTION` or that redirect to another page will now fallback to return `NA` instead of throwing an error when trying to parse the unexpected content (#628, @dgkf).
+
 # remotes 2.4.0
 
 * Re-license as MIT. (#551)
@@ -8,7 +10,7 @@
 
 * `system_requirements()` now works as intended if only the `os` argument is used (@mdneuzerling, #609)
 
-* `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote` now get correct package name from HTTP(S) git repo's `DESCRIPTION` file (or will remain undiscovered if unauthenticated access to the HTTP(s) endpoint is unavailable), and thus package's `DESCRIPTION` file's `Remotes` field could have `git::http(s)://<host>/<username>/<repo>[.git][@ref]` items that install remote packages using git via HTTP(S) protocal (@niheaven, #603; @dgkf, #628).
+* `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote` now get correct package name from HTTP(S) git repo's `DESCRIPTION` file, and thus package's `DESCRIPTION` file's `Remotes` field could have `git::http(s)://<host>/<username>/<repo>[.git][@ref]` items that install remote packages using git via HTTP(S) protocal (@niheaven, #603).
 
 # remotes 2.3.0
 
