@@ -79,7 +79,7 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
     stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
   }
 
-  meta <- re_match(url, "(?:(?<url>[^@]*))(?:@(?<ref>.*))?")
+  meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
   ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
 
   list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)

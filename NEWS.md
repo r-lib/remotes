@@ -1,6 +1,7 @@
 # remotes (development version)
 
 * Using `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote`, http responses returning an invalid `DESCRIPTION` or that redirect to another page will now fallback to return `NA` instead of throwing an error when trying to parse the unexpected content (#628, @dgkf).
+* Fix regex that breaks git protocol in `git_remote` (@niheaven #630).
 
 # remotes 2.4.0
 

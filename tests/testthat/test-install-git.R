@@ -146,7 +146,35 @@ test_that("install_git with command line git and full SHA ref", {
   expect_true(!is.na(remote$sha) && nzchar(remote$sha))
 })
 
+test_that("git_remote returns the url", {
+
+  skip_on_cran()
+
+  # works without ref
+  url <- "https://github.com/cran/falsy.git"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "https://github.com/cran/falsy.git")
+
+  # works with ref
+  url <- "https://github.com/cran/falsy.git@master"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "https://github.com/cran/falsy.git")
+  expect_equal(remote$ref, "master")
+
+  # works without ref (git protocol)
+  url <- "git@github.com:cran/falsy.git"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "git@github.com:cran/falsy.git")
+
+  # works with ref (git protocal)
+  url <- "git@github.com:cran/falsy.git@master"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "git@github.com:cran/falsy.git")
+  expect_equal(remote$ref, "master")
+})
+
 test_that("remote_package_name.git2r_remote returns the package name if it exists", {
+
   skip_on_cran()
   skip_if_offline()
   skip_if_not_installed("git2r")
@@ -184,6 +212,7 @@ test_that("remote_package_name.git2r_remote returns the package name if it exist
 })
 
 test_that("remote_package_name.xgit_remote returns the package name if it exists", {
+
   skip_on_cran()
   skip_if_offline()
   if (is.null(git_path())) skip("git is not installed")
@@ -205,6 +234,7 @@ test_that("remote_package_name.xgit_remote returns the package name if it exists
 })
 
 test_that("remote_sha.xgit remote returns the SHA if it exists", {
+
   skip_on_cran()
   skip_if_offline()
   if (is.null(git_path())) skip("git is not installed")
