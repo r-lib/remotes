@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Fix regex that breaks git protocol in `git_remote` (@niheaven #630).
+
 # remotes 2.4.0
 
 * Re-license as MIT. (#551)
