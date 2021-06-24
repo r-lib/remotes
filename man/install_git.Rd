@@ -98,8 +98,8 @@ option.
 }
 \examples{
 \dontrun{
-install_git("git://github.com/hadley/stringr.git")
-install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
+install_git("https://github.com/hadley/stringr.git")
+install_git("https://github.com/hadley/stringr.git", ref = "stringr-0.2")
 }
 }
 \seealso{

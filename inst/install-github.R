@@ -112,7 +112,8 @@ function(...) {
       "3.4"  = package_version("3.6"),
       "3.5"  = package_version("3.8"),
       "3.6"  = package_version("3.10"),
-      "4.0"  = package_version("3.12")
+      "4.0"  = package_version("3.12"),
+      "4.1"  = package_version("3.13")
     )
   
     # -------------------------------------------------------------------
@@ -2613,9 +2614,9 @@ function(...) {
   #' @export
   #' @examples
   #' \dontrun{
-  #' install_git("git://github.com/hadley/stringr.git")
-  #' install_git("git://github.com/hadley/stringr.git", ref = "stringr-0.2")
-  #'}
+  #' install_git("https://github.com/hadley/stringr.git")
+  #' install_git("https://github.com/hadley/stringr.git", ref = "stringr-0.2")
+  #' }
   install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                           credentials = git_credentials(),
                           git = c("auto", "git2r", "external"),
@@ -2628,33 +2629,35 @@ function(...) {
                           repos = getOption("repos"),
                           type = getOption("pkgType"),
                           ...) {
-  
     if (!missing(branch)) {
       warning("`branch` is deprecated, please use `ref`")
       ref <- branch
     }
   
-    remotes <- lapply(url, git_remote, subdir = subdir, ref = ref,
-      credentials = credentials, git = match.arg(git))
+    remotes <- lapply(url, git_remote,
+      subdir = subdir, ref = ref,
+      credentials = credentials, git = match.arg(git)
+    )
   
-    install_remotes(remotes, credentials = credentials,
-                    dependencies = dependencies,
-                    upgrade = upgrade,
-                    force = force,
-                    quiet = quiet,
-                    build = build,
-                    build_opts = build_opts,
-                    build_manual = build_manual,
-                    build_vignettes = build_vignettes,
-                    repos = repos,
-                    type = type,
-                    ...)
+    install_remotes(remotes,
+      credentials = credentials,
+      dependencies = dependencies,
+      upgrade = upgrade,
+      force = force,
+      quiet = quiet,
+      build = build,
+      build_opts = build_opts,
+      build_manual = build_manual,
+      build_vignettes = build_vignettes,
+      repos = repos,
+      type = type,
+      ...
+    )
   }
   
   
   git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials(),
                          git = c("auto", "git2r", "external"), ...) {
-  
     git <- match.arg(git)
     if (git == "auto") {
       git <- if (!is_standalone() && pkg_installed("git2r")) "git2r" else "external"
@@ -2664,7 +2667,10 @@ function(...) {
       stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
     }
   
-    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
+    meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
+    ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
+  
+    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)
   }
   
   
@@ -2723,49 +2729,65 @@ function(...) {
   
   #' @export
   remote_package_name.git2r_remote <- function(remote, ...) {
-  
     tmp <- tempfile()
     on.exit(unlink(tmp))
     description_path <- paste0(collapse = "/", c(remote$subdir, "DESCRIPTION"))
   
-    # Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
-    # or server doesn't support that return NA
-    res <- try(silent = TRUE,
-      system_check(git_path(),
-        args = c("archive", "-o", tmp, "--remote", remote$url,
-          if (is.null(remote$ref)) "HEAD" else remote$ref,
-          description_path),
-        quiet = TRUE))
+    if (grepl("^https?://", remote$url)) {
+      url <- build_url(sub("\\.git$", "", remote$url), "raw", remote_sha(remote, ...), description_path)
+      download(tmp, url)
+      read_dcf(tmp)$Package
+    } else {
+      # Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
+      # or server doesn't support that return NA
+      res <- try(
+        silent = TRUE,
+        system_check(git_path(),
+          args = c(
+            "archive", "-o", tmp, "--remote", remote$url,
+            if (is.null(remote$ref)) "HEAD" else remote$ref,
+            description_path
+          ),
+          quiet = TRUE
+        )
+      )
   
-    if (inherits(res, "try-error")) {
-      return(NA_character_)
+      if (inherits(res, "try-error")) {
+        return(NA_character_)
+      }
+  
+      # git archive returns a tar file, so extract it to tempdir and read the DCF
+      utils::untar(tmp, files = description_path, exdir = tempdir())
+  
+      read_dcf(file.path(tempdir(), description_path))$Package
     }
-  
-    # git archive returns a tar file, so extract it to tempdir and read the DCF
-    utils::untar(tmp, files = description_path, exdir = tempdir())
-  
-    read_dcf(file.path(tempdir(), description_path))$Package
   }
   
   #' @export
   remote_sha.git2r_remote <- function(remote, ...) {
-    tryCatch({
-      # set suppressWarnings in git2r 0.23.0+
-      res <- suppressWarnings(git2r::remote_ls(remote$url, credentials=remote$credentials))
+    tryCatch(
+      {
+        # set suppressWarnings in git2r 0.23.0+
+        res <- suppressWarnings(git2r::remote_ls(remote$url, credentials = remote$credentials))
   
-      ref <- remote$ref %||% "HEAD"
+        ref <- remote$ref %||% "HEAD"
   
-      if(ref != "HEAD") ref <- paste0("/",ref)
+        if (ref != "HEAD") ref <- paste0("/", ref)
   
-      found <- grep(pattern = paste0(ref,"$"), x = names(res))
+        found <- grep(pattern = paste0(ref, "$"), x = names(res))
   
-      # If none found, it is either a SHA, so return the pinned sha or NA
-      if (length(found) == 0) {
-        return(remote$ref %||% NA_character_)
+        # If none found, it is either a SHA, so return the pinned sha or NA
+        if (length(found) == 0) {
+          return(remote$ref %||% NA_character_)
+        }
+  
+        unname(res[found[1]])
+      },
+      error = function(e) {
+        warning(e)
+        NA_character_
       }
-  
-      unname(res[found[1]])
-    }, error = function(e) { warning(e);  NA_character_})
+    )
   }
   
   #' @export
@@ -2786,7 +2808,7 @@ function(...) {
   
     bundle <- tempfile()
   
-    args <- c('clone', '--depth', '1', '--no-hardlinks')
+    args <- c("clone", "--depth", "1", "--no-hardlinks")
     args <- c(args, x$args, x$url, bundle)
     git(paste0(args, collapse = " "), quiet = quiet)
   
@@ -2831,8 +2853,10 @@ function(...) {
       return(remote$ref %||% NA_character_)
     }
   
-    refs_df <- read.delim(text = refs, stringsAsFactors = FALSE, sep = "\t",
-      header = FALSE)
+    refs_df <- read.delim(
+      text = refs, stringsAsFactors = FALSE, sep = "\t",
+      header = FALSE
+    )
     names(refs_df) <- c("sha", "ref")
   
     refs_df$sha[[1]]
@@ -5009,7 +5033,7 @@ function(...) {
   #' @export
   system_requirements <- function(os, os_release = NULL, path = ".", package = NULL, curl = Sys.which("curl")) {
     if (is.null(os_release)) {
-      os_release <- strsplit(os_release, "-", fixed = TRUE)[[1]]
+      os_release <- strsplit(os, "-", fixed = TRUE)[[1]]
       if (length(os_release) != 2) {
         stop("If os_release is missing, os must consist of name and release.", call. = FALSE)
       }

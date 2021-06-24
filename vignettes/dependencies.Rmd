@@ -71,7 +71,8 @@ Also' section in `?install_github` for a complete list.
 Remotes: gitlab::jimhester/covr
 
 # Git
-Remotes: git::git@bitbucket.org:djnavarro/lsr.git
+Remotes: git::git@bitbucket.org:djnavarro/lsr.git,
+  git::https://github.com/igraph/rigraph.git@master
 
 # Bitbucket
 Remotes: bitbucket::sulab/mygene.r@default, djnavarro/lsr

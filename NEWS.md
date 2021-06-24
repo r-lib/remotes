@@ -1,6 +1,16 @@
 # remotes (development version)
 
+* Fix regex that breaks git protocol in `git_remote` (@niheaven #630).
+
+# remotes 2.4.0
+
 * Re-license as MIT. (#551)
+
+* skip tests for `download.file(method = "internal")`, on R > 4.1, since that method is now defunct on those versions.
+
+* `system_requirements()` now works as intended if only the `os` argument is used (@mdneuzerling, #609)
+
+* `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote` now get correct package name from HTTP(S) git repo's `DESCRIPTION` file, and thus package's `DESCRIPTION` file's `Remotes` field could have `git::http(s)://<host>/<username>/<repo>[.git][@ref]` items that install remote packages using git via HTTP(S) protocal (@niheaven, #603).
 
 # remotes 2.3.0
 
@@ -75,8 +85,8 @@
   field. In such a case, the values for `getOption("repos")` and
   `getOption("pkgType")` will be used (respectively).
 
-* `install_gitlab()` now installs from repositories in subgroups and with dots 
-  in their name. `subdir` is now an explicit argument instead of implicit in 
+* `install_gitlab()` now installs from repositories in subgroups and with dots
+  in their name. `subdir` is now an explicit argument instead of implicit in
   `repo` (@robertdj, #259, #420).
 
 * `install()` now passes the ellipsis `...` to `install_deps()` (@Neil-Schneider, #411)
