@@ -58,12 +58,58 @@ install_gitlab <- function(repo,
 gitlab_remote <- function(repo, subdir = NULL,
                        auth_token = gitlab_pat(), sha = NULL,
                        host = "gitlab.com", ..., 
-                       git_fallback = getOption("remotes.gitlab_git_fallback", TRUE)) {
+                       git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+                       quiet = FALSE) {
 
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "HEAD"
 
-  if (!isTRUE(git_fallback) || auth_token_has_gitlab_api_access(host = host, pat = auth_token)) {
+  # use project id api request as a canary for api access using auth_token.
+  project_id <- try(silent = TRUE, {
+    gitlab_project_id(meta$username, repo, meta$ref, host, auth_token)
+  })
+
+  if (inherits(project_id, "try-error") && isTRUE(git_fallback)) {
+    url <- paste0(build_url(host, repo), ".git")
+    url_has_token <- grepl("^(.*://)?[^@/]+@", url)
+    has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
+    has_credentials <- !is.null(list(...)$credentials)
+
+    if (has_access_token && !url_has_token && !has_credentials) {
+      # for basic http auth, 
+      #   - in GitLab CI using job account, username must be "gitlab-ci-token"
+      #   - for Project Access Tokens, username must be "<project-name>"
+      #   - for Personal Acccess Tokens, username is ignored
+      # choose to use "gitlab-ci-token" for most general default behavior
+      # https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
+      url_protocol <- gsub("((.*)://)?.*", "\\1", url)
+      url_path     <- gsub("((.*)://)?", "", url)
+
+      if (!quiet) {
+        message("auth_token does not have scopes 'read-repository' and 'api' ",
+          "for host '", host, "' required to install using gitlab_remote.\n",
+          "Attempting git_remote using ",
+          sprintf("url=%sgitlab-ci-token:<auth_token>@%s", url_protocol, url_path))
+      }
+
+      url <- paste0(url_protocol, "gitlab-ci-token:", auth_token, "@", url_path)
+    } else if (has_credentials && !quiet) {
+      message("auth_token does not have scopes 'read-repository' and 'api' ",
+        "for host '", host, "' required to install using gitlab_remote.\n",
+        "Attempting git_remote using provided credentials for authentication.")
+    } else if (!quiet) {
+      message("auth_token does not have scopes 'read-repository' and 'api' ",
+        "for host '", host, "' required to install using gitlab_remote.\n",
+        "Attempting using git_remote.")
+    }
+
+    git_remote(
+      url = url,
+      subdir = subdir,
+      ref = sha %||% meta$ref,
+      ...
+    )
+  } else {
     remote("gitlab",
       host = host,
       repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
@@ -72,13 +118,6 @@ gitlab_remote <- function(repo, subdir = NULL,
       ref = meta$ref,
       sha = sha,
       auth_token = auth_token
-    )
-  } else {
-    git_remote(
-      url = paste0(build_url(host, repo), ".git"),
-      subdir = subdir,
-      ref = sha %||% meta$ref,
-      ...
     )
   }
 }
