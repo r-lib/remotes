@@ -39,7 +39,7 @@ install_gitlab <- function(repo,
                            type = getOption("pkgType"),
                            ...) {
 
-  remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host)
+  remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host, ...)
 
   install_remotes(remotes, auth_token = auth_token, host = host,
                   dependencies = dependencies,
@@ -63,7 +63,7 @@ gitlab_remote <- function(repo, subdir = NULL,
   meta <- parse_git_repo(repo)
   meta$ref <- meta$ref %||% "HEAD"
 
-  if (auth_token_has_gitlab_api_access(host = host, pat = auth_token) || !isTRUE(git_fallback)) {
+  if (!isTRUE(git_fallback) || auth_token_has_gitlab_api_access(host = host, pat = auth_token)) {
     remote("gitlab",
       host = host,
       repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
@@ -74,34 +74,9 @@ gitlab_remote <- function(repo, subdir = NULL,
       auth_token = auth_token
     )
   } else {
-    credentials <- git_credentials()
-    url <- paste0(build_url(host, repo), ".git")
-
-    git2r_inst <- pkg_installed("git2r")
-    has_token  <- !is.null(auth_token)
-    url_has_token <- grepl("^(.*://)?[^@/]+@", url)
-
-    if (git2r_inst && has_token) {
-      credentials <- getExportedValue("git2r", "cred_user_pass")(
-        username = "gitlab-ci-token",
-        password = auth_token
-      )
-    } else if (!url_has_token && !git2r_inst && has_token) {
-      url_protocol <- gsub("((.*)://)?.*", "\\1", url)
-      url_path     <- gsub("((.*)://)?", "", url)
-      url <- paste0(
-        url_protocol,
-        "gitlab-ci-token:",
-        auth_token,
-        "@",
-        url_path
-      )
-    }
-
     git_remote(
-      url = url,
+      url = paste0(build_url(host, repo), ".git"),
       subdir = subdir,
-      credentials = credentials,
       ref = sha %||% meta$ref,
       ...
     )
