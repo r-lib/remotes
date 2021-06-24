@@ -2734,9 +2734,14 @@ function(...) {
     description_path <- paste0(collapse = "/", c(remote$subdir, "DESCRIPTION"))
   
     if (grepl("^https?://", remote$url)) {
+      # assumes GitHub-style "<repo>/raw/<ref>/<path>" url
       url <- build_url(sub("\\.git$", "", remote$url), "raw", remote_sha(remote, ...), description_path)
-      download(tmp, url)
-      read_dcf(tmp)$Package
+      tryCatch({
+        download(tmp, url)
+        read_dcf(tmp)$Package
+      }, error = function(e) {
+        NA_character_
+      })
     } else {
       # Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
       # or server doesn't support that return NA
