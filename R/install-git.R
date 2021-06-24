@@ -152,7 +152,7 @@ remote_package_name.git2r_remote <- function(remote, ...) {
       download(tmp, url)
       read_dcf(tmp)$Package
     }, error = function(e) {
-      NA_character_      
+      NA_character_
     })
   } else {
     # Try using git archive --remote to retrieve the DESCRIPTION, if the protocol
