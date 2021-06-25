@@ -18,7 +18,14 @@
 #'   supply to this argument. This is safer than using a password because you
 #'   can easily delete a PAT without affecting any others. Defaults to the
 #'   GITLAB_PAT environment variable.
-#' @inheritParams install_github
+#' @param git_fallback A `logical` value indicating whether to defer to using
+#'   a `git` remote if the GitLab api is inaccessible. This can be a helpful
+#'   mitigating measure when an access token does not have the necessary scopes
+#'   for accessing the GitLab api, but still provides access for git
+#'   authentication. Defaults to the value of option
+#'   `"remotes.gitlab_git_fallback"`, or `TRUE` if the option is not set.
+#' @inheritParams install_git
+#'
 #' @export
 #' @family package installation
 #' @examples
@@ -37,9 +44,16 @@ install_gitlab <- function(repo,
                            build_manual = FALSE, build_vignettes = FALSE,
                            repos = getOption("repos"),
                            type = getOption("pkgType"),
-                           ...) {
+                           ...,
+                           git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+                           credentials = git_credentials()) {
 
-  remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host, ...)
+  remotes <- lapply(repo,
+                    gitlab_remote,
+                    subdir = subdir,
+                    auth_token = auth_token,
+                    host = host,
+                    credentials = credentials)
 
   install_remotes(remotes, auth_token = auth_token, host = host,
                   dependencies = dependencies,

@@ -86,7 +86,14 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
   list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
 }
 
-
+#' Extract URL parts from a git-style url
+#'
+#' Although not a full url parser, this expression captures and separates url
+#' protocol (`prot`), full authentication prefix (`auth`, containing `username`
+#' and `password`), the host and path (`url`) and git reference (`ref`).
+#'
+#' @param url A `character` vector of urls to parse
+#'
 parse_git_url <- function(url) {
   re_match(url, paste0(
     "(?<prot>.*://)?(?<auth>(?<username>[^:@/]*)(?::(?<password>[^@/]*)?)?@)?",
@@ -95,13 +102,25 @@ parse_git_url <- function(url) {
   ))
 }
 
-
+#' Anonymize a git-style url
+#'
+#' Strip a url of user-specific username and password if embedded as part of a
+#' url string.
+#'
+#' @inheritParams parse_git_url
+#'
 git_anon_url <- function(url) {
   meta <- parse_git_url(url)
   paste0(meta$prot, meta$url)
 }
 
-
+#' Censor user password in a git-style url
+#'
+#' If a password is provided as part of a url string, censor the url string,
+#' replacing the password with a series of asterisks.
+#'
+#' @inheritParams parse_git_url
+#'
 git_censored_url <- function(url) {
   meta <- parse_git_url(url)
   auth <- meta$username
@@ -109,7 +128,6 @@ git_censored_url <- function(url) {
   if (nchar(auth)) auth <- paste0(auth, "@")
   paste0(meta$prot, auth, meta$url)
 }
-
 
 git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("git2r",
