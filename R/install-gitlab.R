@@ -119,6 +119,7 @@ gitlab_to_git_remote <- function(repo, subdir = NULL,
   
   url <- paste0(build_url(host, repo), ".git")
   url_has_embedded_token <- grepl("^(.*://)?[^@/]+@", url)
+  has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
   has_credentials <- !is.null(credentials)
   use_git2r <- !is_standalone() && pkg_installed("git2r")
 
