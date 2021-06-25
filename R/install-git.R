@@ -89,8 +89,8 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
 
 parse_git_url <- function(url) {
   re_match(url, paste0(
-    "(?<prot>.*://)?(?<auth>(?<username>[^:@]*)(?::(?<password>[^@]*)?)?@)?",
-    "(?<url>(?:git@)?[^@]*)",
+    "(?<prot>.*://)?(?<auth>(?<username>[^:@/]*)(?::(?<password>[^@/]*)?)?@)?",
+    "(?<url>[^@]*)",
     "(?:@(?<ref>.*))?"
   ))
 }

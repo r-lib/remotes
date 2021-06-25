@@ -148,3 +148,60 @@ test_that("gitlab_project_id", {
 
 })
 
+test_that("gitlab_remote reverts to git2r_remote when git_fallback", {
+  skip_if_not_installed("git2r")
+  withr::local_envvar(c(GITLAB_PAT="badcafe"))
+
+  msgs <- capture.output(type = "message", {
+    r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = TRUE)
+  })
+  expect_true(any(grepl("auth_token does not", msgs)))
+  expect_true(any(grepl("Attempting git_remote using credentials", msgs)))
+  expect_s3_class(r, "git2r_remote")
+  expect_equal(r$credentials$username, "gitlab-ci-token")
+  expect_equal(r$credentials$password, "badcafe")
+
+  withr::local_envvar(c(GITLAB_PAT=""))
+  msgs <- capture.output(type = "message", {
+    r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = TRUE)
+  })
+  expect_true(any(grepl("Unable to establish api access", msgs)))
+  expect_s3_class(r, "git2r_remote")
+  expect_equal(r$credentials, NULL)
+
+  r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE)
+  expect_s3_class(r, "gitlab_remote")
+
+})
+
+test_that("gitlab_remote reverts to xgit_remote when git_fallback", {
+  withr::local_envvar(c(GITLAB_PAT=""))
+  mockery::stub(gitlab_remote, "pkg_installed", FALSE, 3L)
+
+  msgs <- capture.output(type = "message", {
+    r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = TRUE)
+  })
+  
+  expect_true(any(grepl("Unable to establish api access", msgs)))
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab.com/fakenamespace/namespace/repo.git")
+
+  withr::local_envvar(c(GITLAB_PAT="badcafe"))
+
+  msgs <- capture.output(type = "message", {
+    r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = TRUE)
+  })
+
+  expect_true(any(grepl("Attempting git_remote", msgs)))
+  expect_true(any(grepl("url.*<auth_token>", msgs)))
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab-ci-token:badcafe@gitlab.com/fakenamespace/namespace/repo.git")
+
+  msgs <- capture.output(type = "message", {
+    r <- gitlab_remote("fakenamespace/namespace/repo", auth_token = "goodcafe", host = "github.com", git_fallback = TRUE)
+  })
+
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab-ci-token:goodcafe@github.com/fakenamespace/namespace/repo.git")
+})
+

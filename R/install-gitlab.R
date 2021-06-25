@@ -66,7 +66,7 @@ gitlab_remote <- function(repo, subdir = NULL,
 
   # use project id api request as a canary for api access using auth_token.
   project_id <- try(silent = TRUE, {
-    gitlab_project_id(meta$username, repo, meta$ref, host, auth_token)
+    gitlab_project_id(meta$username, meta$repo, meta$ref, host, auth_token)
   })
 
   has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
@@ -102,6 +102,7 @@ gitlab_remote <- function(repo, subdir = NULL,
   }
 }
 
+#' @importFrom utils URLencode
 gitlab_to_git_remote <- function(repo, subdir = NULL,
                                  auth_token = gitlab_pat(), ref = NULL, 
                                  host = "gitlab.com", ..., 
@@ -138,7 +139,7 @@ gitlab_to_git_remote <- function(repo, subdir = NULL,
   } else if (has_access_token && !has_credentials && !use_git2r) {
     url_protocol <- gsub("((.*)://)?.*", "\\1", url)
     url_path     <- gsub("((.*)://)?", "", url)
-    url <- paste0(url_protocol, "gitlab-ci-token:", auth_token, "@", url_path)
+    url <- paste0(url_protocol, "gitlab-ci-token:", utils::URLencode(auth_token), "@", url_path)
 
     if (!quiet)
       message(wrap(exdent = 2L, paste0("Attempting git_remote using ",
@@ -239,19 +240,6 @@ gitlab_commit <- function(username, repo, ref = "HEAD",
   download(tmp, url, headers = c("Private-Token" = pat))
 
   json$parse_file(tmp)$id
-}
-
-auth_token_has_gitlab_api_access <- function(host = "gitlab.com", pat) {
-  # use the /version endpoint - general access endpoint with small payload, but 
-  # inaccessible to CI tokens
-  url <- build_url(host, "api", "v4", "version")
-  has_access <- tryCatch({
-    download(tempfile(), url, headers = c("Private-Token" = pat))
-    TRUE
-  }, error = function(e) {
-    FALSE
-  })
-  has_access
 }
 
 #' Retrieve GitLab personal access token.
