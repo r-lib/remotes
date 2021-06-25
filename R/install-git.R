@@ -79,10 +79,26 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
     stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
   }
 
-  meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
+  meta <- parse_git_url(url)
+  url <- paste0(meta$prot, meta$auth, meta$url)
   ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
+}
+
+
+parse_git_url <- function(url) {
+  re_match(url, paste0(
+    "(?<prot>.*://)?(?<auth>(?<username>[^:@]*)(?::(?<password>[^@]*)?)?@)?",
+    "(?<url>(?:git@)?[^@]*)",
+    "(?:@(?<ref>.*))?"
+  ))
+}
+
+
+scrubbed_git_url <- function(url) {
+  meta <- parse_git_url(url)
+  paste0(meta$prot, meta$url)
 }
 
 
@@ -107,7 +123,7 @@ git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_cr
 #' @export
 remote_download.git2r_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", x$url)
+    message("Downloading git repo ", scrubbed_git_url(x$url))
   }
 
   bundle <- tempfile()
@@ -132,7 +148,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = 
 
   list(
     RemoteType = "git2r",
-    RemoteUrl = x$url,
+    RemoteUrl = scrubbed_git_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha
@@ -220,7 +236,7 @@ format.git2r_remote <- function(x, ...) {
 #' @export
 remote_download.xgit_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", x$url)
+    message("Downloading git repo ", scrubbed_git_url(x$url))
   }
 
   bundle <- tempfile()
@@ -245,7 +261,7 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = N
 
   list(
     RemoteType = "xgit",
-    RemoteUrl = x$url,
+    RemoteUrl = scrubbed_git_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha,
