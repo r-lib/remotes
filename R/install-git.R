@@ -96,9 +96,16 @@ parse_git_url <- function(url) {
 }
 
 
-scrubbed_git_url <- function(url) {
+git_anon_url <- function(url) {
   meta <- parse_git_url(url)
   paste0(meta$prot, meta$url)
+}
+
+
+git_censored_url <- function(url) {
+  meta <- parse_git_url(url)
+  auth <- sub(meta$password, strrep("*", nchar(meta$password)), meta$auth, fixed = TRUE)
+  paste0(meta$prot, meta$auth, meta$url)
 }
 
 
@@ -123,7 +130,7 @@ git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_cr
 #' @export
 remote_download.git2r_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", scrubbed_git_url(x$url))
+    message("Downloading git repo ", git_anon_url(x$url))
   }
 
   bundle <- tempfile()
@@ -148,7 +155,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = 
 
   list(
     RemoteType = "git2r",
-    RemoteUrl = scrubbed_git_url(x$url),
+    RemoteUrl = git_anon_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha
@@ -236,14 +243,15 @@ format.git2r_remote <- function(x, ...) {
 #' @export
 remote_download.xgit_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", scrubbed_git_url(x$url))
+    message("Downloading git repo ", git_anon_url(x$url))
   }
 
   bundle <- tempfile()
 
-  args <- c("clone", "--depth", "1", "--no-hardlinks")
-  args <- c(args, x$args, x$url, bundle)
-  git(paste0(args, collapse = " "), quiet = quiet)
+  args <- c("clone", "--depth", "1", "--no-hardlinks", x$args)
+  display_args <- c(args, git_censored_url(x$url), bundle)
+  args <- c(args, x$url, bundle)
+  git(paste0(args, collapse = " "), quiet = TRUE, display_args = display_args)
 
   if (!is.null(x$ref)) {
     git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
@@ -261,7 +269,7 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = N
 
   list(
     RemoteType = "xgit",
-    RemoteUrl = scrubbed_git_url(x$url),
+    RemoteUrl = git_anon_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha,
