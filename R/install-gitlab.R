@@ -84,7 +84,7 @@ gitlab_remote <- function(repo, subdir = NULL,
       repo = repo,
       subdir = subdir,      
       auth_token = auth_token,
-      sha = sha, 
+      ref = sha %||% meta$ref,
       host = host,
       quiet = quiet,
       ...
@@ -103,7 +103,7 @@ gitlab_remote <- function(repo, subdir = NULL,
 }
 
 gitlab_to_git_remote <- function(repo, subdir = NULL,
-                                 auth_token = gitlab_pat(), sha = NULL,
+                                 auth_token = gitlab_pat(), ref = NULL, 
                                  host = "gitlab.com", ..., 
                                  git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
                                  credentials = NULL,
@@ -148,7 +148,7 @@ gitlab_to_git_remote <- function(repo, subdir = NULL,
   git_remote(
     url = url,
     subdir = subdir,
-    ref = sha %||% meta$ref,
+    ref = ref,
     credentials = credentials,
     ...
   )
