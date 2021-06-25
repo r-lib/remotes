@@ -105,7 +105,7 @@ git_anon_url <- function(url) {
 git_censored_url <- function(url) {
   meta <- parse_git_url(url)
   auth <- meta$username
-  if (nchar(meta$password)) auth <- paste0(auth, ":", strrep("*", nchar(meta$password)))
+  if (nchar(meta$password)) auth <- paste0(auth, ":", strrep("*", 8L))
   if (nchar(auth)) auth <- paste0(auth, "@")
   paste0(meta$prot, auth, meta$url)
 }
@@ -252,8 +252,11 @@ remote_download.xgit_remote <- function(x, quiet = FALSE) {
 
   args <- c("clone", "--depth", "1", "--no-hardlinks", x$args)
   display_args <- c(args, git_censored_url(x$url), bundle)
+  display_args <- paste0(display_args, collapse = " ")
   args <- c(args, x$url, bundle)
-  git(paste0(args, collapse = " "), quiet = TRUE, display_args = display_args)
+  args <- paste0(args, collapse = " ")
+
+  git(args, quiet = quiet, display_args = display_args)
 
   if (!is.null(x$ref)) {
     git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
