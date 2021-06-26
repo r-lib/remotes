@@ -48,12 +48,15 @@ install_gitlab <- function(repo,
                            git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
                            credentials = git_credentials()) {
 
-  remotes <- lapply(repo,
-                    gitlab_remote,
-                    subdir = subdir,
-                    auth_token = auth_token,
-                    host = host,
-                    credentials = credentials)
+  remotes <- lapply(
+    repo,
+    gitlab_remote,
+    subdir = subdir,
+    auth_token = auth_token,
+    host = host,
+    git_fallback = git_fallback, 
+    credentials = credentials
+  )
 
   install_remotes(remotes, auth_token = auth_token, host = host,
                   dependencies = dependencies,
@@ -70,7 +73,7 @@ install_gitlab <- function(repo,
 }
 
 gitlab_remote <- function(repo, subdir = NULL,
-                          auth_token = gitlab_pat(), sha = NULL,
+                          auth_token = gitlab_pat(quiet), sha = NULL,
                           host = "gitlab.com", ..., 
                           git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
                           quiet = FALSE) {
@@ -79,8 +82,9 @@ gitlab_remote <- function(repo, subdir = NULL,
   meta$ref <- meta$ref %||% "HEAD"
 
   # use project id api request as a canary for api access using auth_token.
+  repo <- paste0(c(meta$repo, meta$subdir), collapse = "/")
   project_id <- try(silent = TRUE, {
-    gitlab_project_id(meta$username, meta$repo, meta$ref, host, auth_token)
+    gitlab_project_id(meta$username, repo, meta$ref, host, auth_token)
   })
 
   has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
@@ -95,7 +99,7 @@ gitlab_remote <- function(repo, subdir = NULL,
     }
 
     gitlab_to_git_remote(
-      repo = repo,
+      repo = paste0(c(meta$username, repo), collapse = "/"),
       subdir = subdir,      
       auth_token = auth_token,
       ref = sha %||% meta$ref,
@@ -106,7 +110,7 @@ gitlab_remote <- function(repo, subdir = NULL,
   } else {
     remote("gitlab",
       host = host,
-      repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
+      repo = repo,
       subdir = subdir,
       username = meta$username,
       ref = meta$ref,
@@ -118,7 +122,7 @@ gitlab_remote <- function(repo, subdir = NULL,
 
 #' @importFrom utils URLencode
 gitlab_to_git_remote <- function(repo, subdir = NULL,
-                                 auth_token = gitlab_pat(), ref = NULL, 
+                                 auth_token = gitlab_pat(quiet), ref = NULL, 
                                  host = "gitlab.com", ..., 
                                  git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
                                  credentials = NULL,

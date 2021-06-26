@@ -71,84 +71,80 @@ test_that("check_git_path", {
 })
 
 
-test_that("parse_git_url handles http-style repo urls", {
+test_that("git urls are properly parsed, anonymized and censored", {
   prot <- "http://"
   username <- "janedoe"
   password <- "12345"
+  asterisks <- strrep("*", 8L)
   url <- "www.gitzone.com/namespace/repo.git"
   ref <- "HEAD"
 
-  meta <- parse_git_url(paste0(url))
-  expect_equal(meta$prot, "")
-  expect_equal(meta$auth, "")
-  expect_equal(meta$username, "")
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, "")
+  df <- expand.grid(
+    prot = c("", prot),
+    username = c("", username),
+    password = c("", password),
+    url = url,
+    ref = c("", ref),
+    stringsAsFactors = FALSE
+  )
 
-  meta <- parse_git_url(paste0(prot, url))
-  expect_equal(meta$prot, prot)
-  expect_equal(meta$auth, "")
-  expect_equal(meta$username, "")
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, "")
+  # filter invalid urls with password but no username
+  df <- df[!(!nchar(df$username) & nchar(df$password)),]
 
-  meta <- parse_git_url(paste0(prot, url, "@", ref))
-  expect_equal(meta$prot, prot)
-  expect_equal(meta$auth, "")
-  expect_equal(meta$username, "")
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
+  # format url components and build permuted urls
+  df$auth <- with(df, paste0(
+    username,
+    ifelse(nzchar(password), paste0(":", password), ""),
+    ifelse(nzchar(username), "@", "")
+  ))
+  df$ref_str <- with(df, ifelse(nzchar(ref), paste0("@", ref), ""))
+  df$full_url <- with(df, paste0(prot, auth, url, ref_str))
 
-  meta <- parse_git_url(paste0(url, "@", ref))
-  expect_equal(meta$prot, "")
-  expect_equal(meta$auth, "")
-  expect_equal(meta$username, "")
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
+  for (i in seq_len(nrow(df))) {
+    meta <- parse_git_url(df[i,"full_url"])
+    expect_equal(meta$prot, df$prot[i])
+    expect_equal(meta$auth, df$auth[i])
+    expect_equal(meta$username, df$username[i])
+    expect_equal(meta$password, df$password[i])
+    expect_equal(meta$url, df$url[i])
+    expect_equal(meta$ref, df$ref[i])
+  }
 
-  meta <- parse_git_url(paste0(username, "@", url, "@", ref))
-  expect_equal(meta$prot, "")
-  expect_equal(meta$auth, paste0(username, "@"))
-  expect_equal(meta$username, username)
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
+  expect_true(!any(grepl(password, git_anon_url(df$full_url))))
+  expect_true(!any(grepl(paste0(username, "|", password), git_anon_url(df$full_url))))
 
-  meta <- parse_git_url(paste0(prot, username, "@", url, "@", ref))
-  expect_equal(meta$prot, prot)
-  expect_equal(meta$auth, paste0(username, "@"))
-  expect_equal(meta$username, username)
-  expect_equal(meta$password, "")
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
+  expect_equal(git_anon_url(url), url)
+  expect_equal(git_anon_url(i <- paste0(prot, url)), i)
+  expect_equal(git_anon_url(paste0(prot, url, "@", ref)), paste0(prot, url))
+  expect_equal(git_anon_url(paste0(url, "@", ref)), url)
+  expect_equal(git_anon_url(paste0(username, "@", url, "@", ref)), url)
+  expect_equal(git_anon_url(paste0(prot, username, "@", url, "@", ref)), paste0(prot, url))
+  expect_equal(git_anon_url(paste0(username, ":", password, "@", url)), url)
+  expect_equal(git_anon_url(paste0(username, ":", password, "@", url, "@", ref)), url)
+  expect_equal(git_anon_url(paste0(prot, username, ":", password, "@", url, "@", ref)), paste0(prot, url))
 
-  meta <- parse_git_url(paste0(username, ":", password, "@", url))
-  expect_equal(meta$prot, "")
-  expect_equal(meta$auth, paste0(username, ":", password, "@"))
-  expect_equal(meta$username, username)
-  expect_equal(meta$password, password)
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, "")
+  expect_true(!any(grepl(password, git_censored_url(df$full_url))))
+  expect_equal(git_censored_url(df$full_url), gsub(password, asterisks, paste0(df$prot, df$auth, df$url)))
 
-  meta <- parse_git_url(paste0(username, ":", password, "@", url, "@", ref))
-  expect_equal(meta$prot, "")
-  expect_equal(meta$auth, paste0(username, ":", password, "@"))
-  expect_equal(meta$username, username)
-  expect_equal(meta$password, password)
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
-
-  meta <- parse_git_url(paste0(prot, username, ":", password, "@", url, "@", ref))
-  expect_equal(meta$prot, prot)
-  expect_equal(meta$auth, paste0(username, ":", password, "@"))
-  expect_equal(meta$username, username)
-  expect_equal(meta$password, password)
-  expect_equal(meta$url, url)
-  expect_equal(meta$ref, ref)
+  expect_equal(git_censored_url(url), url)
+  expect_equal(git_censored_url(i <- paste0(prot, url)), i)
+  expect_equal(git_censored_url(paste0(prot, url, "@", ref)), paste0(prot, url))
+  expect_equal(git_censored_url(paste0(url, "@", ref)), url)
+  expect_equal(
+    git_censored_url(paste0(username, "@", url, "@", ref)), 
+    paste0(username, "@", url))
+  expect_equal(
+    git_censored_url(paste0(prot, username, "@", url, "@", ref)), 
+    paste0(prot, username, "@", url))
+  expect_equal(
+    git_censored_url(paste0(username, ":", password, "@", url)), 
+    paste0(username, ":", asterisks, "@", url))
+  expect_equal(
+    git_censored_url(paste0(username, ":", password, "@", url, "@", ref)), 
+    paste0(username, ":", asterisks, "@", url))
+  expect_equal(
+    git_censored_url(paste0(prot, username, ":", password, "@", url, "@", ref)), 
+    paste0(prot, username, ":", asterisks, "@", url))
 })
 
 
@@ -173,53 +169,4 @@ test_that("parse_git_url handles ssh-style repo urls", {
   expect_equal(meta$password, "")
   expect_equal(meta$url, url)
   expect_equal(meta$ref, ref)
-})
-
-
-test_that("git_anon_url removes username and password", {
-  prot <- "http://"
-  username <- "janedoe"
-  password <- "12345"
-  url <- "www.gitzone.com/namespace/repo.git"
-  ref <- "HEAD"
-
-  expect_equal(git_anon_url(url), url)
-  expect_equal(git_anon_url(i <- paste0(prot, url)), i)
-  expect_equal(git_anon_url(paste0(prot, url, "@", ref)), paste0(prot, url))
-  expect_equal(git_anon_url(paste0(url, "@", ref)), url)
-  expect_equal(git_anon_url(paste0(username, "@", url, "@", ref)), url)
-  expect_equal(git_anon_url(paste0(prot, username, "@", url, "@", ref)), paste0(prot, url))
-  expect_equal(git_anon_url(paste0(username, ":", password, "@", url)), url)
-  expect_equal(git_anon_url(paste0(username, ":", password, "@", url, "@", ref)), url)
-  expect_equal(git_anon_url(paste0(prot, username, ":", password, "@", url, "@", ref)), paste0(prot, url))
-})
-
-
-test_that("git_censored_url replaces password with asterisks", {
-  prot <- "http://"
-  username <- "janedoe"
-  password <- "12345"
-  asterisks <- strrep("*", 8L)
-  url <- "www.gitzone.com/namespace/repo.git"
-  ref <- "HEAD"
-
-  expect_equal(git_censored_url(url), url)
-  expect_equal(git_censored_url(i <- paste0(prot, url)), i)
-  expect_equal(git_censored_url(paste0(prot, url, "@", ref)), paste0(prot, url))
-  expect_equal(git_censored_url(paste0(url, "@", ref)), url)
-  expect_equal(
-    git_censored_url(paste0(username, "@", url, "@", ref)), 
-    paste0(username, "@", url))
-  expect_equal(
-    git_censored_url(paste0(prot, username, "@", url, "@", ref)), 
-    paste0(prot, username, "@", url))
-  expect_equal(
-    git_censored_url(paste0(username, ":", password, "@", url)), 
-    paste0(username, ":", asterisks, "@", url))
-  expect_equal(
-    git_censored_url(paste0(username, ":", password, "@", url, "@", ref)), 
-    paste0(username, ":", asterisks, "@", url))
-  expect_equal(
-    git_censored_url(paste0(prot, username, ":", password, "@", url, "@", ref)), 
-    paste0(prot, username, ":", asterisks, "@", url))
 })

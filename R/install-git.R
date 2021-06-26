@@ -124,8 +124,8 @@ git_anon_url <- function(url) {
 git_censored_url <- function(url) {
   meta <- parse_git_url(url)
   auth <- meta$username
-  if (nchar(meta$password)) auth <- paste0(auth, ":", strrep("*", 8L))
-  if (nchar(auth)) auth <- paste0(auth, "@")
+  auth <- ifelse(nzchar(meta$password), paste0(auth, ":", strrep("*", 8L)), auth)
+  auth <- ifelse(nzchar(auth), paste0(auth, "@"), auth)
   paste0(meta$prot, auth, meta$url)
 }
 
