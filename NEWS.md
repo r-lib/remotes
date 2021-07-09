@@ -1,6 +1,9 @@
 # remotes (development version)
 
+* Using `install_gitlab` will now revert to using `install_git` when API access to the GitLab server is unavailable using the provided credentials. This is especially useful within a GitLab CI job where the created `CI_JOB_TOKEN` environment variable does not provide necessary API access, but is sufficient for cloning the repository using `git` (#608, @dgkf)
+
 * Using `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote`, http responses returning an invalid `DESCRIPTION` or that redirect to another page will now fallback to return `NA` instead of throwing an error when trying to parse the unexpected content (#628, @dgkf).
+
 * Fix regex that breaks git protocol in `git_remote` (@niheaven #630).
 
 # remotes 2.4.0
