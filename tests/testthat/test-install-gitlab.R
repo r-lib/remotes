@@ -152,7 +152,7 @@ test_that("gitlab_project_id", {
 test_that("gitlab_remote reverts to git2r_remote when git_fallback with git2r", {
   skip_if_not_installed("git2r")
   withr::local_envvar(c(GITLAB_PAT="badcafe"))
-  mockery::stub(gitlab_remote, "pkg_installed", function(...) TRUE, 2L)  # assume git2r available
+  mockery::stub(gitlab_remote, "pkg_installed", TRUE, 2L)  # assume git2r available
 
   expect_message({
     r <- gitlab_remote(
@@ -180,7 +180,7 @@ test_that("gitlab_remote reverts to git2r_remote when git_fallback with git2r", 
 
 test_that("gitlab_remote reverts to xgit_remote when git_fallback and no git2r", {
   withr::local_envvar(c(GITLAB_PAT=""))
-  mockery::stub(gitlab_remote, "pkg_installed", function(...) FALSE, 2L)  # assume git2r unavailable
+  mockery::stub(gitlab_remote, "pkg_installed", FALSE, 2L)  # assume git2r unavailable
   
   expect_message({
     r <- gitlab_remote(
