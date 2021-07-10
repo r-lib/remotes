@@ -150,9 +150,24 @@ test_that("gitlab_project_id", {
 })
 
 test_that("gitlab_remote reverts to git2r_remote when git_fallback with git2r", {
-  skip_if_not_installed("git2r")
+  skip_if_not_installed("git2r")  # needed for credential creation
   withr::local_envvar(c(GITLAB_PAT="badcafe"))
-  mockery::stub(gitlab_remote, "pkg_installed", TRUE, 2L)  # assume git2r available
+
+  # assume git2r available
+  stubbed_gitlab_to_git_remote <- gitlab_to_git_remote
+  stubbed_git_remote <- git_remote
+  mockery::stub(stubbed_gitlab_to_git_remote, "pkg_installed", TRUE)
+  mockery::stub(stubbed_git_remote, "pkg_installed", TRUE)
+  mockery::stub(stubbed_gitlab_to_git_remote, "git_remote", stubbed_git_remote)
+  mockery::stub(gitlab_remote, "gitlab_to_git_remote", stubbed_gitlab_to_git_remote)
+
+  expect_s3_class(
+    expect_message(
+      gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE), 
+      "GITLAB_PAT"
+    ), 
+    "gitlab_remote"
+  )
 
   expect_message({
     r <- gitlab_remote(
@@ -180,7 +195,19 @@ test_that("gitlab_remote reverts to git2r_remote when git_fallback with git2r", 
 
 test_that("gitlab_remote reverts to xgit_remote when git_fallback and no git2r", {
   withr::local_envvar(c(GITLAB_PAT=""))
-  mockery::stub(gitlab_remote, "pkg_installed", FALSE, 2L)  # assume git2r unavailable
+
+  # assume git2r unavailable
+  stubbed_gitlab_to_git_remote <- gitlab_to_git_remote
+  stubbed_git_remote <- git_remote
+  mockery::stub(stubbed_gitlab_to_git_remote, "pkg_installed", FALSE)
+  mockery::stub(stubbed_git_remote, "pkg_installed", FALSE)
+  mockery::stub(stubbed_gitlab_to_git_remote, "git_remote", stubbed_git_remote)
+  mockery::stub(gitlab_remote, "gitlab_to_git_remote", stubbed_gitlab_to_git_remote)
+
+  expect_s3_class(
+    expect_silent(gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE)), 
+    "gitlab_remote"
+  )
   
   expect_message({
     r <- gitlab_remote(
