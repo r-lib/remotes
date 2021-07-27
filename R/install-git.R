@@ -165,6 +165,7 @@ remote_package_name.git2r_remote <- function(remote, ...) {
         download_args$basic_auth <- list(
           user = Sys.getenv(remote$credentials$username),
           password = Sys.getenv(remote$credentials$username)
+       )
       } else if (inherits(remote$credentials, "cred_token")) {
         if (Sys.getenv(remote$credentials$token) == "") {
           stop(paste0("Environment variable `", remote$credentials$token, "` is unset."), .call = FALSE)
