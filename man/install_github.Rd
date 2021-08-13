@@ -102,7 +102,7 @@ clone the submodules.
 \examples{
 \dontrun{
 install_github("klutometis/roxygen")
-install_github("wch/ggplot2")
+install_github("wch/ggplot2", ref = github_pull("142"))
 install_github(c("rstudio/httpuv", "rstudio/shiny"))
 install_github(c("hadley/httr@v0.4", "klutometis/roxygen#142",
   "r-lib/roxygen2@*release", "mfrasca/r-logging/pkg"))
