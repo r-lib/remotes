@@ -1,6 +1,7 @@
 # remotes (development version)
 
 * Re-license as MIT. (#551)
+* Fix bug in install_bioc() when using version='devel'. The code will now pull from the git HEAD, not a branch named 'HEAD' (@bbimber, #612).
 
 # remotes 2.3.0
 
