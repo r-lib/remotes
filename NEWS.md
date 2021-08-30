@@ -7,6 +7,7 @@
 # remotes 2.4.0
 
 * Re-license as MIT. (#551)
+* Fix bug in install_bioc() when using version='devel'. The code will now pull from the git HEAD, not a branch named 'HEAD' (@bbimber, #612).
 
 * skip tests for `download.file(method = "internal")`, on R > 4.1, since that method is now defunct on those versions.
 
