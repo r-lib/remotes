@@ -1784,7 +1784,6 @@ function(...) {
   
     NULL
   }
-  attr(github_pat, "srcref") <- srcref()
   
   in_ci <- function() {
     nzchar(Sys.getenv("CI"))
