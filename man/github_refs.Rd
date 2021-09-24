@@ -10,11 +10,14 @@ github_pull(pull)
 github_release()
 }
 \arguments{
-\item{pull}{The pull request to install}
+\item{pull}{Character string specifying the pull request to install}
 }
 \description{
 Use as \code{ref} parameter to \code{\link[=install_github]{install_github()}}.
 Allows installing a specific pull request or the latest release.
+}
+\examples{
+github_pull("42")
 }
 \seealso{
 \code{\link[=install_github]{install_github()}}

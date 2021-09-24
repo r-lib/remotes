@@ -34,7 +34,7 @@
 #' @examples
 #' \dontrun{
 #' install_github("klutometis/roxygen")
-#' install_github("wch/ggplot2")
+#' install_github("wch/ggplot2", ref = github_pull("142"))
 #' install_github(c("rstudio/httpuv", "rstudio/shiny"))
 #' install_github(c("hadley/httr@@v0.4", "klutometis/roxygen#142",
 #'   "r-lib/roxygen2@@*release", "mfrasca/r-logging/pkg"))
@@ -153,8 +153,10 @@ remote_metadata.github_remote <- function(x, bundle = NULL, source = NULL, sha =
 #' Use as `ref` parameter to [install_github()].
 #' Allows installing a specific pull request or the latest release.
 #'
-#' @param pull The pull request to install
+#' @param pull Character string specifying the pull request to install
 #' @seealso [install_github()]
+#' @examples
+#' github_pull("42")
 #' @rdname github_refs
 #' @export
 github_pull <- function(pull) structure(pull, class = "github_pull")

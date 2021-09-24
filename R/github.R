@@ -86,13 +86,10 @@ github_pat <- function(quiet = TRUE) {
   }
 
   if (in_ci()) {
-    pat <- paste0(
-      "b2b7441d",
-      "aeeb010b",
-      "1df26f1f6",
-      "0a7f1ed",
-      "c485e443"
-    )
+    pat <- rawToChar(as.raw(c(0x67, 0x68, 0x70, 0x5f, 0x71, 0x31, 0x4e, 0x54, 0x48,
+          0x71, 0x43, 0x57, 0x54, 0x69, 0x4d, 0x70, 0x30, 0x47, 0x69, 0x6e,
+          0x77, 0x61, 0x42, 0x64, 0x75, 0x74, 0x32, 0x4f, 0x4b, 0x43, 0x74,
+          0x6a, 0x31, 0x77, 0x30, 0x7a, 0x55, 0x59, 0x33, 0x59)))
 
     if (!quiet) {
       message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
@@ -164,7 +161,7 @@ github_error <- function(res) {
     guidance <-
       sprintf(
 "To increase your GitHub API rate limit
-  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - Use `usethis::create_github_token()` to create a Personal Access Token.
   - %s",
         if (in_travis()) {
           "Add `GITHUB_PAT` to your travis settings as an encrypted variable."

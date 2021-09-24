@@ -191,8 +191,43 @@ remote_package_name.git2r_remote <- function(remote, ...) {
   if (grepl("^https?://", remote$url)) {
     # assumes GitHub-style "<repo>/raw/<ref>/<path>" url
     url <- build_url(sub("\\.git$", "", remote$url), "raw", remote_sha(remote, ...), description_path)
+    download_args <- list(path = tmp, url = url)
+    if (!is.null(remote$credentials)) {
+      if (inherits(remote$credentials, "cred_user_pass")) {
+        download_args$basic_auth <- list(
+          user = remote$credentials$username,
+          password = remote$credentials$password
+        )
+      } else if (inherits(remote$credentials, "cred_env")) {
+        if (Sys.getenv(remote$credentials$username) == "") {
+          stop(paste0("Environment variable `", remote$credentials$username, "` is unset."), .call = FALSE)
+        }
+        if (Sys.getenv(remote$credentials$password) == "") {
+          stop(paste0("Environment variable `", remote$credentials$password, "` is unset."), .call = FALSE)
+        }
+        download_args$basic_auth <- list(
+          user = Sys.getenv(remote$credentials$username),
+          password = Sys.getenv(remote$credentials$username)
+       )
+      } else if (inherits(remote$credentials, "cred_token")) {
+        if (Sys.getenv(remote$credentials$token) == "") {
+          stop(paste0("Environment variable `", remote$credentials$token, "` is unset."), .call = FALSE)
+        }
+        download_args$auth_token <- Sys.getenv(remote$credentials$token)
+      } else if (inherits(remote$credentials, "cred_ssh_key")) {
+        stop(paste(
+          "Unable to fetch the package DESCRIPTION file using SSH key authentication.",
+          "Try using `git2r::cred_user_pass`, `git2r::cred_env`, or `git2r::cred_token` instead of `git2r::cred_ssh_key` for authentication."
+        ), .call = FALSE)
+      } else {
+        stop(paste(
+          "`remote$credentials` is not NULL and it does not inherit from a recognized class.",
+          "Recognized classes for `remote$credentials` are `cred_user_pass`, `cred_env`, `cred_token`, and `cred_ssh_key`."
+        ), .call = FALSE)
+      }
+    }
     tryCatch({
-      download(tmp, url)
+      do.call(download, args = download_args)
       read_dcf(tmp)$Package
     }, error = function(e) {
       NA_character_
