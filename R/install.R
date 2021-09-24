@@ -3,7 +3,7 @@ install <- function(pkgdir, dependencies, quiet, build, build_opts, build_manual
   warn_for_potential_errors()
 
   if (file.exists(file.path(pkgdir, "src"))) {
-    if (has_package("pkgbuild")) {
+    if (!is_standalone() && has_package("pkgbuild")) {
       pkgbuild::local_build_tools(required = TRUE)
     } else if (!has_devel()) {
       missing_devel_warning(pkgdir)

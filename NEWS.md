@@ -1,5 +1,6 @@
 # remotes (development version)
 
+* pkgbuild is no longer accidentally loaded even in standalone mode (#548)
 * The internal GitHub token used to increase rate limits has been regenerated.
 * Using `remote_package_name.git2r_remote` now passes credentials when looking up the package `DESCRIPTION` (#633, @rnorberg)
 * Using `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote`, http responses returning an invalid `DESCRIPTION` or that redirect to another page will now fallback to return `NA` instead of throwing an error when trying to parse the unexpected content (#628, @dgkf).
