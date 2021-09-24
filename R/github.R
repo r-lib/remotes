@@ -161,7 +161,7 @@ github_error <- function(res) {
     guidance <-
       sprintf(
 "To increase your GitHub API rate limit
-  - Use `usethis::browse_github_pat()` to create a Personal Access Token.
+  - Use `usethis::create_github_token()` to create a Personal Access Token.
   - %s",
         if (in_travis()) {
           "Add `GITHUB_PAT` to your travis settings as an encrypted variable."
