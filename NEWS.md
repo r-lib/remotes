@@ -1,4 +1,4 @@
-# remotes (development version)
+# remotes 2.4.1
 
 * pkgbuild is no longer accidentally loaded even in standalone mode (#548)
 * The internal GitHub token used to increase rate limits has been regenerated.
