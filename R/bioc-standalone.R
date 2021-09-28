@@ -256,7 +256,9 @@ bioconductor <- local({
       BioCworkflows =
         if (bioc_version >= "3.7") "{mirror}/packages/{bv}/workflows",
       BioCextra     =
-        if (bioc_version <= "3.5") "{mirror}/packages/{bv}/extra"
+        if (bioc_version <= "3.5") "{mirror}/packages/{bv}/extra",
+      BioCbooks =
+        if (bioc_version >= "3.12") "{mirror}/packages/{bv}/books"
     )
 
     ## It seems that if a repo is not available yet for bioc-devel,
