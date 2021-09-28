@@ -3,7 +3,7 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   dependencies: dependencies.html
-last_built: 2021-09-28T17:50Z
+last_built: 2021-09-28T18:00Z
 urls:
   reference: https://remotes.r-lib.org/reference
   article: https://remotes.r-lib.org/articles
