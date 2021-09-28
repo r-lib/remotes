@@ -6,7 +6,7 @@
 
 
 <!-- badges: start -->
-[![R build status](https://github.com/r-lib/remotes/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/remotes/actions)
+[![R-CMD-check](https://github.com/r-lib/remotes/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/remotes/actions)
 [![Codecov test coverage](https://codecov.io/gh/r-lib/remotes/branch/master/graph/badge.svg)](https://codecov.io/gh/r-lib/remotes?branch=master)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
