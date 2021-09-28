@@ -19,7 +19,9 @@ install_gitlab(
   build_vignettes = FALSE,
   repos = getOption("repos"),
   type = getOption("pkgType"),
-  ...
+  ...,
+  git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+  credentials = git_credentials()
 )
 }
 \arguments{
@@ -83,6 +85,16 @@ since the previous install.}
 \item{type}{Type of package to \code{update}.}
 
 \item{...}{Other arguments passed on to \code{\link[utils:install.packages]{utils::install.packages()}}.}
+
+\item{git_fallback}{A \code{logical} value indicating whether to defer to using
+a \code{git} remote if the GitLab api is inaccessible. This can be a helpful
+mitigating measure when an access token does not have the necessary scopes
+for accessing the GitLab api, but still provides access for git
+authentication. Defaults to the value of option
+\code{"remotes.gitlab_git_fallback"}, or \code{TRUE} if the option is not set.}
+
+\item{credentials}{A git2r credentials object passed through to clone.
+Supplying this argument implies using \code{git2r} with \code{git}.}
 }
 \description{
 This function is vectorised on \code{repo} so you can install multiple

@@ -517,3 +517,8 @@ raw_to_char_utf8 <- function(x) {
   Encoding(res) <- "UTF-8"
   res
 }
+
+wrap <- function(x, ..., simplify = FALSE) {
+  lines <- unlist(strwrap(unlist(strsplit(x, "\n")), ..., simplify = simplify))
+  paste(lines, collapse = "\n")
+}

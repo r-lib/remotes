@@ -1,9 +1,9 @@
 context("Install from GitLab")
 
 test_that("install_gitlab", {
-
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   Sys.unsetenv("R_TESTS")
 
@@ -31,9 +31,9 @@ test_that("install_gitlab", {
 })
 
 test_that("install_gitlab with subgroups and special characters", {
-
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   Sys.unsetenv("R_TESTS")
 
@@ -67,9 +67,9 @@ test_that("install_gitlab with subgroups and special characters", {
 })
 
 test_that("error if not username, warning if given as argument", {
-
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   Sys.unsetenv("R_TESTS")
 
@@ -85,6 +85,7 @@ test_that("error if not username, warning if given as argument", {
 test_that("remote_download.gitlab_remote messages", {
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   mockery::stub(remote_download.gitlab_remote, "download", TRUE)
   expect_message(
@@ -101,9 +102,9 @@ test_that("remote_download.gitlab_remote messages", {
 })
 
 test_that("remote_sha.gitlab_remote", {
-
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   expect_equal(
     remote_sha(
@@ -132,9 +133,9 @@ test_that("remote_sha.gitlab_remote", {
 })
 
 test_that("gitlab_project_id", {
-
   skip_on_cran()
   skip_if_offline()
+  withr::local_envvar(c(GITLAB_PAT=""))
 
   expect_equal(
     gitlab_project_id(
@@ -146,5 +147,97 @@ test_that("gitlab_project_id", {
     1486846
   )
 
+})
+
+test_that("gitlab_remote reverts to git2r_remote when git_fallback with git2r", {
+  skip_if_not_installed("git2r")  # needed for credential creation
+  withr::local_envvar(c(GITLAB_PAT="badcafe"))
+
+  # assume git2r available
+  stubbed_gitlab_to_git_remote <- gitlab_to_git_remote
+  stubbed_git_remote <- git_remote
+  mockery::stub(stubbed_gitlab_to_git_remote, "pkg_installed", TRUE)
+  mockery::stub(stubbed_git_remote, "pkg_installed", TRUE)
+  mockery::stub(stubbed_gitlab_to_git_remote, "git_remote", stubbed_git_remote)
+  mockery::stub(gitlab_remote, "gitlab_to_git_remote", stubbed_gitlab_to_git_remote)
+
+  expect_s3_class(
+    expect_message(
+      gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE), 
+      "GITLAB_PAT"
+    ), 
+    "gitlab_remote"
+  )
+
+  expect_message({
+    r <- gitlab_remote(
+      "fakenamespace/namespace/repo",
+      git_fallback = TRUE
+    )
+  }, "auth_token does not")
+  expect_s3_class(r, "git2r_remote")
+  expect_equal(r$credentials$username, "gitlab-ci-token")
+  expect_equal(r$credentials$password, "badcafe")
+
+  withr::local_envvar(c(GITLAB_PAT=""))
+  expect_message({
+    r <- gitlab_remote(
+      "fakenamespace/namespace/repo",
+      git_fallback = TRUE
+    )
+  }, "Unable to establish api access")
+  expect_s3_class(r, "git2r_remote")
+  expect_equal(r$credentials, NULL)
+
+  r <- gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE)
+  expect_s3_class(r, "gitlab_remote")
+})
+
+test_that("gitlab_remote reverts to xgit_remote when git_fallback and no git2r", {
+  withr::local_envvar(c(GITLAB_PAT=""))
+
+  # assume git2r unavailable
+  stubbed_gitlab_to_git_remote <- gitlab_to_git_remote
+  stubbed_git_remote <- git_remote
+  mockery::stub(stubbed_gitlab_to_git_remote, "pkg_installed", FALSE)
+  mockery::stub(stubbed_git_remote, "pkg_installed", FALSE)
+  mockery::stub(stubbed_gitlab_to_git_remote, "git_remote", stubbed_git_remote)
+  mockery::stub(gitlab_remote, "gitlab_to_git_remote", stubbed_gitlab_to_git_remote)
+
+  expect_s3_class(
+    expect_silent(gitlab_remote("fakenamespace/namespace/repo", git_fallback = FALSE)), 
+    "gitlab_remote"
+  )
+  
+  expect_message({
+    r <- gitlab_remote(
+      "fakenamespace/namespace/repo",
+      git_fallback = TRUE
+    )
+  }, "Unable to establish api access")
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab.com/fakenamespace/namespace/repo.git")
+
+  withr::local_envvar(c(GITLAB_PAT="badcafe"))
+
+  expect_message({
+    r <- gitlab_remote(
+      "fakenamespace/namespace/repo",
+      git_fallback = TRUE
+    ) 
+  }, "auth_token does not")
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab-ci-token:badcafe@gitlab.com/fakenamespace/namespace/repo.git")
+
+  expect_message({
+    r <- gitlab_remote(
+      "fakenamespace/namespace/repo",
+      auth_token = "goodcafe",
+      host = "github.com",
+      git_fallback = TRUE
+    )
+  }, "Attempting git_remote.*<auth_token>@")
+  expect_s3_class(r, "xgit_remote")
+  expect_equal(r$url, "https://gitlab-ci-token:goodcafe@github.com/fakenamespace/namespace/repo.git")
 })
 

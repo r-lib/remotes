@@ -26,10 +26,12 @@ git_extract_sha1_tar <- function(bundle) {
   }
 }
 
-git <- function(args, quiet = TRUE, path = ".") {
+git <- function(args, quiet = TRUE, path = ".", display_args = args) {
   full <- paste0(shQuote(check_git_path()), " ", paste(args, collapse = ""))
+  display_full <- paste0(shQuote(check_git_path()), " ", paste(display_args, collapse = ""))
+
   if (!quiet) {
-    message(full)
+    message(display_full)
   }
 
   result <- in_dir(path, system(full, intern = TRUE, ignore.stderr = quiet))

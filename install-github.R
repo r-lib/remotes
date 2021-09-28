@@ -1629,10 +1629,12 @@ function(...) {
     }
   }
   
-  git <- function(args, quiet = TRUE, path = ".") {
+  git <- function(args, quiet = TRUE, path = ".", display_args = args) {
     full <- paste0(shQuote(check_git_path()), " ", paste(args, collapse = ""))
+    display_full <- paste0(shQuote(check_git_path()), " ", paste(display_args, collapse = ""))
+  
     if (!quiet) {
-      message(full)
+      message(display_full)
     }
   
     result <- in_dir(path, system(full, intern = TRUE, ignore.stderr = quiet))
@@ -2666,12 +2668,55 @@ function(...) {
       stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
     }
   
-    meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
+    meta <- parse_git_url(url)
+    url <- paste0(meta$prot, meta$auth, meta$url)
     ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
   
-    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)
+    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
   }
   
+  #' Extract URL parts from a git-style url
+  #'
+  #' Although not a full url parser, this expression captures and separates url
+  #' protocol (`prot`), full authentication prefix (`auth`, containing `username`
+  #' and `password`), the host and path (`url`) and git reference (`ref`).
+  #'
+  #' @param url A `character` vector of urls to parse
+  #'
+  parse_git_url <- function(url) {
+    re_match(url, paste0(
+      "(?<prot>.*://)?(?<auth>(?<username>[^:@/]*)(?::(?<password>[^@/]*)?)?@)?",
+      "(?<url>[^@]*)",
+      "(?:@(?<ref>.*))?"
+    ))
+  }
+  
+  #' Anonymize a git-style url
+  #'
+  #' Strip a url of user-specific username and password if embedded as part of a
+  #' url string.
+  #'
+  #' @inheritParams parse_git_url
+  #'
+  git_anon_url <- function(url) {
+    meta <- parse_git_url(url)
+    paste0(meta$prot, meta$url)
+  }
+  
+  #' Censor user password in a git-style url
+  #'
+  #' If a password is provided as part of a url string, censor the url string,
+  #' replacing the password with a series of asterisks.
+  #'
+  #' @inheritParams parse_git_url
+  #'
+  git_censored_url <- function(url) {
+    meta <- parse_git_url(url)
+    auth <- meta$username
+    auth <- ifelse(nzchar(meta$password), paste0(auth, ":", strrep("*", 8L)), auth)
+    auth <- ifelse(nzchar(auth), paste0(auth, "@"), auth)
+    paste0(meta$prot, auth, meta$url)
+  }
   
   git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
     remote("git2r",
@@ -2694,7 +2739,7 @@ function(...) {
   #' @export
   remote_download.git2r_remote <- function(x, quiet = FALSE) {
     if (!quiet) {
-      message("Downloading git repo ", x$url)
+      message("Downloading git repo ", git_anon_url(x$url))
     }
   
     bundle <- tempfile()
@@ -2719,7 +2764,7 @@ function(...) {
   
     list(
       RemoteType = "git2r",
-      RemoteUrl = x$url,
+      RemoteUrl = git_anon_url(x$url),
       RemoteSubdir = x$subdir,
       RemoteRef = x$ref,
       RemoteSha = sha
@@ -2842,14 +2887,18 @@ function(...) {
   #' @export
   remote_download.xgit_remote <- function(x, quiet = FALSE) {
     if (!quiet) {
-      message("Downloading git repo ", x$url)
+      message("Downloading git repo ", git_anon_url(x$url))
     }
   
     bundle <- tempfile()
   
-    args <- c("clone", "--depth", "1", "--no-hardlinks")
-    args <- c(args, x$args, x$url, bundle)
-    git(paste0(args, collapse = " "), quiet = quiet)
+    args <- c("clone", "--depth", "1", "--no-hardlinks", x$args)
+    display_args <- c(args, git_censored_url(x$url), bundle)
+    display_args <- paste0(display_args, collapse = " ")
+    args <- c(args, x$url, bundle)
+    args <- paste0(args, collapse = " ")
+  
+    git(args, quiet = quiet, display_args = display_args)
   
     if (!is.null(x$ref)) {
       git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
@@ -2867,7 +2916,7 @@ function(...) {
   
     list(
       RemoteType = "xgit",
-      RemoteUrl = x$url,
+      RemoteUrl = git_anon_url(x$url),
       RemoteSubdir = x$subdir,
       RemoteRef = x$ref,
       RemoteSha = sha,
@@ -3205,7 +3254,14 @@ function(...) {
   #'   supply to this argument. This is safer than using a password because you
   #'   can easily delete a PAT without affecting any others. Defaults to the
   #'   GITLAB_PAT environment variable.
-  #' @inheritParams install_github
+  #' @param git_fallback A `logical` value indicating whether to defer to using
+  #'   a `git` remote if the GitLab api is inaccessible. This can be a helpful
+  #'   mitigating measure when an access token does not have the necessary scopes
+  #'   for accessing the GitLab api, but still provides access for git
+  #'   authentication. Defaults to the value of option
+  #'   `"remotes.gitlab_git_fallback"`, or `TRUE` if the option is not set.
+  #' @inheritParams install_git
+  #'
   #' @export
   #' @family package installation
   #' @examples
@@ -3224,9 +3280,19 @@ function(...) {
                              build_manual = FALSE, build_vignettes = FALSE,
                              repos = getOption("repos"),
                              type = getOption("pkgType"),
-                             ...) {
+                             ...,
+                             git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+                             credentials = git_credentials()) {
   
-    remotes <- lapply(repo, gitlab_remote, subdir = subdir, auth_token = auth_token, host = host)
+    remotes <- lapply(
+      repo,
+      gitlab_remote,
+      subdir = subdir,
+      auth_token = auth_token,
+      host = host,
+      git_fallback = git_fallback, 
+      credentials = credentials
+    )
   
     install_remotes(remotes, auth_token = auth_token, host = host,
                     dependencies = dependencies,
@@ -3243,20 +3309,103 @@ function(...) {
   }
   
   gitlab_remote <- function(repo, subdir = NULL,
-                         auth_token = gitlab_pat(), sha = NULL,
-                         host = "gitlab.com", ...) {
+                            auth_token = gitlab_pat(quiet), sha = NULL,
+                            host = "gitlab.com", ..., 
+                            git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+                            quiet = FALSE) {
   
     meta <- parse_git_repo(repo)
     meta$ref <- meta$ref %||% "HEAD"
   
-    remote("gitlab",
-      host = host,
-      repo = paste(c(meta$repo, meta$subdir), collapse = "/"),
+    # use project id api request as a canary for api access using auth_token.
+    repo <- paste0(c(meta$repo, meta$subdir), collapse = "/")
+    project_id <- try(silent = TRUE, {
+      gitlab_project_id(meta$username, repo, meta$ref, host, auth_token)
+    })
+  
+    has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
+    if (inherits(project_id, "try-error") && isTRUE(git_fallback)) {
+      if (has_access_token && !quiet) {
+        message(wrap(exdent = 2L, paste0("auth_token does not have scopes ", 
+          "'read-repository' and 'api' for host '", host, "' required to ",
+          "install using gitlab_remote.")))
+      } else if (!quiet) {
+        message(wrap(exdent = 2L, paste0("Unable to establish api access for ",
+          "host '", host, "' required to install using gitlab_remote.")))
+      }
+  
+      gitlab_to_git_remote(
+        repo = paste0(c(meta$username, repo), collapse = "/"),
+        subdir = subdir,      
+        auth_token = auth_token,
+        ref = sha %||% meta$ref,
+        host = host,
+        quiet = quiet,
+        ...
+      )
+    } else {
+      remote("gitlab",
+        host = host,
+        repo = repo,
+        subdir = subdir,
+        username = meta$username,
+        ref = meta$ref,
+        sha = sha,
+        auth_token = auth_token
+      )
+    }
+  }
+  
+  #' @importFrom utils URLencode
+  gitlab_to_git_remote <- function(repo, subdir = NULL,
+                                   auth_token = gitlab_pat(quiet), ref = NULL, 
+                                   host = "gitlab.com", ..., 
+                                   git_fallback = getOption("remotes.gitlab_git_fallback", TRUE),
+                                   credentials = NULL,
+                                   quiet = FALSE) {
+  
+    # for basic http auth, required names are largely undocumented:
+    #   - in GitLab CI using job account, username must be "gitlab-ci-token"
+    #   - for Project Access Tokens, username must be "<project-name>"
+    #   - for Personal Access Tokens, username is ignored
+    #
+    # choose to use "gitlab-ci-token" for most general default behavior
+    # https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
+    
+    url <- paste0(build_url(host, repo), ".git")
+    url_has_embedded_token <- grepl("^(.*://)?[^@/]+@", url)
+    has_access_token <- !is.null(auth_token) && nchar(auth_token) > 0L
+    has_credentials <- !is.null(credentials)
+    use_git2r <- !is_standalone() && pkg_installed("git2r")
+  
+    if (url_has_embedded_token || has_credentials) {
+      if (!quiet)
+        message(wrap(exdent = 2L, paste0("Attempting git_remote")))
+    } else if (has_access_token && !has_credentials && use_git2r) {
+      if (!quiet)
+        message(wrap(exdent = 2L, paste0("Attempting git_remote using ",
+          "credentials: username='gitlab-ci-token', password=<auth_token>")))
+  
+      credentials <- getExportedValue("git2r", "cred_user_pass")(
+        username = "gitlab-ci-token",
+        password = auth_token
+      )    
+    } else if (has_access_token && !has_credentials && !use_git2r) {
+      url_protocol <- gsub("((.*)://)?.*", "\\1", url)
+      url_path     <- gsub("((.*)://)?", "", url)
+      url <- paste0(url_protocol, "gitlab-ci-token:", utils::URLencode(auth_token), "@", url_path)
+  
+      if (!quiet)
+        message(wrap(exdent = 2L, paste0("Attempting git_remote using ",
+          sprintf("url=%sgitlab-ci-token:<auth_token>@%s", url_protocol, url_path))))
+    }
+  
+    git_remote(
+      url = url,
       subdir = subdir,
-      username = meta$username,
-      ref = meta$ref,
-      sha = sha,
-      auth_token = auth_token
+      ref = ref,
+      credentials = credentials,
+      ...
     )
   }
   
@@ -5675,6 +5824,11 @@ function(...) {
     res <- rawToChar(x)
     Encoding(res) <- "UTF-8"
     res
+  }
+  
+  wrap <- function(x, ..., simplify = FALSE) {
+    lines <- unlist(strwrap(unlist(strsplit(x, "\n")), ..., simplify = simplify))
+    paste(lines, collapse = "\n")
   }
 
 

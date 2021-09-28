@@ -79,12 +79,55 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
     stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
   }
 
-  meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
+  meta <- parse_git_url(url)
+  url <- paste0(meta$prot, meta$auth, meta$url)
   ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
 
-  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)
+  list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
 }
 
+#' Extract URL parts from a git-style url
+#'
+#' Although not a full url parser, this expression captures and separates url
+#' protocol (`prot`), full authentication prefix (`auth`, containing `username`
+#' and `password`), the host and path (`url`) and git reference (`ref`).
+#'
+#' @param url A `character` vector of urls to parse
+#'
+parse_git_url <- function(url) {
+  re_match(url, paste0(
+    "(?<prot>.*://)?(?<auth>(?<username>[^:@/]*)(?::(?<password>[^@/]*)?)?@)?",
+    "(?<url>[^@]*)",
+    "(?:@(?<ref>.*))?"
+  ))
+}
+
+#' Anonymize a git-style url
+#'
+#' Strip a url of user-specific username and password if embedded as part of a
+#' url string.
+#'
+#' @inheritParams parse_git_url
+#'
+git_anon_url <- function(url) {
+  meta <- parse_git_url(url)
+  paste0(meta$prot, meta$url)
+}
+
+#' Censor user password in a git-style url
+#'
+#' If a password is provided as part of a url string, censor the url string,
+#' replacing the password with a series of asterisks.
+#'
+#' @inheritParams parse_git_url
+#'
+git_censored_url <- function(url) {
+  meta <- parse_git_url(url)
+  auth <- meta$username
+  auth <- ifelse(nzchar(meta$password), paste0(auth, ":", strrep("*", 8L)), auth)
+  auth <- ifelse(nzchar(auth), paste0(auth, "@"), auth)
+  paste0(meta$prot, auth, meta$url)
+}
 
 git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("git2r",
@@ -107,7 +150,7 @@ git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_cr
 #' @export
 remote_download.git2r_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", x$url)
+    message("Downloading git repo ", git_anon_url(x$url))
   }
 
   bundle <- tempfile()
@@ -132,7 +175,7 @@ remote_metadata.git2r_remote <- function(x, bundle = NULL, source = NULL, sha = 
 
   list(
     RemoteType = "git2r",
-    RemoteUrl = x$url,
+    RemoteUrl = git_anon_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha
@@ -255,14 +298,18 @@ format.git2r_remote <- function(x, ...) {
 #' @export
 remote_download.xgit_remote <- function(x, quiet = FALSE) {
   if (!quiet) {
-    message("Downloading git repo ", x$url)
+    message("Downloading git repo ", git_anon_url(x$url))
   }
 
   bundle <- tempfile()
 
-  args <- c("clone", "--depth", "1", "--no-hardlinks")
-  args <- c(args, x$args, x$url, bundle)
-  git(paste0(args, collapse = " "), quiet = quiet)
+  args <- c("clone", "--depth", "1", "--no-hardlinks", x$args)
+  display_args <- c(args, git_censored_url(x$url), bundle)
+  display_args <- paste0(display_args, collapse = " ")
+  args <- c(args, x$url, bundle)
+  args <- paste0(args, collapse = " ")
+
+  git(args, quiet = quiet, display_args = display_args)
 
   if (!is.null(x$ref)) {
     git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
@@ -280,7 +327,7 @@ remote_metadata.xgit_remote <- function(x, bundle = NULL, source = NULL, sha = N
 
   list(
     RemoteType = "xgit",
-    RemoteUrl = x$url,
+    RemoteUrl = git_anon_url(x$url),
     RemoteSubdir = x$subdir,
     RemoteRef = x$ref,
     RemoteSha = sha,
