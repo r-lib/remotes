@@ -16,7 +16,7 @@
 #' @param subdir Subdirectory within repo that contains the R package.
 #' @param auth_token To install from a private repo, generate a personal
 #'   access token (PAT) with at least repo scope in
-#'   "https://github.com/settings/tokens" and
+#'   \url{https://github.com/settings/tokens} and
 #'   supply to this argument. This is safer than using a password because
 #'   you can easily delete a PAT without affecting any others. Defaults to
 #'   the `GITHUB_PAT` environment variable.
