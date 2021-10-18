@@ -1,5 +1,7 @@
 # remotes (development version)
 
+* Fix regex to handle user names in URL in `git_remote`, add regression tests (@achimgaedke, #646).
+
 # remotes 2.4.1
 
 * pkgbuild is no longer accidentally loaded even in standalone mode (#548)
