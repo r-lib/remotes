@@ -2666,10 +2666,14 @@ function(...) {
       stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
     }
   
-    meta <- re_match(url, "(?<url>(?:git@)?[^@]*)(?:@(?<ref>.*))?")
-    ref <- ref %||% (if (meta$ref == "") NULL else meta$ref)
+     url_parts = re_match( url,
+           "(?<protocol>[^/]*://)?(?<authhost>[^/]+)(?<path>[^@]*)(@(?<ref>.*))?")
   
-    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](meta$url, subdir, ref, credentials)
+    ref <- ref %||% (if (url_parts$ref == "") NULL else url_parts$ref)
+  
+    url = paste0(url_parts$protocol, url_parts$authhost, url_parts$path)
+  
+    list(git2r = git_remote_git2r, external = git_remote_xgit)[[git]](url, subdir, ref, credentials)
   }
   
   
@@ -2928,7 +2932,8 @@ function(...) {
   #'   for more details.
   #' @param subdir Subdirectory within repo that contains the R package.
   #' @param auth_token To install from a private repo, generate a personal
-  #'   access token (PAT) in "https://github.com/settings/tokens" and
+  #'   access token (PAT) with at least repo scope in
+  #'   \url{https://github.com/settings/tokens} and
   #'   supply to this argument. This is safer than using a password because
   #'   you can easily delete a PAT without affecting any others. Defaults to
   #'   the `GITHUB_PAT` environment variable.
@@ -3201,7 +3206,8 @@ function(...) {
   #'   \link{install_gitlab} may work without, omitting it generally
   #'   leads to package restoration errors.
   #' @param auth_token To install from a private repo, generate a personal access
-  #'   token (PAT) in \url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and
+  #'   token (PAT) with at least read_api scope in
+  #'   \url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and
   #'   supply to this argument. This is safer than using a password because you
   #'   can easily delete a PAT without affecting any others. Defaults to the
   #'   GITLAB_PAT environment variable.

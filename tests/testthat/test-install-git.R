@@ -166,11 +166,24 @@ test_that("git_remote returns the url", {
   remote <- git_remote(url)
   expect_equal(remote$url, "git@github.com:cran/falsy.git")
 
-  # works with ref (git protocal)
+  # works with ref (git protocol)
   url <- "git@github.com:cran/falsy.git@master"
   remote <- git_remote(url)
   expect_equal(remote$url, "git@github.com:cran/falsy.git")
   expect_equal(remote$ref, "master")
+
+  url <- "ssh://git@git.host.com:7999/proj/name.git"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "ssh://git@git.host.com:7999/proj/name.git")
+
+  url <- "ssh://git@git.host.com:7999/proj/name.git@fixup/issue"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "ssh://git@git.host.com:7999/proj/name.git")
+  expect_equal(remote$ref, "fixup/issue")
+
+  url <- "https://someuser@dev.azure.com/someuser/MyProject/_git/MyPackage"
+  remote <- git_remote(url)
+  expect_equal(remote$url, "https://someuser@dev.azure.com/someuser/MyProject/_git/MyPackage")
 })
 
 test_that("remote_package_name.git2r_remote returns the package name if it exists", {
