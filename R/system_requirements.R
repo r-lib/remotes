@@ -49,16 +49,18 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
         "--silent",
         shQuote(sprintf("%s/sysreqs?all=false&pkgname=%s&distribution=%s&release=%s",
           rspm_repo_url,
-          package,
+          paste(package, collapse = "&pkgname="),
           os,
           os_release)
       )),
       stdout = TRUE
     )
     res <- json$parse(res)
-
-    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["pre_install"]]))))
-    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["install_scripts"]]))))
+    if (!is.null(res$error)) {
+      stop(res$error)
+    }
+    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["requirements"]],  `[[`, c("requirements", "pre_install")))))
+    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["requirements"]], `[[`, c("requirements", "install_scripts")))))
   } else {
     desc_file <- normalizePath(file.path(path, "DESCRIPTION"), mustWork = FALSE)
     if (!file.exists(desc_file)) {
@@ -80,6 +82,9 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
       stdout = TRUE
     )
     res <- json$parse(res)
+    if (!is.null(res$error)) {
+      stop(res$error)
+    }
 
     pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["dependencies"]], `[[`, "pre_install"))))
     install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["dependencies"]], `[[`, "install_scripts"))))
