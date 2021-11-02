@@ -1,7 +1,7 @@
 DEFAULT_RSPM_REPO_ID <-  "1" # cran
 DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 
-#' Query the system requirements for a dev package (and its dependencies)
+#' Query the system requirements for a package (and its dependencies)
 #'
 #' Returns a character vector of commands to run that will install system
 #' requirements for the queried operating system.
@@ -13,7 +13,8 @@ DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 #'   If `os_release` is `NULL`, `os` must consist of the operating system
 #'   and the version separated by a dash, e.g. `"ubuntu-18.04"`.
 #' @param path The path to the dev package's root directory.
-#' @param package A CRAN package name. If not `NULL`, this is used and `path` is ignored.
+#' @param package CRAN package name(s) to lookup system requirements for. If not
+#'   `NULL`, this is used and `path` is ignored.
 #' @param curl The location of the curl binary on your system.
 #' @return A character vector of commands needed to install the system requirements for the package.
 #' @export
