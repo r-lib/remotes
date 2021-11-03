@@ -29,7 +29,8 @@ install_gitlab(
 \item{subdir}{Subdirectory within repo that contains the R package.}
 
 \item{auth_token}{To install from a private repo, generate a personal access
-token (PAT) in \url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and
+token (PAT) with at least read_api scope in
+\url{https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html} and
 supply to this argument. This is safer than using a password because you
 can easily delete a PAT without affecting any others. Defaults to the
 GITLAB_PAT environment variable.}
