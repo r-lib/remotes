@@ -134,7 +134,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># build = FALSE because of some specificities of XGBoost package</span>
 <span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dmlc/xgboost/R-package"</span>, build <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p>To install a certain branch or commit or tag, append it to the repo name, after an <code><a href="https://rdrr.io/r/base/slotOp.html">@</a></code>:</p>
+<p>To install a certain branch or commit or tag, append it to the repo name, after an <code>@</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"gaborcsardi/pkgconfig@v2.0.0"</span><span class="op">)</span></code></pre></div>
 <p>To install the latest release, append <code>@*release</code> to the repo name:</p>
@@ -201,7 +201,7 @@
 <h3 class="hasAnchor">
 <a href="#standalone-mode" class="anchor"></a>Standalone mode</h3>
 <p>remotes will use the curl, git2r and pkgbuild packages if they are installed to provide faster implementations for some aspects of the install process. However if you are using remotes to install or update these packages (or their reverse dependencies) using them during installation may fail (particularly on Windows).</p>
-<p>If you set the environment variable <code>R_REMOTES_STANDALONE="true"</code> (e.g. in R <code><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv(R_REMOTES_STANDALONE="true")</a></code>) you can force remotes to operate in standalone mode and use only its internal R implementations. This will allow successful installation of these packages.</p>
+<p>If you set the environment variable <code>R_REMOTES_STANDALONE="true"</code> (e.g. in R <code>Sys.setenv(R_REMOTES_STANDALONE="true")</code>) you can force remotes to operate in standalone mode and use only its internal R implementations. This will allow successful installation of these packages.</p>
 </div>
 <div id="options" class="section level3">
 <h3 class="hasAnchor">

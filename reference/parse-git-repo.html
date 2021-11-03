@@ -167,285 +167,301 @@ and various GitHub browser URLs</p></dd>
 <code>ref</code>, <code>pull</code>, <code>release</code>, some which will be empty.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"metacran/crandb"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] ""
-#&gt; 
-#&gt; $username
-#&gt; [1] "metacran"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "crandb"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"jimhester/covr#47"</span><span class='op'>)</span>        <span class='co'>## pull request</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] ""
-#&gt; 
-#&gt; $username
-#&gt; [1] "jimhester"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "covr"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] "47"
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"jeroen/curl@v0.9.3"</span><span class='op'>)</span>       <span class='co'>## specific tag</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] ""
-#&gt; 
-#&gt; $username
-#&gt; [1] "jeroen"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "curl"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] "v0.9.3"
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"tidyverse/dplyr@*release"</span><span class='op'>)</span> <span class='co'>## shorthand for latest release</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] ""
-#&gt; 
-#&gt; $username
-#&gt; [1] "tidyverse"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "dplyr"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] "*release"
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"r-lib/remotes@550a3c7d3f9e1493a2ba"</span><span class='op'>)</span> <span class='co'>## commit SHA</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] ""
-#&gt; 
-#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] "550a3c7d3f9e1493a2ba"
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"igraph=igraph/rigraph"</span><span class='op'>)</span> <span class='co'>## Different package name from repo name</span>
-</div><div class='output co'>#&gt; $package
-#&gt; [1] "igraph"
-#&gt; 
-#&gt; $username
-#&gt; [1] "igraph"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "rigraph"
-#&gt; 
-#&gt; $subdir
-#&gt; [1] ""
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'>
-<span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/jeroen/curl.git"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "jeroen"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "curl"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"git@github.com:metacran/crandb.git"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "metacran"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "crandb"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/jimhester/covr"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "jimhester"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "covr"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.example.com/user/repo.git"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "user"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "repo"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"git@github.example.com:user/repo.git"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "user"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "repo"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'>
-<span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/pull/108"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] "108"
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/tree/name-of-branch"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $ref
-#&gt; [1] "name-of-branch"
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/commit/1234567"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $ref
-#&gt; [1] "1234567"
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/releases/latest"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $ref
-#&gt; [1] ""
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] "*release"
-#&gt; </div><div class='input'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $username
-#&gt; [1] "r-lib"
-#&gt; 
-#&gt; $repo
-#&gt; [1] "remotes"
-#&gt; 
-#&gt; $ref
-#&gt; [1] "1.0.0"
-#&gt; 
-#&gt; $pull
-#&gt; [1] ""
-#&gt; 
-#&gt; $release
-#&gt; [1] ""
-#&gt; </div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"metacran/crandb"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "metacran"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "crandb"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"jimhester/covr#47"</span><span class='op'>)</span>        <span class='co'>## pull request</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "jimhester"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "covr"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "47"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"jeroen/curl@v0.9.3"</span><span class='op'>)</span>       <span class='co'>## specific tag</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "jeroen"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "curl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "v0.9.3"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"tidyverse/dplyr@*release"</span><span class='op'>)</span> <span class='co'>## shorthand for latest release</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "tidyverse"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "dplyr"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "*release"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"r-lib/remotes@550a3c7d3f9e1493a2ba"</span><span class='op'>)</span> <span class='co'>## commit SHA</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "550a3c7d3f9e1493a2ba"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_repo_spec</span><span class='op'>(</span><span class='st'>"igraph=igraph/rigraph"</span><span class='op'>)</span> <span class='co'>## Different package name from repo name</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $package</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "igraph"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "igraph"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "rigraph"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $subdir</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/jeroen/curl.git"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "jeroen"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "curl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"git@github.com:metacran/crandb.git"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "metacran"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "crandb"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/jimhester/covr"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "jimhester"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "covr"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.example.com/user/repo.git"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "user"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "repo"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"git@github.example.com:user/repo.git"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "user"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "repo"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/pull/108"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "108"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/tree/name-of-branch"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "name-of-branch"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/commit/1234567"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "1234567"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/releases/latest"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "*release"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'>parse_github_url</span><span class='op'>(</span><span class='st'>"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $username</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "r-lib"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $repo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "remotes"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ref</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "1.0.0"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $pull</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $release</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] ""</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
