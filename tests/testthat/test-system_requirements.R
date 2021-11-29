@@ -182,14 +182,14 @@ test_that("system_requirements work with vector package arguments", {
   skip_if_offline()
 
   expect_equal(
-    system_requirements("ubuntu", "16.04", package = c("curl", "git2r")),
+    sort(system_requirements("ubuntu", "16.04", package = c("curl", "git2r"))),
 
-    c("apt-get install -y software-properties-common",
+    sort(c("apt-get install -y software-properties-common",
       "add-apt-repository -y ppa:cran/libgit2",  "apt-get update",
       "apt-get install -y libgit2-dev", "apt-get install -y libssh2-1-dev",
       "apt-get install -y libssl-dev", "apt-get install -y zlib1g-dev",
       "apt-get install -y libcurl4-openssl-dev"
-    )
+    ))
   )
 })
 
