@@ -1,3 +1,9 @@
+
+# remotes development version
+
+* `install_github()` now uses credentials from the git credential store,
+  if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
+
 # remotes 2.4.2
 
 * Gábor Csárdi is now the maintainer.
