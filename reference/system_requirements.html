@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Query the system requirements for a dev package (and its dependencies) — system_requirements • remotes</title>
+<title>Query the system requirements for a package (and its dependencies) — system_requirements • remotes</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Query the system requirements for a dev package (and its dependencies) — system_requirements" />
+<meta property="og:title" content="Query the system requirements for a package (and its dependencies) — system_requirements" />
 <meta property="og:description" content="Returns a character vector of commands to run that will install system
 requirements for the queried operating system." />
 
@@ -124,7 +124,7 @@ requirements for the queried operating system." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Query the system requirements for a dev package (and its dependencies)</h1>
+    <h1>Query the system requirements for a package (and its dependencies)</h1>
     <small class="dont-index">Source: <a href='https://github.com/r-lib/remotes/blob/master/R/system_requirements.R'><code>R/system_requirements.R</code></a></small>
     <div class="hidden name"><code>system_requirements.Rd</code></div>
     </div>
@@ -159,7 +159,8 @@ and the version separated by a dash, e.g. <code>"ubuntu-18.04"</code>.</p></td>
     </tr>
     <tr>
       <th>package</th>
-      <td><p>A CRAN package name. If not <code>NULL</code>, this is used and <code>path</code> is ignored.</p></td>
+      <td><p>CRAN package name(s) to lookup system requirements for. If not
+<code>NULL</code>, this is used and <code>path</code> is ignored.</p></td>
     </tr>
     <tr>
       <th>curl</th>
