@@ -8,9 +8,17 @@ test_that("github_pat", {
   expect_message(github_pat(quiet = FALSE), "Using github PAT from envvar GITHUB_PAT")
 
   # Check standard GITHUB_PAT
-  withr::with_envvar(c(GITHUB_PAT = NA, GITHUB_TOKEN = NA, CI = NA), {
-     expect_equal(github_pat(), NULL)
-  })
+  withr::with_envvar(
+    c(
+      GITHUB_PAT = NA,
+      GITHUB_TOKEN = NA,
+      CI = NA,
+      GITHUB_PAT_GITHUB_COM = "FAIL" # make gitcreds fail
+    ),
+    {
+      expect_equal(github_pat(), NULL)
+    }
+  )
 
   # Check for embedded token
   withr::with_envvar(c(GITHUB_PAT=NA, CI="true"), {
