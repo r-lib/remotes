@@ -1,5 +1,6 @@
 # remotes (development version)
 
+* Gábor Csárdi is now the maintainer.
 * `bioc_version()` now points to the most recent (2021-10-27) Bioconductor
   release, `v3.14` (@stufield, #664).
 * Fix regex to handle user names in URL in `git_remote`, add regression tests (@achimgaedke, #646).
