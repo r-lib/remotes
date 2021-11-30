@@ -1,6 +1,6 @@
 Package: remotes
 Title: R Package Installation from Remote Repositories, Including 'GitHub'
-Version: 2.4.1.9000
+Version: 2.4.2
 Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre")),
     person("Jim", "Hester", , "jim.hester@rstudio.com", role = "aut"),

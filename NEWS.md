@@ -1,4 +1,4 @@
-# remotes (development version)
+# remotes 2.4.2
 
 * Gábor Csárdi is now the maintainer.
 * `bioc_version()` now points to the most recent (2021-10-27) Bioconductor
