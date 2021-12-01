@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://remotes.r-lib.org/404.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/MAINTENANCE.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/articles/dependencies.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/authors.html</loc>
+  </url>
+  <url>
     <loc>https://remotes.r-lib.org/index.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/news/index.html</loc>
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/available_packages.html</loc>
@@ -26,6 +50,9 @@
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/gitlab_pat.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/reference/index.html</loc>
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/install_bioc.html</loc>
@@ -80,8 +107,5 @@
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/update_packages.html</loc>
-  </url>
-  <url>
-    <loc>https://remotes.r-lib.org/articles/dependencies.html</loc>
   </url>
 </urlset>
