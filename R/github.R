@@ -79,10 +79,24 @@ github_pat <- function(quiet = TRUE) {
     pat <- Sys.getenv(env_var)
     if (nzchar(pat)) {
       if (!quiet) {
-        message("Using github PAT from envvar ", env_var)
+        message("Using github PAT from envvar ", env_var, ". ",
+                "Use `gitcreds::gitcreds_set()` and unset ", env_var,
+                " in .Renviron (or elsewhere) if you want to use the more ",
+                "secure git credential store instead.")
       }
       return(pat)
     }
+  }
+
+  pat <- tryCatch(
+    gitcreds_get()$password,
+    error = function(e) ""
+  )
+  if (nzchar(pat)) {
+    if (!quiet) {
+      message("Using GitHub PAT from the git credential store.")
+    }
+    return(pat)
   }
 
   if (in_ci()) {
@@ -92,7 +106,7 @@ github_pat <- function(quiet = TRUE) {
           0x6a, 0x31, 0x77, 0x30, 0x7a, 0x55, 0x59, 0x33, 0x59)))
 
     if (!quiet) {
-      message("Using bundled GitHub PAT. Please add your own PAT to the env var `GITHUB_PAT`")
+      message("Using bundled GitHub PAT. Please add your own PAT using `gitcreds::gitcreds_set()`")
     }
 
     return(pat)
