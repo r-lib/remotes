@@ -80,8 +80,9 @@ github_pat <- function(quiet = TRUE) {
     if (nzchar(pat)) {
       if (!quiet) {
         message("Using github PAT from envvar ", env_var, ". ",
-                "Use `gitcreds::gitcreds_set()` if you want to use the git ",
-                "credential store instead")
+                "Use `gitcreds::gitcreds_set()` and unset ", env_var,
+                " in .Renviron (or elsewhere) if you want to use the more ",
+                "secure git credential store instead.")
       }
       return(pat)
     }
