@@ -63,6 +63,7 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
     build_vignettes = build_vignettes,
     repos = repos,
     type = type,
+    git = match.arg(git),
     ...
   )
 }
