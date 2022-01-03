@@ -10,7 +10,11 @@ available_packages_set(repos, type, db)
 
 available_packages_reset()
 
-available_packages(repos = getOption("repos"), type = getOption("pkgType"))
+available_packages(
+  repos = getOption("repos"),
+  type = getOption("pkgType"),
+  ...
+)
 }
 \arguments{
 \item{repos}{
@@ -22,6 +26,12 @@ available_packages(repos = getOption("repos"), type = getOption("pkgType"))
     \code{\link[utils]{install.packages}}.
 
     If \code{type = "both"} this will use the source repository.
+  }
+
+\item{...}{
+    allow additional arguments to be passed from callers (which might be
+    arguments to future versions of this function).  Currently these are
+    all passed to \code{\link[utils]{download.file}()}.
   }
 }
 \description{

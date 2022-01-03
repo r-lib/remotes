@@ -26,9 +26,9 @@ available_packages_reset <- function() {
 #' @keywords internal
 #' @seealso [utils::available.packages()] for full documentation on the output format.
 #' @export
-available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
+available_packages <- function(repos = getOption("repos"), type = getOption("pkgType"), ...) {
   available_packages_set(
     repos, type,
-    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, ...))
   )
 }

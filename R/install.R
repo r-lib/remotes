@@ -170,7 +170,7 @@ r_error_matches <- function(msg, str) {
 #' Install package dependencies if needed.
 #'
 #' @inheritParams package_deps
-#' @param ... additional arguments passed to [utils::install.packages()].
+#' @param ... additional arguments passed to [utils::install.packages()] and [utils::available.packages()].
 #' @param build If `TRUE` build the package before installing.
 #' @param build_opts Options to pass to `R CMD build`, only used when `build` is `TRUE`.
 #' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
@@ -192,7 +192,8 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type
+    type = type,
+    ...
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies

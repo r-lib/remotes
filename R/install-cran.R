@@ -55,7 +55,7 @@ remote_package_name.cran_remote <- function(remote, ...) {
 
 #' @export
 remote_sha.cran_remote <- function(remote, ...) {
-  cran <- available_packages(remote$repos, remote$pkg_type)
+  cran <- available_packages(remote$repos, remote$pkg_type, ...)
 
   trim_ws(unname(cran[, "Version"][match(remote$name, rownames(cran))]))
 }
