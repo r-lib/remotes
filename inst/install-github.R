@@ -432,9 +432,10 @@ function(...) {
   #' @seealso [utils::available.packages()] for full documentation on the output format.
   #' @export
   available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
+    headers <- getOption("remotes.download.headers")
     available_packages_set(
       repos, type,
-      suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+      suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, headers = headers))
     )
   }
   # Contents of R/dcf.R
@@ -897,6 +898,18 @@ function(...) {
   
     args <- list(...)
     args <- args[names(args) %in% args_to_keep]
+  
+    if (!"headers" %in% names(args)) {
+      headers <- getOption("remotes.download.headers")
+      if (!is.null(headers)) {
+        args$headers <- headers
+      }
+    } else {
+      message(
+        "Using the `headers` argument may not work as expected. ",
+        "Consider setting `options(remotes.download.headers)` instead."
+      )
+    }
   
     if (is.null(quiet))
       quiet <- !identical(type, "source")
