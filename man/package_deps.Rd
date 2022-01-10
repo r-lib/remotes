@@ -11,8 +11,7 @@ package_deps(
   packages,
   dependencies = NA,
   repos = getOption("repos"),
-  type = getOption("pkgType"),
-  ...
+  type = getOption("pkgType")
 )
 
 local_package_deps(pkgdir = ".", dependencies = NA)
@@ -21,8 +20,7 @@ dev_package_deps(
   pkgdir = ".",
   dependencies = NA,
   repos = getOption("repos"),
-  type = getOption("pkgType"),
-  ...
+  type = getOption("pkgType")
 )
 
 \method{update}{package_deps}(
@@ -65,8 +63,6 @@ common ones include:
 
 \item{type}{Type of package to \code{update}.}
 
-\item{...}{Additional arguments passed to \code{install_packages} and \code{available_packages}.}
-
 \item{pkgdir}{Path to a package directory, or to a package tarball.}
 
 \item{object}{A \code{package_deps} object.}
@@ -90,6 +86,8 @@ since the previous install.}
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
 \item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
+
+\item{...}{Additional arguments passed to \code{install_packages}.}
 }
 \value{
 A \code{data.frame} with columns:

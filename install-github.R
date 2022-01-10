@@ -431,10 +431,10 @@ function(...) {
   #' @keywords internal
   #' @seealso [utils::available.packages()] for full documentation on the output format.
   #' @export
-  available_packages <- function(repos = getOption("repos"), type = getOption("pkgType"), ...) {
+  available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
     available_packages_set(
       repos, type,
-      suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, ...))
+      suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
     )
   }
   # Contents of R/dcf.R
@@ -571,7 +571,7 @@ function(...) {
   #' @param type Type of package to `update`.
   #'
   #' @param object A `package_deps` object.
-  #' @param ... Additional arguments passed to `install_packages` and `available_packages`.
+  #' @param ... Additional arguments passed to `install_packages`.
   #' @inheritParams install_github
   #'
   #' @return
@@ -597,10 +597,10 @@ function(...) {
   
   package_deps <- function(packages, dependencies = NA,
                            repos = getOption("repos"),
-                           type = getOption("pkgType"), ...) {
+                           type = getOption("pkgType")) {
   
     repos <- fix_repositories(repos)
-    cran <- available_packages(repos, type, ...)
+    cran <- available_packages(repos, type)
   
     deps <- find_deps(packages, available = cran, top_dep = dependencies)
   
@@ -659,7 +659,7 @@ function(...) {
   
   dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                                repos = getOption("repos"),
-                               type = getOption("pkgType"), ...) {
+                               type = getOption("pkgType")) {
   
     pkg <- load_pkg_description(pkgdir)
     repos <- c(repos, parse_additional_repositories(pkg))
@@ -675,7 +675,7 @@ function(...) {
         repos[missing_repos] <- bioc_repos[missing_repos]
     }
   
-    cran_deps <- package_deps(deps, repos = repos, type = type, ...)
+    cran_deps <- package_deps(deps, repos = repos, type = type)
   
     res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
   
@@ -1017,7 +1017,7 @@ function(...) {
       packages <- utils::installed.packages()[, "Package"]
     }
   
-    pkgs <- package_deps(packages, repos = repos, type = type, ...)
+    pkgs <- package_deps(packages, repos = repos, type = type)
     update(pkgs,
            dependencies = dependencies,
            upgrade = upgrade,
@@ -3322,7 +3322,7 @@ function(...) {
   
   #' @export
   remote_sha.cran_remote <- function(remote, ...) {
-    cran <- available_packages(remote$repos, remote$pkg_type, ...)
+    cran <- available_packages(remote$repos, remote$pkg_type)
   
     trim_ws(unname(cran[, "Version"][match(remote$name, rownames(cran))]))
   }
@@ -5319,7 +5319,7 @@ function(...) {
   #' Install package dependencies if needed.
   #'
   #' @inheritParams package_deps
-  #' @param ... additional arguments passed to [utils::install.packages()] and [utils::available.packages()].
+  #' @param ... additional arguments passed to [utils::install.packages()].
   #' @param build If `TRUE` build the package before installing.
   #' @param build_opts Options to pass to `R CMD build`, only used when `build` is `TRUE`.
   #' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
@@ -5341,8 +5341,7 @@ function(...) {
       pkgdir,
       repos = repos,
       dependencies = dependencies,
-      type = type,
-      ...
+      type = type
     )
   
     dep_deps <- if (isTRUE(dependencies)) NA else dependencies

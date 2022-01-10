@@ -60,7 +60,7 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 
 \item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
 
-\item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}} and \code{\link[utils:available.packages]{utils::available.packages()}}.}
+\item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }
 \description{
 Install package dependencies if needed.

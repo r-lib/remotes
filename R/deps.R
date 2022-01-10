@@ -34,7 +34,7 @@
 #' @param type Type of package to `update`.
 #'
 #' @param object A `package_deps` object.
-#' @param ... Additional arguments passed to `install_packages` and `available_packages`.
+#' @param ... Additional arguments passed to `install_packages`.
 #' @inheritParams install_github
 #'
 #' @return
@@ -60,10 +60,10 @@
 
 package_deps <- function(packages, dependencies = NA,
                          repos = getOption("repos"),
-                         type = getOption("pkgType"), ...) {
+                         type = getOption("pkgType")) {
 
   repos <- fix_repositories(repos)
-  cran <- available_packages(repos, type, ...)
+  cran <- available_packages(repos, type)
 
   deps <- find_deps(packages, available = cran, top_dep = dependencies)
 
@@ -122,7 +122,7 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType"), ...) {
+                             type = getOption("pkgType")) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -138,7 +138,7 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
       repos[missing_repos] <- bioc_repos[missing_repos]
   }
 
-  cran_deps <- package_deps(deps, repos = repos, type = type, ...)
+  cran_deps <- package_deps(deps, repos = repos, type = type)
 
   res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
 
@@ -480,7 +480,7 @@ update_packages <- function(packages = TRUE,
     packages <- utils::installed.packages()[, "Package"]
   }
 
-  pkgs <- package_deps(packages, repos = repos, type = type, ...)
+  pkgs <- package_deps(packages, repos = repos, type = type)
   update(pkgs,
          dependencies = dependencies,
          upgrade = upgrade,
