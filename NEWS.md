@@ -3,8 +3,8 @@
 
 * `install_github()` now uses credentials from the git credential store,
   if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
-* `available_packages()` now supports the use of ellipsis, allowing additional arguments such as `headers` to be 
-  passed to `available.packages()` as well as `install.packages()` (@AshesITR, #682).
+* Download headers can now be set via `options(remotes.download.headers)` allowing the use of headers for e.g. 
+  retrieving available packages (@AshesITR, #682).
 
 # remotes 2.4.2
 

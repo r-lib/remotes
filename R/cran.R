@@ -27,8 +27,9 @@ available_packages_reset <- function() {
 #' @seealso [utils::available.packages()] for full documentation on the output format.
 #' @export
 available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
+  headers <- getOption("remotes.download.headers")
   available_packages_set(
     repos, type,
-    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+    suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, headers = headers))
   )
 }

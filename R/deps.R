@@ -361,6 +361,18 @@ install_packages <- function(packages, repos = getOption("repos"),
   args <- list(...)
   args <- args[names(args) %in% args_to_keep]
 
+  if (!"headers" %in% names(args)) {
+    headers <- getOption("remotes.download.headers")
+    if (!is.null(headers)) {
+      args$headers <- headers
+    }
+  } else {
+    message(
+      "Using the `headers` argument may not work as expected. ",
+      "Consider setting `options(remotes.download.headers)` instead."
+    )
+  }
+
   if (is.null(quiet))
     quiet <- !identical(type, "source")
 

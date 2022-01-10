@@ -1,6 +1,7 @@
 Meta
 doc
 .Rproj.user
+.idea
 .Rhistory
 .RData
 /.env
