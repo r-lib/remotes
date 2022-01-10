@@ -432,11 +432,19 @@ function(...) {
   #' @seealso [utils::available.packages()] for full documentation on the output format.
   #' @export
   available_packages <- function(repos = getOption("repos"), type = getOption("pkgType")) {
-    headers <- getOption("remotes.download.headers")
-    available_packages_set(
-      repos, type,
-      suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, headers = headers))
-    )
+    if (getRversion() < '3.5.0') {
+      # R 3.5.0 added ellipsis to utils::available.packages()
+      available_packages_set(
+        repos, type,
+        suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type))
+      )
+    } else {
+      headers <- getOption("remotes.download.headers")
+      available_packages_set(
+        repos, type,
+        suppressWarnings(utils::available.packages(utils::contrib.url(repos, type), type = type, headers = headers))
+      )
+    }
   }
   # Contents of R/dcf.R
   read_dcf <- function(path) {
