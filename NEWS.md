@@ -1,5 +1,14 @@
-# remotes (development version)
 
+# remotes development version
+
+* `install_github()` now uses credentials from the git credential store,
+  if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
+
+# remotes 2.4.2
+
+* Gábor Csárdi is now the maintainer.
+* `bioc_version()` now points to the most recent (2021-10-27) Bioconductor
+  release, `v3.14` (@stufield, #664).
 * Fix regex to handle user names in URL in `git_remote`, add regression tests (@achimgaedke, #646).
 
 # remotes 2.4.1

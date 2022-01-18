@@ -1,7 +1,7 @@
 DEFAULT_RSPM_REPO_ID <-  "1" # cran
 DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 
-#' Query the system requirements for a dev package (and its dependencies)
+#' Query the system requirements for a package (and its dependencies)
 #'
 #' Returns a character vector of commands to run that will install system
 #' requirements for the queried operating system.
@@ -13,7 +13,8 @@ DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
 #'   If `os_release` is `NULL`, `os` must consist of the operating system
 #'   and the version separated by a dash, e.g. `"ubuntu-18.04"`.
 #' @param path The path to the dev package's root directory.
-#' @param package A CRAN package name. If not `NULL`, this is used and `path` is ignored.
+#' @param package CRAN package name(s) to lookup system requirements for. If not
+#'   `NULL`, this is used and `path` is ignored.
 #' @param curl The location of the curl binary on your system.
 #' @return A character vector of commands needed to install the system requirements for the package.
 #' @export
@@ -49,16 +50,18 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
         "--silent",
         shQuote(sprintf("%s/sysreqs?all=false&pkgname=%s&distribution=%s&release=%s",
           rspm_repo_url,
-          package,
+          paste(package, collapse = "&pkgname="),
           os,
           os_release)
       )),
       stdout = TRUE
     )
     res <- json$parse(res)
-
-    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["pre_install"]]))))
-    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["requirements"]], function(x) x[["requirements"]][["install_scripts"]]))))
+    if (!is.null(res$error)) {
+      stop(res$error)
+    }
+    pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["requirements"]],  `[[`, c("requirements", "pre_install")))))
+    install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["requirements"]], `[[`, c("requirements", "install_scripts")))))
   } else {
     desc_file <- normalizePath(file.path(path, "DESCRIPTION"), mustWork = FALSE)
     if (!file.exists(desc_file)) {
@@ -80,6 +83,9 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
       stdout = TRUE
     )
     res <- json$parse(res)
+    if (!is.null(res$error)) {
+      stop(res$error)
+    }
 
     pre_install <- unique(unlist(c(res[["pre_install"]], lapply(res[["dependencies"]], `[[`, "pre_install"))))
     install_scripts <- unique(unlist(c(res[["install_scripts"]], lapply(res[["dependencies"]], `[[`, "install_scripts"))))
