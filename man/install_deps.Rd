@@ -15,6 +15,7 @@ install_deps(
   build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
   build_manual = FALSE,
   build_vignettes = FALSE,
+  git = c("auto", "git2r", "external"),
   ...
 )
 }
@@ -59,6 +60,10 @@ to "always". \code{TRUE} and \code{FALSE} are also accepted and correspond to
 \item{build_manual}{If \code{FALSE}, don't build PDF manual ('--no-manual').}
 
 \item{build_vignettes}{If \code{FALSE}, don't build package vignettes ('--no-build-vignettes').}
+
+\item{git}{Whether to use the \code{git2r} package, or an external
+git client via system. Default is \code{git2r} if it is installed,
+otherwise an external git installation.}
 
 \item{...}{additional arguments passed to \code{\link[utils:install.packages]{utils::install.packages()}}.}
 }

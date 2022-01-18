@@ -47,24 +47,24 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
   }
 
   remotes <- lapply(url, git_remote,
-    subdir = subdir, ref = ref,
-    credentials = credentials, git = match.arg(git)
+                    subdir = subdir, ref = ref,
+                    credentials = credentials, git = match.arg(git)
   )
 
   install_remotes(remotes,
-    credentials = credentials,
-    dependencies = dependencies,
-    upgrade = upgrade,
-    force = force,
-    quiet = quiet,
-    build = build,
-    build_opts = build_opts,
-    build_manual = build_manual,
-    build_vignettes = build_vignettes,
-    repos = repos,
-    type = type,
-    git = match.arg(git),
-    ...
+                  credentials = credentials,
+                  dependencies = dependencies,
+                  upgrade = upgrade,
+                  force = force,
+                  quiet = quiet,
+                  build = build,
+                  build_opts = build_opts,
+                  build_manual = build_manual,
+                  build_vignettes = build_vignettes,
+                  repos = repos,
+                  type = type,
+                  git = match.arg(git),
+                  ...
   )
 }
 
@@ -80,8 +80,8 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
     stop("`credentials` can only be used with `git = \"git2r\"`", call. = FALSE)
   }
 
-   url_parts = re_match( url,
-         "(?<protocol>[^/]*://)?(?<authhost>[^/]+)(?<path>[^@]*)(@(?<ref>.*))?")
+  url_parts = re_match( url,
+                        "(?<protocol>[^/]*://)?(?<authhost>[^/]+)(?<path>[^@]*)(@(?<ref>.*))?")
 
   ref <- ref %||% (if (url_parts$ref == "") NULL else url_parts$ref)
 
@@ -93,19 +93,19 @@ git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credent
 
 git_remote_git2r <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("git2r",
-    url = url,
-    subdir = subdir,
-    ref = ref,
-    credentials = credentials
+         url = url,
+         subdir = subdir,
+         ref = ref,
+         credentials = credentials
   )
 }
 
 
 git_remote_xgit <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials()) {
   remote("xgit",
-    url = url,
-    subdir = subdir,
-    ref = ref
+         url = url,
+         subdir = subdir,
+         ref = ref
   )
 }
 
@@ -170,7 +170,7 @@ remote_package_name.git2r_remote <- function(remote, ...) {
         download_args$basic_auth <- list(
           user = Sys.getenv(remote$credentials$username),
           password = Sys.getenv(remote$credentials$username)
-       )
+        )
       } else if (inherits(remote$credentials, "cred_token")) {
         if (Sys.getenv(remote$credentials$token) == "") {
           stop(paste0("Environment variable `", remote$credentials$token, "` is unset."), .call = FALSE)
@@ -200,21 +200,36 @@ remote_package_name.git2r_remote <- function(remote, ...) {
     res <- try(
       silent = TRUE,
       system_check(git_path(),
-        args = c(
-          "archive", "-o", tmp, "--remote", remote$url,
-          if (is.null(remote$ref)) "HEAD" else remote$ref,
-          description_path
-        ),
-        quiet = TRUE
+                   args = c(
+                     "archive", "-o", tmp, "--remote", remote$url,
+                     if (is.null(remote$ref)) "HEAD" else remote$ref,
+                     description_path
+                   ),
+                   quiet = TRUE
       )
     )
 
     if (inherits(res, "try-error")) {
-      return(NA_character_)
+      res <- try(
+        silent = TRUE,
+        {
+          bundle <- remote_download(remote, quiet = TRUE)
+          bundle_description_path <- file.path(bundle, description_path)
+          if (file.exists(bundle_description_path)) {
+            description_path_dir <- file.path(tempdir(), dirname(description_path))
+            dir.create(description_path_dir, recursive = TRUE,
+                       showWarnings = FALSE)
+            file.copy(bundle_description_path,
+                      file.path(tempdir(), description_path))
+          }
+        })
+      if (inherits(res, "try-error")) {
+        return(NA_character_)
+      }
+    } else {
+      # git archive returns a tar file, so extract it to tempdir and read the DCF
+      utils::untar(tmp, files = description_path, exdir = tempdir())
     }
-
-    # git archive returns a tar file, so extract it to tempdir and read the DCF
-    utils::untar(tmp, files = description_path, exdir = tempdir())
 
     read_dcf(file.path(tempdir(), description_path))$Package
   }

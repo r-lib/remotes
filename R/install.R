@@ -175,6 +175,9 @@ r_error_matches <- function(msg, str) {
 #' @param build_opts Options to pass to `R CMD build`, only used when `build` is `TRUE`.
 #' @param build_manual If `FALSE`, don't build PDF manual ('--no-manual').
 #' @param build_vignettes If `FALSE`, don't build package vignettes ('--no-build-vignettes').
+#' @param git Whether to use the `git2r` package, or an external
+#'   git client via system. Default is `git2r` if it is installed,
+#'   otherwise an external git installation.
 #' @export
 #' @examples
 #' \dontrun{install_deps(".")}
@@ -187,12 +190,14 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
                          build = TRUE,
                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes"),
                          build_manual = FALSE, build_vignettes = FALSE,
+                         git = c("auto", "git2r", "external"),
                          ...) {
   packages <- dev_package_deps(
     pkgdir,
     repos = repos,
     dependencies = dependencies,
-    type = type
+    type = type,
+    git = git
   )
 
   dep_deps <- if (isTRUE(dependencies)) NA else dependencies

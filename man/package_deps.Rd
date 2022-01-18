@@ -20,7 +20,8 @@ dev_package_deps(
   pkgdir = ".",
   dependencies = NA,
   repos = getOption("repos"),
-  type = getOption("pkgType")
+  type = getOption("pkgType"),
+  git = c("auto", "git2r", "external")
 )
 
 \method{update}{package_deps}(
@@ -64,6 +65,10 @@ common ones include:
 \item{type}{Type of package to \code{update}.}
 
 \item{pkgdir}{Path to a package directory, or to a package tarball.}
+
+\item{git}{Whether to use the \code{git2r} package, or an external
+git client via system. Default is \code{git2r} if it is installed,
+otherwise an external git installation.}
 
 \item{object}{A \code{package_deps} object.}
 
