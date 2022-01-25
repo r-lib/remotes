@@ -46,7 +46,7 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
   pkg_urls <- unlist(strsplit(url_fields, "[[:space:]]*,[[:space:]]*"))
 
   # Remove trailing "/issues" from the BugReports URL
-  pkg_urls <- sub("/issues$", "", pkg_urls)
+  pkg_urls <- sub("/issues/?$", "", pkg_urls)
 
   valid_domains <- c("github[.]com", "gitlab[.]com", "bitbucket[.]org")
 
@@ -56,7 +56,7 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
         domain = paste0(valid_domains, collapse = "|"),
         username = "[^/]+",
         repo = "[^/@#]+",
-        subdir = "[^/@$ ]+"
+        subdir = "[^/@$ ]*"
       )
     )[c("domain", "username", "repo", "subdir")]
 
