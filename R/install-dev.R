@@ -56,7 +56,7 @@ install_dev <- function(package, cran_url = getOption("repos")[["CRAN"]], ...) {
         domain = paste0(valid_domains, collapse = "|"),
         username = "[^/]+",
         repo = "[^/@#]+",
-        subdir = "[^/@$ ]*"
+        subdir = "[^/@$ ]+"
       )
     )[c("domain", "username", "repo", "subdir")]
 
