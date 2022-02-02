@@ -3680,13 +3680,18 @@ function(...) {
   
     bundle <- tempfile()
   
-    args <- c("clone", "--depth", "1", "--no-hardlinks")
+    disallows_unadvertised <- grepl("(github|bitbucket)[.]com", tolower(x$url))
+    args <- c("clone", if (is.null(x$ref) && disallows_unadvertised) c("--depth", "1"), "--no-hardlinks")
     args <- c(args, x$args, x$url, bundle)
     git(paste0(args, collapse = " "), quiet = quiet)
   
     if (!is.null(x$ref)) {
-      git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
-      git(paste0(c("checkout", "FETCH_HEAD"), collapse = " "), quiet = quiet, path = bundle)
+      if (!disallows_unadvertised) {
+        git(paste0(c("fetch", "origin", x$ref), collapse = " "), quiet = quiet, path = bundle)
+        git(paste0(c("checkout", "FETCH_HEAD"), collapse = " "), quiet = quiet, path = bundle)
+      } else {
+        git(paste0(c("checkout", x$ref), collapse = " "), quiet = quiet, path = bundle)
+      }
     }
   
     bundle
