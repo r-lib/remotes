@@ -2681,7 +2681,7 @@ function(...) {
           if (in_travis()) {
             "Add `GITHUB_PAT` to your travis settings as an encrypted variable."
           } else {
-            "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
+            "Use `gitcreds::gitcreds_set()` to add the token."
           }
         )
     } else if (identical(as.integer(res$status_code), 404L)) {
@@ -3380,7 +3380,7 @@ function(...) {
     pkg_urls <- unlist(strsplit(url_fields, "[[:space:]]*,[[:space:]]*"))
   
     # Remove trailing "/issues" from the BugReports URL
-    pkg_urls <- sub("/issues$", "", pkg_urls)
+    pkg_urls <- sub("/issues/?$", "", pkg_urls)
   
     valid_domains <- c("github[.]com", "gitlab[.]com", "bitbucket[.]org")
   
