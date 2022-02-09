@@ -148,7 +148,9 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
   git <- match.arg(git)
   res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes", git = git))
 
-  res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
+  res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies),
+                                            extra_deps, pkg = pkg, git = git),
+                          stringsAsFactors = FALSE))
 
   res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
 }
