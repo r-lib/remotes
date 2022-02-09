@@ -213,6 +213,7 @@ install_deps <- function(pkgdir = ".", dependencies = NA,
     build_vignettes = build_vignettes,
     type = type,
     repos = repos,
+    git = git,
     ...
   )
 }
