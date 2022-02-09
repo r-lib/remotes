@@ -220,7 +220,8 @@ remote_package_name.git2r_remote <- function(remote, ...) {
             dir.create(description_path_dir, recursive = TRUE,
                        showWarnings = FALSE)
             file.copy(bundle_description_path,
-                      file.path(tempdir(), description_path))
+                      file.path(tempdir(), description_path),
+                      overwrite = TRUE)
           }
         })
       if (inherits(res, "try-error")) {
