@@ -4,6 +4,9 @@
 * `install_github()` now uses credentials from the git credential store,
   if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
 
+* Fix `get_extra_deps()` helper not excluding Enhances dependencies what
+  could lead to errors if developer specified version requirement.
+
 # remotes 2.4.2
 
 * Gábor Csárdi is now the maintainer.
