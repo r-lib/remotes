@@ -1070,6 +1070,8 @@ function(...) {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
   
+    type = sub("^[.a-zA-Z0-9]+=", "", type)
+  
     if (grepl("@", type)) {
       # Custom host
       tah <- strsplit(type, "@", fixed = TRUE)[[1]]
