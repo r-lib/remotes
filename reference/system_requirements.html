@@ -65,13 +65,13 @@ requirements for the queried operating system.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">system_requirements</span><span class="op">(</span>
-  <span class="va">os</span>,
-  os_release <span class="op">=</span> <span class="cn">NULL</span>,
-  path <span class="op">=</span> <span class="st">"."</span>,
-  package <span class="op">=</span> <span class="cn">NULL</span>,
-  curl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html" class="external-link">Sys.which</a></span><span class="op">(</span><span class="st">"curl"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">system_requirements</span><span class="op">(</span></span>
+<span>  <span class="va">os</span>,</span>
+<span>  os_release <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  path <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  package <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  curl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html" class="external-link">Sys.which</a></span><span class="op">(</span><span class="st">"curl"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -82,17 +82,26 @@ requirements for the queried operating system.</p>
 list of supported operating systems.</p>
 <p>If <code>os_release</code> is <code>NULL</code>, <code>os</code> must consist of the operating system
 and the version separated by a dash, e.g. <code>"ubuntu-18.04"</code>.</p></dd>
+
+
 <dt>path</dt>
 <dd><p>The path to the dev package's root directory.</p></dd>
+
+
 <dt>package</dt>
 <dd><p>CRAN package name(s) to lookup system requirements for. If not
 <code>NULL</code>, this is used and <code>path</code> is ignored.</p></dd>
+
+
 <dt>curl</dt>
 <dd><p>The location of the curl binary on your system.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A character vector of commands needed to install the system requirements for the package.</p>
+    
+
+<p>A character vector of commands needed to install the system requirements for the package.</p>
     </div>
 
   </div>
@@ -107,7 +116,7 @@ and the version separated by a dash, e.g. <code>"ubuntu-18.04"</code>.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

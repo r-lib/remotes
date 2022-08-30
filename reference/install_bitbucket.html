@@ -65,25 +65,25 @@ a single command.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">install_bitbucket</span><span class="op">(</span>
-  <span class="va">repo</span>,
-  ref <span class="op">=</span> <span class="st">"HEAD"</span>,
-  subdir <span class="op">=</span> <span class="cn">NULL</span>,
-  auth_user <span class="op">=</span> <span class="fu">bitbucket_user</span><span class="op">(</span><span class="op">)</span>,
-  password <span class="op">=</span> <span class="fu">bitbucket_password</span><span class="op">(</span><span class="op">)</span>,
-  host <span class="op">=</span> <span class="st">"api.bitbucket.org/2.0"</span>,
-  dependencies <span class="op">=</span> <span class="cn">NA</span>,
-  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  quiet <span class="op">=</span> <span class="cn">FALSE</span>,
-  build <span class="op">=</span> <span class="cn">TRUE</span>,
-  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,
-  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,
-  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,
-  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_bitbucket</span><span class="op">(</span></span>
+<span>  <span class="va">repo</span>,</span>
+<span>  ref <span class="op">=</span> <span class="st">"HEAD"</span>,</span>
+<span>  subdir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auth_user <span class="op">=</span> <span class="fu">bitbucket_user</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  password <span class="op">=</span> <span class="fu">bitbucket_password</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  host <span class="op">=</span> <span class="st">"api.bitbucket.org/2.0"</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,</span>
+<span>  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -94,23 +94,35 @@ a single command.</p>
 specify <code>subdir</code> and/or <code>ref</code> using the respective parameters
 (see below); if both are specified, the values in <code>repo</code> take
 precedence.</p></dd>
+
+
 <dt>ref</dt>
 <dd><p>Desired git reference; could be a commit, tag, or branch name.
 Defaults to HEAD.</p></dd>
+
+
 <dt>subdir</dt>
 <dd><p>Subdirectory within repo that contains the R package.</p></dd>
+
+
 <dt>auth_user</dt>
 <dd><p>your account username if you're attempting to install
 a package hosted in a private repository (and your username is different
 to <code>username</code>). Defaults to the <code>BITBUCKET_USER</code> environment
 variable.</p></dd>
+
+
 <dt>password</dt>
 <dd><p>your password. Defaults to the <code>BITBUCKET_PASSWORD</code>
 environment variable. See details for further information on setting
 up a password.</p></dd>
+
+
 <dt>host</dt>
 <dd><p>GitHub API host to use. Override with your GitHub enterprise
 hostname, for example, <code>"github.hostname.com/api/v3"</code>.</p></dd>
+
+
 <dt>dependencies</dt>
 <dd><p>Which dependencies do you want to check?
 Can be a character vector (selecting from "Depends", "Imports",
@@ -124,6 +136,8 @@ just check this package, not its dependencies).</p>
 common ones include:</p><ul><li><p>Config/Needs/website - for dependencies used in building the pkgdown site.</p></li>
 <li><p>Config/Needs/coverage for dependencies used in calculating test coverage.</p></li>
 </ul></dd>
+
+
 <dt>upgrade</dt>
 <dd><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
@@ -131,25 +145,44 @@ and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent
 to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and correspond to
 "always" and "never" respectively.</p></dd>
+
+
 <dt>force</dt>
 <dd><p>Force installation, even if the remote state has not changed
 since the previous install.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>If <code>TRUE</code>, suppress output.</p></dd>
+
+
 <dt>build</dt>
 <dd><p>If <code>TRUE</code> build the package before installing.</p></dd>
+
+
 <dt>build_opts</dt>
 <dd><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code> is <code>TRUE</code>.</p></dd>
+
+
 <dt>build_manual</dt>
 <dd><p>If <code>FALSE</code>, don't build PDF manual ('--no-manual').</p></dd>
+
+
 <dt>build_vignettes</dt>
 <dd><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').</p></dd>
+
+
 <dt>repos</dt>
 <dd><p>A character vector giving repositories to use.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Type of package to <code>update</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed on to <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">utils::install.packages()</a></code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -163,7 +196,7 @@ your repositories and pull requests. Then store your password in the
 environment variable <code>BITBUCKET_PASSWORD</code> (e.g. <code>evelynwaugh:swordofhonour</code>)</p>
 <p>Note that on Windows, authentication requires the "libcurl" download
 method. You can set the default download method via the
-<code>download.file.method</code> option:</p><div class="sourceCode"><pre><code><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>download.file.method <span class="op">=</span> <span class="st">"libcurl"</span><span class="op">)</span></code></pre></div>
+<code>download.file.method</code> option:</p><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>download.file.method <span class="op">=</span> <span class="st">"libcurl"</span><span class="op">)</span></span></code></pre></div>
 
 <p>In particular, if unset, RStudio sets the download method to "wininet".
 To override this, you might want to set it to "libcurl" in your
@@ -190,10 +223,10 @@ that it does <em>not</em> set the system proxies automatically, see
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">install_bitbucket</span><span class="op">(</span><span class="st">"sulab/mygene.r@default"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">install_bitbucket</span><span class="op">(</span><span class="st">"djnavarro/lsr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">install_bitbucket</span><span class="op">(</span><span class="st">"sulab/mygene.r@default"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_bitbucket</span><span class="op">(</span><span class="st">"djnavarro/lsr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -208,7 +241,7 @@ that it does <em>not</em> set the system proxies automatically, see
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

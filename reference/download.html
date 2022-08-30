@@ -65,35 +65,48 @@ otherwise a wrapper around <code><a href="https://rdrr.io/r/utils/download.file.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">download</span><span class="op">(</span>
-  <span class="va">path</span>,
-  <span class="va">url</span>,
-  auth_token <span class="op">=</span> <span class="cn">NULL</span>,
-  basic_auth <span class="op">=</span> <span class="cn">NULL</span>,
-  quiet <span class="op">=</span> <span class="cn">TRUE</span>,
-  headers <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download</span><span class="op">(</span></span>
+<span>  <span class="va">path</span>,</span>
+<span>  <span class="va">url</span>,</span>
+<span>  auth_token <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  basic_auth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  headers <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>path</dt>
 <dd><p>Path to download to. <code>dirname(path)</code> must exist.</p></dd>
+
+
 <dt>url</dt>
 <dd><p>URL.</p></dd>
+
+
 <dt>auth_token</dt>
 <dd><p>Token for token-based authentication or <code>NULL</code>.</p></dd>
+
+
 <dt>basic_auth</dt>
 <dd><p>List with <code>user</code> and <code>password</code> for basic HTTP
 authentication, or <code>NULL</code>.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>Passed to <code><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file()</a></code> or <code><a href="https://rdrr.io/pkg/curl/man/curl_download.html" class="external-link">curl::curl_download()</a></code>.</p></dd>
+
+
 <dt>headers</dt>
 <dd><p>Named character vector of HTTP headers to use.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>path</code>, if the download was successful.</p>
+    
+
+<p><code>path</code>, if the download was successful.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -123,7 +136,7 @@ directly in <code>headers</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

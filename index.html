@@ -113,7 +113,7 @@
 </h2>
 <p>Install the released version of remotes from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -121,20 +121,20 @@
 <p>Note that most of the examples here use GitHub. See below for other supported repository types.</p>
 <p>To install the latest version of a package in the default branch from GitHub, you can use the <code>user/repo</code> form. Note that <code>user</code> can also be an organization:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"r-lib/conflicted"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"r-lib/conflicted"</span><span class="op">)</span></span></code></pre></div>
 <p>If the R package is inside a subdirectory of the root directory, then give this subdirectory as well:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># build = FALSE because of some specificities of XGBoost package</span>
-<span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dmlc/xgboost/R-package"</span>, build <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># build = FALSE because of some specificities of XGBoost package</span></span>
+<span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dmlc/xgboost/R-package"</span>, build <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>To install a certain branch or commit or tag, append it to the repo name, after an <code>@</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"gaborcsardi/pkgconfig@v2.0.0"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"gaborcsardi/pkgconfig@v2.0.0"</span><span class="op">)</span></span></code></pre></div>
 <p>To install the latest release, append <code>@*release</code> to the repo name:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"gaborcsardi/pkgconfig@*release"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"gaborcsardi/pkgconfig@*release"</span><span class="op">)</span></span></code></pre></div>
 <p>To install a pull request, append <code>#</code> and the id (an integer number) of the pull request to the repo name:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"r-lib/pkgconfig#7"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"r-lib/pkgconfig#7"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
 </h3>
@@ -294,7 +294,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

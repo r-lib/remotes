@@ -65,9 +65,9 @@ specified R version.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bioc_version</span><span class="op">(</span>r_ver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">getRversion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">bioc_install_repos</span><span class="op">(</span>r_ver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">getRversion</a></span><span class="op">(</span><span class="op">)</span>, bioc_ver <span class="op">=</span> <span class="fu">bioc_version</span><span class="op">(</span><span class="va">r_ver</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bioc_version</span><span class="op">(</span>r_ver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">getRversion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bioc_install_repos</span><span class="op">(</span>r_ver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">getRversion</a></span><span class="op">(</span><span class="op">)</span>, bioc_ver <span class="op">=</span> <span class="fu">bioc_version</span><span class="op">(</span><span class="va">r_ver</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -75,14 +75,24 @@ specified R version.</p>
     <dl><dt>r_ver</dt>
 <dd><p>R version to use. For <code>bioc_install_repos()</code> it is
 ignored if <code>bioc_ver</code> is specified.</p></dd>
+
+
 <dt>bioc_ver</dt>
 <dd><p>Bioconductor version to use. Defaults to the default one
 corresponding to <code>r_ver</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>bioc_version()</code> returns a Bioconductor version, a <code>package_version</code>object.
-<code>bioc_install_repos()</code> returns a named character vector of the URLs of
+    
+
+<p><code>bioc_version()</code> returns a Bioconductor version, a <code>package_version</code></p>
+
+
+<p>object.</p>
+
+
+<p><code>bioc_install_repos()</code> returns a named character vector of the URLs of
 the Bioconductor repositories, appropriate for the current or the
 specified R version.</p>
     </div>
@@ -100,11 +110,11 @@ default value is <code>https://bioconductor.org</code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">bioc_version</span><span class="op">(</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">bioc_version</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘3.15’</span>
-<span class="r-in"><span class="fu">bioc_version</span><span class="op">(</span><span class="st">"3.4"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">bioc_version</span><span class="op">(</span><span class="st">"3.4"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘3.6’</span>
-<span class="r-in"><span class="fu">bioc_install_repos</span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">bioc_install_repos</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                 BioCsoft </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            "https://bioconductor.org/packages/3.15/bioc" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                  BioCann </span>
@@ -129,7 +139,7 @@ default value is <code>https://bioconductor.org</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

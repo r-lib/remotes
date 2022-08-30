@@ -65,21 +65,21 @@ a single command.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">install_local</span><span class="op">(</span>
-  path <span class="op">=</span> <span class="st">"."</span>,
-  subdir <span class="op">=</span> <span class="cn">NULL</span>,
-  dependencies <span class="op">=</span> <span class="cn">NA</span>,
-  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  quiet <span class="op">=</span> <span class="cn">FALSE</span>,
-  build <span class="op">=</span> <span class="op">!</span><span class="fu">is_binary_pkg</span><span class="op">(</span><span class="va">path</span><span class="op">)</span>,
-  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,
-  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,
-  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,
-  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_local</span><span class="op">(</span></span>
+<span>  path <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  subdir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build <span class="op">=</span> <span class="op">!</span><span class="fu">is_binary_pkg</span><span class="op">(</span><span class="va">path</span><span class="op">)</span>,</span>
+<span>  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,</span>
+<span>  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -87,8 +87,12 @@ a single command.</p>
     <dl><dt>path</dt>
 <dd><p>path to local directory, or compressed file (tar, zip, tar.gz
 tar.bz2, tgz2 or tbz)</p></dd>
+
+
 <dt>subdir</dt>
 <dd><p>subdirectory within url bundle that contains the R package.</p></dd>
+
+
 <dt>dependencies</dt>
 <dd><p>Which dependencies do you want to check?
 Can be a character vector (selecting from "Depends", "Imports",
@@ -102,6 +106,8 @@ just check this package, not its dependencies).</p>
 common ones include:</p><ul><li><p>Config/Needs/website - for dependencies used in building the pkgdown site.</p></li>
 <li><p>Config/Needs/coverage for dependencies used in calculating test coverage.</p></li>
 </ul></dd>
+
+
 <dt>upgrade</dt>
 <dd><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
@@ -109,25 +115,44 @@ and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent
 to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and correspond to
 "always" and "never" respectively.</p></dd>
+
+
 <dt>force</dt>
 <dd><p>Force installation, even if the remote state has not changed
 since the previous install.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>If <code>TRUE</code>, suppress output.</p></dd>
+
+
 <dt>build</dt>
 <dd><p>If <code>TRUE</code> build the package before installing.</p></dd>
+
+
 <dt>build_opts</dt>
 <dd><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code> is <code>TRUE</code>.</p></dd>
+
+
 <dt>build_manual</dt>
 <dd><p>If <code>FALSE</code>, don't build PDF manual ('--no-manual').</p></dd>
+
+
 <dt>build_vignettes</dt>
 <dd><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').</p></dd>
+
+
 <dt>repos</dt>
 <dd><p>A character vector giving repositories to use.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Type of package to <code>update</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed on to <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">utils::install.packages()</a></code>.</p></dd>
+
 </dl></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -146,12 +171,12 @@ since the previous install.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">pkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/download.packages.html" class="external-link">download.packages</a></span><span class="op">(</span><span class="st">"testthat"</span>, <span class="va">dir</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">install_local</span><span class="op">(</span><span class="va">pkg</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/download.packages.html" class="external-link">download.packages</a></span><span class="op">(</span><span class="st">"testthat"</span>, <span class="va">dir</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_local</span><span class="op">(</span><span class="va">pkg</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -166,7 +191,7 @@ since the previous install.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

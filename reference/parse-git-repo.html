@@ -82,26 +82,32 @@ and various GitHub browser URLs</p></dd>
 </dl></div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span>
-
-<span class="fu">parse_github_repo_spec</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span>
-
-<span class="fu">parse_github_url</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">parse_github_repo_spec</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">parse_github_url</span><span class="op">(</span><span class="va">repo</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>repo</dt>
 <dd><p>Character scalar, the repo specification.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>List with members: <code>username</code>, <code>repo</code>, <code>subdir</code><code>ref</code>, <code>pull</code>, <code>release</code>, some which will be empty.</p>
+    
+
+<p>List with members: <code>username</code>, <code>repo</code>, <code>subdir</code></p>
+
+
+<p><code>ref</code>, <code>pull</code>, <code>release</code>, some which will be empty.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"metacran/crandb"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"metacran/crandb"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -123,7 +129,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"jimhester/covr#47"</span><span class="op">)</span>        <span class="co">## pull request</span></span>
+<span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"jimhester/covr#47"</span><span class="op">)</span>        <span class="co">## pull request</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -145,7 +151,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"jeroen/curl@v0.9.3"</span><span class="op">)</span>       <span class="co">## specific tag</span></span>
+<span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"jeroen/curl@v0.9.3"</span><span class="op">)</span>       <span class="co">## specific tag</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -167,7 +173,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"tidyverse/dplyr@*release"</span><span class="op">)</span> <span class="co">## shorthand for latest release</span></span>
+<span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"tidyverse/dplyr@*release"</span><span class="op">)</span> <span class="co">## shorthand for latest release</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -189,7 +195,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "*release"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"r-lib/remotes@550a3c7d3f9e1493a2ba"</span><span class="op">)</span> <span class="co">## commit SHA</span></span>
+<span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"r-lib/remotes@550a3c7d3f9e1493a2ba"</span><span class="op">)</span> <span class="co">## commit SHA</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -211,7 +217,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"igraph=igraph/rigraph"</span><span class="op">)</span> <span class="co">## Different package name from repo name</span></span>
+<span class="r-in"><span><span class="fu">parse_repo_spec</span><span class="op">(</span><span class="st">"igraph=igraph/rigraph"</span><span class="op">)</span> <span class="co">## Different package name from repo name</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $package</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "igraph"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -233,8 +239,8 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/jeroen/curl.git"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/jeroen/curl.git"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "jeroen"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -250,7 +256,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"git@github.com:metacran/crandb.git"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"git@github.com:metacran/crandb.git"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "metacran"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -266,7 +272,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/jimhester/covr"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/jimhester/covr"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "jimhester"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -282,7 +288,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.example.com/user/repo.git"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.example.com/user/repo.git"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "user"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -298,7 +304,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"git@github.example.com:user/repo.git"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"git@github.example.com:user/repo.git"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "user"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -314,8 +320,8 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/pull/108"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/pull/108"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "r-lib"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -331,7 +337,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/tree/name-of-branch"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/tree/name-of-branch"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "r-lib"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -347,7 +353,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/commit/1234567"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/commit/1234567"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "r-lib"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -363,7 +369,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/releases/latest"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/releases/latest"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "r-lib"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -379,7 +385,7 @@ and various GitHub browser URLs</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $release</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "*release"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parse_github_url</span><span class="op">(</span><span class="st">"https://github.com/r-lib/remotes/releases/tag/1.0.0"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $username</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "r-lib"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -409,7 +415,7 @@ and various GitHub browser URLs</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

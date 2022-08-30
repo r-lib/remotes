@@ -65,27 +65,29 @@ archive directories, in order to find specific versions of the requested package
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">install_version</span><span class="op">(</span>
-  <span class="va">package</span>,
-  version <span class="op">=</span> <span class="cn">NULL</span>,
-  dependencies <span class="op">=</span> <span class="cn">NA</span>,
-  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,
-  force <span class="op">=</span> <span class="cn">FALSE</span>,
-  quiet <span class="op">=</span> <span class="cn">FALSE</span>,
-  build <span class="op">=</span> <span class="cn">FALSE</span>,
-  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,
-  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,
-  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,
-  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,
-  type <span class="op">=</span> <span class="st">"source"</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_version</span><span class="op">(</span></span>
+<span>  <span class="va">package</span>,</span>
+<span>  version <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  upgrade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"ask"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-resave-data"</span>, <span class="st">"--no-manual"</span>, <span class="st">"--no-build-vignettes"</span><span class="op">)</span>,</span>
+<span>  build_manual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"source"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>package</dt>
 <dd><p>Name of the package to install.</p></dd>
+
+
 <dt>version</dt>
 <dd><p>Version of the package to install.  Can either be a string giving the exact
 version required, or a specification in the same format as the parenthesized expressions used
@@ -94,6 +96,8 @@ in package dependencies. One of the following formats:</p><ul><li><p>An exact ve
 <li><p>Several criteria to satisfy, as a comma-separated string, e.g. <code>"&gt;= 1.12.0, &lt; 1.14"</code></p></li>
 <li><p>Several criteria to satisfy, as elements of a character vector, e.g. <code>c("&gt;= 1.12.0", "&lt; 1.14")</code></p></li>
 </ul></dd>
+
+
 <dt>dependencies</dt>
 <dd><p>logical indicating whether to also install
     uninstalled packages which these packages depend on/link
@@ -114,6 +118,8 @@ in package dependencies. One of the following formats:</p><ul><li><p>An exact ve
     examples, tests and vignettes (if the package author specified them
     correctly).</p>
 <p>In all of these, <code>"LinkingTo"</code> is omitted for binary packages.</p></dd>
+
+
 <dt>upgrade</dt>
 <dd><p>Should package dependencies be upgraded? One of "default", "ask", "always", or "never". "default"
 respects the value of the <code>R_REMOTES_UPGRADE</code> environment variable if set,
@@ -121,21 +127,35 @@ and falls back to "ask" if unset. "ask" prompts the user for which out of
 date packages to upgrade. For non-interactive sessions "ask" is equivalent
 to "always". <code>TRUE</code> and <code>FALSE</code> are also accepted and correspond to
 "always" and "never" respectively.</p></dd>
+
+
 <dt>force</dt>
 <dd><p>Force installation, even if the remote state has not changed
 since the previous install.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>logical: if true, reduce the amount of output.  This is <em>not</em>
     passed to <code><a href="https://rdrr.io/r/utils/available.packages.html" class="external-link">available.packages</a>()</code> in case that is called, on
     purpose.</p></dd>
+
+
 <dt>build</dt>
 <dd><p>If <code>TRUE</code> build the package before installing.</p></dd>
+
+
 <dt>build_opts</dt>
 <dd><p>Options to pass to <code>R CMD build</code>, only used when <code>build</code> is <code>TRUE</code>.</p></dd>
+
+
 <dt>build_manual</dt>
 <dd><p>If <code>FALSE</code>, don't build PDF manual ('--no-manual').</p></dd>
+
+
 <dt>build_vignettes</dt>
 <dd><p>If <code>FALSE</code>, don't build package vignettes ('--no-build-vignettes').</p></dd>
+
+
 <dt>repos</dt>
 <dd><p>character vector, the base URL(s) of the repositories
     to use, e.g., the URL of a CRAN mirror such as
@@ -143,12 +163,17 @@ since the previous install.</p></dd>
     supported URL schemes see <code><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></code>.</p>
 <p>Can be <code>NULL</code> to install from local files, directories or URLs:
     this will be inferred by extension from <code>pkgs</code> if of length one.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>character, indicating the type of package to download and
     install.  Will be <code>"source"</code> except on Windows and some macOS
     builds: see the section on ‘Binary packages’ for those.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed on to <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">utils::install.packages()</a></code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -177,19 +202,19 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">install_version</span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"1.11.0"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">install_version</span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"&gt;= 1.12.0, &lt; 1.14"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Specify search order (e.g. in ~/.Rprofile)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span class="r-in">  prod <span class="op">=</span> <span class="st">"http://mycompany.example.com/r-repo"</span>,</span>
-<span class="r-in">  dev <span class="op">=</span> <span class="st">"http://mycompany.example.com/r-repo-dev"</span>,</span>
-<span class="r-in">  CRAN <span class="op">=</span> <span class="st">"https://cran.revolutionanalytics.com"</span></span>
-<span class="r-in"><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">install_version</span><span class="op">(</span><span class="st">"mypackage"</span>, <span class="st">"1.15"</span><span class="op">)</span> <span class="co"># finds in 'prod'</span></span>
-<span class="r-in"><span class="fu">install_version</span><span class="op">(</span><span class="st">"mypackage"</span>, <span class="st">"1.16-39487"</span><span class="op">)</span> <span class="co"># finds in 'dev'</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">install_version</span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"1.11.0"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_version</span><span class="op">(</span><span class="st">"devtools"</span>, <span class="st">"&gt;= 1.12.0, &lt; 1.14"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Specify search order (e.g. in ~/.Rprofile)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  prod <span class="op">=</span> <span class="st">"http://mycompany.example.com/r-repo"</span>,</span></span>
+<span class="r-in"><span>  dev <span class="op">=</span> <span class="st">"http://mycompany.example.com/r-repo-dev"</span>,</span></span>
+<span class="r-in"><span>  CRAN <span class="op">=</span> <span class="st">"https://cran.revolutionanalytics.com"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">install_version</span><span class="op">(</span><span class="st">"mypackage"</span>, <span class="st">"1.15"</span><span class="op">)</span> <span class="co"># finds in 'prod'</span></span></span>
+<span class="r-in"><span><span class="fu">install_version</span><span class="op">(</span><span class="st">"mypackage"</span>, <span class="st">"1.16-39487"</span><span class="op">)</span> <span class="co"># finds in 'dev'</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -204,7 +229,7 @@ can check if you do by running <code>devtools::has_devel</code> (you need the <c
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
