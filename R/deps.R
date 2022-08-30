@@ -533,12 +533,7 @@ parse_one_extra <- function(x, ...) {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
 
-  if (grepl("=", type, fixed = TRUE)) {
-    # Allow different names for package and repo
-    tah <- strsplit(type, "=", fixed = TRUE)[[1]]
-    pkgname <- tah[1]
-    type <- tah[2]
-  }
+  type = sub("^[.a-zA-Z0-9]+=", "", type)
 
   if (grepl("@", type)) {
     # Custom host
