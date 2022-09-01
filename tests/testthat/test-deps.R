@@ -372,6 +372,12 @@ test_that("git remotes for git2r and xgit", {
 
 })
 
+test_that("remotes are parsed with explicit package names", {
+  expect_equal(
+    parse_one_extra("testthat=github::hadley/testthat"),
+    github_remote("hadley/testthat"))
+})
+
 test_that("type = 'both' works well", {
 
   skip_on_cran()
