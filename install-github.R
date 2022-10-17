@@ -1070,6 +1070,8 @@ function(...) {
       stop("Malformed remote specification '", x, "'", call. = FALSE)
     }
   
+    type = sub("^[.a-zA-Z0-9]+=", "", type)
+  
     if (grepl("@", type)) {
       # Custom host
       tah <- strsplit(type, "@", fixed = TRUE)[[1]]
@@ -2681,7 +2683,7 @@ function(...) {
           if (in_travis()) {
             "Add `GITHUB_PAT` to your travis settings as an encrypted variable."
           } else {
-            "Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`."
+            "Use `gitcreds::gitcreds_set()` to add the token."
           }
         )
     } else if (identical(as.integer(res$status_code), 404L)) {
@@ -3380,7 +3382,7 @@ function(...) {
     pkg_urls <- unlist(strsplit(url_fields, "[[:space:]]*,[[:space:]]*"))
   
     # Remove trailing "/issues" from the BugReports URL
-    pkg_urls <- sub("/issues$", "", pkg_urls)
+    pkg_urls <- sub("/issues/?$", "", pkg_urls)
   
     valid_domains <- c("github[.]com", "gitlab[.]com", "bitbucket[.]org")
   
@@ -5989,7 +5991,7 @@ function(...) {
   supported_os_versions <- function() {
     list(
       #"debian" = c("8", "9"),
-      "ubuntu" = c("14.04", "16.04", "18.04", "20.04"),
+      "ubuntu" = c("14.04", "16.04", "18.04", "20.04", "22.04"),
       "centos" = c("6", "7", "8"),
       "redhat" = c("6", "7", "8"),
       "opensuse" = c("42.3", "15.0"),

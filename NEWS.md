@@ -3,6 +3,7 @@
 
 * `install_github()` now uses credentials from the git credential store,
   if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
+* Remotes field accepts explicit package names: `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
 * Download headers can now be set via `options(remotes.download.headers)` allowing the use of headers for e.g. 
   retrieving available packages (@AshesITR, #682).
 

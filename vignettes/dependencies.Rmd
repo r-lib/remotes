@@ -72,7 +72,7 @@ Remotes: gitlab::jimhester/covr
 
 # Git
 Remotes: git::git@bitbucket.org:djnavarro/lsr.git,
-  git::https://github.com/igraph/rigraph.git@master
+  git::https://github.com/igraph/rigraph.git@main
 
 # Bitbucket
 Remotes: bitbucket::sulab/mygene.r@default, djnavarro/lsr
