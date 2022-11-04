@@ -32,7 +32,8 @@
 #'   "always" and "never" respectively.
 #' @param repos A character vector giving repositories to use.
 #' @param type Type of package to `update`.
-#'
+#' @param remote_precedence A logical flag specifying whether remote sources should take precedence over
+#'   CRAN when both were found.
 #' @param object A `package_deps` object.
 #' @param ... Additional arguments passed to `install_packages`.
 #' @inheritParams install_github
@@ -122,7 +123,8 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
-                             type = getOption("pkgType")) {
+                             type = getOption("pkgType"),
+                             remote_precedence = TRUE) {
 
   pkg <- load_pkg_description(pkgdir)
   repos <- c(repos, parse_additional_repositories(pkg))
@@ -140,14 +142,14 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   cran_deps <- package_deps(deps, repos = repos, type = type)
 
-  res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
+  res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"), remote_precedence)
 
   res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
 
   res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
 }
 
-combine_remote_deps <- function(cran_deps, remote_deps) {
+combine_remote_deps <- function(cran_deps, remote_deps, remote_precedence) {
   # If there are no dependencies there will be no remote dependencies either,
   # so just return them (and don't force the remote_deps promise)
   if (nrow(cran_deps) == 0) {
@@ -158,7 +160,13 @@ combine_remote_deps <- function(cran_deps, remote_deps) {
   remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
 
   # If there are remote deps remove the equivalent CRAN deps
-  cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+  if (remote_precedence) {
+    cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+  # Otherwise remove remotes already covered by CRAN
+  } else {
+    remote_deps <- remote_deps[!(remote_deps$package %in% cran_deps$package), ]
+  }
+  
 
   rbind(remote_deps, cran_deps)
 }
@@ -532,6 +540,8 @@ parse_one_extra <- function(x, ...) {
   } else {
     stop("Malformed remote specification '", x, "'", call. = FALSE)
   }
+
+  type = sub("^[.a-zA-Z0-9]+=", "", type)
 
   if (grepl("@", type)) {
     # Custom host

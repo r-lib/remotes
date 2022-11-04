@@ -3,6 +3,9 @@
 
 * `install_github()` now uses credentials from the git credential store,
   if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
+* Remotes field accepts explicit package names: `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
+* Add `remote_precedence` parameter to `dev_package_deps()` which allows user to choose whether 
+  remote sources should have a priority over cran sources. (#732, @maksymiuks)
 
 * Fix `get_extra_deps()` helper not excluding Enhances dependencies what
   could lead to errors if developer specified version requirement.
