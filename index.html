@@ -83,14 +83,18 @@
 <div class="section level1">
 <div class="page-header"><h1 id="remotes">remotes<a class="anchor" aria-label="anchor" href="#remotes"></a>
 </h1></div>
-<blockquote><p>Install R Packages from remote or local repositories, including GitHub, GitLab, Bitbucket, and Bioconductor</p></blockquote>
+<blockquote>
+<p>Install R Packages from remote or local repositories, including GitHub, GitLab, Bitbucket, and Bioconductor</p>
+</blockquote>
 <!-- badges: start -->
+
 <p>Download and install R packages stored in GitHub, GitLab, Bitbucket, Bioconductor, or plain subversion or git repositories. This package is a lightweight replacement of the <code>install_*</code> functions in <a href="https://github.com/r-lib/devtools" class="external-link"><code>devtools</code></a>. Indeed most of the code was copied over from <code>devtools</code>.</p>
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
 <ul>
-<li>Installers:<ul>
+<li>Installers:
+<ul>
 <li>Install packages with their dependencies.</li>
 <li>Install from GitHub, GitLab, Bitbucket.</li>
 <li>Install from git and subversion repositories.</li>
@@ -178,7 +182,8 @@
 <ul>
 <li>For R older than 3.2, the curl package is required as remotes falls back to <code><a href="https://rdrr.io/pkg/curl/man/curl_download.html" class="external-link">curl::curl_download</a></code> in that case</li>
 <li>For R newer than 3.3, default <code><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file()</a></code> method is used. (<code>method = "auto"</code>)</li>
-<li>For in between versions,<ul>
+<li>For in between versions,
+<ul>
 <li>
 <code>method = "wininet"</code> is used on windows OS</li>
 <li>
@@ -275,7 +280,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/r-lib/remotes/actions" class="external-link"><img src="https://github.com/r-lib/remotes/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://app.codecov.io/gh/r-lib/remotes?branch=main" class="external-link"><img src="https://codecov.io/gh/r-lib/remotes/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://www.r-pkg.org/pkg/remotes" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/remotes" alt="CRAN RStudio mirror downloads"></a></li>
 <li><a href="https://www.r-pkg.org/pkg/remotes" class="external-link"><img src="https://www.r-pkg.org/badges/version/remotes"></a></li>
