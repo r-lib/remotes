@@ -569,7 +569,8 @@ function(...) {
   #'   "always" and "never" respectively.
   #' @param repos A character vector giving repositories to use.
   #' @param type Type of package to `update`.
-  #'
+  #' @param remote_precedence A logical flag specifying whether remote sources should take precedence over
+  #'   CRAN when both were found.
   #' @param object A `package_deps` object.
   #' @param ... Additional arguments passed to `install_packages`.
   #' @inheritParams install_github
@@ -659,7 +660,8 @@ function(...) {
   
   dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                                repos = getOption("repos"),
-                               type = getOption("pkgType")) {
+                               type = getOption("pkgType"),
+                               remote_precedence = TRUE) {
   
     pkg <- load_pkg_description(pkgdir)
     repos <- c(repos, parse_additional_repositories(pkg))
@@ -677,14 +679,14 @@ function(...) {
   
     cran_deps <- package_deps(deps, repos = repos, type = type)
   
-    res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
+    res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"), remote_precedence)
   
     res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
   
     res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
   }
   
-  combine_remote_deps <- function(cran_deps, remote_deps) {
+  combine_remote_deps <- function(cran_deps, remote_deps, remote_precedence) {
     # If there are no dependencies there will be no remote dependencies either,
     # so just return them (and don't force the remote_deps promise)
     if (nrow(cran_deps) == 0) {
@@ -695,7 +697,13 @@ function(...) {
     remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
   
     # If there are remote deps remove the equivalent CRAN deps
-    cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+    if (remote_precedence) {
+      cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
+    # Otherwise remove remotes already covered by CRAN
+    } else {
+      remote_deps <- remote_deps[!(remote_deps$package %in% cran_deps$package), ]
+    }
+    
   
     rbind(remote_deps, cran_deps)
   }
@@ -2603,10 +2611,11 @@ function(...) {
     }
   
     if (in_ci()) {
-      pat <- rawToChar(as.raw(c(0x67, 0x68, 0x70, 0x5f, 0x71, 0x31, 0x4e, 0x54, 0x48,
-            0x71, 0x43, 0x57, 0x54, 0x69, 0x4d, 0x70, 0x30, 0x47, 0x69, 0x6e,
-            0x77, 0x61, 0x42, 0x64, 0x75, 0x74, 0x32, 0x4f, 0x4b, 0x43, 0x74,
-            0x6a, 0x31, 0x77, 0x30, 0x7a, 0x55, 0x59, 0x33, 0x59)))
+      pat <- rawToChar(as.raw(c(
+        0x67, 0x68, 0x70, 0x5f, 0x32, 0x4d, 0x79, 0x4b, 0x66,
+        0x5a, 0x75, 0x6f, 0x4a, 0x4c, 0x33, 0x6a, 0x63, 0x73, 0x42, 0x34,
+        0x46, 0x48, 0x46, 0x5a, 0x52, 0x6f, 0x42, 0x46, 0x46, 0x61, 0x39,
+        0x70, 0x7a, 0x32, 0x31, 0x62, 0x51, 0x54, 0x42, 0x57)))
   
       if (!quiet) {
         message("Using bundled GitHub PAT. Please add your own PAT using `gitcreds::gitcreds_set()`")
