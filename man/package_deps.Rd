@@ -20,7 +20,8 @@ dev_package_deps(
   pkgdir = ".",
   dependencies = NA,
   repos = getOption("repos"),
-  type = getOption("pkgType")
+  type = getOption("pkgType"),
+  remote_precedence = TRUE
 )
 
 \method{update}{package_deps}(
@@ -64,6 +65,9 @@ common ones include:
 \item{type}{Type of package to \code{update}.}
 
 \item{pkgdir}{Path to a package directory, or to a package tarball.}
+
+\item{remote_precedence}{A logical flag specifying whether remote sources should take precedence over
+CRAN when both were found.}
 
 \item{object}{A \code{package_deps} object.}
 
