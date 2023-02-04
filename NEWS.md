@@ -7,6 +7,9 @@
 * Add `remote_precedence` parameter to `dev_package_deps()` which allows user to choose whether 
   remote sources should have a priority over cran sources. (#732, @maksymiuks)
 
+* `dev_package_deps()` now works for packages with `Enhances` dependencies
+  (#711, @maksymiuks).
+
 # remotes 2.4.2
 
 * Gábor Csárdi is now the maintainer.

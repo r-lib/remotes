@@ -218,7 +218,7 @@ get_extra_deps <- function(pkg, dependencies) {
   dependencies <- intersect(dependencies, names(pkg))
 
   #remove standard dependencies
-  setdiff(dependencies, tolower(standardise_dep(TRUE)))
+  setdiff(dependencies, tolower(standardise_dep(c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances"))))
 }
 
 #' @export
