@@ -1,5 +1,8 @@
 url: https://remotes.r-lib.org
 
+development:
+  mode: auto
+
 template:
   package: tidytemplate
   bootstrap: 5
