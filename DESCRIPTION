@@ -46,3 +46,4 @@ RoxygenNote: 7.1.2
 SystemRequirements: Subversion for install_svn, git for install_git
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+Config/Needs/website: tidyverse/tidytemplate
