@@ -1,5 +1,5 @@
 DEFAULT_RSPM_REPO_ID <-  "1" # cran
-DEFAULT_RSPM <-  "https://packagemanager.rstudio.com"
+DEFAULT_RSPM <-  "https://packagemanager.posit.co"
 
 #' Query the system requirements for a package (and its dependencies)
 #'
@@ -48,6 +48,7 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
       curl,
       args = c(
         "--silent",
+        "-L",
         shQuote(sprintf("%s/sysreqs?all=false&pkgname=%s&distribution=%s&release=%s",
           rspm_repo_url,
           paste(package, collapse = "&pkgname="),
@@ -72,6 +73,7 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
       curl,
       args = c(
         "--silent",
+        "-L",
         "--data-binary",
         shQuote(paste0("@", desc_file)),
         shQuote(sprintf("%s/sysreqs?distribution=%s&release=%s&suggests=true",

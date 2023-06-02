@@ -108,8 +108,10 @@ environment variable \code{BITBUCKET_PASSWORD} (e.g. \code{evelynwaugh:swordofho
 
 Note that on Windows, authentication requires the "libcurl" download
 method. You can set the default download method via the
-\code{download.file.method} option:\preformatted{options(download.file.method = "libcurl")
-}
+\code{download.file.method} option:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options(download.file.method = "libcurl")
+}\if{html}{\out{</div>}}
 
 In particular, if unset, RStudio sets the download method to "wininet".
 To override this, you might want to set it to "libcurl" in your
