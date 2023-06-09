@@ -149,7 +149,7 @@ dependencies are installed from Bioconductor.
     * `method = "wininet"` is used on windows OS
     * `method = "libcurl"` is used on other OS, if available.
 
-See `help("download.file")` for informations on these methods and for
+See `help("download.file")` for information on these methods and for
 setting proxies if needed.
 
 ### Standalone mode

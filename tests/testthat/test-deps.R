@@ -66,7 +66,7 @@ test_that("extra_deps", {
 
   expect_equal(res$package, c("testthat", "roxygen2"))
 
-  # There are the shas for the v2.0.0 and v6.0.1 tags respectivly
+  # There are the shas for the v2.0.0 and v6.0.1 tags respectively
   expect_equal(
     res$available,
     c("b0c0d5dcd78c5f97790c4b6ddb5babbce4c63a9d",
