@@ -10,6 +10,7 @@ test_that("bioc is standalone", {
   funs <- Filter(function(x) is.function(stenv[[x]]), objs)
   funobjs <- mget(funs, stenv)
 
+  skip_if_not_installed("codetools")
   expect_message(
     mapply(codetools::checkUsage, funobjs, funs,
            MoreArgs = list(report = message)),
