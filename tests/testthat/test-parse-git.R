@@ -1,5 +1,3 @@
-context("Parse git repo")
-
 test_that("pull request and latest release, via spec and URL", {
 
   expect_equal(

@@ -1,6 +1,3 @@
-
-context("Download")
-
 test_that("download_method", {
 
   mockery::stub(download_method, "get_r_version", "3.3.0")

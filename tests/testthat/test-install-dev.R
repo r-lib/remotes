@@ -1,5 +1,3 @@
-context("test-install-dev")
-
 test_that("install_dev works with GitHub URLs", {
   skip_on_cran()
   skip_if_offline()

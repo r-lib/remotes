@@ -1,6 +1,3 @@
-
-context("Install from GitHub")
-
 test_that("github_resolve_ref.github_release", {
 
   skip_on_cran()

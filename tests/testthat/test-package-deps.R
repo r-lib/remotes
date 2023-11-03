@@ -1,6 +1,3 @@
-
-context("Package dependencies")
-
 test_that("parse_deps", {
   expect_null(parse_deps(NULL))
   expect_null(parse_deps(""))

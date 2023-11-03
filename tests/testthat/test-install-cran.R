@@ -1,5 +1,3 @@
-context("Installing from CRAN")
-
 test_that("", {
 
   skip_on_cran()

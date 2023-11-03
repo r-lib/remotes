@@ -1,6 +1,3 @@
-
-context("JSON parser")
-
 test_that("JSON is standalone", {
   ## baseenv() makes sure that the remotes package env is not used
   env <- new.env(parent = baseenv())

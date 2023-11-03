@@ -1,5 +1,3 @@
-context("install_bioc.R")
-
 test_that("bioc repo paths are parsed correctly", {
   expect_equal(parse_bioc_repo("devtools"), list(repo="devtools"))
   expect_equal(parse_bioc_repo("devtools#abc123"), list(repo="devtools", commit="abc123"))

@@ -1,6 +1,3 @@
-
-context("Deps")
-
 test_that("standardise_dep", {
 
   expect_equal(
@@ -268,8 +265,6 @@ test_that("update.package_deps 3", {
   )
 })
 
-context("Remotes")
-
 test_that("extra_deps returns an empty data frame if no remotes specified", {
 
   pkg <- list(
@@ -531,11 +526,11 @@ test_that("dev_package_deps works with package using remotes", {
 
   is_falsy <- "falsy" == res$package
   expect_true(any(is_falsy))
-  expect_is(res$remote[is_falsy][[1]], "github_remote")
+  expect_s3_class(res$remote[is_falsy][[1]], "github_remote")
 
   is_testthat <- "testthat" == res$package
   expect_true(any(is_testthat))
-  expect_is(res$remote[is_testthat][[1]], "cran_remote")
+  expect_s3_class(res$remote[is_testthat][[1]], "cran_remote")
 })
 
 test_that("dev_package_deps can retrieve custom fields", {
@@ -546,13 +541,13 @@ test_that("dev_package_deps can retrieve custom fields", {
 
   is_pkgdown <- "pkgdown" == res$package
   expect_true(any(is_pkgdown))
-  expect_is(res$remote[is_pkgdown][[1]], "github_remote")
+  expect_s3_class(res$remote[is_pkgdown][[1]], "github_remote")
 
   res <- dev_package_deps(test_path("withremotes"), dependencies = "Config/Needs/coverage")
 
   is_covr <- "covr" == res$package
   expect_true(any(is_covr))
-  expect_is(res$remote[is_covr][[1]], "cran_remote")
+  expect_s3_class(res$remote[is_covr][[1]], "cran_remote")
 })
 
 test_that("dev_package_deps works with url remotes", {

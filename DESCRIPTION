@@ -37,7 +37,7 @@ Suggests:
     pingr,
     rmarkdown,
     rprojroot,
-    testthat,
+    testthat (>= 3.0.0),
     webfakes,
     withr
 Depends:
@@ -48,3 +48,4 @@ SystemRequirements: Subversion for install_svn, git for install_git
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Config/Needs/website: tidyverse/tidytemplate
+Config/testthat/edition: 3

@@ -1,6 +1,3 @@
-
-context("BioConductor packages")
-
 test_that("bioc is standalone", {
   ## baseenv() makes sure that the remotes package env is not used
   env <- new.env(parent = baseenv())
@@ -39,7 +36,7 @@ test_that("internal map is current", {
   skip_if_offline()
   expect_equal(
     bioconductor$get_release_version(),
-    package_version("3.16"))
+    package_version("3.18"))
 })
 
 test_that("set of repos are correct", {

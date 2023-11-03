@@ -1,6 +1,3 @@
-
-context("Install from SVN repositories")
-
 test_that("install_svn", {
 
   skip_on_cran()

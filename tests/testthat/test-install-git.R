@@ -1,6 +1,3 @@
-
-context("Install from git repo")
-
 test_that("install_git with git2r", {
 
   skip_on_cran()

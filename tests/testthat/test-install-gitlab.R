@@ -1,5 +1,3 @@
-context("Install from GitLab")
-
 test_that("install_gitlab", {
 
   skip_on_cran()
