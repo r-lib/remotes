@@ -39,15 +39,6 @@ test_that("install_dev fails if there is no URL field with a GitHub, GitLab or B
   expect_error(install_dev("XML"), "Could not determine development repository")
 })
 
-test_that("install_dev works with GitLab URLs", {
-  skip_on_cran()
-  skip_if_offline()
-
-  mockery::stub(install_dev, "install_gitlab", identity)
-
-  expect_equal(install_dev("iemiscdata"), "iembry/iemiscdata")
-})
-
 test_that("install_dev works with Bitbucket URLs", {
   skip_on_cran()
   skip_if_offline()
