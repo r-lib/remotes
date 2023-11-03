@@ -6,9 +6,9 @@ Authors@R: c(
     person("Jim", "Hester", role = "aut"),
     person("Hadley", "Wickham", role = c("aut")),
     person("Winston", "Chang", role = "aut"),
-    person("RStudio", role = c("cph", "fnd")),
     person("Martin", "Morgan", role = "aut"),
     person("Dan", "Tenenbaum", role = "aut"),
+    person("Posit Software, PBC", role = c("cph", "fnd")),
     person("Mango Solutions", role = "cph")
     )
 Description: Download and install R packages stored in 'GitHub', 'GitLab', 

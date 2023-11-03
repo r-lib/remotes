@@ -22,7 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Jim Hester \email{jim.hester@rstudio.com}
+  \item Jim Hester
   \item Hadley Wickham
   \item Winston Chang
   \item Martin Morgan
@@ -31,7 +31,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item RStudio [copyright holder, funder]
+  \item Posit Software, PBC [copyright holder, funder]
   \item Mango Solutions [copyright holder]
 }
 
