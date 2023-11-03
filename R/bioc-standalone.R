@@ -67,6 +67,7 @@
 #' * 2020-03-22 get_matching_bioc_version() is now correct if the current
 #'              R version is not in the builtin mapping.
 #' * 2020-11-21 Update internal map for 3.12.
+#' * 2023-05-08 Add 'books' repo.
 #'
 #' @name bioconductor
 #' @keywords internal
@@ -79,7 +80,12 @@ bioconductor <- local({
   # -------------------------------------------------------------------
   # Configuration that does not change often
 
-  config_url <- "https://bioconductor.org/config.yaml"
+  config_url <- function() {
+    Sys.getenv(
+      "R_BIOC_CONFIG_URL",
+      "https://bioconductor.org/config.yaml"
+    )
+  }
 
   builtin_map <- list(
     "2.1"  = package_version("1.6"),
@@ -106,7 +112,9 @@ bioconductor <- local({
     "3.6"  = package_version("3.10"),
     "4.0"  = package_version("3.12"),
     "4.1"  = package_version("3.14"),
-    "4.2"  = package_version("3.16")
+    "4.2"  = package_version("3.16"),
+    "4.3"  = package_version("3.17"),
+    "4.4"  = package_version("3.18")
   )
 
   # -------------------------------------------------------------------
@@ -117,14 +125,21 @@ bioconductor <- local({
   version_map <- NULL
   yaml_config <- NULL
 
+  clear_cache <- function() {
+    devel_version <<- NULL
+    release_version <<- NULL
+    version_map <<- NULL
+    yaml_config <<- NULL
+  }
+
   # -------------------------------------------------------------------
   # API
 
   get_yaml_config <- function(forget = FALSE) {
     if (forget || is.null(yaml_config)) {
-      new <- tryCatch(read_url(config_url), error = function(x) x)
+      new <- tryCatch(read_url(config_url()), error = function(x) x)
       if (inherits(new, "error")) {
-        http_url <- sub("^https", "http", config_url)
+        http_url <- sub("^https", "http", config_url())
         new <- tryCatch(read_url(http_url), error = function(x) x)
       }
       if (inherits(new, "error")) stop(new)
@@ -258,7 +273,7 @@ bioconductor <- local({
         if (bioc_version >= "3.7") "{mirror}/packages/{bv}/workflows",
       BioCextra     =
         if (bioc_version <= "3.5") "{mirror}/packages/{bv}/extra",
-      BioCbooks =
+      BioCbooks     =
         if (bioc_version >= "3.12") "{mirror}/packages/{bv}/books"
     )
 
