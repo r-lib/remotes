@@ -354,6 +354,19 @@ test_that("remotes are parsed with explicit host", {
 
 })
 
+test_that("git remotes for git2r and xgit", {
+
+  expect_equal(
+    parse_one_extra("git::git@github.com:hadley/testthat", git = "external"),
+    git_remote("git@github.com:hadley/testthat", git = "external"))
+
+
+  expect_equal(
+    parse_one_extra("git::git@github.com:hadley/testthat", git = "git2r"),
+    git_remote("git@github.com:hadley/testthat", git = "git2r"))
+
+})
+
 test_that("remotes are parsed with explicit package names", {
   expect_equal(
     parse_one_extra("testthat=github::hadley/testthat"),

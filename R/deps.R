@@ -118,12 +118,17 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 #' `dev_package_deps` lists the status of the dependencies
 #' of a local package.
 #'
+#' @param git Whether to use the `git2r` package, or an external
+#'   git client via system. Default is `git2r` if it is installed,
+#'   otherwise an external git installation.
+#'
 #' @export
 #' @rdname package_deps
 
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
                              type = getOption("pkgType"),
+                             git = c("auto", "git2r", "external"),
                              remote_precedence = TRUE) {
 
   pkg <- load_pkg_description(pkgdir)
@@ -142,9 +147,14 @@ dev_package_deps <- function(pkgdir = ".", dependencies = NA,
 
   cran_deps <- package_deps(deps, repos = repos, type = type)
 
-  res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"), remote_precedence)
+  git <- match.arg(git)
+  res <- combine_remote_deps(cran_deps,
+                             extra_deps(pkg, "remotes", git = git),
+                             remote_precedence)
 
-  res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
+  res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies),
+                                            extra_deps, pkg = pkg, git = git),
+                          stringsAsFactors = FALSE))
 
   res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
 }
@@ -166,7 +176,7 @@ combine_remote_deps <- function(cran_deps, remote_deps, remote_precedence) {
   } else {
     remote_deps <- remote_deps[!(remote_deps$package %in% cran_deps$package), ]
   }
-  
+
 
   rbind(remote_deps, cran_deps)
 }
@@ -591,12 +601,12 @@ package_deps_new <- function(package = character(), installed = character(),
   res
 }
 
-extra_deps <- function(pkg, field) {
+extra_deps <- function(pkg, field, ...) {
   if (!has_extra_deps(pkg, field)) {
     return(package_deps_new())
   }
   dev_packages <- split_extra_deps(pkg[[field]])
-  extra <- lapply(dev_packages, parse_one_extra)
+  extra <- lapply(dev_packages, parse_one_extra, ...)
 
   package <- vapply(extra, function(x) remote_package_name(x), character(1), USE.NAMES = FALSE)
   installed <- vapply(package, function(x) local_sha(x), character(1), USE.NAMES = FALSE)

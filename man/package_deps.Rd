@@ -21,7 +21,11 @@ dev_package_deps(
   dependencies = NA,
   repos = getOption("repos"),
   type = getOption("pkgType"),
+<<<<<<< HEAD
+  git = c("auto", "git2r", "external")
+=======
   remote_precedence = TRUE
+>>>>>>> upstream/main
 )
 
 \method{update}{package_deps}(
@@ -66,8 +70,14 @@ common ones include:
 
 \item{pkgdir}{Path to a package directory, or to a package tarball.}
 
+<<<<<<< HEAD
+\item{git}{Whether to use the \code{git2r} package, or an external
+git client via system. Default is \code{git2r} if it is installed,
+otherwise an external git installation.}
+=======
 \item{remote_precedence}{A logical flag specifying whether remote sources should take precedence over
 CRAN when both were found.}
+>>>>>>> upstream/main
 
 \item{object}{A \code{package_deps} object.}
 
