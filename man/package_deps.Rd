@@ -21,7 +21,8 @@ dev_package_deps(
   dependencies = NA,
   repos = getOption("repos"),
   type = getOption("pkgType"),
-  remote_precedence = TRUE
+  remote_precedence = TRUE,
+  additional_repositories = TRUE
 )
 
 \method{update}{package_deps}(
@@ -68,6 +69,9 @@ common ones include:
 
 \item{remote_precedence}{A logical flag specifying whether remote sources should take precedence over
 CRAN when both were found.}
+
+\item{additional_repositories}{A logical flag specifying whether \code{Additional_repositories} should
+be extracted from the DESCRIPTION and appended to \code{repos}.}
 
 \item{object}{A \code{package_deps} object.}
 
