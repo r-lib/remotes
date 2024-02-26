@@ -6,9 +6,11 @@
 * Remotes field accepts explicit package names: `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
 * Add `remote_precedence` parameter to `dev_package_deps()` which allows user to choose whether 
   remote sources should have a priority over cran sources. (#732, @maksymiuks)
-
 * `dev_package_deps()` now works for packages with `Enhances` dependencies
   (#711, @maksymiuks).
+* Add `additional_repositories` parameter to `dev_package_deps()` which allows user to choose whether 
+  `Additional_repositories` should be extracted from the `DESCRIPTION` file and appended
+  to repos. (#782, @maksymiuks)
 
 # remotes 2.4.2
 
