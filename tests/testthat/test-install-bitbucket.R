@@ -1,6 +1,3 @@
-
-context("Install from Bitbucket")
-
 test_that("", {
 
   skip_on_cran()

@@ -1,6 +1,3 @@
-
-context("DCF files")
-
 test_that("read_dcf and write_dcf", {
 
   DESC <- "Package: foobar

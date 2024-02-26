@@ -1,6 +1,3 @@
-
-context("GitHub")
-
 test_that("github_pat", {
   withr::local_envvar(c(GITHUB_PAT="badcafe"))
 
@@ -90,13 +87,13 @@ test_that("github_error", {
   # Test without the TRAVIS envvar set
   withr::with_envvar(c(TRAVIS = NA), {
     err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
-    expect_known_output(conditionMessage(err), test_path("github-error-local.txt"), print = TRUE)
+    expect_snapshot(conditionMessage(err))
   })
 
   # Test with the TRAVIS envvar set
   withr::with_envvar(c(TRAVIS = "true"), {
     err <- github_error(list(headers = "", status_code = "304", content = charToRaw('{"message": "foobar"}')))
-    expect_known_output(conditionMessage(err), test_path("github-error-travis.txt"), print = TRUE)
+    expect_snapshot(conditionMessage(err))
   })
 
 })

@@ -1,6 +1,3 @@
-
-context("CRAN")
-
 test_that("available_packages", {
 
   skip_on_cran()

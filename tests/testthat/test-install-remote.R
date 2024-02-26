@@ -1,5 +1,3 @@
-context("install-remotes.R")
-
 test_that("different_sha returns TRUE if remote or local sha is NA not found", {
   expect_true(different_sha(remote_sha = NA, local_sha = "4a2ea2"))
   expect_true(different_sha(remote_sha = "4a2ea2", local_sha = NA))

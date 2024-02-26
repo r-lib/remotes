@@ -1,6 +1,3 @@
-
-context("install-github.R script")
-
 test_that("install-github.R script is up to date", {
   skip_if(covr::in_covr())
   skip_on_cran()

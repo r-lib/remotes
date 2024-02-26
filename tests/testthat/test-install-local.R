@@ -1,6 +1,3 @@
-
-context("Installing from local files")
-
 test_that("install_local", {
 
   skip_on_cran()

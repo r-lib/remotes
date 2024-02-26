@@ -1,6 +1,3 @@
-
-context("Git")
-
 test_that("git_extract_sha1_tar", {
 
   skip_on_cran()

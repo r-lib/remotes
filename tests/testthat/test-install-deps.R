@@ -1,6 +1,3 @@
-
-context("Installing package dependencies")
-
 test_that("installing packages with dependencies", {
 
   skip_on_cran()

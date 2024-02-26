@@ -1,4 +1,16 @@
 url: https://remotes.r-lib.org
+
+development:
+  mode: auto
+
+template:
+  package: tidytemplate
+  bootstrap: 5
+
+  includes:
+    in_header: |
+      <script defer data-domain="remotes.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
+
 reference:
   - title: Package Installation
     desc: Tools for installing packages from a variety of locations.

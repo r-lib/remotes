@@ -1,7 +1,7 @@
 
 load_pkg_description <- function(path) {
 
-  path <- normalizePath(path)
+  path <- normalizePath(path, mustWork = TRUE)
 
   if (!is_dir(path)) {
     dir <- tempfile()

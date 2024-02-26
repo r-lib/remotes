@@ -1,6 +1,3 @@
-
-context("Decompress")
-
 test_that("decompress various file types", {
 
   types <- c("zip", "tar", "tar.gz", "tgz")

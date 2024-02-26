@@ -1,5 +1,3 @@
-context("package")
-
 test_that("load_pkg_description", {
   pkg <- load_pkg_description("noremotes")
   expect_equal(pkg$package, "noremotes")

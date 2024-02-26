@@ -1,6 +1,3 @@
-
-context("Install a specific version from CRAN")
-
 test_that("install_version", {
   skip_on_cran()
   skip_if_offline()
@@ -240,12 +237,12 @@ test_that("version requirement comparisons", {
     data.frame(compare = "==", version = "1.5", stringsAsFactors = FALSE)
   )
 
-  expect_equivalent(
+  expect_equal(
     version_criteria(NULL),
     data.frame(compare = NA_character_, version = NA_character_, stringsAsFactors = FALSE)
   )
 
-  expect_equivalent(
+  expect_equal(
     version_criteria(NA),
     data.frame(compare = NA_character_, version = NA_character_, stringsAsFactors = FALSE)
   )

@@ -1,5 +1,3 @@
-context("install")
-
 test_that("safe_build_package works with pkgbuild", {
   out <- tempfile()
   dir.create(out)

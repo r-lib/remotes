@@ -35,7 +35,7 @@
 
 * `system_requirements()` now works as intended if only the `os` argument is used (@mdneuzerling, #609)
 
-* `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote` now get correct package name from HTTP(S) git repo's `DESCRIPTION` file, and thus package's `DESCRIPTION` file's `Remotes` field could have `git::http(s)://<host>/<username>/<repo>[.git][@ref]` items that install remote packages using git via HTTP(S) protocal (@niheaven, #603).
+* `remote_package_name.git2r_remote` and `remote_package_name.xgit_remote` now get correct package name from HTTP(S) git repo's `DESCRIPTION` file, and thus package's `DESCRIPTION` file's `Remotes` field could have `git::http(s)://<host>/<username>/<repo>[.git][@ref]` items that install remote packages using git via HTTP(S) protocol (@niheaven, #603).
 
 # remotes 2.3.0
 

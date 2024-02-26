@@ -1,6 +1,3 @@
-
-context("Utilities")
-
 test_that("%||%", {
   expect_equal(NULL %||% "foo", "foo")
   expect_equal("foo" %||% "bar", "foo")

@@ -1,5 +1,3 @@
-context("submodule.R")
-
 test_that("parse_submodules works with a single submodule", {
   x <-
 '[submodule "foobar"]

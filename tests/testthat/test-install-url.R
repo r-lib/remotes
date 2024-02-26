@@ -1,6 +1,3 @@
-
-context("Installing from URLs")
-
 test_that("install_url", {
 
   skip_on_cran()

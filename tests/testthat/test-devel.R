@@ -1,5 +1,3 @@
-context("devel")
-
 test_that("has_devel", {
   # All platforms when tests are run should have a compiler
   expect_true(has_devel())
