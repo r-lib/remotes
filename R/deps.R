@@ -34,6 +34,8 @@
 #' @param type Type of package to `update`.
 #' @param remote_precedence A logical flag specifying whether remote sources should take precedence over
 #'   CRAN when both were found.
+#' @param additional_repositories A logical flag specifying whether `Additional_repositories` should
+#'   be extracted from the DESCRIPTION and appended to `repos`.
 #' @param object A `package_deps` object.
 #' @param ... Additional arguments passed to `install_packages`.
 #' @inheritParams install_github
@@ -124,10 +126,11 @@ local_package_deps <- function(pkgdir = ".", dependencies = NA) {
 dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                              repos = getOption("repos"),
                              type = getOption("pkgType"),
-                             remote_precedence = TRUE) {
+                             remote_precedence = TRUE,
+                             additional_repositories = TRUE) {
 
   pkg <- load_pkg_description(pkgdir)
-  repos <- c(repos, parse_additional_repositories(pkg))
+  repos <- c(repos, if (additional_repositories) parse_additional_repositories(pkg))
 
   deps <- local_package_deps(pkgdir = pkgdir, dependencies = dependencies)
 
