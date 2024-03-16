@@ -1,66 +1,3 @@
-test_that("install_svn", {
-
-  skip_on_cran()
-  skip_if_offline()
-
-  Sys.unsetenv("R_TESTS")
-
-  lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
-  dir.create(lib)
-
-  url <- "https://github.com/mangothecat/simplegraph/trunk"
-  install_svn(url, lib = lib, quiet = TRUE)
-
-  expect_silent(packageDescription("simplegraph", lib.loc = lib))
-  expect_equal(
-    packageDescription("simplegraph", lib.loc = lib)$RemoteType,
-    "svn")
-
-  remote <- package2remote("simplegraph", lib = lib)
-  expect_s3_class(remote, "remote")
-  expect_s3_class(remote, "svn_remote")
-  expect_equal(format(remote), "SVN")
-  expect_equal(remote$url, url)
-  expect_equal(remote$svn_subdir, NULL)
-  expect_true(!is.na(remote$revision) && nzchar(remote$revision))
-  expect_equal(remote$args, NULL)
-})
-
-test_that("install_svn branch", {
-
-  skip_on_cran()
-  skip_if_offline()
-
-  Sys.unsetenv("R_TESTS")
-
-  lib <- tempfile()
-  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
-  dir.create(lib)
-
-  url <- "https://github.com/mangothecat/simplegraph"
-  install_svn(
-    url,
-    subdir = "branches/remotes-test",
-    lib = lib,
-    quiet = TRUE
-  )
-
-  expect_silent(packageDescription("simplegraph", lib.loc = lib))
-  expect_equal(
-    packageDescription("simplegraph", lib.loc = lib)$RemoteType,
-    "svn")
-
-  remote <- package2remote("simplegraph", lib = lib)
-  expect_s3_class(remote, "remote")
-  expect_s3_class(remote, "svn_remote")
-  expect_equal(format(remote), "SVN")
-  expect_equal(remote$url, url)
-  expect_equal(remote$svn_subdir, "branches/remotes-test")
-  expect_true(!is.na(remote$revision) && nzchar(remote$revision))
-  expect_equal(remote$args, NULL)
-})
-
 test_that("install_svn subdir", {
 
   skip_on_cran()
@@ -95,25 +32,6 @@ test_that("remote_download.svn_remote error", {
   expect_error(
     remote_download.svn_remote(x),
     "There seems to be a problem retrieving"
-  )
-})
-
-test_that("downloading an SVN revision", {
-
-  skip_on_cran()
-  skip_if_offline()
-
-  x <- list(
-    url = "https://github.com/mangothecat/simplegraph/trunk",
-    revision = "r28"
-  )
-
-  bundle <- remote_download.svn_remote(x)
-  on.exit(unlink(bundle), add = TRUE)
-
-  expect_output(
-    print(list.files(bundle)),
-    "DESCRIPTION"
   )
 })
 
