@@ -191,8 +191,8 @@ your repositories and pull requests. Then store your password in the
 environment variable <code>BITBUCKET_PASSWORD</code> (e.g. <code>evelynwaugh:swordofhonour</code>)</p>
 <p>Note that on Windows, authentication requires the "libcurl" download
 method. You can set the default download method via the
-<code>download.file.method</code> option:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">download.file.method =</span> <span class="st">"libcurl"</span>)</span></code></pre><p></p></div>
+<code>download.file.method</code> option:</p><div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>download.file.method <span class="op">=</span> <span class="st">"libcurl"</span><span class="op">)</span></span></code></pre></div>
+
 <p>In particular, if unset, RStudio sets the download method to "wininet".
 To override this, you might want to set it to "libcurl" in your
 R profile, see <a href="https://rdrr.io/r/base/Startup.html" class="external-link">base::Startup</a>. The caveat of the "libcurl" method is

@@ -79,9 +79,7 @@ between local and CRAN versions of each dependent package; an
 <span>  pkgdir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span>,</span>
-<span>  remote_precedence <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  additional_repositories <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"pkgType"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for package_deps</span></span>
@@ -132,16 +130,6 @@ common ones include:</p><ul><li><p>Config/Needs/website - for dependencies used 
 
 <dt>pkgdir</dt>
 <dd><p>Path to a package directory, or to a package tarball.</p></dd>
-
-
-<dt>remote_precedence</dt>
-<dd><p>A logical flag specifying whether remote sources should take precedence over
-CRAN when both were found.</p></dd>
-
-
-<dt>additional_repositories</dt>
-<dd><p>A logical flag specifying whether <code>Additional_repositories</code> should
-be extracted from the DESCRIPTION and appended to <code>repos</code>.</p></dd>
 
 
 <dt>object</dt>
