@@ -585,10 +585,7 @@ function(...) {
   #'   "always" and "never" respectively.
   #' @param repos A character vector giving repositories to use.
   #' @param type Type of package to `update`.
-  #' @param remote_precedence A logical flag specifying whether remote sources should take precedence over
-  #'   CRAN when both were found.
-  #' @param additional_repositories A logical flag specifying whether `Additional_repositories` should
-  #'   be extracted from the DESCRIPTION and appended to `repos`.
+  #'
   #' @param object A `package_deps` object.
   #' @param ... Additional arguments passed to `install_packages`.
   #' @inheritParams install_github
@@ -678,12 +675,10 @@ function(...) {
   
   dev_package_deps <- function(pkgdir = ".", dependencies = NA,
                                repos = getOption("repos"),
-                               type = getOption("pkgType"),
-                               remote_precedence = TRUE,
-                               additional_repositories = TRUE) {
+                               type = getOption("pkgType")) {
   
     pkg <- load_pkg_description(pkgdir)
-    repos <- c(repos, if (additional_repositories) parse_additional_repositories(pkg))
+    repos <- c(repos, parse_additional_repositories(pkg))
   
     deps <- local_package_deps(pkgdir = pkgdir, dependencies = dependencies)
   
@@ -698,14 +693,14 @@ function(...) {
   
     cran_deps <- package_deps(deps, repos = repos, type = type)
   
-    res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"), remote_precedence)
+    res <- combine_remote_deps(cran_deps, extra_deps(pkg, "remotes"))
   
     res <- do.call(rbind, c(list(res), lapply(get_extra_deps(pkg, dependencies), extra_deps, pkg = pkg), stringsAsFactors = FALSE))
   
     res[is.na(res$package) | !duplicated(res$package, fromLast = TRUE), ]
   }
   
-  combine_remote_deps <- function(cran_deps, remote_deps, remote_precedence) {
+  combine_remote_deps <- function(cran_deps, remote_deps) {
     # If there are no dependencies there will be no remote dependencies either,
     # so just return them (and don't force the remote_deps promise)
     if (nrow(cran_deps) == 0) {
@@ -716,13 +711,7 @@ function(...) {
     remote_deps <- remote_deps[is.na(remote_deps$package) | remote_deps$package %in% cran_deps$package, ]
   
     # If there are remote deps remove the equivalent CRAN deps
-    if (remote_precedence) {
-      cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
-    # Otherwise remove remotes already covered by CRAN
-    } else {
-      remote_deps <- remote_deps[!(remote_deps$package %in% cran_deps$package), ]
-    }
-    
+    cran_deps <- cran_deps[!(cran_deps$package %in% remote_deps$package), ]
   
     rbind(remote_deps, cran_deps)
   }
