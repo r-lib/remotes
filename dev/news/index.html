@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">remotes</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.4.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.5.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,22 @@
       <small>Source: <a href="https://github.com/r-lib/remotes/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="remotes-development-version">remotes (development version)<a class="anchor" aria-label="anchor" href="#remotes-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.5.0" id="remotes-250">remotes 2.5.0<a class="anchor" aria-label="anchor" href="#remotes-250"></a></h2><p class="text-muted">CRAN release: 2024-03-17</p>
+<ul><li>
+<code><a href="../reference/install_github.html">install_github()</a></code> now uses credentials from the git credential store, if <code>GITHUB_PAT</code> and <code>GITHUB_TOKEN</code> are not set.</li>
+<li>The <code>Remotes</code> field in <code>DESCRIPTION</code> now accepts explicit package names: <code>&lt;pkgname&gt;=&lt;type&gt;::&lt;username&gt;/&lt;repo&gt;</code> (<a href="https://github.com/r-lib/remotes/issues/719" class="external-link">#719</a>, <a href="https://github.com/heavywatal" class="external-link">@heavywatal</a>).</li>
+<li>
+<code><a href="../reference/package_deps.html">dev_package_deps()</a></code> now works for packages with <code>Enhances</code> dependencies (<a href="https://github.com/r-lib/remotes/issues/711" class="external-link">#711</a>, <a href="https://github.com/maksymiuks" class="external-link">@maksymiuks</a>).</li>
+<li>
+<code><a href="../reference/install_dev.html">install_dev()</a></code> now ignores a trailing slash (<a href="https://github.com/r-lib/remotes/issues/692" class="external-link">#692</a>, <a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>).</li>
+<li>System requirements now support Ubuntu 22.04.</li>
+<li>
+<code><a href="../reference/package_deps.html">local_package_deps()</a></code> now errors for non-existent directories (<a href="https://github.com/r-lib/remotes/issues/772" class="external-link">#772</a>, <a href="https://github.com/MatthieuStigler" class="external-link">@MatthieuStigler</a>).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.4.2" id="remotes-242">remotes 2.4.2<a class="anchor" aria-label="anchor" href="#remotes-242"></a></h2><p class="text-muted">CRAN release: 2021-11-30</p>
 <ul><li>Gábor Csárdi is now the maintainer.</li>
