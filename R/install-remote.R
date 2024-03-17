@@ -214,7 +214,7 @@ package2remote <- function(name, lib = .libPaths(), repos = getOption("repos"), 
         sha = NA_character_))
   }
 
-  if (is.null(x$RemoteType) || x$RemoteType == "cran") {
+  if (is.null(x$RemoteType) || x$RemoteType %in% c("cran", "standard", "any")) {
 
     # Packages installed with install.packages() or locally without remotes
     return(remote("cran",
