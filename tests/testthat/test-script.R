@@ -6,7 +6,7 @@ test_that("install-github.R script is up to date", {
   tmp <- test_temp_file(".R")
 
   withr::with_dir(
-    rprojroot::find_package_root_file(),
+    test_package_root(),
     brew::brew(file.path(root, "install-github.Rin"), tmp))
 
   expect_equal(
