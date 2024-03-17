@@ -1631,6 +1631,8 @@ function(...) {
   }
   # Contents of R/git-auth.R
   
+  # nocov start
+  
   gitcreds_get <- NULL
   gitcreds_set <- NULL
   gitcreds_delete <- NULL
@@ -2097,7 +2099,8 @@ function(...) {
     c(
       GCM_INTERACTIVE = "Never",
       GCM_MODAL_PROMPT = "false",
-      GCM_VALIDATE = "false"
+      GCM_VALIDATE = "false",
+      GCM_GUI_PROMPT = "false"
     )
   }
   
@@ -2444,6 +2447,8 @@ function(...) {
   
   environment()
   })
+  
+  # nocov end
   # Contents of R/git.R
   
   # Extract the commit hash from a git archive. Git archives include the SHA1
@@ -4563,7 +4568,7 @@ function(...) {
           sha = NA_character_))
     }
   
-    if (is.null(x$RemoteType) || x$RemoteType == "cran") {
+    if (is.null(x$RemoteType) || x$RemoteType %in% c("cran", "standard", "any")) {
   
       # Packages installed with install.packages() or locally without remotes
       return(remote("cran",
