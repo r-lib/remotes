@@ -1,16 +1,22 @@
-
 # remotes development version
 
-* `install_github()` now uses credentials from the git credential store,
-  if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
-* Remotes field accepts explicit package names: `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
-* Add `remote_precedence` parameter to `dev_package_deps()` which allows user to choose whether 
-  remote sources should have a priority over cran sources. (#732, @maksymiuks)
+* `install_github()` now uses credentials from the git
+  credential store, if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
+* The `Remotes` field in `DESCRIPTION` now accepts explicit package names:
+  `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
+* `dev_package_deps()` noq has a `remote_precedence` parameter which allows
+  the user to choose whether remote sources should have a priority over
+  CRAN sources (#732, @maksymiuks).
 * `dev_package_deps()` now works for packages with `Enhances` dependencies
   (#711, @maksymiuks).
-* Add `additional_repositories` parameter to `dev_package_deps()` which allows user to choose whether 
-  `Additional_repositories` should be extracted from the `DESCRIPTION` file and appended
-  to repos. (#782, @maksymiuks)
+* `dev_package_deps()` now has an `additional_repositories` parameter
+  which allows the user to choose whether `Additional_repositories` should
+  be extracted from the `DESCRIPTION` file and appended to repos
+  (#782, @maksymiuks).
+* `install_dev()` now ignores a trailing slash (#692,  @krlmlr).
+* System requirements now support Ubuntu 22.04.
+* `local_package_deps()` now errors for non-existent directories
+  (#772, @MatthieuStigler).
 
 # remotes 2.4.2
 
