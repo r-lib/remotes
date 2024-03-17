@@ -4,6 +4,9 @@
     <loc>https://remotes.r-lib.org/404.html</loc>
   </url>
   <url>
+    <loc>https://remotes.r-lib.org/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
     <loc>https://remotes.r-lib.org/LICENSE-text.html</loc>
   </url>
   <url>
@@ -98,6 +101,9 @@
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/parse-git-repo.html</loc>
+  </url>
+  <url>
+    <loc>https://remotes.r-lib.org/reference/remotes-package.html</loc>
   </url>
   <url>
     <loc>https://remotes.r-lib.org/reference/standardise_dep.html</loc>
