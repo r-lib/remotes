@@ -25,6 +25,7 @@ test_that("install_svn subdir", {
 test_that("remote_download.svn_remote error", {
 
   skip_on_cran()
+  if (Sys.which("svn") == "") skip("Subversion not installed")
 
   x <- list(url = "http://foo.bar.com")
 

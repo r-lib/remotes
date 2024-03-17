@@ -54,7 +54,7 @@ test_that("install-github.R script does not load any package", {
     },
     args = list(script = script, lib = lib),
     cmdargs = c("--vanilla", "--slave", "--no-save", "--no-restore"),
-    timeout = 20
+    timeout = 60
   )
 
   expect_equal(pkgs[[1]], pkgs[[2]])

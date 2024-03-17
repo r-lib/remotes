@@ -13,7 +13,11 @@ test_that("", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
-  install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE, quiet = TRUE)
+  # we'll get warnings when CRAN moves binary packages to the
+  # cran-archive server.
+  suppressWarnings(
+    install_cran("pkgconfig", lib = lib, repos = repos, force = TRUE, quiet = TRUE)
+  )
 
   expect_silent(packageDescription("pkgconfig", lib.loc = lib))
 })
