@@ -182,7 +182,10 @@ remote_package_name <- function(remote, ...) UseMethod("remote_package_name")
 #' @export
 remote_sha <- function(remote, ...) UseMethod("remote_sha")
 
+#' @export
 remote_package_name.default <- function(remote, ...) remote$repo
+
+#' @export
 remote_sha.default <- function(remote, ...) NA_character_
 
 different_sha <- function(remote_sha, local_sha) {

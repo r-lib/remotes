@@ -3021,6 +3021,7 @@ function(...) {
     }, error = function(e) NA_character_)
   }
   
+  #' @export
   remote_sha.bioc_xgit_remote <- function(remote, ...) {
     url <- paste0(remote$mirror, "/", remote$repo)
     ref <- remote$branch
@@ -4536,7 +4537,10 @@ function(...) {
   #' @export
   remote_sha <- function(remote, ...) UseMethod("remote_sha")
   
+  #' @export
   remote_package_name.default <- function(remote, ...) remote$repo
+  
+  #' @export
   remote_sha.default <- function(remote, ...) NA_character_
   
   different_sha <- function(remote_sha, local_sha) {

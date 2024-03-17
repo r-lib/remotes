@@ -236,6 +236,7 @@ remote_sha.bioc_git2r_remote <- function(remote, ...) {
   }, error = function(e) NA_character_)
 }
 
+#' @export
 remote_sha.bioc_xgit_remote <- function(remote, ...) {
   url <- paste0(remote$mirror, "/", remote$repo)
   ref <- remote$branch
