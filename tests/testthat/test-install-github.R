@@ -192,7 +192,7 @@ test_that("github_remote with deleted branch", {
 
 test_that("github_pull", {
 
-  if (getRversions() < "4.0.0" && .Platform$OS.type == "windows") {
+  if (getRversion() < "4.0.0" && .Platform$OS.type == "windows") {
     skip("Does not work on older R on Windows") # why?
   }
   skip_on_cran()
