@@ -32,7 +32,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Posit Software, PBC [copyright holder, funder]
-  \item Mango Solutions [copyright holder]
+  \item Ascent Digital Services [copyright holder]
 }
 
 }

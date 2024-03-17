@@ -10,7 +10,7 @@
 #'   `username/repo[@@ref]`.
 #' @param host GitLab API host to use. Override with your GitLab enterprise
 #'   hostname, for example, `"<PROTOCOL://>gitlab.hostname.com"`.
-#'   The PROTOCOL is required by packrat during RStudio Connect deployment. While
+#'   The PROTOCOL is required by packrat during Posit Connect deployment. While
 #'   \link{install_gitlab} may work without, omitting it generally
 #'   leads to package restoration errors.
 #' @param auth_token To install from a private repo, generate a personal access

@@ -42,7 +42,7 @@ test_that("downloading a wrong SVN revision", {
   skip_if_offline()
 
   x <- list(
-    url = "https://github.com/mangothecat/simplegraph/trunk",
+    url = "https://github.com/gaborcsardi/simplegraph/trunk",
     revision = "xxx"
   )
 

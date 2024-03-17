@@ -37,7 +37,7 @@ GITLAB_PAT environment variable.}
 
 \item{host}{GitLab API host to use. Override with your GitLab enterprise
 hostname, for example, \code{"<PROTOCOL://>gitlab.hostname.com"}.
-The PROTOCOL is required by packrat during RStudio Connect deployment. While
+The PROTOCOL is required by packrat during Posit Connect deployment. While
 \link{install_gitlab} may work without, omitting it generally
 leads to package restoration errors.}
 
@@ -97,7 +97,7 @@ install_gitlab("jimhester/covr")
 }
 }
 \seealso{
-Other package installation: 
+Other package installation:
 \code{\link{install_bioc}()},
 \code{\link{install_bitbucket}()},
 \code{\link{install_cran}()},

@@ -15,19 +15,19 @@ knitr::opts_chunk$set(
 
 # remotes
 
-> Install R Packages from remote or local repositories, 
+> Install R Packages from remote or local repositories,
 > including GitHub, GitLab, Bitbucket, and Bioconductor
 
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/r-lib/remotes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/remotes?branch=main)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
+[![CRAN Posit mirror downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->
 
-Download and install R packages stored in GitHub, GitLab, Bitbucket, 
+Download and install R packages stored in GitHub, GitLab, Bitbucket,
 Bioconductor, or plain subversion or git repositories. This package
 is a lightweight replacement of the `install_*` functions in
 [`devtools`](https://github.com/r-lib/devtools).
@@ -231,4 +231,4 @@ It also uses some remotes specific options:
 
 ## License
 
-GPL (>= 2) © Mango Solutions, RStudio
+GPL (>= 2) © Ascent Digital Services, Posit Software, PBC

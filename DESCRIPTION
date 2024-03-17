@@ -9,7 +9,7 @@ Authors@R: c(
     person("Martin", "Morgan", role = "aut"),
     person("Dan", "Tenenbaum", role = "aut"),
     person("Posit Software, PBC", role = c("cph", "fnd")),
-    person("Mango Solutions", role = "cph")
+    person("Ascent Digital Services", role = "cph")
   )
 Description: Download and install R packages stored in 'GitHub', 'GitLab',
     'Bitbucket', 'Bioconductor', or plain 'subversion' or 'git'
@@ -41,7 +41,7 @@ Suggests:
     testthat (>= 3.0.0),
     webfakes,
     withr
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3

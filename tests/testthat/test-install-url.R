@@ -9,7 +9,7 @@ test_that("install_url", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
-  url <- "https://github.com/mangothecat/simplegraph/archive/HEAD.zip"
+  url <- "https://github.com/gaborcsardi/simplegraph/archive/HEAD.zip"
   install_url(url, lib = lib, quiet = TRUE)
 
   expect_silent(packageDescription("simplegraph", lib.loc = lib))

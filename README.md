@@ -11,7 +11,7 @@
 [![R-CMD-check](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/r-lib/remotes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/remotes?branch=main)
-[![CRAN RStudio mirror
+[![CRAN Posit mirror
 downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Lifecycle:
@@ -224,4 +224,4 @@ It also uses some remotes specific options:
 
 ## License
 
-GPL (\>= 2) © Mango Solutions, RStudio
+GPL (\>= 2) © Ascent Digital Services, Posit Software, PBC
