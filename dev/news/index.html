@@ -59,7 +59,11 @@
 <code><a href="../reference/install_github.html">install_github()</a></code> now uses credentials from the git credential store, if <code>GITHUB_PAT</code> and <code>GITHUB_TOKEN</code> are not set.</li>
 <li>The <code>Remotes</code> field in <code>DESCRIPTION</code> now accepts explicit package names: <code>&lt;pkgname&gt;=&lt;type&gt;::&lt;username&gt;/&lt;repo&gt;</code> (<a href="https://github.com/r-lib/remotes/issues/719" class="external-link">#719</a>, <a href="https://github.com/heavywatal" class="external-link">@heavywatal</a>).</li>
 <li>
+<code><a href="../reference/package_deps.html">dev_package_deps()</a></code> noq has a <code>remote_precedence</code> parameter which allows the user to choose whether remote sources should have a priority over CRAN sources (<a href="https://github.com/r-lib/remotes/issues/732" class="external-link">#732</a>, <a href="https://github.com/maksymiuks" class="external-link">@maksymiuks</a>).</li>
+<li>
 <code><a href="../reference/package_deps.html">dev_package_deps()</a></code> now works for packages with <code>Enhances</code> dependencies (<a href="https://github.com/r-lib/remotes/issues/711" class="external-link">#711</a>, <a href="https://github.com/maksymiuks" class="external-link">@maksymiuks</a>).</li>
+<li>
+<code><a href="../reference/package_deps.html">dev_package_deps()</a></code> now has an <code>additional_repositories</code> parameter which allows the user to choose whether <code>Additional_repositories</code> should be extracted from the <code>DESCRIPTION</code> file and appended to repos (<a href="https://github.com/r-lib/remotes/issues/782" class="external-link">#782</a>, <a href="https://github.com/maksymiuks" class="external-link">@maksymiuks</a>).</li>
 <li>
 <code><a href="../reference/install_dev.html">install_dev()</a></code> now ignores a trailing slash (<a href="https://github.com/r-lib/remotes/issues/692" class="external-link">#692</a>, <a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>).</li>
 <li>System requirements now support Ubuntu 22.04.</li>
