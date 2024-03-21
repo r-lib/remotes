@@ -6,8 +6,15 @@
   credential store, if `GITHUB_PAT` and `GITHUB_TOKEN` are not set.
 * The `Remotes` field in `DESCRIPTION` now accepts explicit package names:
   `<pkgname>=<type>::<username>/<repo>` (#719, @heavywatal).
+* `dev_package_deps()` noq has a `remote_precedence` parameter which allows
+  the user to choose whether remote sources should have a priority over
+  CRAN sources (#732, @maksymiuks).
 * `dev_package_deps()` now works for packages with `Enhances` dependencies
   (#711, @maksymiuks).
+* `dev_package_deps()` now has an `additional_repositories` parameter
+  which allows the user to choose whether `Additional_repositories` should
+  be extracted from the `DESCRIPTION` file and appended to repos
+  (#782, @maksymiuks).
 * `install_dev()` now ignores a trailing slash (#692,  @krlmlr).
 * System requirements now support Ubuntu 22.04.
 * `local_package_deps()` now errors for non-existent directories
