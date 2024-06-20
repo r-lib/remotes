@@ -74,6 +74,7 @@
 #' @noRd
 NULL
 
+#' @importFrom utils download.file
 
 bioconductor <- local({
 
