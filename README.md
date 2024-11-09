@@ -9,13 +9,13 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/remotes/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/r-lib/remotes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/remotes?branch=main)
 [![CRAN Posit mirror
 downloads](https://cranlogs.r-pkg.org/badges/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![](https://www.r-pkg.org/badges/version/remotes)](https://www.r-pkg.org/pkg/remotes)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Codecov test 
+coverage](https://codecov.io/gh/r-lib/remotes/graph/badge.svg)](https://app.codecov.io/gh/r-lib/remotes)
 <!-- badges: end -->
 
 Download and install R packages stored in GitHub, GitLab, Bitbucket,
