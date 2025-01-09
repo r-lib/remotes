@@ -36,7 +36,7 @@ test_that("internal map is current", {
   skip_if_offline()
   expect_equal(
     bioconductor$get_release_version(),
-    package_version("3.18"))
+    package_version("3.20"))
 })
 
 test_that("set of repos are correct", {
