@@ -136,15 +136,15 @@ test_that("system_requirements return the system requirements if 2nd order depen
 
   expect_equal(
     system_requirements("ubuntu", "16.04", pkg),
-    c("apt-get install -y libcurl4-openssl-dev",
-      "apt-get install -y libssl-dev"
+    c("apt-get install -y libssl-dev",
+      "apt-get install -y libcurl4-openssl-dev"
     )
   )
 
   expect_equal(
     system_requirements("redhat", "7", pkg),
-    c("yum install -y libcurl-devel",
-      "yum install -y openssl-devel"
+    c("yum install -y openssl-devel",
+      "yum install -y libcurl-devel"
     )
   )
 })
@@ -186,8 +186,7 @@ test_that("system_requirements work with vector package arguments", {
 
     sort(c("apt-get install -y software-properties-common",
       "add-apt-repository -y ppa:cran/libgit2",  "apt-get update",
-      "apt-get install -y libgit2-dev", "apt-get install -y libssh2-1-dev",
-      "apt-get install -y libssl-dev", "apt-get install -y zlib1g-dev",
+      "apt-get install -y libgit2-dev", "apt-get install -y libssl-dev", 
       "apt-get install -y libcurl4-openssl-dev"
     ))
   )
