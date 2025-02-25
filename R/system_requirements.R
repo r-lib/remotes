@@ -101,7 +101,7 @@ system_requirements <- function(os, os_release = NULL, path = ".", package = NUL
 supported_os_versions <- function() {
   list(
     #"debian" = c("8", "9"),
-    "ubuntu" = c("14.04", "16.04", "18.04", "20.04", "22.04"),
+    "ubuntu" = c("14.04", "16.04", "18.04", "20.04", "22.04", "24.04"),
     "centos" = c("6", "7", "8"),
     "redhat" = c("6", "7", "8"),
     "opensuse" = c("42.3", "15.0"),
