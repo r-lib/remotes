@@ -20,6 +20,8 @@ install_dev(package, cran_url = getOption("repos")[["CRAN"]], ...)
 looks in the 'URL' and 'BugReports' fields for GitHub, GitLab or Bitbucket
 URLs. It then calls the appropriate \code{install_()} function to install the
 development package.
+
+\code{can_install_dev()} checks if the development version can be installed.
 }
 \examples{
 \dontrun{
