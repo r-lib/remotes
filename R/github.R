@@ -4,18 +4,13 @@ github_GET <- function(path, ..., host = "api.github.com", pat = github_pat(), u
   url <- build_url(host, path)
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       if (!is.null(pat)) {
         c("Authorization" = paste0("token ", pat))
       }
     )
-    curl::handle_setheaders(h, .list = headers)
-    res <- curl::curl_fetch_memory(url, handle = h)
 
-    if (res$status_code >= 300) {
-      stop(github_error(res))
-    }
+    res <- github_curl_fetch_memory(url, headers)
     json$parse(raw_to_char_utf8(res$content))
   } else {
     tmp <- tempfile()
@@ -31,24 +26,20 @@ github_commit <- function(username, repo, ref = "HEAD",
   url <- build_url(host, "repos", username, repo, "commits", utils::URLencode(ref, reserved = TRUE))
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       "Accept" = "application/vnd.github.v3.sha",
       if (!is.null(pat)) {
         c("Authorization" = paste0("token ", pat))
+      },
+      if (!is.null(current_sha)) {
+        c("If-None-Match" = paste0('"', current_sha, '"'))
       }
     )
 
-    if (!is.null(current_sha)) {
-      headers <- c(headers, "If-None-Match" = paste0('"', current_sha, '"'))
-    }
-    curl::handle_setheaders(h, .list = headers)
-    res <- curl::curl_fetch_memory(url, handle = h)
+    res <- github_curl_fetch_memory(url, headers, accept = 304)
+
     if (res$status_code == 304) {
       return(current_sha)
-    }
-    if (res$status_code >= 300) {
-      stop(github_error(res))
     }
 
     raw_to_char_utf8(res$content)
@@ -135,7 +126,6 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
   url <- paste0(url, "?ref=", utils::URLencode(ref))
 
   if (isTRUE(use_curl)) {
-    h <- curl::new_handle()
     headers <- c(
       "Accept" = "application/vnd.github.v3.raw",
       if (!is.null(pat)) {
@@ -143,11 +133,8 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
       }
     )
 
-    curl::handle_setheaders(h, .list = headers)
-    res <- curl::curl_fetch_memory(url, handle = h)
-    if (res$status_code >= 300) {
-      stop(github_error(res))
-    }
+    res <- github_curl_fetch_memory(url, headers)
+
     raw_to_char_utf8(res$content)
   } else {
     tmp <- tempfile()
@@ -158,6 +145,20 @@ github_DESCRIPTION <- function(username, repo, subdir = NULL, ref = "HEAD", host
 
     base64_decode(gsub("\\\\n", "", json$parse_file(tmp)$content))
   }
+}
+
+github_curl_fetch_memory <- function(url, headers, accept = NULL) {
+  h <- curl::new_handle()
+  curl::handle_setheaders(h, .list = headers)
+  res <- curl::curl_fetch_memory(url, handle = h)
+
+  if (!(res$status_code %in% accept)) {
+    if (res$status_code >= 300) {
+      stop(github_error(res))
+    }
+  }
+
+  res
 }
 
 github_error <- function(res) {
