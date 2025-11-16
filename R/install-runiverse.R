@@ -9,6 +9,9 @@
 #'
 #' @param package The package name to install.
 #' @param universe The R-Universe to use, infer from the package if `NULL`.
+#' @param ... Additional arguments passed to `install_cran()`.
+#' @param linux_distro A string specifying the Linux distribution
+#'   for the installation of binary packages on Linux.
 #' @return A character vector of the names of installed packages, invisibly.
 #' @family package installation
 #' @export
@@ -23,7 +26,14 @@
 #' # From Bitbucket
 #' install_runiverse("argparser")
 #' }
-install_runiverse <- function(package, universe = NULL, ...) {
+install_runiverse <- function(package, universe = NULL, ..., linux_distro = NULL) {
+  if (...length() > 0) {
+    stop(
+      "Additional arguments (...) are not supported by install_runiverse()",
+      call. = FALSE
+    )
+  }
+
   if (is.null(universe)) {
     universe <- get_runiverse_for_package(package)
   } else if (length(universe) != 1 || !is.character(universe)) {
@@ -31,7 +41,16 @@ install_runiverse <- function(package, universe = NULL, ...) {
   }
 
   # https://github.com/r-lib/remotes/issues/618#issuecomment-3333533114
-  repo <- paste0("https://", universe, ".r-universe.dev/", package)
+  # https://docs.r-universe.dev/install/binaries.html#how-to-install-linux-binary-packages
+  if (is.null(linux_distro)) {
+    repo <- paste0("https://", universe, ".r-universe.dev/", package)
+  } else {
+    repo <- paste0(
+      "https://", universe, ".r-universe.dev/",
+      "bin/linux/", linux_distro, "-", R.version$arch, "/",
+      substr(getRversion(), 1, 3), "/", package
+    )
+  }
 
   tempdir <- tempfile("remotes")
   dir.create(tempdir)
@@ -60,7 +79,7 @@ install_runiverse <- function(package, universe = NULL, ...) {
       if (is.na(org_pkg$.match[[i]])) {
         install_remote(org_pkg$.text[[i]])
       } else {
-        install_runiverse(org_pkg$pkg[[i]], universe = org_pkg$org[[i]], ...)
+        install_runiverse(org_pkg$pkg[[i]], universe = org_pkg$org[[i]], linux_distro = linux_distro)
       }
     }
   }
