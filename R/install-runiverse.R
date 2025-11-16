@@ -46,8 +46,8 @@ install_runiverse <- function(package, universe = NULL, ..., linux_distro = NULL
     repo <- paste0("https://", universe, ".r-universe.dev/", package)
   } else {
     repo <- paste0(
-      "https://", universe, ".r-universe.dev/",
-      "bin/linux/", linux_distro, "-", R.version$arch, "/",
+      "https://", universe, ".r-universe.dev/", package,
+      "/bin/linux/", linux_distro, "-", R.version$arch, "/",
       substr(getRversion(), 1, 3)
     )
   }
