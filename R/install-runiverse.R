@@ -48,7 +48,7 @@ install_runiverse <- function(package, universe = NULL, ..., linux_distro = NULL
     repo <- paste0(
       "https://", universe, ".r-universe.dev/",
       "bin/linux/", linux_distro, "-", R.version$arch, "/",
-      substr(getRversion(), 1, 3), "/", package
+      substr(getRversion(), 1, 3)
     )
   }
 
@@ -85,7 +85,7 @@ install_runiverse <- function(package, universe = NULL, ..., linux_distro = NULL
   }
 
   # We already downloaded but can't provide a correct `type` argument
-  install_cran(package, repos = repo)
+  install_cran(package, repos = repo, dependencies = FALSE)
 }
 
 get_runiverse_for_package <- function(package) {
