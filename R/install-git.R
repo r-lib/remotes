@@ -41,10 +41,20 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
                         repos = getOption("repos"),
                         type = getOption("pkgType"),
                         ...) {
+
+
+  # PATCH: Force system git, avoid git2r crash
+
+  if ("git2r" %in% git && git[1] == "auto") {
+    git[1] <- "external"
+  }
+
+
   if (!missing(branch)) {
     warning("`branch` is deprecated, please use `ref`")
     ref <- branch
   }
+
 
   remotes <- lapply(url, git_remote,
     subdir = subdir, ref = ref,
