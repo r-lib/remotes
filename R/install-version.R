@@ -96,6 +96,13 @@ version_from_tarball <- function(tarball_name) {
   ifelse(grepl(package_ver_regex, tarball_name), sub(package_ver_regex, "\\1", tarball_name), NULL)
 }
 
+#' Check package version with a given criteria
+#'
+#' @param to_check Package version
+#' @param criteria Criteria used to verify the required package version
+#'
+#' @return Vector with logical values
+#' @export
 version_satisfies_criteria <- function(to_check, criteria) {
   to_check <- package_version(to_check)
   result <- apply(version_criteria(criteria), 1, function(r) {
