@@ -71,6 +71,28 @@ install_git <- function(url, subdir = NULL, ref = NULL, branch = NULL,
 git_remote <- function(url, subdir = NULL, ref = NULL, credentials = git_credentials(),
                        git = c("auto", "git2r", "external"), ...) {
   git <- match.arg(git)
+
+  if (git == "auto" && requireNamespace("git2r", quietly = TRUE)) {
+    features <- git2r::libgit2_features()
+
+    # Check if URL is SSH format and git2r lacks SSH support
+    if (grepl("^git@", url) && !features$ssh) {
+      stop(
+        "Cannot use git2r for SSH URLs - libssh2 support not available.\n\n",
+        "To fix this issue, choose one of these options:\n",
+        "  1. Use external git: install_git(url, git = 'external')\n",
+        "  2. Convert to HTTPS: ", gsub("^git@([^:]+):", "https://\\1/", url), "\n",
+        "  3. Reinstall git2r with SSH support (requires libssh2-dev)\n\n",
+        "For more info, see: https://github.com/r-lib/remotes/issues/832",
+        call. = FALSE
+      )
+    }
+
+    # If we reach here and git2r is available, prefer it
+    if (git == "auto") {
+      git <- "git2r"
+    }
+  }
   if (git == "auto") {
     git <- if (!is_standalone() && pkg_installed("git2r")) "git2r" else "external"
   }
