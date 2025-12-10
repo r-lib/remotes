@@ -179,7 +179,7 @@ download_version <- function(package, version = NULL,
                              repos = getOption("repos"),
                              type = getOption("pkgType"), ...) {
   url <- download_version_url(package, version, repos, type)
-  download(path = tempfile(), url = url)
+  download(path = tempfile(), url = url, ...)
 }
 
 download_version_url <- function(package, version, repos, type, available, verbose = length(repos) > 1) {
