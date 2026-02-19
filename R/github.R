@@ -68,7 +68,7 @@ github_commit <- function(username, repo, ref = "HEAD",
 #'
 #' @keywords internal
 #' @noRd
-github_pat <- function(quiet = TRUE) {
+github_pat <- function(quiet = TRUE, host = "api.github.com") {
 
   env_var_aliases <- c(
     "GITHUB_PAT",
@@ -89,7 +89,7 @@ github_pat <- function(quiet = TRUE) {
   }
 
   pat <- tryCatch(
-    gitcreds_get()$password,
+    gitcreds_get(url = download_url(host))$password,
     error = function(e) ""
   )
   if (nzchar(pat)) {

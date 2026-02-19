@@ -30,6 +30,17 @@ test_that("github_pat", {
   expect_true(nzchar(github_pat()))
 })
 
+test_that("github_pat uses host-specific PAT env var", {
+  withr::local_envvar(c(
+    GITHUB_PAT = NA,
+    GITHUB_TOKEN = NA,
+    CI = NA,
+    GITHUB_PAT_GITHUB_EXAMPLE_COM = "host-pat"
+  ))
+
+  expect_equal(github_pat(host = "github.example.com/api/v3"), "host-pat")
+})
+
 test_that("github_commit", {
   skip_on_cran()
   skip_if_offline()
