@@ -45,3 +45,50 @@ test_that("package2remotes looks for the DESCRIPTION in .libPaths", {
 
   expect_equal(package2remote("noremotes")$sha, NA_character_)
 })
+
+test_that("package2remote() resolves host-specific github PATs", {
+  withr::local_envvar(c(
+    GITHUB_PAT = NA,
+    GITHUB_TOKEN = NA,
+    GITHUB_PAT_GITHUB_COM = "pat-github-com",
+    GITHUB_PAT_GITHUB_EXAMPLE_COM = "pat-github-example"
+  ))
+
+  lib <- tempfile()
+  dir.create(lib)
+  on.exit(unlink(lib, recursive = TRUE), add = TRUE)
+
+  dir.create(file.path(lib, "pkg1"))
+  writeLines(c(
+    "Package: pkg1",
+    "Version: 1.0.0",
+    "RemoteType: github",
+    "RemoteHost: api.github.com",
+    "RemotePackage: pkg1",
+    "RemoteRepo: pkg1",
+    "RemoteUsername: repo",
+    "RemoteRef: HEAD",
+    "RemoteSha: abc123"
+  ), file.path(lib, "pkg1", "DESCRIPTION"))
+
+  dir.create(file.path(lib, "pkg2"))
+  writeLines(c(
+    "Package: pkg2",
+    "Version: 1.0.0",
+    "RemoteType: github",
+    "RemoteHost: github.example.com/api/v3",
+    "RemotePackage: pkg2",
+    "RemoteRepo: pkg2",
+    "RemoteUsername: repo",
+    "RemoteRef: HEAD",
+    "RemoteSha: def456"
+  ), file.path(lib, "pkg2", "DESCRIPTION"))
+
+  remote1 <- package2remote("pkg1", lib = lib)
+  remote2 <- package2remote("pkg2", lib = lib)
+
+  expect_equal(remote1$host, "api.github.com")
+  expect_equal(remote2$host, "github.example.com/api/v3")
+  expect_equal(remote1$auth_token, "pat-github-com")
+  expect_equal(remote2$auth_token, "pat-github-example")
+})
