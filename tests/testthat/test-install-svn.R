@@ -9,10 +9,10 @@ test_that("install_svn subdir", {
   on.exit(unlink(lib, recursive = TRUE), add = TRUE)
   dir.create(lib)
 
-  mockery::stub(
-    install_svn,
-    "install_remotes",
-    function(remotes, ...) remotes)
+  local_mocked_bindings(
+    install_remotes = function(remotes, ...) remotes,
+    .package = "remotes"
+  )
 
   rem <- install_svn(
     "https://github.com/dmlc/xgboost/trunk",
@@ -29,7 +29,11 @@ test_that("remote_download.svn_remote error", {
 
   x <- list(url = "http://foo.bar.com")
 
-  mockery::stub(remote_download.svn_remote, "system2", 1)
+  local_mocked_bindings(
+    system2 = function(...) 1,
+    .package = "base"
+  )
+
   expect_error(
     remote_download.svn_remote(x),
     "There seems to be a problem retrieving"
@@ -63,9 +67,16 @@ test_that("svn_path", {
   cat("Hello", file = tmp)
   expect_equal(svn_path(tmp), tmp)
 
-  mockery::stub(svn_path, "Sys.which", "")
-  mockery::stub(svn_path, "os_type", "windows")
-  mockery::stub(svn_path, "file.exists", FALSE)
+  local_mocked_bindings(
+    Sys.which = function(...) "",
+    file.exists = function(...) FALSE,
+    .package = "base"
+  )
+  local_mocked_bindings(
+    os_type = function(...) "windows",
+    .package = "remotes"
+  )
+
   expect_error(
     svn_path(),
     "SVN does not seem to be installed on your system"

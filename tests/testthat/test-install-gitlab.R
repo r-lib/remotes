@@ -84,7 +84,11 @@ test_that("remote_download.gitlab_remote messages", {
   skip_on_cran()
   skip_if_offline()
 
-  mockery::stub(remote_download.gitlab_remote, "download", TRUE)
+  local_mocked_bindings(
+    gitlab_project_id = function(...) 123,
+    download = function(...) TRUE,
+    .package = "remotes"
+  )
   expect_message(
     remote_download.gitlab_remote(
       remote("gitlab",

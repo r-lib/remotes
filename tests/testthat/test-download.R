@@ -14,9 +14,6 @@ test_that("download_method", {
 
   local_mocked_bindings(
     get_r_version = function(...) "3.2.5",
-    .package = "remotes"
-  )
-  local_mocked_bindings(
     os_type = function(...) "windows",
     .package = "remotes"
   )
@@ -25,13 +22,7 @@ test_that("download_method", {
 
   local_mocked_bindings(
     get_r_version = function(...) "3.2.5",
-    .package = "remotes"
-  )
-  local_mocked_bindings(
     os_type = function(...) "unix",
-    .package = "remotes"
-  )
-  local_mocked_bindings(
     has_curl = function(...) TRUE,
     .package = "remotes"
   )

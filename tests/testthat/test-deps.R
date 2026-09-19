@@ -144,10 +144,6 @@ test_that("update_packages", {
 
   local_mocked_bindings(
     package_deps = function(...) object,
-    .package = "remotes"
-  )
-
-  local_mocked_bindings(
     update.package_deps = function(x, ...) x$package,
     .package = "remotes"
   )

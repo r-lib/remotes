@@ -150,7 +150,10 @@ test_that("error if not username, warning if given as argument", {
 
 test_that("remote_download.github_remote messages", {
 
-  mockery::stub(remote_download.github_remote, "download", TRUE)
+  local_mocked_bindings(
+    download = function(...) TRUE,
+    .package = "remotes"
+  )
   expect_message(
     remote_download.github_remote(
       list(

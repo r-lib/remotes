@@ -1,6 +1,6 @@
 # remotes (development version)
 
-* Replaced `mockery::stub()` with `testthat::local_mocked_bindings()`. Removed {mockery} as a suggested package.
+* Replaced `mockery::stub()` with `testthat::local_mocked_bindings()`. Removed {mockery} as a suggested package (#804).
 
 # remotes 2.5.0
 

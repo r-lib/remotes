@@ -67,15 +67,12 @@ test_that("git_path", {
 
   local_mocked_bindings(
     Sys.which = function(...) "",
+    file.exists = function(...) FALSE,
     .package = "base"
   )
   local_mocked_bindings(
     os_type = function(...) "windows",
     .package = "remotes"
-  )
-  local_mocked_bindings(
-    file.exists = function(...) FALSE,
-    .package = "base"
   )
 
   expect_null(git_path())
