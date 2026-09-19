@@ -33,7 +33,6 @@ Suggests:
     curl,
     git2r (>= 0.23.0),
     knitr,
-    mockery,
     pingr,
     pkgbuild (>= 1.0.1),
     rmarkdown,
