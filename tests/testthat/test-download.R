@@ -1,24 +1,55 @@
 test_that("download_method", {
 
-  mockery::stub(download_method, "get_r_version", "3.3.0")
-  mockery::stub(download_method, "has_curl", FALSE)
+  local_mocked_bindings(
+    get_r_version = function(...) "3.3.0",
+    .package = "remotes"
+  )
+
+  local_mocked_bindings(
+    has_curl = function(...) FALSE,
+    .package = "remotes"
+  )
   with_options(list(download.file.method = NULL),
                expect_equal(download_method(), "auto"))
 
-  mockery::stub(download_method, "get_r_version", "3.2.5")
-  mockery::stub(download_method, "os_type", "windows")
+  local_mocked_bindings(
+    get_r_version = function(...) "3.2.5",
+    .package = "remotes"
+  )
+  local_mocked_bindings(
+    os_type = function(...) "windows",
+    .package = "remotes"
+  )
   with_options(list(download.file.method = NULL),
                expect_equal(download_method(), "wininet"))
 
-  mockery::stub(download_method, "get_r_version", "3.2.5")
-  mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "has_curl", TRUE)
+  local_mocked_bindings(
+    get_r_version = function(...) "3.2.5",
+    .package = "remotes"
+  )
+  local_mocked_bindings(
+    os_type = function(...) "unix",
+    .package = "remotes"
+  )
+  local_mocked_bindings(
+    has_curl = function(...) TRUE,
+    .package = "remotes"
+  )
   with_options(list(download.file.method = NULL),
                expect_equal(download_method(), "libcurl"))
 
-  mockery::stub(download_method, "get_r_version", "3.2.5")
-  mockery::stub(download_method, "os_type", "unix")
-  mockery::stub(download_method, "has_curl", FALSE)
+  local_mocked_bindings(
+    get_r_version = function(...) "3.2.5",
+    .package = "remotes"
+  )
+  local_mocked_bindings(
+    os_type = function(...) "unix",
+    .package = "remotes"
+  )
+  local_mocked_bindings(
+    has_curl = function(...) FALSE,
+    .package = "remotes"
+  )
   with_options(list(download.file.method = NULL),
                expect_equal(download_method(), "auto"))
 })
@@ -46,7 +77,10 @@ test_that("os_type", {
 test_that("download fallback to curl, https", {
   skip_if(is_standalone())
 
-  mockery::stub(download, "getRversion", package_version("3.0.0"))
+  local_mocked_bindings(
+    getRversion = function(...) package_version("3.0.0"),
+    .package = "base"
+  )
   download(tmp <- tempfile(), httpbin$url("/ip"))
   expect_match(paste(readLines(tmp, warn = FALSE), collapse = "\n"), "origin")
 })
@@ -54,7 +88,10 @@ test_that("download fallback to curl, https", {
 test_that("download with curl, basic auth", {
   skip_if(is_standalone())
 
-  mockery::stub(download, "getRversion", package_version("3.0.0"))
+  local_mocked_bindings(
+    getRversion = function(...) package_version("3.0.0"),
+    .package = "base"
+  )
   download(
     tmp <- tempfile(),
     httpbin$url("/basic-auth/user/passwd"),
@@ -231,7 +268,10 @@ test_that("base wininet download with basic auth", {
 })
 
 test_that("curl download with basic auth", {
-  mockery::stub(download, "getRversion", package_version("3.0.0"))
+  local_mocked_bindings(
+    getRversion = function(...) package_version("3.0.0"),
+    .package = "base"
+  )
 
   url <- httpbin$url("/basic-auth/ruser/rpass")
   tmp <- tempfile()
@@ -271,7 +311,10 @@ test_that("basic + token auth is error", {
 })
 
 test_that("curl is needed for older R", {
-  mockery::stub(curl_download, "pkg_installed", FALSE)
+  local_mocked_bindings(
+    pkg_installed = function(...) FALSE,
+    .package = "remotes"
+  )
   expect_error(
     curl_download(httpbin$url("/get"), tempfile(), TRUE, list()),
     "The 'curl' package is required"

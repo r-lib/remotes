@@ -106,8 +106,20 @@ test_that("getrootdir",  {
 })
 
 test_that("my_unzip respects options('unzip')", {
-  mockery::stub(my_unzip, "utils::unzip", function(...) int <<- TRUE)
-  mockery::stub(my_unzip, "system_check", function(...) int <<- FALSE)
+
+  local_mocked_bindings(
+    unzip = function(...) {
+      int <<- TRUE
+    },
+    .package = "utils"
+  )
+
+  local_mocked_bindings(
+    system_check = function(...) {
+      int <<- FALSE
+    },
+    .package = "remotes"
+  )
 
   int <- NULL
   withr::with_options(c("unzip" = "internal"), my_unzip("blah", "tg"))
