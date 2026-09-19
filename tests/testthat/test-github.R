@@ -79,10 +79,10 @@ test_that("github_DESCRIPTION", {
 })
 
 test_that("github_error", {
-  mockery::stub(
-    github_error,
-    "curl::parse_headers_list",
-    list(`x-ratelimit-remaining` = 0, `x-ratelimit-limit` = 5000, `x-ratelimit-reset` = "1539962178"))
+  local_mocked_bindings(
+    parse_headers_list = function(...) list(`x-ratelimit-remaining` = 0, `x-ratelimit-limit` = 5000, `x-ratelimit-reset` = "1539962178"),
+    .package = "curl"
+  )
 
   # Test without the TRAVIS envvar set
   withr::with_envvar(c(TRAVIS = NA), {
