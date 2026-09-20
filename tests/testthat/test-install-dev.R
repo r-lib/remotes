@@ -3,7 +3,7 @@ test_that("install_dev works with GitHub URLs", {
   skip_if_offline()
 
   local_mocked_bindings(
-    install_github = function(...) identity,
+    install_github = identity,
     .package = "remotes"
   )
 
@@ -22,7 +22,7 @@ test_that("install_dev works with uset CRAN mirrors", {
   skip_if_offline()
 
   local_mocked_bindings(
-    install_github = function(...) identity,
+    install_github = identity,
     .package = "remotes"
   )
 
@@ -50,7 +50,7 @@ test_that("install_dev works with Bitbucket URLs", {
   skip_if_offline()
 
   local_mocked_bindings(
-    install_bitbucket = function(...) identity,
+    install_bitbucket = identity,
     .package = "remotes"
   )
 
