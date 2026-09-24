@@ -2,7 +2,10 @@ test_that("install_dev works with GitHub URLs", {
   skip_on_cran()
   skip_if_offline()
 
-  mockery::stub(install_dev, "install_github", identity)
+  local_mocked_bindings(
+    install_github = identity,
+    .package = "remotes"
+  )
 
   expect_equal(install_dev("dplyr"), "tidyverse/dplyr")
 
@@ -18,7 +21,10 @@ test_that("install_dev works with uset CRAN mirrors", {
   skip_on_cran()
   skip_if_offline()
 
-  mockery::stub(install_dev, "install_github", identity)
+  local_mocked_bindings(
+    install_github = identity,
+    .package = "remotes"
+  )
 
   expect_equal(install_dev("dplyr", cran_url = NULL), "tidyverse/dplyr")
 
@@ -43,7 +49,10 @@ test_that("install_dev works with Bitbucket URLs", {
   skip_on_cran()
   skip_if_offline()
 
-  mockery::stub(install_dev, "install_bitbucket", identity)
+  local_mocked_bindings(
+    install_bitbucket = identity,
+    .package = "remotes"
+  )
 
   expect_equal(install_dev("argparser"), "djhshih/argparser")
 })

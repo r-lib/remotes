@@ -19,31 +19,29 @@ test_that("decompress various file types", {
 
 test_that("decompress with internal unzip", {
 
+  local_mocked_bindings(
+    getOption = function(x, default = NULL) {
+      if (x == "unzip") {
+        "internal"
+      } else {
+        if (missing(default) || x %in% names(options())) {
+          options()[[x]]
+        } else {
+          default
+        }
+      }
+    },
+    .package = "base"
+  )
+
   types <- c("zip", "tar", "tar.gz", "tgz")
 
   for (type in types) {
-
     fname <- paste0("foo.", type)
     archive <- file.path("archives", fname)
 
     dec <- tempfile()
     on.exit(unlink(dec, recursive = TRUE), add = TRUE)
-
-    mockery::stub(
-      decompress,
-      "getOption",
-      function(x, default = NULL) {
-        if (x == "unzip") {
-          "internal"
-        } else {
-          if (missing(default) || x %in% names(options())) {
-            options()[[x]]
-          } else {
-            default
-          }
-        }
-      }
-    )
 
     decompress(archive, dec)
 
@@ -108,8 +106,20 @@ test_that("getrootdir",  {
 })
 
 test_that("my_unzip respects options('unzip')", {
-  mockery::stub(my_unzip, "utils::unzip", function(...) int <<- TRUE)
-  mockery::stub(my_unzip, "system_check", function(...) int <<- FALSE)
+
+  local_mocked_bindings(
+    unzip = function(...) {
+      int <<- TRUE
+    },
+    .package = "utils"
+  )
+
+  local_mocked_bindings(
+    system_check = function(...) {
+      int <<- FALSE
+    },
+    .package = "remotes"
+  )
 
   int <- NULL
   withr::with_options(c("unzip" = "internal"), my_unzip("blah", "tg"))

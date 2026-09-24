@@ -3,40 +3,53 @@ test_that("has_devel", {
   expect_true(has_devel())
 
   # has_devel should return FALSE if an error occurs from has_devel2
-  mockery::stub(
-    has_devel, "has_devel2", function(...) stop("failed"))
+  local_mocked_bindings(
+    has_devel2 = function(...) stop("failed"),
+    .package = "remotes"
+  )
   expect_false(has_devel())
 })
 
 test_that("has_devel2", {
   # has_devel2 should error if an error occurs from R CMD SHLIB
-  mockery::stub(
-    has_devel2, "R", function(...) stop("failed"))
+  local_mocked_bindings(
+    R = function(...) stop("failed"),
+    .package = "remotes"
+  )
   expect_error(has_devel2())
 })
 
 test_that("missing_devel_warning", {
-  mockery::stub(
-    missing_devel_warning, "has_devel2", function(...) FALSE)
+  local_mocked_bindings(
+    has_devel2 = function(...) FALSE,
+    .package = "remotes"
+  )
 
   expect_warning(
     missing_devel_warning("noremotes"), "has compiled code, but no suitable compiler")
 
   # Windows
-  mockery::stub(
-    missing_devel_warning, "sys_type", function() "windows")
+  local_mocked_bindings(
+    sys_type = function(...) "windows",
+    .package = "remotes"
+  )
   expect_warning(
     missing_devel_warning("noremotes"), "Install Rtools")
 
   # MacOS
-  mockery::stub(
-    missing_devel_warning, "sys_type", function() "macos")
+  local_mocked_bindings(
+    sys_type = function(...) "macos",
+    .package = "remotes"
+  )
+
   expect_warning(
     missing_devel_warning("noremotes"), "Install XCode")
 
   # Linux
-  mockery::stub(
-    missing_devel_warning, "sys_type", function() "linux")
+  local_mocked_bindings(
+    sys_type = function(...) "linux",
+    .package = "remotes"
+  )
   expect_warning(
     missing_devel_warning("noremotes"), "Install compilers")
 })

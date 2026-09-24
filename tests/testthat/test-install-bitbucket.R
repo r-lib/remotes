@@ -32,12 +32,10 @@ test_that("remote_download.bitbucket_remote", {
   x <- list(username = "csardigabor", repo = "pkgconfig", ref = "HEAD",
     host = "api.bitbucket.org/2.0")
 
-  mockery::stub(
-    remote_download.bitbucket_remote, "download", function(...) { }
-  )
-
-  mockery::stub(
-    remote_download.bitbucket_remote, "bitbucket_download_url", function(...) { }
+  local_mocked_bindings(
+    download = function(...) {},
+    bitbucket_download_url = function(...) {},
+    .package = "remotes"
   )
 
   expect_message(
@@ -91,15 +89,11 @@ test_that("more bitbucket password", {
     host = "api.bitbucket.com/2.0"
   )
 
-  mockery::stub(
-    remote_download.bitbucket_remote,
-    "download",
-    function(dest, src, basic_auth) basic_auth)
-
-  mockery::stub(
-    remote_download.bitbucket_remote,
-    "bitbucket_download_url",
-    function(...) { })
+  local_mocked_bindings(
+    download = function(dest, src, basic_auth) basic_auth,
+    bitbucket_download_url = function(...) {},
+    .package = "remotes"
+  )
 
   expect_equal(
     remote_download.bitbucket_remote(x),

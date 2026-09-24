@@ -106,12 +106,22 @@ test_that("windows untar, --force-local errors", {
   do <- function(has, tar_result) {
     withr::local_envvar(c(TAR = ""))
     calls <- 0
-    mockery::stub(untar, "system2", if (has) "--force-local" else "nah")
-    mockery::stub(untar, "os_type", "windows")
-    mockery::stub(untar, "utils::untar", function(extras, ...) {
-      calls <<- calls + 1L
-      if (grepl("force-local", extras)) tar_result() else "ok"
-    })
+
+    local_mocked_bindings(
+      system2 = if (has) "--force-local" else "nah",
+      .package = "base"
+    )
+    local_mocked_bindings(
+      os_type = function(...) "windows",
+      .package = "remotes"
+    )
+    local_mocked_bindings(
+      untar = function(extras, ...) {
+        calls <<- calls + 1L
+        if (grepl("force-local", extras)) tar_result() else "ok"
+      },
+      .package = "utils"
+    )
 
     expect_equal(untar("foobar"), "ok")
     expect_equal(calls, 1 + has)

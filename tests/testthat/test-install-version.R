@@ -104,8 +104,11 @@ test_that("install_version for archived packages", {
 
   lib <- tempfile()
 
-  mockery::stub(install_version, "install_url", function(url, ...) url)
-  mockery::stub(install_version, "add_metadata", NULL)
+  local_mocked_bindings(
+    install_url = function(url, ...) url,
+    add_metadata = function(...) NULL,
+    .package = "remotes"
+  )
 
   expect_match(
     fixed = TRUE,
@@ -113,7 +116,11 @@ test_that("install_version for archived packages", {
     "src/contrib/Archive/igraph0/igraph0_0.5.7.tar.gz"
   )
 
-  mockery::stub(download_version, "download", function(url, ...) url)
+  local_mocked_bindings(
+    download = function(url, ...) url,
+    .package = "remotes"
+  )
+
   expect_match(
     fixed = TRUE,
     download_version("igraph0", type = "source", lib = lib, repos = repos),
@@ -145,22 +152,25 @@ test_that("download_version_url for multiple repositories", {
   available <- as.matrix(read.table(textConnection(available), header = TRUE))
   rownames(available) <- available[, "Package"]
 
-  mockery::stub(download_version_url, "package_find_archives", function(package, repo, verbose = FALSE) {
-    pathfunc <- function(package, version) {
-      sprintf("%s/%s_%s.tar.gz", package, package, version)
-    }
-
-    arch <-
-      if (repo == repos["Prod"]) {
-        list("Foo" = data.frame(size = 1:2, row.names = pathfunc("Foo", c("0.8", "0.9"))))
-      } else if (repo == repos["Dev"]) {
-        list("Foo" = data.frame(size = 1:2, row.names = pathfunc("Foo", c("0.8-123", "0.9-456"))))
-      } else {
-        list()
+  local_mocked_bindings(
+    package_find_archives = function(package, repo, verbose = FALSE) {
+      pathfunc <- function(package, version) {
+        sprintf("%s/%s_%s.tar.gz", package, package, version)
       }
 
-    arch[[package]]
-  })
+      arch <-
+        if (repo == repos["Prod"]) {
+          list("Foo" = data.frame(size = 1:2, row.names = pathfunc("Foo", c("0.8", "0.9"))))
+        } else if (repo == repos["Dev"]) {
+          list("Foo" = data.frame(size = 1:2, row.names = pathfunc("Foo", c("0.8-123", "0.9-456"))))
+        } else {
+          list()
+        }
+
+      arch[[package]]
+    },
+    .package = "remotes"
+  )
 
   # Latest released version
   expect_equal(
@@ -225,10 +235,18 @@ test_that("version requirement comparisons", {
     expect_false(version_satisfies_criteria("2.1", required))
     expect_false(version_satisfies_criteria("1.5", required))
 
-    mockery::stub(package_installed, "utils::packageDescription", function(...) "2.0")
+    local_mocked_bindings(
+      packageDescription = function(...) "2.0",
+      .package = "utils"
+    )
+
     expect_true(package_installed("foo", required))
 
-    mockery::stub(package_installed, "utils::packageDescription", function(...) "1.0")
+    local_mocked_bindings(
+      packageDescription = function(...) "1.0",
+      .package = "utils"
+    )
+
     expect_false(package_installed("foo", required))
   }
 

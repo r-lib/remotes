@@ -142,11 +142,11 @@ test_that("update_packages", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  mockery::stub(update_packages, "package_deps", object)
-  mockery::stub(
-    update_packages,
-    "update.package_deps",
-    function(x, ...) x$package)
+  local_mocked_bindings(
+    package_deps = function(...) object,
+    update.package_deps = function(x, ...) x$package,
+    .package = "remotes"
+  )
 
   expect_equal(
     update_packages("dotenv"),
@@ -206,7 +206,11 @@ test_that("update.package_deps", {
 
   class(object) <- c("package_deps", "data.frame")
 
-  mockery::stub(update, "install_packages", NULL)
+  local_mocked_bindings(
+    install_packages = function(...) NULL,
+    .package = "remotes"
+  )
+
   expect_message(
     update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? not available: falsy"
@@ -230,7 +234,11 @@ test_that("update.package_deps 2", {
   )
   class(object) <- c("package_deps", "data.frame")
 
-  mockery::stub(update, "install_packages", NULL)
+  local_mocked_bindings(
+    install_packages = function(...) NULL,
+    .package = "remotes"
+  )
+
   expect_message(
     update(object, upgrade = TRUE, quiet = FALSE),
     "Skipping 1 packages? ahead of CRAN: falsy"
@@ -255,10 +263,11 @@ test_that("update.package_deps 3", {
 
   class(object) <- c("package_deps", "data.frame")
 
-  mockery::stub(
-    update.package_deps,
-    "install_packages",
-    function(packages, ...) packages)
+  local_mocked_bindings(
+    install_packages = function(packages, ...) packages,
+    .package = "remotes"
+  )
+
   expect_equal(
     update(object, upgrade = FALSE),
     NULL
@@ -424,7 +433,11 @@ test_that("upgradeable_packages works", {
                object)
 
   # returns selected row to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "select_menu", function(...) "falsy (1.0    -> 1.1   ) [CRAN]", TRUE)
+  local_mocked_bindings(
+    select_menu = function(...) "falsy (1.0    -> 1.1   ) [CRAN]",
+    .package = "remotes"
+  )
+
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -433,7 +446,11 @@ test_that("upgradeable_packages works", {
               )
 
   # returns selected rows to update if "ask" and is_interactive
-  mockery::stub(upgradable_packages, "select_menu", function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"))
+  local_mocked_bindings(
+    select_menu = function(...) c("falsy (1.0    -> 1.1   ) [CRAN]", "rlang (abc123 -> zyx456) [GitHub]"),
+    .package = "remotes"
+  )
+
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -443,17 +460,27 @@ test_that("upgradeable_packages works", {
               )
 
   # All should be the whole object
-  mockery::stub(upgradable_packages, "select_menu", function(...) "All")
+  local_mocked_bindings(
+    select_menu = function(...) "All",
+    .package = "remotes"
+  )
+
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object)
 
   # None should be only un-installed packages
-  mockery::stub(upgradable_packages, "select_menu", function(...) "None")
+  local_mocked_bindings(
+    select_menu = function(...) "None",
+    .package = "remotes"
+  )
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[which(object$package == "magrittr"), ])
 
   # CRAN should be only the CRAN packages
-  mockery::stub(upgradable_packages, "select_menu", function(...) "CRAN packages only")
+  local_mocked_bindings(
+    select_menu = function(...) "CRAN packages only",
+    .package = "remotes"
+  )
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[c(
                  which(object$package == "falsy"),
@@ -462,7 +489,11 @@ test_that("upgradeable_packages works", {
               )
 
   # empty vector should be the 0 row object (you get this when canceling the selection)
-  mockery::stub(upgradable_packages, "select_menu", function(...) character(0))
+  local_mocked_bindings(
+    select_menu = function(...) character(0),
+    .package = "remotes"
+  )
+
   expect_equal(upgradable_packages(object, "ask", TRUE, is_interactive = TRUE),
                object[which(object$package == "magrittr"), ])
 

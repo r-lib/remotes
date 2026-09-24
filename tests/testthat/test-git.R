@@ -23,8 +23,16 @@ test_that("git_extract_sha1_tar", {
 
 test_that("git not quiet", {
 
-  mockery::stub(git, "check_git_path", "/foo/git")
-  mockery::stub(git, "system", "0")
+  local_mocked_bindings(
+    check_git_path = function(...) "/foo/git",
+    .package = "remotes"
+  )
+
+  local_mocked_bindings(
+    system = function(...) "0",
+    .package = "base"
+  )
+
   expect_message(
     git(args = c("arg1", "arg2"), quiet = FALSE),
     "['\"]/foo/git['\"] arg1arg2"
@@ -34,11 +42,17 @@ test_that("git not quiet", {
 
 test_that("git error", {
 
-  mockery::stub(git, "check_git_path", "/foo/git")
-  mockery::stub(git, "system", structure("foo", status = "1"))
+  local_mocked_bindings(
+    check_git_path = function(...) "/foo/git",
+    .package = "remotes"
+  )
+
+  local_mocked_bindings(
+    system = function(...) structure("foo", status = "1"),
+    .package = "base"
+  )
   expect_error(git(args = "arg"), "Command failed")
 })
-
 
 test_that("git_path", {
 
@@ -51,16 +65,26 @@ test_that("git_path", {
   cat("Hello", file = tmp)
   expect_equal(git_path(tmp), tmp)
 
-  mockery::stub(git_path, "Sys.which", "")
-  mockery::stub(git_path, "os_type", "windows")
-  mockery::stub(git_path, "file.exists", FALSE)
+  local_mocked_bindings(
+    Sys.which = function(...) "",
+    file.exists = function(...) FALSE,
+    .package = "base"
+  )
+  local_mocked_bindings(
+    os_type = function(...) "windows",
+    .package = "remotes"
+  )
+
   expect_null(git_path())
 })
 
 
 test_that("check_git_path", {
 
-  mockery::stub(check_git_path, "git_path", NULL)
+  local_mocked_bindings(
+    git_path = function(...) NULL,
+    .package = "remotes"
+  )
   expect_error(
     check_git_path(),
     "Git does not seem to be installed on your system"

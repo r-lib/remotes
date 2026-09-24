@@ -43,7 +43,11 @@ test_that("safe_build_package fails appropriately without pkgbuild", {
 })
 
 test_that("safe_build_package calls pkgbuild with appropriate arguments", {
-  mockery::stub(safe_build_package, "pkgbuild::build", function(...) list(...))
+
+  local_mocked_bindings(
+    build = function(...) list(...),
+    .package = "pkgbuild"
+  )
 
   expect_equal(
     safe_build_package(
