@@ -1,0 +1,4 @@
+# License
+
+    YEAR: 2015-2024
+    COPYRIGHT HOLDER: remotes core team, see COPYRIGHTS file
